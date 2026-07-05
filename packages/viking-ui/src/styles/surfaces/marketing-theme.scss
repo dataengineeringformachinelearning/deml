@@ -1,7 +1,3 @@
-/*! DEML Design Tokens — compiled from Viking-UI canonical tokens.
- *  Static CSS: npm run build:static-css --prefix viking-ui-docs */
-@use 'tokens';
-
 body {
   font-size: var(--base-font-size);
   color: var(--text-color);
