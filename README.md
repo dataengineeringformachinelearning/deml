@@ -12,6 +12,8 @@ license: apache-2.0
 
 # DEML — Control Plane
 
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdataengineeringformachinelearning%2Fdeml.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdataengineeringformachinelearning%2Fdeml?ref=badge_large&issueType=license)
+
 Firebase-authenticated user control plane: Angular product UI (`deml.app`) + Django BFF (`backend.deml.app`) + Viking-UI.
 
 > **Repo map**
