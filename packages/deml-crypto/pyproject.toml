@@ -35,8 +35,8 @@ dev = ["pytest>=7.0.0", "ruff>=0.4.0"]
 [project.urls]
 Homepage = "https://dataengineeringformachinelearning.com"
 Documentation = "https://dataengineeringformachinelearning.com/documentation"
-Repository = "https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning"
-Issues = "https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning/issues"
+Repository = "https://github.com/dataengineeringformachinelearning/deml"
+Issues = "https://github.com/dataengineeringformachinelearning/deml/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/deml_crypto"]

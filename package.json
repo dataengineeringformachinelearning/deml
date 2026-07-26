@@ -1,12 +1,11 @@
 {
-  "name": "deml-platform",
+  "name": "deml",
   "private": true,
-  "description": "DEML monorepo workspace scripts",
+  "description": "DEML control plane — Angular app, Django BFF, Viking-UI",
   "packageManager": "npm@11.18.0",
   "workspaces": [
     "packages/*",
     "frontend",
-    "marketing",
     "viking-ui-docs",
     "infrastructure/studio"
   ],

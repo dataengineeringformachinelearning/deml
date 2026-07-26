@@ -7,6 +7,14 @@ processing, analytics, projections, replay, and machine learning.
 Integration contract: [docs/FORJD_INTEGRATION.md](docs/FORJD_INTEGRATION.md).
 Scale guidance: [docs/SCALE.md](docs/SCALE.md).
 
+## Repo map
+
+| Repo | Role |
+|------|------|
+| **This repo (`deml`)** | Control plane — Angular product + Django BFF + Viking-UI |
+| [`forjd`](https://github.com/dataengineeringformachinelearning/forjd) | Data plane — sealed streaming engine |
+| [`dataengineeringformachinelearning`](https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning) | Community / marketing site + public BOOK |
+
 ## DEML ↔ FORJD Boundary
 
 - Keep the complete Angular product surface intact: dashboards, analytics, status

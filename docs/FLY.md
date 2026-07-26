@@ -1,7 +1,9 @@
 # DEML Django on Fly.io (`deml-backend`)
 
 Primary host for the DEML **user control plane** (Firebase identity, billing, BFF → FORJD).
-Angular stays on Vercel (`docs/VERCEL.md`). FORJD owns streaming/processing on Fly/Vercel separately.
+Deploy from this repo's `backend/` directory (`backend/fly.toml`).
+Angular stays on Vercel (`docs/VERCEL.md`) from the same GitHub repo (`deml`).
+FORJD owns streaming/processing on Fly/Vercel in the [`forjd`](https://github.com/dataengineeringformachinelearning/forjd) repo.
 
 ```text
 Browser (Vercel deml.app)

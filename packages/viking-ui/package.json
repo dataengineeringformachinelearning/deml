@@ -11,7 +11,7 @@
   "style": "./dist/viking-ui.css",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning.git",
+    "url": "git+https://github.com/dataengineeringformachinelearning/deml.git",
     "directory": "packages/viking-ui"
   },
   "publishConfig": {

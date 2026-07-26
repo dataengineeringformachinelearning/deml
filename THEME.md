@@ -74,7 +74,7 @@ Directional references are [Material Design 3](https://m3.material.io/) for adap
 
 ### Composable primitive model
 
-[Viking-UI](https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning/tree/main/packages/viking-ui) follows a **composable primitive** model: consume package components and synced CSS from applications, and place all styling behavior in the package.
+[Viking-UI](https://github.com/dataengineeringformachinelearning/deml/tree/main/packages/viking-ui) follows a **composable primitive** model: consume package components and synced CSS from applications, and place all styling behavior in the package.
 
 | Pattern                  | Viking-UI equivalent                                                   | Notes                                                                |
 | ------------------------ | ---------------------------------------------------------------------- | -------------------------------------------------------------------- |

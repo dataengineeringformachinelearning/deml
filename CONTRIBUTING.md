@@ -46,7 +46,7 @@ New shared UI **always** belongs in `packages/viking-ui/` first (styles, tokens,
 ### Clone and run locally
 
 ```bash
-git clone https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning.git
+git clone https://github.com/dataengineeringformachinelearning/deml.git
 cd deml
 
 # Workspace + library

@@ -1,5 +1,5 @@
 ---
-title: DEML Platform
+title: DEML Control Plane
 emoji: 🧠
 colorFrom: blue
 colorTo: indigo
@@ -10,128 +10,87 @@ pinned: false
 license: apache-2.0
 ---
 
-# Data Engineering for Machine Learning: Developer Platform
+# DEML — Control Plane
 
-[Acknowledgements & Technologies](#acknowledgements--technologies)
+Firebase-authenticated user control plane: Angular product UI (`deml.app`) + Django BFF (`backend.deml.app`) + Viking-UI.
 
-![DEML brand](https://raw.githubusercontent.com/dataengineeringformachinelearning/dataengineeringformachinelearning/main/frontend/public/dataengineeringformachinelearning-social.png)
+> **Repo map**
+>
+> | Repo | Role | Production |
+> |------|------|------------|
+> | **This repo (`deml`)** | Control plane | Vercel `deml` → `deml.app` · Fly `deml-backend` → `backend.deml.app` |
+> | [`forjd`](https://github.com/dataengineeringformachinelearning/forjd) | Data plane | Vercel `forjd` → `forjd.co` · Fly `forjd-backend` / `forjd-engine` |
+> | [`dataengineeringformachinelearning`](https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning) | Community / BOOK | Vercel `marketing` → `dataengineeringformachinelearning.com` |
 
-> **Platform boundary:** DEML is the Firebase-authenticated user control plane and
-> Angular backend-for-frontend. FORJD is the universal secure streaming engine for
-> sealed intake, processing, projections, analytics, replay, threat processing, and
-> machine learning. DEML calls FORJD with tenant-bound opaque `fjsvc_` tokens and
-> sealed AES-256-GCM envelopes. Production hosts: Angular on **Vercel**, Django BFF
-> on **Fly** (`deml-backend`), streaming engine on **FORJD** Fly + Supabase.
-> Integration contract: [docs/FORJD_INTEGRATION.md](docs/FORJD_INTEGRATION.md)
-> (Pipeline Studio compose/export → FORJD YAML deploy). FORJD extension map:
-> [EXTENDING.md](https://github.com/dataengineeringformachinelearning/forjd/blob/main/docs/EXTENDING.md).
+**Platform boundary:** DEML owns identity, billing, consent, and product UI. FORJD owns sealed intake, workflows, projections, analytics, replay, threat processing, and ML. DEML calls FORJD with tenant-bound opaque `fjsvc_` tokens and AES-256-GCM sealed envelopes — never Firebase end-user tokens.
+Integration: [`docs/FORJD_INTEGRATION.md`](docs/FORJD_INTEGRATION.md) · FORJD extend: [`EXTENDING.md`](https://github.com/dataengineeringformachinelearning/forjd/blob/main/docs/EXTENDING.md).
 
-**Data Engineering for Machine Learning (DEML)** is operational intelligence infrastructure for the new digital battlefield. The platform fuses high-throughput telemetry engineering, AI engineering, and intelligence-driven cybersecurity into a single multi-tenant SaaS fabric—where every command path is versioned, every projection is idempotent, and every tenant traverses identical symmetrical pipelines without exception.
+## What's in this repo
 
----
+| Path | Purpose |
+|------|---------|
+| `frontend/` | Angular 22+ product app (Signals + Viking-UI) |
+| `backend/` | Django BFF / control plane (Fly) |
+| `packages/viking-ui/` | Suite design system (`@dataengineeringformachinelearning/viking-ui`) |
+| `packages/deml-crypto`, `packages/deml-rate-limit` | Shared Python libs |
+| `viking-ui-docs/` | Package docs / Storybook consumers |
+| `native/` | macOS security workbench |
+| `docs/` | Deploy, FORJD integration, suite UI law |
+| `BOOK.md` / `WHITEPAPER.md` | Architecture narrative (also published on the community site) |
 
-## Concept of Operations
+## Deploy map
 
-| Document                                                                                  | Purpose                                 |
-| ----------------------------------------------------------------------------------------- | --------------------------------------- |
-| [BOOK.md](BOOK.md)                                                                        | Full platform architecture & operations |
-| [WHITEPAPER.md](WHITEPAPER.md)                                                            | Executive summary for reviewers         |
-| [BOOK.md § Appendix N](BOOK.md#appendix-n-concept-of-operations-operator-quick-reference) | On-call operational checklists          |
-| [BOOK.md § Appendix U](BOOK.md#appendix-u-deml-platform-technology-stack)                 | Technology stack overview               |
+| Surface | Host | Deploy from |
+|---------|------|-------------|
+| Product UI | [deml.app](https://deml.app) | Vercel project `deml`, root `frontend`, GitHub `…/deml` |
+| Django BFF | [backend.deml.app](https://backend.deml.app) | Fly app `deml-backend` (`backend/fly.toml`) |
+| Community site | [dataengineeringformachinelearning.com](https://dataengineeringformachinelearning.com) | **Other repo** — community `marketing/` |
+| Data plane | [forjd.co](https://forjd.co) / [backend.forjd.co](https://backend.forjd.co) | **Other repo** — `forjd` |
 
-### Product surfaces (`deml.app`)
+Operator runbooks: [`docs/VERCEL.md`](docs/VERCEL.md) · [`docs/FLY.md`](docs/FLY.md) · [`docs/PRODUCTION_DEPLOY.md`](docs/PRODUCTION_DEPLOY.md).
 
-| Route                 | Purpose                                                                 |
-| --------------------- | ----------------------------------------------------------------------- |
-| `/dashboard`          | CES / KPI overview (Signals + Django SSE live ticks)                    |
-| `/analytics`          | Telemetry & threats (FORJD projections via BFF; `LiveUpdatesService`)   |
-| `/pipeline`           | Pipeline Studio — compose/export FORJD workflow YAML (no remote write)  |
-| `/status`, `/explore` | Public status pages (FORJD status APIs proxied by Django)               |
-| `/settings`           | Account / billing / consent (DEML Postgres; Firebase Auth + MFA writes) |
+```bash
+# Angular (from frontend/)
+npx vercel link --project deml --yes
+npx vercel deploy --prod --yes
 
-### Native macOS security workbench
-
-The repository also includes `native/macos-app`, a local-first native Rust
-security operations client. It provides browser-based Firebase/MFA authentication with
-a PKCE-protected return to the app, Keychain-backed desktop sessions, a
-persistent vulnerability queue, Ollama and cloud-model triage, and
-approval-gated patch application for agent-assisted remediation. See
-[BOOK.md § Appendix R](BOOK.md#appendix-r-deml-macos-security-workbench) for the
-security model and build instructions.
-
----
-
-## Core Capabilities
-
-- **Sealed FORJD projections**: Django BFF forwards sealed telemetry with tenant-bound `fjsvc_` (browser never holds service tokens); FORJD materializes durable read models
-- **FORJD data plane stack**: FastAPI + Prefect 3 + Rust sealed hot path (+ Python soft fallback) + Polars batch LazyFrames (DEML does not run stream workers or Airflow)
-- **High-Throughput Ingestion**: Sub-second sealed dispatch with durable FORJD outbox semantics
-- **Live dashboards**: Angular 22+ Signals + Django SSE (`/api/v1/analytics/live`) — `{count, cursor}` ticks only; `latestEvent` / `degraded` callouts; not Firestore
-- **Account Isolation**: Strict tenant separation without cross-account data exposure
-- **Aggregate Threat Modeling**: Collective anomaly baselines without raw data sharing
-- **Predictive SLAs**: Machine learning forecasts service-level breach trajectories (executed in FORJD)
-- **SIEM/SOAR Federation**: STIX 2.1 threat intelligence export
-- **WCAG 2.1 AA Design**: Premium Viking-UI theme across all surfaces ([THEME.md](THEME.md)); not FORJD `forjd-ui`
-- **Readable Metric Layouts**: Dense Viking-UI cards use a two-column maximum (6/12 each), equal-height rows, and single-line operational labels
-- **Canonical Brand Assets**: DEML artwork uses brand navy `#070C20` and brand blue `#0078FF`, governed and synchronized through Viking-UI
-
----
-
-## Official Integrations
-
-| Platform       | Primary endpoints                   | Guide                                                         |
-| -------------- | ----------------------------------- | ------------------------------------------------------------- |
-| **Kubernetes** | `/api/v1/predict`, `/api/v1/ingest` | [BOOK.md § Appendix Z](BOOK.md#appendix-z-integration-guides) |
-| **TensorFlow** | `/api/v1/ingest`, `/api/v1/predict` | [BOOK.md § Appendix Z](BOOK.md#appendix-z-integration-guides) |
-| **PyTorch**    | `/api/v1/ingest`, `/api/v1/predict` | [BOOK.md § Appendix Z](BOOK.md#appendix-z-integration-guides) |
-| **Spark**      | `/api/v1/ingest`                    | [BOOK.md § Appendix Z](BOOK.md#appendix-z-integration-guides) |
-| **Databricks** | `/api/v1/ingest`, `/api/v1/predict` | [BOOK.md § Appendix Z](BOOK.md#appendix-z-integration-guides) |
-| **Redshift**   | `/api/v1/ingest`, `/api/v1/predict` | [BOOK.md § Appendix Z](BOOK.md#appendix-z-integration-guides) |
-
----
-
-## Getting Started
-
-### 1. Account Setup
-
-Register via the web dashboard to create your account. Each account supports multiple status pages.
-
-### 2. Connect Your Services
-
-Navigate to the **Integrations** tab to generate secure ingestion tokens. Follow the integration guides for your specific tech stack.
-
-### 3. Authentication
-
-```http
-Authorization: Bearer YOUR_API_KEY
+# Django BFF (from backend/)
+fly deploy -a deml-backend
 ```
 
----
+## Product surfaces (`deml.app`)
 
-## Support & Resources
+| Route | Purpose |
+|-------|---------|
+| `/dashboard` | CES / KPI overview (Signals + Django SSE) |
+| `/analytics` | Telemetry & threats (FORJD via BFF) |
+| `/pipeline` | Pipeline Studio — compose/export FORJD YAML |
+| `/status`, `/explore` | Public status pages |
+| `/settings` | Account / billing / consent |
 
-- **Support:** Open tickets from your dashboard
-- **Status:** Monitor on the global Status page
-- **Docs:** [DeepWiki](https://deepwiki.com/dataengineeringformachinelearning/dataengineeringformachinelearning) · [Glossary](BOOK.md#appendix-q-deml-glossary) · [Billing](BOOK.md#appendix-m-billing--subscriptions-operator-reference)
+## Local development
 
----
+```bash
+# Frontend
+cd frontend && npm install --legacy-peer-deps && npm start
 
-**Resources:** [GitHub](https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning) · [FORJD data plane](https://github.com/dataengineeringformachinelearning/forjd) · [CONTRIBUTING](CONTRIBUTING.md) · [SECURITY](SECURITY.md)
+# Backend
+cd backend && uv sync && uv run python manage.py runserver
+```
 
-## Acknowledgements & Technologies
+Quality gates: see [`AGENTS.md`](AGENTS.md) · [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
-DEML and Viking-UI are original implementations informed by the open standards,
-tools, and public design-system guidance below. References are directional
-quality bars; their component runtimes and source are not bundled into Viking-UI.
+## Docs
 
-- **Design systems and UI references:** [Material Design 3](https://m3.material.io/) for adaptive foundations and accessibility; [Flux UI](https://fluxui.dev/) for composable, responsive layouts; [Spartan](https://spartan.ng/) for accessible Angular primitives and signal-first ergonomics; [shadcn/ui](https://ui.shadcn.com/) for open composition, blocks, and clear component anatomy; and [Cloudscape Design System](https://cloudscape.design/) for AWS-scale responsive application patterns, accessibility guidance, and operational density.
-- **Security and governance reference:** [Trust Controls](https://www.trustcontrols.ai/) for control-oriented product governance and evidence-minded security UX.
-- **Design-system delivery:** [Storybook](https://storybook.js.org/) for component documentation and accessibility review; [Chromatic](https://www.chromatic.com/) for published visual regression evidence; [axe-core](https://github.com/dequelabs/axe-core) for automated WCAG checks; and [Inter](https://rsms.me/inter/) for self-hosted variable typography.
-- **Core application stack:** [Angular](https://angular.dev/) 22+ (Signals + Viking-UI), [Astro](https://astro.build/), [Django](https://www.djangoproject.com/), [PostgreSQL](https://www.postgresql.org/), [Firebase](https://firebase.google.com/) Auth-only, [FORJD](https://github.com/dataengineeringformachinelearning/forjd) (FastAPI / Prefect 3 / Polars / Rust sealed data plane), [Fly.io](https://fly.io/), [Vercel](https://vercel.com/), [OpenTelemetry](https://opentelemetry.io/) (optional control-plane observability only), and [Firecrawl](https://www.firecrawl.dev/) for verified public-site technology evidence.
+| Doc | Purpose |
+|-----|---------|
+| [BOOK.md](BOOK.md) | Full architecture & operations |
+| [WHITEPAPER.md](WHITEPAPER.md) | Executive summary |
+| [THEME.md](THEME.md) | Viking-UI token law |
+| [AGENTS.md](AGENTS.md) | Agent / invariant briefing |
 
-The comprehensive technology acknowledgement and software inventory remain in
-[BOOK.md](BOOK.md#acknowledgements--technologies) and the generated SBOM.
+**Resources:** [GitHub](https://github.com/dataengineeringformachinelearning/deml) · [Community / BOOK](https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning) · [FORJD](https://github.com/dataengineeringformachinelearning/forjd) · [SECURITY](SECURITY.md)
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdataengineeringformachinelearning%2Fdataengineeringformachinelearning.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdataengineeringformachinelearning%2Fdataengineeringformachinelearning?ref=badge_large&issueType=license)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdataengineeringformachinelearning%2Fdeml.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdataengineeringformachinelearning%2Fdeml?ref=badge_large&issueType=license)
 
-![GitHub Repo stars](https://img.shields.io/github/stars/dataengineeringformachinelearning/dataengineeringformachinelearning?style=social)
+![GitHub Repo stars](https://img.shields.io/github/stars/dataengineeringformachinelearning/deml?style=social)

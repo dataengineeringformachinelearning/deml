@@ -1,13 +1,14 @@
 # DEML static web on Vercel
 
-All DEML **static web** surfaces ship on Vercel. Django BFF remains on **Fly** (`deml-backend`). FORJD (Fly) + Supabase own the streaming engine. Firebase is **Auth-only** (no Firebase Hosting).
+This **control-plane** repo deploys the Angular product UI on Vercel. Django BFF remains on **Fly** (`deml-backend`). FORJD (Fly) + Supabase own the streaming engine. Firebase is **Auth-only** (no Firebase Hosting).
 
-| Project     | Root directory | Public hostname                                 | Role                           |
-| ----------- | -------------- | ----------------------------------------------- | ------------------------------ |
-| `deml`      | `frontend`     | `https://deml.app`                              | Product showcase + Angular app |
-| `marketing` | `marketing`    | `https://dataengineeringformachinelearning.com` | Community entry (Astro)        |
+| Project | GitHub repo | Root directory | Public hostname | Role |
+| ------- | ----------- | -------------- | --------------- | ---- |
+| `deml` | `dataengineeringformachinelearning/deml` | `frontend` | `https://deml.app` | Product Angular app |
+| `marketing` | `dataengineeringformachinelearning/dataengineeringformachinelearning` | `marketing` | `https://dataengineeringformachinelearning.com` | Community Astro site (**other repo**) |
+| `forjd` | `dataengineeringformachinelearning/forjd` | `frontend` | `https://forjd.co` | FORJD landing (**other repo**) |
 
-Public Storybook hosting (`deml-ui` / `ui.deml.app`) is **retired** (Vercel project deleted). Viking-UI components stay in `packages/viking-ui/`; run Storybook locally (`npm run storybook` / `build-storybook`) or via Chromatic. Lock each Vercel project Production Branch to `main` in the dashboard.
+Public Storybook hosting (`deml-ui` / `ui.deml.app`) is **retired**. Viking-UI components stay in `packages/viking-ui/`; run Storybook locally (`npm run storybook` / `build-storybook`) or via Chromatic. Lock the Vercel project Production Branch to `main`.
 
 ## Project: `deml` (Angular product UI)
 
@@ -28,12 +29,12 @@ The Angular app must **not** call FORJD or Supabase with Firebase end-user token
 | ---------------- | ------------------------------------------------------------------------------ |
 | Project name     | `deml`                                                                         |
 | Framework Preset | Other                                                                          |
-| Root Directory   | `frontend` (Git monorepo root → app folder)                                    |
+| Root Directory   | `frontend`                                                                     |
 | Build Command    | `npm run build` (from `vercel.json`)                                           |
 | Output Directory | `dist/frontend/browser`                                                        |
 | Install Command  | `npm install --legacy-peer-deps --no-workspaces`                               |
 | Node.js          | **24.x** (`frontend/package.json` engines)                                     |
-| Git repository   | `dataengineeringformachinelearning/dataengineeringformachinelearning` (`main`) |
+| Git repository   | `dataengineeringformachinelearning/deml` (`main`)                              |
 
 ## Environment variables (Production)
 
@@ -163,28 +164,9 @@ Confirm `dist/frontend/browser/index.html` exists (CSR) and there is **no** `dis
 Promote the previous Vercel deployment, or point DNS back to the previous host.
 Do not re-enable Angular SSR unless you restore `angular.json` `server` / `ssr` entries.
 
-## Project: `marketing` (community Astro)
+## Project: `marketing` (community Astro — other repo)
 
-| Setting        | Value                                            |
-| -------------- | ------------------------------------------------ |
-| Project name   | `marketing`                                      |
-| Root Directory | `marketing`                                      |
-| Config         | `marketing/vercel.json`                          |
-| Build          | `npm run build` → `dist`                         |
-| Install        | `npm install --legacy-peer-deps --no-workspaces` |
-| Domain         | `dataengineeringformachinelearning.com`          |
-
-Preserves `/status/:slug` → `deml.app` and redirects `/documentation` → `backend.deml.app/documentation`.
-`VERCEL=1` skips the monorepo Viking package prebuild (uses published npm package).
-
-```bash
-cd marketing
-npx vercel link --project marketing --yes
-npx vercel env add FRONTEND_URL production --value 'https://deml.app' --force --yes --no-sensitive
-npx vercel env add BACKEND_URL production --value 'https://backend.deml.app' --force --yes --no-sensitive
-npx vercel env add MARKETING_URL production --value 'https://dataengineeringformachinelearning.com' --force --yes --no-sensitive
-npx vercel deploy --prod --yes
-```
+Lives in [`dataengineeringformachinelearning`](https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning), not this control-plane repo. Deploy docs: community [`docs/VERCEL.md`](https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning/blob/main/docs/VERCEL.md).
 
 ## Project: `deml-ui` (retired)
 

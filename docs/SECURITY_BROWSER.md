@@ -53,7 +53,7 @@ CSP currently allows `'unsafe-inline'` for third-party and bootstrap scripts; ti
 
 ## CSP deepenings (2026-07)
 
-Enforced CSP across product (`frontend/vercel.json`, `frontend/nginx.conf`), marketing (`marketing/vercel.json`), Storybook heads (`packages/viking-ui/.storybook/*-head.html`), and Django HTML (`backend/config/csp_middleware.py`):
+Enforced CSP across product (`frontend/vercel.json`, `frontend/nginx.conf`), community marketing (`marketing/vercel.json` in the community repo), Storybook heads (`packages/viking-ui/.storybook/*-head.html`), and Django HTML (`backend/config/csp_middleware.py`):
 
 | Change                                                                                                                                                              | Status |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |

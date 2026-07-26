@@ -1,9 +1,17 @@
 # Production deploy — DEML (Vercel + Fly) → FORJD
 
-Operator runbook for production. Pair with
-[`PRODUCTION_CHECKLIST.md`](./PRODUCTION_CHECKLIST.md),
+Operator runbook for the **control-plane** repo
+([`deml`](https://github.com/dataengineeringformachinelearning/deml)).
+Pair with [`PRODUCTION_CHECKLIST.md`](./PRODUCTION_CHECKLIST.md),
 [`FORJD_INTEGRATION.md`](./FORJD_INTEGRATION.md),
 [`FLY.md`](./FLY.md), [`VERCEL.md`](./VERCEL.md).
+
+| Surface | GitHub | Host |
+|---------|--------|------|
+| Angular product | this repo (`frontend/`) → Vercel `deml` | `deml.app` |
+| Django BFF | this repo (`backend/`) → Fly `deml-backend` | `backend.deml.app` |
+| Community Astro | [`dataengineeringformachinelearning`](https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning) | `dataengineeringformachinelearning.com` |
+| FORJD API / landing | [`forjd`](https://github.com/dataengineeringformachinelearning/forjd) | `backend.forjd.co` / `forjd.co` |
 
 **Last live baseline (2026-07-18, before the SIEM/SOAR hardening in this
 change set):**
@@ -26,9 +34,13 @@ FORJD migrations below.
 
 ## 1. Vercel — Angular (`deml`)
 
+GitHub source must be `dataengineeringformachinelearning/deml` (root `frontend`).
+Do **not** point this Vercel project at the community repo.
+
 ```bash
 cd frontend
 npx vercel link --project deml --yes
+npx vercel git connect https://github.com/dataengineeringformachinelearning/deml.git --yes
 
 # Required production env (baked at build by set-env.js)
 npx vercel env add BACKEND_URL production --value 'https://backend.deml.app' --force --yes --no-sensitive
