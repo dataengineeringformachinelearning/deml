@@ -51,8 +51,12 @@ const compile = (entry, style = "expanded") => {
       stdio: "inherit",
     },
   );
-  const css = readFileSync(outFile, "utf8");
+  let css = readFileSync(outFile, "utf8");
   rmSync(outFile, { force: true });
+  // Compressed CSS can join `*/` + `*` into `*/*,*` which re-opens a comment.
+  if (style === "compressed") {
+    css = css.replace(/\*\/(?=\*)/g, "*/\n");
+  }
   return css;
 };
 

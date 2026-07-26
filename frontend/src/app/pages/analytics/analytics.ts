@@ -1092,9 +1092,10 @@ export class AnalyticsComponent implements OnDestroy {
         path.setAttribute('aria-label', tooltip);
         path.addEventListener('focus', () => marker.openTooltip());
         path.addEventListener('blur', () => marker.closeTooltip());
-        path.addEventListener('keydown', (event: KeyboardEvent) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
+        path.addEventListener('keydown', (event: Event) => {
+          const keyEvent = event as KeyboardEvent;
+          if (keyEvent.key === 'Enter' || keyEvent.key === ' ') {
+            keyEvent.preventDefault();
             marker.openTooltip();
           }
         });

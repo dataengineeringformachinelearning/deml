@@ -38,6 +38,8 @@
     "build:viking-ui": "npm run build:viking-ui --prefix frontend",
     "build:viking-ui:package": "npm run build --workspace @dataengineeringformachinelearning/viking-ui",
     "build:viking-ui:universal": "npm run build:viking-ui:package",
+    "sync:frontend-viking": "node scripts/sync_frontend_viking_assets.mjs",
+    "build:frontend:vercel": "npm run build:viking-ui:package && npm run sync:frontend-viking && npm run build --workspace frontend",
     "changeset": "npx -y @changesets/cli",
     "version:viking-ui": "node scripts/sync_viking_ui_version.mjs --changesets",
     "publish:viking-ui": "npm run ci:viking-ui && npx -y @changesets/cli publish",

@@ -30,9 +30,9 @@ The Angular app must **not** call FORJD or Supabase with Firebase end-user token
 | Project name     | `deml`                                                                         |
 | Framework Preset | Other                                                                          |
 | Root Directory   | `frontend`                                                                     |
-| Build Command    | `npm run build` (from `vercel.json`)                                           |
+| Build Command    | `cd .. && npm run build:frontend:vercel` (build local Viking-UI, then Angular) |
 | Output Directory | `dist/frontend/browser`                                                        |
-| Install Command  | `npm install --legacy-peer-deps --no-workspaces`                               |
+| Install Command  | `cd .. && npm install --legacy-peer-deps` (workspace — local `packages/viking-ui`) |
 | Node.js          | **24.x** (`frontend/package.json` engines)                                     |
 | Git repository   | `dataengineeringformachinelearning/deml` (`main`)                              |
 
@@ -96,9 +96,10 @@ npx vercel link --project deml --yes
 npx vercel deploy --prod --yes
 ```
 
-`vercel.json` uses `npm install --legacy-peer-deps --no-workspaces` so Vercel installs
-the published `@dataengineeringformachinelearning/viking-ui` from npm instead of the
-monorepo workspace link (which is not built on the Vercel machine).
+`vercel.json` installs from the **repo root** with npm workspaces, then
+`build:frontend:vercel` builds `packages/viking-ui` and syncs CSS into
+`frontend/public/assets` before `ng build`. The published npm package stays for
+marketing/community consumers; the control-plane app always uses the in-repo kit.
 
 ### Production env (required — wrong values crash the app)
 

@@ -1,9 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run build",
+  "buildCommand": "cd .. && npm run build:frontend:vercel",
   "outputDirectory": "dist/frontend/browser",
   "framework": null,
-  "installCommand": "npm install --legacy-peer-deps --no-workspaces",
+  "installCommand": "cd .. && npm install --legacy-peer-deps",
   "redirects": [
     {
       "source": "/docs",
