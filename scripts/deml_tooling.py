@@ -114,9 +114,46 @@ def cmd_install_hooks(args: argparse.Namespace) -> None:
   )
 
 
+def cmd_bootstrap(args: argparse.Namespace) -> None:
+  """Fresh-clone install: npm workspaces + backend venv + contracts."""
+  _run(["npm", "ci", "--legacy-peer-deps"])
+  _run(["npm", "run", "build:contracts"])
+  venv = ROOT / "backend" / ".venv"
+  if not venv.is_dir():
+    _run([sys.executable, "-m", "venv", str(venv)])
+  pip = venv / ("Scripts" if os.name == "nt" else "bin") / "pip"
+  _run([str(pip), "install", "-e", "packages/deml-contracts"])
+  _run([str(pip), "install", "-r", "backend/requirements.txt"])
+  if not args.skip_hooks:
+    cmd_install_hooks(argparse.Namespace())
+  print("\n✓ bootstrap complete — next: npm run verify")
+
+
+def cmd_verify(args: argparse.Namespace) -> None:
+  """install → build → test smoke for a clean clone."""
+  venv_python = ROOT / "backend" / ".venv" / ("Scripts" if os.name == "nt" else "bin") / "python"
+  py = str(venv_python) if venv_python.is_file() else sys.executable
+  _run([py, "scripts/check_config_catalog.py"])
+  _run(["npm", "run", "validate:contracts"])
+  _run([py, "scripts/check_usecase_coverage.py"])
+  _run(
+    [py, "-m", "pytest", "utils/test_env.py", "config/test_ready_contract.py", "-q", "--tb=line"],
+    cwd=ROOT / "backend",
+  )
+  _run(["npm", "run", "typecheck", "--workspace", "frontend"])
+  print("\n✓ verify passed (config + contracts + usecase registry + backend smoke + frontend tsc)")
+
+
 def build_parser() -> argparse.ArgumentParser:
   parser = argparse.ArgumentParser(description="DEML unified dev tooling")
   sub = parser.add_subparsers(dest="command", required=True)
+
+  bootstrap = sub.add_parser("bootstrap", help="Fresh-clone npm + backend venv + contracts")
+  bootstrap.add_argument("--skip-hooks", action="store_true")
+  bootstrap.set_defaults(func=cmd_bootstrap, skip_hooks=False)
+
+  verify = sub.add_parser("verify", help="Config/contracts/usecase + smoke tests")
+  verify.set_defaults(func=cmd_verify)
 
   sync = sub.add_parser("sync", help="Propagate design system, widgets, and docs")
   sync.add_argument("--all", action="store_true", help="Sync content, design-system, and widgets")
