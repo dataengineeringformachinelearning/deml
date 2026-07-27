@@ -1,7 +1,14 @@
 # DEML Django on Fly.io (`deml-backend`)
 
 Primary host for the DEML **user control plane** (Firebase identity, billing, BFF → FORJD).
-Deploy from this repo's `backend/` directory (`backend/fly.toml`).
+Before `fly deploy`, stage shared contracts into the backend Docker context:
+
+```bash
+# from monorepo root
+node scripts/sync_deml_contracts_docker.mjs
+cd backend && fly deploy
+```
+
 Angular stays on Vercel (`docs/VERCEL.md`) from the same GitHub repo (`deml`).
 FORJD owns streaming/processing on Fly/Vercel in the [`forjd`](https://github.com/dataengineeringformachinelearning/forjd) repo.
 
@@ -88,6 +95,8 @@ appropriate.
 ## Deploy
 
 ```bash
+# from monorepo root — stage deml-contracts into backend/vendor/
+node scripts/sync_deml_contracts_docker.mjs
 cd backend
 fly deploy
 ```

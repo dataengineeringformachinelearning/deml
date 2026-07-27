@@ -1,9 +1,13 @@
-# Builder stage
-FROM python:3.11-slim-bookworm AS builder
+# DEML Django control plane — Python 3.12 (matches CI).
+# Context: backend/ after staging contracts from monorepo root:
+#   npm run sync:contracts:docker
+#   cd backend && fly deploy
+#
+# Catalog pin: config/deml.catalog.json → python.version
+FROM python:3.12-slim-bookworm AS builder
 
 WORKDIR /app
 
-# Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc g++ python3-dev cmake ninja-build libssl-dev git \
     && rm -rf /var/lib/apt/lists/*
@@ -15,54 +19,50 @@ RUN git clone --branch 0.15.0 --depth 1 https://github.com/open-quantum-safe/lib
     cmake -GNinja -DOQS_USE_OPENSSL=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=/opt/oqs .. && \
     ninja && ninja install
 
-# Set environment variables for the compiler and runtime to find liboqs
 ENV LD_LIBRARY_PATH="/opt/oqs/lib" \
     C_INCLUDE_PATH="/opt/oqs/include" \
     CPLUS_INCLUDE_PATH="/opt/oqs/include" \
     LIBRARY_PATH="/opt/oqs/lib"
 
-# Create virtual environment
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Install requirements
+# --- Shared contracts SoT (staged vendor/ or monorepo packages/) ---
+COPY vendor/deml-contracts /packages/deml-contracts
+RUN pip install --no-cache-dir /packages/deml-contracts
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code for collectstatic
-# Railway sets root directory to backend/; docker-compose uses context: ./backend
 COPY . .
-# Inline env for collectstatic only — never persist DATABASE_URL into the runtime image.
 RUN DATABASE_URL=sqlite:////tmp/collectstatic.db \
     SECRET_KEY=collectstatic-build-only \
     DEBUG=false \
     python manage.py collectstatic --noinput --clear
 
-# Re-link python symlinks to /usr/bin/python3 (distroless python path)
-RUN ln -sf /usr/bin/python3 /opt/venv/bin/python && \
-    ln -sf /usr/bin/python3 /opt/venv/bin/python3
+# --- Slim runtime (non-root 1001; pins match CI Python 3.12) ---
+FROM python:3.12-slim-bookworm AS runtime
 
-# Runtime stage
-FROM gcr.io/distroless/python3-debian12
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libssl3 ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --gid 1001 deml \
+    && useradd --uid 1001 --gid deml --shell /usr/sbin/nologin --create-home deml
 
-# Copy the built liboqs shared libraries from the builder stage
 COPY --from=builder /opt/oqs /opt/oqs
+COPY --from=builder /opt/venv /opt/venv
+COPY --from=builder /app /app
 
 ENV PATH="/opt/venv/bin:$PATH" \
-    PYTHONPATH="/opt/venv/lib/python3.11/site-packages" \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    LD_LIBRARY_PATH="/opt/oqs/lib"
+    LD_LIBRARY_PATH="/opt/oqs/lib" \
+    PORT=8080
 
 WORKDIR /app
+USER 1001
 
-# Copy virtual env and code from builder
-COPY --chown=65532:65532 --from=builder /opt/venv /opt/venv
-COPY --chown=65532:65532 --from=builder /app /app
-
-# Fly uses PORT=8080 (fly.toml); Railway may use 8000.
 EXPOSE 8000 8080
 
-USER nonroot
-
-ENTRYPOINT ["/opt/venv/bin/python", "start.py"]
+# Liveness/readiness: GET /api/v1/health · GET /api/v1/ready (catalog health.*)
+CMD ["python", "start.py"]

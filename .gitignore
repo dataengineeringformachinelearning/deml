@@ -96,3 +96,6 @@ packages/deml-design-system/
 .railway-config-pull-*/
 .vercel
 .firebase/
+
+# Staged contracts for Docker/Fly (generated)
+backend/vendor/deml-contracts/

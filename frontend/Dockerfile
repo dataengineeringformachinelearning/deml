@@ -1,4 +1,7 @@
-# CSR static build for optional Railway fallback. Primary host is Vercel (project: deml).
+# Optional static image (Railway standby). Primary host is Vercel:
+#   frontend/vercel.json → npm run build:frontend:vercel (monorepo root).
+# This Dockerfile is frontend-context only and cannot see workspace packages;
+# prefer Vercel for production. Catalog: config/deml.catalog.json
 FROM node:24-alpine AS builder
 
 RUN apk add --no-cache git

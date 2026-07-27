@@ -1,0 +1,336 @@
+{
+  "version": 1,
+  "description": "DEML configuration inventory SoT. Enforce with: npm run validate:config",
+  "docs": "docs/CONFIGURATION.md",
+  "runtime": {
+    "backend": "backend/config/settings.py + backend/utils/env.py",
+    "frontend": "frontend/set-env.js → src/environments/environment*.ts",
+    "contracts": "packages/deml-contracts"
+  },
+  "suite_urls": {
+    "FRONTEND_URL": "https://deml.app",
+    "BACKEND_URL": "https://backend.deml.app",
+    "MARKETING_URL": "https://dataengineeringformachinelearning.com",
+    "FORJD_API_URL": "https://backend.forjd.co"
+  },
+  "ports": {
+    "backend_local": 8000,
+    "backend_fly": 8080,
+    "frontend_local": 4200,
+    "postgres_local": 5432
+  },
+  "health": {
+    "liveness": "/api/v1/health",
+    "readiness": "/api/v1/ready"
+  },
+  "python": {
+    "version": "3.12",
+    "backend_dockerfile": "backend/Dockerfile",
+    "ci": ".github/workflows/ci.yml"
+  },
+  "variables": [
+    {
+      "name": "SECRET_KEY",
+      "layers": ["backend"],
+      "secret": true,
+      "required_on": ["paas"],
+      "example": "backend/.env.example",
+      "group": "app"
+    },
+    {
+      "name": "DEBUG",
+      "layers": ["backend"],
+      "secret": false,
+      "required_on": ["paas"],
+      "example": "backend/.env.example",
+      "group": "app"
+    },
+    {
+      "name": "ALLOWED_HOSTS",
+      "layers": ["backend"],
+      "secret": false,
+      "required_on": ["paas"],
+      "example": "backend/.env.example",
+      "group": "app"
+    },
+    {
+      "name": "DATABASE_URL",
+      "layers": ["backend"],
+      "secret": true,
+      "required_on": ["paas"],
+      "example": "backend/.env.example",
+      "group": "database",
+      "notes": "postgres://…?sslmode=verify-full (require allowed for Supabase hosts)"
+    },
+    {
+      "name": "DATABASE_SEARCH_PATH",
+      "layers": ["backend"],
+      "secret": false,
+      "required_on": [],
+      "example": "backend/.env.example",
+      "group": "database"
+    },
+    {
+      "name": "FRONTEND_URL",
+      "layers": ["backend", "frontend"],
+      "secret": false,
+      "required_on": ["vercel"],
+      "example": ["backend/.env.example", "frontend/.env.example"],
+      "group": "urls"
+    },
+    {
+      "name": "BACKEND_URL",
+      "layers": ["backend", "frontend"],
+      "secret": false,
+      "required_on": ["vercel"],
+      "example": ["backend/.env.example", "frontend/.env.example"],
+      "group": "urls"
+    },
+    {
+      "name": "MARKETING_URL",
+      "layers": ["backend", "frontend"],
+      "secret": false,
+      "required_on": [],
+      "example": ["backend/.env.example", "frontend/.env.example"],
+      "group": "urls"
+    },
+    {
+      "name": "CORS_ALLOWED_ORIGINS",
+      "layers": ["backend"],
+      "secret": false,
+      "required_on": [],
+      "example": "backend/.env.example",
+      "group": "cors"
+    },
+    {
+      "name": "CSRF_TRUSTED_ORIGINS",
+      "layers": ["backend"],
+      "secret": false,
+      "required_on": [],
+      "example": "backend/.env.example",
+      "group": "cors"
+    },
+    {
+      "name": "FIREBASE_PROJECT_ID",
+      "layers": ["backend", "frontend"],
+      "secret": false,
+      "required_on": ["vercel"],
+      "example": ["backend/.env.example", "frontend/.env.example"],
+      "group": "firebase"
+    },
+    {
+      "name": "FIREBASE_SERVICE_ACCOUNT_JSON",
+      "layers": ["backend"],
+      "secret": true,
+      "required_on": ["paas"],
+      "example": "backend/.env.example",
+      "group": "firebase"
+    },
+    {
+      "name": "FIREBASE_API_KEY",
+      "layers": ["frontend"],
+      "secret": false,
+      "required_on": ["vercel"],
+      "example": "frontend/.env.example",
+      "group": "firebase"
+    },
+    {
+      "name": "FIREBASE_APP_ID",
+      "layers": ["frontend"],
+      "secret": false,
+      "required_on": ["vercel"],
+      "example": "frontend/.env.example",
+      "group": "firebase"
+    },
+    {
+      "name": "FIREBASE_AUTH_DOMAIN",
+      "layers": ["frontend"],
+      "secret": false,
+      "required_on": ["vercel"],
+      "example": "frontend/.env.example",
+      "group": "firebase"
+    },
+    {
+      "name": "FIREBASE_MESSAGING_SENDER_ID",
+      "layers": ["frontend"],
+      "secret": false,
+      "required_on": ["vercel"],
+      "example": "frontend/.env.example",
+      "group": "firebase"
+    },
+    {
+      "name": "FORJD_API_URL",
+      "layers": ["backend", "frontend"],
+      "secret": false,
+      "required_on": ["paas"],
+      "example": ["backend/.env.example", "frontend/.env.example"],
+      "group": "forjd"
+    },
+    {
+      "name": "FORJD_SERVICE_TOKEN",
+      "layers": ["backend"],
+      "secret": true,
+      "required_on": ["paas"],
+      "example": "backend/.env.example",
+      "group": "forjd"
+    },
+    {
+      "name": "FORJD_TENANT_ID",
+      "layers": ["backend"],
+      "secret": false,
+      "required_on": ["paas"],
+      "example": "backend/.env.example",
+      "group": "forjd"
+    },
+    {
+      "name": "FORJD_PROVISION_TOKEN",
+      "layers": ["backend"],
+      "secret": true,
+      "required_on": [],
+      "example": "backend/.env.example",
+      "group": "forjd"
+    },
+    {
+      "name": "FORJD_WRITE_MODE",
+      "layers": ["backend"],
+      "secret": false,
+      "required_on": [],
+      "example": "backend/.env.example",
+      "group": "forjd",
+      "default": "forjd"
+    },
+    {
+      "name": "FORJD_READ_MODE",
+      "layers": ["backend"],
+      "secret": false,
+      "required_on": [],
+      "example": "backend/.env.example",
+      "group": "forjd",
+      "default": "forjd"
+    },
+    {
+      "name": "FORJD_CUTOVER_PHASE",
+      "layers": ["backend"],
+      "secret": false,
+      "required_on": [],
+      "example": "backend/.env.example",
+      "group": "forjd",
+      "default": "2"
+    },
+    {
+      "name": "FORJD_REQUIRED_CONTRACT_VERSION",
+      "layers": ["backend"],
+      "secret": false,
+      "required_on": [],
+      "example": "backend/.env.example",
+      "group": "forjd"
+    },
+    {
+      "name": "ENCRYPTION_MASTER_KEY",
+      "layers": ["backend"],
+      "secret": true,
+      "required_on": ["paas"],
+      "example": "backend/.env.example",
+      "group": "crypto"
+    },
+    {
+      "name": "DEML_TRANSPORT_SECURITY",
+      "layers": ["backend"],
+      "secret": false,
+      "required_on": [],
+      "example": "backend/.env.example",
+      "group": "security",
+      "default": "required"
+    },
+    {
+      "name": "STRIPE_SECRET_KEY",
+      "layers": ["backend"],
+      "secret": true,
+      "required_on": [],
+      "example": "backend/.env.example",
+      "group": "billing"
+    },
+    {
+      "name": "STRIPE_WEBHOOK_SECRET",
+      "layers": ["backend"],
+      "secret": true,
+      "required_on": [],
+      "example": "backend/.env.example",
+      "group": "billing"
+    },
+    {
+      "name": "STRIPE_PRICE_ID",
+      "layers": ["backend"],
+      "secret": false,
+      "required_on": [],
+      "example": "backend/.env.example",
+      "group": "billing"
+    },
+    {
+      "name": "SENTRY_DSN",
+      "layers": ["backend", "frontend"],
+      "secret": false,
+      "required_on": [],
+      "example": ["backend/.env.example", "frontend/.env.example"],
+      "group": "observability"
+    },
+    {
+      "name": "ROLLBAR_ACCESS_TOKEN",
+      "layers": ["backend", "frontend"],
+      "secret": true,
+      "required_on": [],
+      "example": "backend/.env.example",
+      "group": "observability"
+    },
+    {
+      "name": "STRUCTURED_LOGS",
+      "layers": ["backend"],
+      "secret": false,
+      "required_on": [],
+      "example": "backend/.env.example",
+      "group": "observability"
+    },
+    {
+      "name": "DEML_LIVE_UPDATES_ENABLED",
+      "layers": ["backend"],
+      "secret": false,
+      "required_on": [],
+      "example": "backend/.env.example",
+      "group": "live"
+    },
+    {
+      "name": "ENABLE_LEGACY_PLAINTEXT_TELEMETRY",
+      "layers": ["frontend", "backend"],
+      "secret": false,
+      "required_on": [],
+      "example": "frontend/.env.example",
+      "group": "ingest",
+      "default": "false"
+    },
+    {
+      "name": "SANITY_PROJECT_ID",
+      "layers": ["frontend"],
+      "secret": false,
+      "required_on": [],
+      "example": "frontend/.env.example",
+      "group": "sanity"
+    },
+    {
+      "name": "SANITY_DATASET",
+      "layers": ["frontend"],
+      "secret": false,
+      "required_on": [],
+      "example": "frontend/.env.example",
+      "group": "sanity"
+    },
+    {
+      "name": "PORT",
+      "layers": ["backend"],
+      "secret": false,
+      "required_on": [],
+      "example": null,
+      "group": "runtime",
+      "notes": "Fly injects 8080; local default 8000"
+    }
+  ]
+}

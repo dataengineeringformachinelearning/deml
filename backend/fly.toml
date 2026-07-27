@@ -1,9 +1,8 @@
 # DEML Django user control plane on Fly.io
 #
-# Deploy (from this directory):
-#   fly apps create deml-backend
-#   fly secrets set SECRET_KEY=… DATABASE_URL=… FORJD_SERVICE_TOKEN=… …
-#   fly deploy
+# Deploy (from monorepo root, after staging contracts):
+#   node scripts/sync_deml_contracts_docker.mjs
+#   cd backend && fly deploy
 #
 # Docs: ../docs/FLY.md
 # Health: https://deml-backend.fly.dev/api/v1/health
@@ -50,6 +49,7 @@ primary_region = 'iad'
     hard_limit = 100
     soft_limit = 50
 
+  # Liveness — catalog health.liveness
   [[http_service.checks]]
     interval = '15s'
     timeout = '5s'
@@ -59,6 +59,7 @@ primary_region = 'iad'
     [http_service.checks.headers]
       Host = 'deml-backend.fly.dev'
 
+  # Readiness — catalog health.readiness (DB + FORJD credential presence)
   [[http_service.checks]]
     interval = '30s'
     timeout = '5s'
