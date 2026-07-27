@@ -6,6 +6,14 @@
  * the mapped tenant credential upstream.
  */
 
+import type {
+  EncryptedEnvelope,
+  SealedEvent,
+} from '@dataengineeringformachinelearning/deml-contracts';
+import {
+  TELEMETRY_CONTENT_TYPE,
+  TELEMETRY_WORKFLOW_ID,
+} from '@dataengineeringformachinelearning/deml-contracts';
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../constants/api.constants';
 
@@ -13,24 +21,11 @@ const GCM_NONCE_BYTES = 12;
 const AES_KEY_BYTES = 32;
 const SESSION_STORAGE_KEY = 'deml_forjd_crypto_session_v1';
 
-export type SealedEnvelope = {
-  algo: 'aes-256-gcm';
-  key_id: string;
-  nonce: string;
-  ciphertext: string;
-  ciphertext_sha256: string;
-};
+/** @deprecated Prefer EncryptedEnvelope from deml-contracts */
+export type SealedEnvelope = EncryptedEnvelope;
 
-export type SealedEventWire = {
-  tenant_id: string;
-  client_event_id: string;
-  content_type: 'application/forjd-telemetry+v1';
-  event_type: 'deml.metric' | 'deml.alert';
-  workflow_id: 'deml_telemetry';
-  encryption: { mode: 'e2ee'; algo: 'aes-256-gcm' };
-  envelope: SealedEnvelope;
-  metadata: Record<string, string | string[]>;
-};
+/** Canonical sealed ingest wire shape (deml-contracts SoT). */
+export type SealedEventWire = SealedEvent;
 
 type CachedSession = {
   tenantId: string;
@@ -221,9 +216,10 @@ export async function sealAndIngest(
   const wire: SealedEventWire = {
     tenant_id: tenantId,
     client_event_id: clientEventId,
-    content_type: 'application/forjd-telemetry+v1',
+    content_type: TELEMETRY_CONTENT_TYPE,
     event_type: 'deml.metric',
-    workflow_id: 'deml_telemetry',
+    schema_version: 1,
+    workflow_id: TELEMETRY_WORKFLOW_ID,
     encryption: { mode: 'e2ee', algo: 'aes-256-gcm' },
     envelope,
     metadata: safeMeta,

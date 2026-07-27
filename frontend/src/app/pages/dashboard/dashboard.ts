@@ -45,6 +45,7 @@ import {
   type VikingOnboardingStep,
   type SuiteActivityEntry,
 } from '@dataengineeringformachinelearning/viking-ui';
+import { ERROR_CODES } from '@dataengineeringformachinelearning/deml-contracts';
 import {
   FORJD_FALLBACK_BODY,
   FORJD_UNAVAILABLE_BODY,
@@ -552,7 +553,8 @@ export class Dashboard implements OnInit, OnDestroy {
 
   private applyOverviewResponse(response: DashboardOverviewResponse): void {
     if (response.status === 'success' && response.data) {
-      const degraded = response?.degraded === true || response?.code === 'forjd_degraded';
+      const degraded =
+        response?.degraded === true || response?.code === ERROR_CODES.FORJD_DEGRADED;
       const { benchmarking, ces, user_metrics } = response.data;
       this.cesLevel.set(ces?.level ?? 0);
       this.threatLevel.set(ces?.threat ?? 0);
@@ -639,7 +641,7 @@ export class Dashboard implements OnInit, OnDestroy {
         this.metricsDegraded.set(true);
         const code = err?.error?.code;
         const detail = err?.error?.detail;
-        if (err?.status === 503 || code === 'forjd_degraded') {
+        if (err?.status === 503 || code === ERROR_CODES.FORJD_DEGRADED) {
           this.loadError.set(detail || FORJD_UNAVAILABLE_BODY);
         } else {
           this.loadError.set(detail || LOAD_FAILED_BODY);

@@ -39,6 +39,7 @@ import {
   VikingSectionTemplate,
   VikingStreamStatus,
 } from '@dataengineeringformachinelearning/viking-ui';
+import { ERROR_CODES } from '@dataengineeringformachinelearning/deml-contracts';
 import { ThemeService } from '../../services/theme.service';
 import { AuthService } from '../../services/auth.service';
 import { LiveUpdatesService } from '../../services/live-updates.service';
@@ -523,7 +524,7 @@ export class AnalyticsComponent implements OnDestroy {
             const degraded =
               response?.degraded === true ||
               response?.code === 'forjd_read_fallback' ||
-              response?.code === 'forjd_degraded' ||
+              response?.code === ERROR_CODES.FORJD_DEGRADED ||
               user_metrics?.data_available === false;
             this.metricsDegraded.set(degraded);
             this.loadError.set(degraded ? FORJD_FALLBACK_BODY : null);
@@ -688,7 +689,7 @@ export class AnalyticsComponent implements OnDestroy {
           this.uptimePercent.set(null);
           const code = err?.error?.code;
           const detail = err?.error?.detail;
-          if (err?.status === 503 || code === 'forjd_degraded') {
+          if (err?.status === 503 || code === ERROR_CODES.FORJD_DEGRADED) {
             this.loadError.set(detail || FORJD_UNAVAILABLE_BODY);
           } else if (err?.status === 401 || err?.status === 403) {
             this.loadError.set(detail || 'Sign in again to load analytics.');

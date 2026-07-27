@@ -97,6 +97,27 @@ if (onVercel && !vercelFrontend) {
 const buildFrontendUrl = vercelFrontend;
 const forjdApiUrl = process.env.FORJD_API_URL ?? 'https://backend.forjd.co';
 
+// --- Vercel fail-fast (catalog: VERCEL_FRONTEND_REQUIRED) ---
+if (onVercel) {
+  const missing = [];
+  if (!apiKey || apiKey === 'PLACEHOLDER_API_KEY' || apiKey.startsWith('your-')) {
+    missing.push('FIREBASE_API_KEY');
+  }
+  if (!projectId) missing.push('FIREBASE_PROJECT_ID');
+  if (!appId || appId.startsWith('1:...')) missing.push('FIREBASE_APP_ID');
+  if (!authDomain) missing.push('FIREBASE_AUTH_DOMAIN');
+  if (!messagingSenderId) missing.push('FIREBASE_MESSAGING_SENDER_ID');
+  if (!buildBackendUrl) missing.push('BACKEND_URL');
+  if (!buildFrontendUrl) missing.push('FRONTEND_URL');
+  if (missing.length) {
+    console.error(
+      `set-env: Vercel build missing required env: ${missing.join(', ')}. ` +
+        'See config/deml.catalog.json and frontend/.env.example.',
+    );
+    process.exit(1);
+  }
+}
+
 const getBackendUrlCode = `
 const getBackendUrl = () => {
   const host = typeof window !== 'undefined' ? window.location.hostname : '';
