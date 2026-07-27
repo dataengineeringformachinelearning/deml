@@ -62,6 +62,7 @@ Enforced CSP across product (`frontend/vercel.json`, `frontend/nginx.conf`), com
 | Pin `https://cdn.jsdelivr.net` (no `*.jsdelivr.net`)                                                                                                                | Done   |
 | Narrow product/marketing `script-src` to explicit DEML hosts (`deml.app`, `backend.deml.app`, marketing apex); broader `connect-src` kept for previews              | Done   |
 | Add Vercel Analytics hosts (`va.vercel-scripts.com`, `vitals.vercel-insights.com`) on product CSP                                                                   | Done   |
+| Add Vercel Live toolbar host (`vercel.live`) on product `script-src` / `connect-src` / `frame-src`                                                                  | Done   |
 | Add `form-action 'self'`; product/marketing `frame-ancestors 'self'` (`/auth-status` keeps its cross-surface allowlist; Django HTML keeps `frame-ancestors 'none'`) | Done   |
 | Django: no `'unsafe-eval'`; Storybook keeps `'unsafe-eval'` (required)                                                                                              | Done   |
 | Permissions-Policy denies `payment` / `usb` / `bluetooth` (aligned)                                                                                                 | Done   |

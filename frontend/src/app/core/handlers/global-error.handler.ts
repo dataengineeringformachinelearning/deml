@@ -14,6 +14,11 @@ export class GlobalErrorHandler implements ErrorHandler {
       return;
     }
 
+    // Browser extensions (Angular DevTools) throw into the app error channel on prod.
+    if (isIgnoredClientNoise(error)) {
+      return;
+    }
+
     void this.captureInMonitoring(error);
     console.error('GlobalErrorHandler caught an error:', error);
 
@@ -52,4 +57,18 @@ export class GlobalErrorHandler implements ErrorHandler {
       // Error reporting must never create a second application failure.
     }
   }
+}
+
+// --- Extension / tooling noise (not app defects) ---
+function isIgnoredClientNoise(error: unknown): boolean {
+  const message =
+    error instanceof Error
+      ? error.message
+      : typeof error === 'string'
+        ? error
+        : String((error as { message?: unknown })?.message ?? error ?? '');
+  return (
+    message.includes('Angular DevTools') ||
+    message.includes('Angular debugging APIs are not available')
+  );
 }
