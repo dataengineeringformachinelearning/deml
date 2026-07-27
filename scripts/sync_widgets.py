@@ -37,20 +37,22 @@ def resolve_widget_src(root: str, name: str) -> str:
 
 def sync_widgets() -> None:
   root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+  marketing_alive = os.path.isfile(
+    os.path.join(root, "marketing", "src", "layouts", "Layout.astro")
+  )
   marketing_widgets = os.path.join(root, "marketing", "public", "assets", "widgets")
   backend_widgets = os.path.join(root, "backend", "static", "widgets")
   docs_widgets = os.path.join(root, "viking-ui-docs", "public", "assets", "widgets")
   frontend_public_widgets = os.path.join(root, "frontend", "public", "assets", "widgets")
 
-  for widgets_dir in (marketing_widgets, backend_widgets, docs_widgets, frontend_public_widgets):
+  widget_dirs = [backend_widgets, docs_widgets, frontend_public_widgets]
+  if marketing_alive:
+    widget_dirs.insert(0, marketing_widgets)
+
+  for widgets_dir in widget_dirs:
     os.makedirs(widgets_dir, exist_ok=True)
 
-  shared_widget_targets = (
-    marketing_widgets,
-    backend_widgets,
-    docs_widgets,
-    frontend_public_widgets,
-  )
+  shared_widget_targets = tuple(widget_dirs)
 
   copied_paths: list[str] = []
 
@@ -61,6 +63,9 @@ def sync_widgets() -> None:
       continue
 
     if name == "cookie-consent.js":
+      if not marketing_alive:
+        print(f"Skip {name}: marketing surface not in this repo", file=sys.stderr)
+        continue
       dst = os.path.join(marketing_widgets, name)
       shutil.copy2(src, dst)
       copied_paths.append(dst)
@@ -75,7 +80,10 @@ def sync_widgets() -> None:
         print(f"Synced {name} -> {dst_dir}")
       continue
 
-    for dst_dir in (marketing_widgets, backend_widgets):
+    embed_targets = [backend_widgets]
+    if marketing_alive:
+      embed_targets.insert(0, marketing_widgets)
+    for dst_dir in embed_targets:
       dst = os.path.join(dst_dir, name)
       shutil.copy2(src, dst)
       copied_paths.append(dst)
@@ -105,11 +113,15 @@ def sync_algolia_config() -> None:
     print(f"Skip missing Algolia config: {ALGOLIA_CONFIG}", file=sys.stderr)
     return
 
-  targets = (
-    os.path.join(root, "backend", "static"),
-    os.path.join(root, "marketing", "public", "assets"),
-    os.path.join(root, "frontend", "public", "assets"),
+  marketing_alive = os.path.isfile(
+    os.path.join(root, "marketing", "src", "layouts", "Layout.astro")
   )
+  targets = [
+    os.path.join(root, "backend", "static"),
+    os.path.join(root, "frontend", "public", "assets"),
+  ]
+  if marketing_alive:
+    targets.insert(1, os.path.join(root, "marketing", "public", "assets"))
 
   for dst_dir in targets:
     os.makedirs(dst_dir, exist_ok=True)

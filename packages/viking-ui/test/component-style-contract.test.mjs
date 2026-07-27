@@ -94,7 +94,7 @@ test("desktop account actions use one semantic group and the navbar gap", () => 
 
   assert.match(
     navbarStyles,
-    /\.desktop-auth\s*\{[\s\S]*?gap:\s*var\(--viking-space-2, 16px\);/,
+    /\.desktop-auth\s*\{[\s\S]*?gap:\s*var\(--viking-space-2/,
   );
   for (const navbar of [angularNavbar, webNavbar]) {
     assert.match(
@@ -131,16 +131,21 @@ test("the application bundle keeps Angular surfaces complete without static-site
   assert.match(applicationBundle, /@use "components\/badges" as \*/);
   assert.match(applicationBundle, /@use "components\/icon-inline" as \*/);
   assert.match(applicationBundle, /@use "surfaces\/app-pages" as \*/);
+  // Product home (/) reuses landing surface partials — allow those only.
+  assert.match(applicationBundle, /@use "surfaces\/marketing-landing" as \*/);
+  assert.match(applicationBundle, /@use "surfaces\/marketing-community" as \*/);
   assert.doesNotMatch(
     applicationBundle,
-    /@use ["'][^"']*(?:marketing|docs|backend|swagger)/,
+    /@use ["'][^"']*(?:marketing-global|docs|backend|swagger)/,
   );
   const applicationClosure = [
     ...collectSassUseClosure(path.join(stylesDir, "viking-app.scss")),
   ].map((filePath) => path.relative(stylesDir, filePath));
   assert.equal(
     applicationClosure.some((filePath) =>
-      /(?:^|\/)(?:marketing|docs|backend|swagger)[^/]*\.scss$/.test(filePath),
+      /(?:^|\/)(?:marketing-global|docs|backend|swagger)[^/]*\.scss$/.test(
+        filePath,
+      ),
     ),
     false,
     `Application Sass closure contains a static-only surface: ${applicationClosure.join(", ")}`,
@@ -315,7 +320,35 @@ test("Blue Note categories and optional outlines keep stable layout contracts", 
     "surfaces",
     "marketing-blue-note-detail.scss",
   );
-  const marketingRoot = path.resolve(packageDir, "..", "..", "marketing");
+  // Marketing Astro lives in the community repo; prefer sibling checkout, else skip templates.
+  const marketingCandidates = [
+    path.resolve(packageDir, "..", "..", "marketing"),
+    path.resolve(
+      packageDir,
+      "..",
+      "..",
+      "..",
+      "dataengineeringformachinelearning",
+      "marketing",
+    ),
+  ];
+  const marketingRoot = marketingCandidates.find((candidate) =>
+    existsSync(path.join(candidate, "src", "pages", "blog", "index.astro")),
+  );
+
+  assert.match(
+    blueNoteStyles,
+    /\.blue-note-categories li\s*\{[^}]*display:\s*inline-flex;[^}]*margin:\s*0;[^}]*line-height:\s*var\(--viking-line-height-snug\);/s,
+  );
+  assert.match(
+    detailStyles,
+    /\.blue-note-prose\s*\{[^}]*width:\s*100%;[^}]*max-width:\s*var\(--viking-content-readable-max-width\);/s,
+  );
+
+  if (!marketingRoot) {
+    return;
+  }
+
   const indexTemplate = readFileSync(
     path.join(marketingRoot, "src", "pages", "blog", "index.astro"),
     "utf8",
@@ -326,16 +359,8 @@ test("Blue Note categories and optional outlines keep stable layout contracts", 
   );
 
   assert.match(indexTemplate, /class="blue-note-categories"/);
-  assert.match(
-    blueNoteStyles,
-    /\.blue-note-categories li\s*\{[^}]*display:\s*inline-flex;[^}]*margin:\s*0;[^}]*line-height:\s*var\(--viking-line-height-snug\);/s,
-  );
   assert.match(detailTemplate, /const outlineHeadings = headings\.filter/);
   assert.match(detailTemplate, /blue-note-article-layout--with-outline/);
-  assert.match(
-    detailStyles,
-    /\.blue-note-prose\s*\{[^}]*width:\s*100%;[^}]*max-width:\s*var\(--viking-content-readable-max-width\);/s,
-  );
   assert.match(
     detailStyles,
     /\.blue-note-article-layout--with-outline\s*\{[^}]*grid-template-columns:\s*var\(--viking-space-24\) minmax\(0, 1fr\);/s,

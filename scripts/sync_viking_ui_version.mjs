@@ -1,23 +1,31 @@
 import { spawnSync } from "node:child_process";
-import { readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  readFileSync,
+  readdirSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const PACKAGE_NAME = "@dataengineeringformachinelearning/viking-ui";
 const ROOT_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const CANONICAL_MANIFEST = "packages/viking-ui/package.json";
+// Marketing lives in the community repo — do not require it here.
 const CONSUMER_MANIFESTS = [
   "frontend/package.json",
-  "marketing/package.json",
   "viking-ui-docs/package.json",
-];
+].filter((relativePath) => existsSync(join(ROOT_DIR, relativePath)));
 const COPY_FILES = [
   "BOOK.md",
   "WHITEPAPER.md",
   "packages/viking-ui/README.md",
   "viking-ui-docs/README.md",
-];
-const COPY_DIRECTORIES = ["frontend/src", "viking-ui-docs/src"];
+].filter((relativePath) => existsSync(join(ROOT_DIR, relativePath)));
+const COPY_DIRECTORIES = ["frontend/src", "viking-ui-docs/src"].filter(
+  (relativePath) => existsSync(join(ROOT_DIR, relativePath)),
+);
 const COPY_EXTENSIONS = new Set([
   ".astro",
   ".html",
@@ -29,10 +37,9 @@ const COPY_EXTENSIONS = new Set([
 const LOCKFILE_PROJECTS = [
   ".",
   "frontend",
-  "marketing",
   "packages/viking-ui",
   "viking-ui-docs",
-];
+].filter((relativePath) => existsSync(join(ROOT_DIR, relativePath)));
 const args = new Set(process.argv.slice(2));
 const shouldWrite = args.has("--write") || args.has("--changesets");
 // Lockfile refresh hits the npm registry for nested installs (`--workspaces=false`).
@@ -137,22 +144,80 @@ for (const relativePath of versionedCopyFiles) {
 }
 
 if (shouldRefreshLockfiles) {
-  for (const relativeDirectory of LOCKFILE_PROJECTS) {
-    const workspaceArgs =
-      relativeDirectory === "." ? [] : ["--workspaces=false"];
-    run(
-      "npm",
-      [
-        "install",
-        "--package-lock-only",
-        "--legacy-peer-deps",
-        "--ignore-scripts",
-        "--no-audit",
-        "--no-fund",
-        ...workspaceArgs,
-      ],
-      join(ROOT_DIR, relativeDirectory),
-    );
+  // Root workspace install resolves local packages (deml-contracts, viking-ui).
+  // Nested --workspaces=false installs break on unpublished workspace deps.
+  run(
+    "npm",
+    [
+      "install",
+      "--package-lock-only",
+      "--legacy-peer-deps",
+      "--ignore-scripts",
+      "--no-audit",
+      "--no-fund",
+    ],
+    ROOT_DIR,
+  );
+
+  // Keep the package-local lockfile version field in sync for npm pack/publish.
+  const vikingLockPath = "packages/viking-ui/package-lock.json";
+  if (existsSync(join(ROOT_DIR, vikingLockPath))) {
+    const vikingLock = readJson(vikingLockPath);
+    vikingLock.version = canonicalVersion;
+    if (vikingLock.packages?.[""]) {
+      vikingLock.packages[""].version = canonicalVersion;
+    }
+    writeJson(vikingLockPath, vikingLock);
+    console.log(`Aligned ${vikingLockPath} to ${canonicalVersion}`);
+  }
+
+  // Nested consumer locks (legacy) — patch version pins only.
+  for (const relativePath of [
+    "frontend/package-lock.json",
+    "viking-ui-docs/package-lock.json",
+  ]) {
+    if (!existsSync(join(ROOT_DIR, relativePath))) continue;
+    const lockfile = readJson(relativePath);
+    let changed = false;
+    if (lockfile.packages?.[""]?.dependencies?.[PACKAGE_NAME]) {
+      lockfile.packages[""].dependencies[PACKAGE_NAME] = canonicalRange;
+      changed = true;
+    }
+    const nodeKey = `node_modules/${PACKAGE_NAME}`;
+    const tarball = `https://registry.npmjs.org/${PACKAGE_NAME}/-/${PACKAGE_NAME.split("/").pop()}-${canonicalVersion}.tgz`;
+    // Prefer live integrity from the registry when available.
+    let integrity = lockfile.packages?.[nodeKey]?.integrity;
+    try {
+      const meta = spawnSync(
+        "npm",
+        ["view", `${PACKAGE_NAME}@${canonicalVersion}`, "dist.integrity"],
+        { encoding: "utf8" },
+      );
+      if (meta.status === 0 && meta.stdout.trim()) {
+        integrity = meta.stdout.trim();
+      }
+    } catch {
+      /* keep prior integrity */
+    }
+    if (lockfile.packages?.[nodeKey]) {
+      lockfile.packages[nodeKey].version = canonicalVersion;
+      lockfile.packages[nodeKey].resolved = tarball;
+      if (integrity) lockfile.packages[nodeKey].integrity = integrity;
+      changed = true;
+    }
+    if (lockfile.dependencies?.[PACKAGE_NAME]) {
+      const entry = lockfile.dependencies[PACKAGE_NAME];
+      if (typeof entry === "object" && entry) {
+        entry.version = canonicalVersion;
+        entry.resolved = tarball;
+        if (integrity) entry.integrity = integrity;
+        changed = true;
+      }
+    }
+    if (changed) {
+      writeJson(relativePath, lockfile);
+      console.log(`Aligned ${relativePath} to ${canonicalRange}`);
+    }
   }
 }
 

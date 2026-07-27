@@ -48,7 +48,13 @@ def sync_fonts() -> None:
       sys.exit(1)
     validate_woff2(src)
 
+  marketing_alive = os.path.isfile(
+    os.path.join(root, "marketing", "src", "layouts", "Layout.astro")
+  )
+
   for rel in FONT_TARGETS:
+    if rel.startswith("marketing/") and not marketing_alive:
+      continue
     dst_dir = os.path.join(root, rel)
     os.makedirs(dst_dir, exist_ok=True)
     for name in FONT_FILES:

@@ -74,14 +74,14 @@ html {
   outline-offset: var(--viking-ring-offset, var(--suite-ring-offset));
 }
 
-#main-content:focus {
+// SPA route focus + skip-link target — never outline the whole landmark.
+#main-content:focus,
+#main-content:focus-visible,
+[data-suite-main]:focus,
+[data-suite-main]:focus-visible,
+.suite-main:focus,
+.suite-main:focus-visible {
   outline: none;
-}
-
-#main-content:focus-visible {
-  outline: var(--viking-ring-width, var(--suite-ring-width)) solid
-    var(--viking-ring, var(--suite-ring));
-  outline-offset: var(--viking-ring-offset, var(--suite-ring-offset));
 }
 
 a:focus-visible,

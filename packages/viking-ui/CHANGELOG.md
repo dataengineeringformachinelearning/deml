@@ -1,5 +1,11 @@
 # @dataengineeringformachinelearning/viking-ui
 
+## 10.0.0
+
+### Major Changes
+
+- Updates latest
+
 ## 9.7.3
 
 ### Patch Changes

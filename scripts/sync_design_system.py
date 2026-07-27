@@ -45,19 +45,37 @@ def sync_design_system() -> None:
       print(f"Expected build output missing: {path}", file=sys.stderr)
       sys.exit(1)
 
+  # Marketing lives in the community repo — never create a stub tree here.
+  marketing_alive = os.path.isfile(
+    os.path.join(root_dir, "marketing", "src", "layouts", "Layout.astro")
+  )
+
+  def _optional_target(path: str) -> str | None:
+    if "marketing" in path.split(os.sep) and not marketing_alive:
+      return None
+    return path
+
   viking_css_targets = [
-    os.path.join(root_dir, "frontend", "public", "assets", "viking-ui.css"),
-    os.path.join(root_dir, "backend", "static", "viking-ui.css"),
-    os.path.join(root_dir, "marketing", "public", "assets", "viking-ui.css"),
-    os.path.join(root_dir, "viking-ui-docs", "public", "assets", "viking-ui.css"),
-    os.path.join(docs_static_dir, "viking-ui.css"),
+    t
+    for t in (
+      os.path.join(root_dir, "frontend", "public", "assets", "viking-ui.css"),
+      os.path.join(root_dir, "backend", "static", "viking-ui.css"),
+      os.path.join(root_dir, "marketing", "public", "assets", "viking-ui.css"),
+      os.path.join(root_dir, "viking-ui-docs", "public", "assets", "viking-ui.css"),
+      os.path.join(docs_static_dir, "viking-ui.css"),
+    )
+    if _optional_target(t)
   ]
 
   suite_fonts_src = os.path.join(dist_dir, "suite-fonts.css")
   suite_fonts_targets = [
-    os.path.join(root_dir, "frontend", "public", "assets", "suite-fonts.css"),
-    os.path.join(root_dir, "marketing", "public", "assets", "suite-fonts.css"),
-    os.path.join(root_dir, "viking-ui-docs", "public", "assets", "suite-fonts.css"),
+    t
+    for t in (
+      os.path.join(root_dir, "frontend", "public", "assets", "suite-fonts.css"),
+      os.path.join(root_dir, "marketing", "public", "assets", "suite-fonts.css"),
+      os.path.join(root_dir, "viking-ui-docs", "public", "assets", "suite-fonts.css"),
+    )
+    if _optional_target(t)
   ]
 
   viking_app_css_targets = [
@@ -65,10 +83,14 @@ def sync_design_system() -> None:
   ]
 
   elements_targets = [
-    os.path.join(root_dir, "backend", "static", "viking-ui-elements.js"),
-    os.path.join(root_dir, "marketing", "public", "assets", "viking-ui-elements.js"),
-    os.path.join(root_dir, "viking-ui-docs", "public", "assets", "viking-ui-elements.js"),
-    os.path.join(docs_static_dir, "viking-ui-elements.js"),
+    t
+    for t in (
+      os.path.join(root_dir, "backend", "static", "viking-ui-elements.js"),
+      os.path.join(root_dir, "marketing", "public", "assets", "viking-ui-elements.js"),
+      os.path.join(root_dir, "viking-ui-docs", "public", "assets", "viking-ui-elements.js"),
+      os.path.join(docs_static_dir, "viking-ui-elements.js"),
+    )
+    if _optional_target(t)
   ]
 
   tokens_json_targets = [

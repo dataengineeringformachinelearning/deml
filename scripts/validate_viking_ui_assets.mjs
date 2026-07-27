@@ -54,13 +54,15 @@ for (const artifact of packageArtifacts) {
   requireFile(path.join("packages", "viking-ui", "dist", artifact));
 }
 
+const marketingPresent = existsSync(
+  path.join(rootDir, "marketing", "src", "layouts", "Layout.astro"),
+);
+
 const staticMirrors = [
   ["viking-app.css", "frontend/public/assets/viking-app.css"],
   ["viking-ui.css", "backend/static/viking-ui.css"],
-  ["viking-ui.css", "marketing/public/assets/viking-ui.css"],
   ["viking-ui.css", "viking-ui-docs/public/assets/viking-ui.css"],
   ["viking-ui-elements.js", "backend/static/viking-ui-elements.js"],
-  ["viking-ui-elements.js", "marketing/public/assets/viking-ui-elements.js"],
   [
     "viking-ui-elements.js",
     "viking-ui-docs/public/assets/viking-ui-elements.js",
@@ -68,6 +70,13 @@ const staticMirrors = [
   ["viking-tokens.json", "backend/static/viking-tokens.json"],
   ["viking-tokens.json", "viking-ui-docs/public/assets/viking-tokens.json"],
 ];
+
+if (marketingPresent) {
+  staticMirrors.push(
+    ["viking-ui.css", "marketing/public/assets/viking-ui.css"],
+    ["viking-ui-elements.js", "marketing/public/assets/viking-ui-elements.js"],
+  );
+}
 
 for (const [artifact, mirror] of staticMirrors) {
   requireSameFile(path.join("packages", "viking-ui", "dist", artifact), mirror);
@@ -121,12 +130,16 @@ const removedFrontendMirrors = [
   "backend/static/design-tokens.css",
   "backend/static/viking-components.css",
   "backend/static/deml-components.css",
-  "marketing/public/assets/design-tokens.css",
-  "marketing/public/assets/viking-components.css",
-  "marketing/public/assets/deml-components.css",
   "viking-ui-docs/public/assets/design-tokens.css",
   "viking-ui-docs/public/assets/viking-components.css",
   "viking-ui-docs/public/assets/deml-components.css",
+  ...(marketingPresent
+    ? [
+        "marketing/public/assets/design-tokens.css",
+        "marketing/public/assets/viking-components.css",
+        "marketing/public/assets/deml-components.css",
+      ]
+    : []),
 ];
 
 for (const relativePath of removedFrontendMirrors) {
@@ -149,15 +162,17 @@ for (const relativePath of sourceImportChecks) {
   }
 }
 
-const marketingLayout = readText("marketing/src/layouts/Layout.astro");
-const marketingElementsScripts =
-  marketingLayout.match(
-    /viking-ui-(?:elements)\.js|viking-ui\/web-components\.js/g,
-  ) ?? [];
-if (marketingElementsScripts.length !== 1) {
-  failures.push(
-    "marketing/src/layouts/Layout.astro should load one Viking UI element entrypoint exactly once.",
-  );
+if (marketingPresent) {
+  const marketingLayout = readText("marketing/src/layouts/Layout.astro");
+  const marketingElementsScripts =
+    marketingLayout.match(
+      /viking-ui-(?:elements)\.js|viking-ui\/web-components\.js/g,
+    ) ?? [];
+  if (marketingElementsScripts.length !== 1) {
+    failures.push(
+      "marketing/src/layouts/Layout.astro should load one Viking UI element entrypoint exactly once.",
+    );
+  }
 }
 
 const packageJson = JSON.parse(readText("packages/viking-ui/package.json"));
@@ -190,7 +205,7 @@ if (!packageJson.sideEffects?.includes("./dist/viking-app.css")) {
 }
 
 const singleBundleLayouts = [
-  "marketing/src/layouts/Layout.astro",
+  ...(marketingPresent ? ["marketing/src/layouts/Layout.astro"] : []),
   "viking-ui-docs/src/layouts/BaseLayout.astro",
   "backend/templates/base.html",
 ];
@@ -203,6 +218,9 @@ const countBundleCssImports = (content) => {
 };
 
 for (const relativePath of singleBundleLayouts) {
+  if (!existsSync(path.join(rootDir, relativePath))) {
+    continue;
+  }
   const content = readText(relativePath);
   const cssLinkCount = countBundleCssImports(content);
   if (cssLinkCount !== 1) {

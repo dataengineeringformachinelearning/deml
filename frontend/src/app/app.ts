@@ -138,11 +138,13 @@ export class App implements OnInit {
       this.isDashboardPage.set(isDashboard && !isStandaloneStatus);
 
       // SPA keyboard/SR: move focus to main when the path changes (not query/hash).
+      // focusVisible:false — do not paint a full-page suite ring on programmatic focus
+      // (Chromium otherwise matches :focus-visible after scripted .focus()).
       if (pathChanged && isPlatformBrowser(this.platformId) && !this.isAuthStatusPage()) {
         this.lastFocusedPath = nextPath;
         queueMicrotask(() => {
           const main = document.getElementById('main-content');
-          main?.focus({ preventScroll: true });
+          main?.focus({ preventScroll: true, focusVisible: false });
         });
       }
     });

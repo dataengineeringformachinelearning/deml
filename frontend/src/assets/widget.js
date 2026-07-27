@@ -49,7 +49,7 @@
 
   const DEFAULT_STATUS_APP = 'https://deml.app';
   const VIKING_UI_CSS_CDN =
-    'https://cdn.jsdelivr.net/npm/@dataengineeringformachinelearning/viking-ui@9.7.3/dist/viking-ui.css';
+    'https://cdn.jsdelivr.net/npm/@dataengineeringformachinelearning/viking-ui@10.0.0/dist/viking-ui.css';
   /* Pass 6 — shadow-root fallback tokens mirror suite-tokens Role A (void + electric + gold).
      Prefer host page suite CSS when present; these values keep embeds on-brand offline. */
   const PLATFORM_WIDGET_STYLES = `

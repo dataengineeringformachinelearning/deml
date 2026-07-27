@@ -1,6 +1,6 @@
 {
   "name": "viking-ui-docs",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
   "type": "module",
   "description": "Viking-UI documentation showcase (Astro) for the DEML design system.",
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
-    "@dataengineeringformachinelearning/viking-ui": "^9.7.3",
+    "@dataengineeringformachinelearning/viking-ui": "^10.0.0",
     "@sentry/browser": "^9.47.1",
     "astro": "^7.1.3"
   },

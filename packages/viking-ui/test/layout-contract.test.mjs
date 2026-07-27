@@ -147,7 +147,7 @@ test("dashboard security panels use the equal-height panel recipe", () => {
 
   assert.match(
     dashboard,
-    /<viking-tab-panel value="security">[\s\S]*?<viking-panel-grid \[columns\]="2">[\s\S]*?<h2>Threat Queue<\/h2>[\s\S]*?<h2>How threats are detected<\/h2>/,
+    /<viking-tab-panel value="security">[\s\S]*?<viking-panel-grid \[columns\]="2">[\s\S]*?title="Threat queue"[\s\S]*?title="How threats are detected"/,
   );
 });
 
@@ -257,7 +257,7 @@ test("analytics uses compact three-up gauges, even chart rhythm, and a templated
 
   assert.match(
     analytics,
-    /<viking-section-template[\s\S]*?class="analytics-export-card"[\s\S]*?heading="Exports"[\s\S]*?description="Signed downloads · CSV · JSON · Parquet · PDF"[\s\S]*?<viking-form-section heading="Generate"/,
+    /<viking-section-template[\s\S]*?class="analytics-export-card"[\s\S]*?heading="Exports"[\s\S]*?description="Signed downloads · CSV · JSON · Parquet · PDF"[\s\S]*?<viking-form-section heading="Options"/,
   );
   assert.match(
     analytics,
@@ -530,9 +530,11 @@ test("component spacing declarations use Viking spacing tokens", () => {
 
   const violations = componentFiles.flatMap((filePath) => {
     const source = readFileSync(filePath, "utf8");
-    return [...source.matchAll(rawPixelSpacing)].map(
-      (match) => `${path.relative(packageDir, filePath)}: ${match[0].trim()}`,
-    );
+    return [...source.matchAll(rawPixelSpacing)]
+      .map((match) => match[0].trim())
+      // Token fallbacks like var(--viking-space-px, 1px) are allowed.
+      .filter((decl) => !/--viking-space[\w-]*/.test(decl))
+      .map((decl) => `${path.relative(packageDir, filePath)}: ${decl}`);
   });
 
   assert.deepEqual(
