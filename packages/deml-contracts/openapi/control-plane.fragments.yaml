@@ -1,0 +1,275 @@
+# DEML-owned OpenAPI fragments (contract SoT).
+# FORJD adapter routes are listed as path aliases with x-deml-upstream.
+# Not a complete deployable OpenAPI document — merge into generated Ninja schema later.
+openapi: 3.1.0
+info:
+  title: DEML Control Plane Contracts
+  version: 0.1.0
+  description: |
+    Canonical fragments for UC-* contracts.
+    Narrative: docs/use-cases/CANONICAL.md
+paths:
+  /api/v1/health:
+    get:
+      operationId: getHealth
+      tags: [UC-HEALTH-001]
+      security: []
+      responses:
+        "200":
+          description: Liveness
+  /api/v1/ready:
+    get:
+      operationId: getReady
+      tags: [UC-HEALTH-001]
+      security: []
+      responses:
+        "200":
+          description: Readiness (may be soft-degraded on FORJD)
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/ready.schema.json
+  /api/v1/auth/user:
+    get:
+      operationId: getAuthUser
+      tags: [UC-AUTH-001]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Authenticated identity probe
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/auth.schema.json#/$defs/AuthUserResponse
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /api/v1/auth/delete-account:
+    delete:
+      operationId: deleteAccount
+      tags: [UC-AUTH-006]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Deletion completed
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/auth.schema.json#/$defs/DeleteAccountOut
+        "503":
+          description: FORJD erase blocked; identity retained
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/error-envelope.schema.json
+  /api/v1/auth/api-keys/generate:
+    post:
+      operationId: generateApiKey
+      tags: [UC-AUTH-005]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/auth.schema.json#/$defs/APIKeyGenerateIn
+      responses:
+        "200":
+          description: One-time deml_ key
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/auth.schema.json#/$defs/APIKeyGenerateOut
+  /api/v1/forjd/ingest:
+    post:
+      operationId: forjdIngestSealed
+      tags: [UC-INGEST-001]
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/sealed-event.schema.json
+      responses:
+        "200":
+          description: FORJD ingest receipt (shape owned upstream)
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "503":
+          $ref: "#/components/responses/ForjdDegraded"
+  /api/v1/forjd/ingest/events:batch:
+    post:
+      operationId: forjdIngestSealedBatch
+      tags: [UC-INGEST-002]
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [events]
+              properties:
+                events:
+                  type: array
+                  minItems: 1
+                  maxItems: 25
+                  items:
+                    $ref: ../schemas/sealed-event.schema.json
+      responses:
+        "200":
+          description: Batch receipt
+        "503":
+          $ref: "#/components/responses/ForjdDegraded"
+  /api/v1/ingest:
+    post:
+      operationId: nativeIngestSealed
+      tags: [UC-INGEST-001]
+      x-deml-upstream: /api/v1/ingest
+      x-deml-tenant-binding: sealed
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/sealed-event.schema.json
+      responses:
+        "200":
+          description: Upstream receipt
+  /api/v1/analytics/live:
+    get:
+      operationId: analyticsLiveSse
+      tags: [UC-ANALYTICS-001]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: text/event-stream of LiveSse events
+          content:
+            text/event-stream:
+              schema:
+                $ref: ../schemas/live-sse.schema.json
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /api/v1/analytics/playbook-runs/{run_id}/actions/{action_result_id}/ack:
+    post:
+      operationId: playbookActionAck
+      tags: [UC-ANALYTICS-003]
+      x-deml-csrf: header-auth-only
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RunId"
+        - $ref: "#/components/parameters/ActionResultId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/playbook-action.schema.json#/$defs/PlaybookActionAckIn
+      responses:
+        "200":
+          description: Ack accepted by FORJD
+  /api/v1/analytics/playbook-runs/{run_id}/actions/{action_result_id}/retry:
+    post:
+      operationId: playbookActionRetry
+      tags: [UC-ANALYTICS-003]
+      x-deml-csrf: header-auth-only
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RunId"
+        - $ref: "#/components/parameters/ActionResultId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/playbook-action.schema.json#/$defs/PlaybookActionRetryIn
+      responses:
+        "200":
+          description: Retry accepted
+  /api/v1/billing/create-checkout-session:
+    post:
+      operationId: createCheckoutSession
+      tags: [UC-BILL-001]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Stripe Checkout URL (when enabled)
+        "403":
+          description: Checkout disabled or unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/error-envelope.schema.json
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Firebase ID token or deml_ API key (Bearer)
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: deml_ API key
+  parameters:
+    RunId:
+      name: run_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    ActionResultId:
+      name: action_result_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+  responses:
+    Unauthorized:
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/error-envelope.schema.json
+    Forbidden:
+      description: Role or Pro entitlement denial
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/error-envelope.schema.json
+    RateLimited:
+      description: DEML headless/IP rate limit
+      headers:
+        Retry-After:
+          schema: { type: string }
+        X-RateLimit-Limit:
+          schema: { type: string }
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/error-envelope.schema.json
+    ForjdDegraded:
+      description: Typed data-plane outage
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/error-envelope.schema.json

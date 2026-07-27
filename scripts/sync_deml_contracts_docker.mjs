@@ -1,0 +1,30 @@
+#!/usr/bin/env node
+/**
+ * Stage packages/deml-contracts into backend/vendor/deml-contracts for Docker
+ * builds whose context is backend/ (Fly deploy from backend/).
+ */
+import { cpSync, mkdirSync, rmSync, existsSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const src = join(root, 'packages', 'deml-contracts');
+const dest = join(root, 'backend', 'vendor', 'deml-contracts');
+
+if (!existsSync(src)) {
+  console.error(`Missing contracts package at ${src}`);
+  process.exit(1);
+}
+
+rmSync(dest, { recursive: true, force: true });
+mkdirSync(dirname(dest), { recursive: true });
+cpSync(src, dest, {
+  recursive: true,
+  filter: (path) =>
+    !path.includes(`${join('deml-contracts', '.venv')}`) &&
+    !path.includes(`${join('deml-contracts', 'uv.lock')}`) &&
+    !path.includes('__pycache__') &&
+    !path.includes('node_modules'),
+});
+writeFileSync(join(root, 'backend', 'vendor', '.gitignore'), 'deml-contracts/\n');
+console.log(`Staged deml-contracts → ${dest}`);

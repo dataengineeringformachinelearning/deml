@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deml.app/schemas/playbook-action.json",
+  "title": "PlaybookActionControls",
+  "description": "UC-ANALYTICS-003 ack/retry bodies (header-auth only).",
+  "$defs": {
+    "PlaybookActionAckIn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["succeeded"],
+      "properties": {
+        "succeeded": { "type": "boolean" },
+        "external_reference": {
+          "type": ["string", "null"],
+          "maxLength": 255
+        },
+        "metadata": { "type": "object" }
+      }
+    },
+    "PlaybookActionRetryIn": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    }
+  }
+}

@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "deml-contracts"
+version = "0.1.0"
+description = "Canonical DEML use-case Python contracts (Pydantic)"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.11"
+authors = [
+  { name = "Joe Alongi", email = "contact@joealongi.dev" },
+]
+dependencies = [
+  "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0.0", "ruff>=0.4.0"]
+
+[project.urls]
+Repository = "https://github.com/dataengineeringformachinelearning/deml"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/deml_contracts"]
