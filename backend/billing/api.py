@@ -12,12 +12,19 @@ try:
 except ImportError:
   HAS_STRIPE = False
 
+from deml_contracts import (
+  BillingErrorOut,
+  BillingSyncOut,
+  CheckoutSessionOut,
+  SubscriptionMutateOut,
+)
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.http import HttpResponse
 from monitor.models import UserLifecycleJob, UserProfile
 from ninja import Router
+from utils.structured_log import log_usecase
 
 logger = logging.getLogger(__name__)
 
@@ -138,7 +145,10 @@ def create_checkout_session(request):
   from django.http import JsonResponse
 
   if not _PRO_CHECKOUT_ENABLED:
-    return JsonResponse({"error": _PRO_CHECKOUT_DISABLED_MSG}, status=403)
+    log_usecase(logger, "UC-BILL-001", "checkout_disabled")
+    return JsonResponse(
+      BillingErrorOut(error=_PRO_CHECKOUT_DISABLED_MSG).model_dump(), status=403
+    )
 
   if not request.user.is_authenticated or not request.user.is_active:
     return JsonResponse({"error": "Authentication required"}, status=401)
@@ -213,7 +223,7 @@ def create_checkout_session(request):
       session_kwargs["customer_email"] = request.user.email
 
     session = stripe.checkout.Session.create(**session_kwargs)
-    return {"checkout_url": session.url}
+    return CheckoutSessionOut(checkout_url=session.url).model_dump()
   except Exception as e:
     logger.error("Error creating checkout session: %s", type(e).__name__)
     from django.http import JsonResponse
@@ -377,22 +387,22 @@ def sync_subscription(request: Any) -> Any:
 
   profile = _get_profile(request)
   if not profile:
-    return {"status": "synced", "active": False, "cancel_at_period_end": False}
+    return BillingSyncOut(status="synced", active=False, cancel_at_period_end=False).model_dump()
 
   if not HAS_STRIPE or not getattr(stripe, "api_key", None):
-    return {
-      "status": "synced",
-      "active": profile.subscription_active,
-      "cancel_at_period_end": False,
-      "message": "Billing sync unavailable (Stripe not configured)",
-    }
+    return BillingSyncOut(
+      status="synced",
+      active=profile.subscription_active,
+      cancel_at_period_end=False,
+      message="Billing sync unavailable (Stripe not configured)",
+    ).model_dump()
 
   # Never attach subscriptions by email — only bound Stripe identifiers.
   customer_id = str(profile.stripe_customer_id or "").strip()
   subscription_id = str(profile.stripe_subscription_id or "").strip()
   if not customer_id and not subscription_id:
     _downgrade_to_standard(profile)
-    return {"status": "synced", "active": False, "cancel_at_period_end": False}
+    return BillingSyncOut(status="synced", active=False, cancel_at_period_end=False).model_dump()
 
   try:
     subscription: Any | None = None
@@ -402,12 +412,12 @@ def sync_subscription(request: Any) -> Any:
       except Exception as err:
         if not _stripe_resource_is_missing(err):
           logger.warning("Stripe subscription retrieve failed: %s", type(err).__name__)
-          return {
-            "status": "synced",
-            "active": profile.subscription_active,
-            "cancel_at_period_end": False,
-            "message": "Billing sync degraded (Stripe API error)",
-          }
+          return BillingSyncOut(
+            status="synced",
+            active=profile.subscription_active,
+            cancel_at_period_end=False,
+            message="Billing sync degraded (Stripe API error)",
+          ).model_dump()
         subscription = None
     elif customer_id:
       try:
@@ -420,12 +430,12 @@ def sync_subscription(request: Any) -> Any:
       except Exception as err:
         if not _stripe_resource_is_missing(err):
           logger.warning("Stripe customer sync failed: %s", type(err).__name__)
-          return {
-            "status": "synced",
-            "active": profile.subscription_active,
-            "cancel_at_period_end": False,
-            "message": "Billing sync degraded (Stripe API error)",
-          }
+          return BillingSyncOut(
+            status="synced",
+            active=profile.subscription_active,
+            cancel_at_period_end=False,
+            message="Billing sync degraded (Stripe API error)",
+          ).model_dump()
         subscription = None
 
     if (
@@ -440,18 +450,18 @@ def sync_subscription(request: Any) -> Any:
       _apply_active_subscription(
         profile, subscription, customer_id=str(resolved_customer or "") or None
       )
-      return {
-        "status": "synced",
-        "active": True,
-        "cancel_at_period_end": bool(
+      return BillingSyncOut(
+        status="synced",
+        active=True,
+        cancel_at_period_end=bool(
           subscription.get("cancel_at_period_end")
           if isinstance(subscription, dict)
           else getattr(subscription, "cancel_at_period_end", False)
         ),
-      }
+      ).model_dump()
 
     _downgrade_to_standard(profile)
-    return {"status": "synced", "active": False, "cancel_at_period_end": False}
+    return BillingSyncOut(status="synced", active=False, cancel_at_period_end=False).model_dump()
   except Exception as e:
     logger.error("Error syncing subscription: %s", type(e).__name__, exc_info=True)
     from django.http import JsonResponse
@@ -484,7 +494,15 @@ def cancel_subscription(request):
 
   try:
     sub = stripe.Subscription.modify(profile.stripe_subscription_id, cancel_at_period_end=True)
-    return {"status": "cancelled", "cancel_at_period_end": sub.cancel_at_period_end}
+    log_usecase(
+      logger,
+      "UC-BILL-003",
+      "subscription_cancelled",
+      cancel_at_period_end=bool(sub.cancel_at_period_end),
+    )
+    return SubscriptionMutateOut(
+      status="cancelled", cancel_at_period_end=bool(sub.cancel_at_period_end)
+    ).model_dump()
   except Exception as e:
     logger.error("Error cancelling subscription: %s", type(e).__name__)
     from django.http import JsonResponse
@@ -517,7 +535,15 @@ def resume_subscription(request):
 
   try:
     sub = stripe.Subscription.modify(profile.stripe_subscription_id, cancel_at_period_end=False)
-    return {"status": "resumed", "cancel_at_period_end": sub.cancel_at_period_end}
+    log_usecase(
+      logger,
+      "UC-BILL-003",
+      "subscription_resumed",
+      cancel_at_period_end=bool(sub.cancel_at_period_end),
+    )
+    return SubscriptionMutateOut(
+      status="resumed", cancel_at_period_end=bool(sub.cancel_at_period_end)
+    ).model_dump()
   except Exception as e:
     logger.error("Error resuming subscription: %s", type(e).__name__)
     from django.http import JsonResponse

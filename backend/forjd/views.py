@@ -14,13 +14,15 @@ from uuid import UUID, uuid4
 logger = logging.getLogger(__name__)
 
 from asgiref.sync import sync_to_async
+from deml_contracts import ErrorCode
+from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from pydantic import ValidationError
+
 from config.csrf_header_auth import (
   authorization_header_required,
   csrf_exempt_require_header_auth,
 )
-from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from pydantic import ValidationError
 
 from forjd.angular_compat import (
   deml_analytics_overview,
@@ -387,7 +389,7 @@ def _adapter_error_response(exc: AdapterError) -> JsonResponse:
     return JsonResponse(
       {
         "detail": exc.detail,
-        "code": "forjd_degraded",
+        "code": ErrorCode.FORJD_DEGRADED.value,
         "source": "forjd",
       },
       status=503,
@@ -416,7 +418,7 @@ def _forjd_error_response(exc: ForjdError) -> JsonResponse:
     result = JsonResponse(
       {
         "detail": "FORJD is temporarily unavailable",
-        "code": "forjd_degraded",
+        "code": ErrorCode.FORJD_DEGRADED.value,
         "source": "forjd",
       },
       status=503,
@@ -444,7 +446,7 @@ def _upstream_error_response(response: ForjdResponse) -> JsonResponse:
     result = JsonResponse(
       {
         "detail": "FORJD is temporarily unavailable",
-        "code": "forjd_degraded",
+        "code": ErrorCode.FORJD_DEGRADED.value,
         "source": "forjd",
       },
       status=503,
@@ -491,7 +493,7 @@ async def _typed_json_call(
   is_get = request.method == "GET"
   if not is_get and not writes_enabled():
     return JsonResponse(
-      {"detail": "FORJD writes are disabled", "code": "forjd_writes_disabled"},
+      {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
       status=503,
     )
   try:
@@ -630,7 +632,7 @@ async def native_forjd_proxy(
         result = JsonResponse(
           {
             "detail": "FORJD writes are disabled",
-            "code": "forjd_writes_disabled",
+            "code": ErrorCode.FORJD_WRITES_DISABLED.value,
           },
           status=503,
         )
@@ -1061,7 +1063,7 @@ async def status_pages_list_proxy(request: HttpRequest) -> HttpResponse:
   try:
     if not writes_enabled():
       return JsonResponse(
-        {"detail": "FORJD writes are disabled", "code": "forjd_writes_disabled"},
+        {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
         status=503,
       )
     credential = await _credential_for_request(request)
@@ -1108,7 +1110,7 @@ async def status_page_detail_proxy(request: HttpRequest, page_id: str) -> HttpRe
   try:
     if not writes_enabled():
       return JsonResponse(
-        {"detail": "FORJD writes are disabled", "code": "forjd_writes_disabled"},
+        {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
         status=503,
       )
     credential = await _credential_for_request(request)
@@ -1191,7 +1193,7 @@ async def status_page_services_proxy(request: HttpRequest, page_id: str) -> Http
       return JsonResponse({"detail": "Method not allowed"}, status=405)
     if not writes_enabled():
       return JsonResponse(
-        {"detail": "FORJD writes are disabled", "code": "forjd_writes_disabled"},
+        {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
         status=503,
       )
     credential = await _credential_for_request(request)
@@ -1256,7 +1258,7 @@ async def status_service_delete_proxy(request: HttpRequest, service_id: str) -> 
   try:
     if not writes_enabled():
       return JsonResponse(
-        {"detail": "FORJD writes are disabled", "code": "forjd_writes_disabled"},
+        {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
         status=503,
       )
     credential = await _credential_for_request(request)
@@ -1310,7 +1312,7 @@ async def status_page_incidents_proxy(request: HttpRequest, page_id: str) -> Htt
       return JsonResponse({"detail": "Method not allowed"}, status=405)
     if not writes_enabled():
       return JsonResponse(
-        {"detail": "FORJD writes are disabled", "code": "forjd_writes_disabled"},
+        {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
         status=503,
       )
     credential = await _credential_for_request(request)
@@ -1358,7 +1360,7 @@ async def status_incident_delete_proxy(request: HttpRequest, incident_id: str) -
   try:
     if not writes_enabled():
       return JsonResponse(
-        {"detail": "FORJD writes are disabled", "code": "forjd_writes_disabled"},
+        {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
         status=503,
       )
     credential = await _credential_for_request(request)
@@ -1860,7 +1862,7 @@ async def exports_collection_proxy(request: HttpRequest) -> HttpResponse:
   try:
     if not writes_enabled():
       return JsonResponse(
-        {"detail": "FORJD writes are disabled", "code": "forjd_writes_disabled"},
+        {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
         status=503,
       )
     credential = await _credential_for_request(request)
@@ -2133,7 +2135,7 @@ async def ml_train_proxy(request: HttpRequest) -> HttpResponse:
     return JsonResponse({"detail": "Method not allowed"}, status=405)
   if not writes_enabled():
     return JsonResponse(
-      {"detail": "FORJD writes are disabled", "code": "forjd_writes_disabled"},
+      {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
       status=503,
     )
   try:
@@ -2189,7 +2191,7 @@ async def ml_threat_train_proxy(request: HttpRequest) -> HttpResponse:
     return JsonResponse({"detail": "Method not allowed"}, status=405)
   if not writes_enabled():
     return JsonResponse(
-      {"detail": "FORJD writes are disabled", "code": "forjd_writes_disabled"},
+      {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
       status=503,
     )
   try:
@@ -2237,7 +2239,7 @@ async def predict_proxy(request: HttpRequest) -> HttpResponse:
     return JsonResponse({"detail": "Method not allowed"}, status=405)
   if not writes_enabled():
     return JsonResponse(
-      {"detail": "FORJD writes are disabled", "code": "forjd_writes_disabled"},
+      {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
       status=503,
     )
   try:
@@ -2325,7 +2327,7 @@ async def unsupported_forjd_proxy(
         resource_id=request.path,
       )
     return JsonResponse(
-      {"detail": "FORJD writes are disabled", "code": "forjd_writes_disabled"},
+      {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
       status=503,
     )
   if request.method == "GET" and empty_read_fallback_enabled():

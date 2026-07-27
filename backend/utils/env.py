@@ -179,14 +179,26 @@ def validate_production_config() -> None:
     if not db_url.startswith(_POSTGRES_SCHEMES):
       raise RuntimeError(f"DATABASE_URL on {host} must use postgres:// or postgresql:// scheme.")
 
-  # Fly control plane must be wired to FORJD for streaming/processing.
-  if is_fly_deploy():
+  # PaaS control plane must be wired to FORJD when read/write modes are active
+  # (production steady state: FORJD_WRITE_MODE=forjd / FORJD_READ_MODE=forjd).
+  write_mode = get_str("FORJD_WRITE_MODE", "forjd").lower()
+  read_mode = get_str("FORJD_READ_MODE", "forjd").lower()
+  forjd_active = write_mode in {"forjd", "dual"} or read_mode in {"forjd", "dual"}
+  if is_paas_deploy() and forjd_active:
     if not get_str("FORJD_API_URL").lower().startswith("https://"):
-      raise RuntimeError("Fly deploy requires FORJD_API_URL=https://… (FORJD data plane).")
+      raise RuntimeError(f"{host} deploy requires FORJD_API_URL=https://… (FORJD data plane).")
     if not get_str("FORJD_SERVICE_TOKEN"):
-      raise RuntimeError("Fly deploy requires FORJD_SERVICE_TOKEN (fjsvc_…).")
+      raise RuntimeError(f"{host} deploy requires FORJD_SERVICE_TOKEN (fjsvc_…).")
     if not get_str("FORJD_TENANT_ID"):
-      raise RuntimeError("Fly deploy requires FORJD_TENANT_ID (UUID).")
+      raise RuntimeError(f"{host} deploy requires FORJD_TENANT_ID (UUID).")
+    if not get_str("ENCRYPTION_MASTER_KEY") and not get_str("GCP_KMS_KEY_NAME"):
+      raise RuntimeError(
+        f"{host} deploy requires ENCRYPTION_MASTER_KEY (or GCP_KMS_KEY_NAME) for sealed secrets."
+      )
+    if not get_str("FIREBASE_SERVICE_ACCOUNT_JSON"):
+      raise RuntimeError(
+        f"{host} deploy requires FIREBASE_SERVICE_ACCOUNT_JSON for identity verification."
+      )
 
   # Host header attacks — never ship wildcard ALLOWED_HOSTS on PaaS.
   if is_paas_deploy():

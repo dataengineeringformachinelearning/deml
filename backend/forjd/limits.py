@@ -1,11 +1,20 @@
-"""Shared DEML-side limits for the canonical FORJD ingest contract."""
+"""Shared DEML-side limits for the canonical FORJD ingest contract.
+
+Batch/body caps are owned by ``deml_contracts``; this module re-exports them and
+keeps path allowlists that are BFF-routing concerns.
+"""
 
 from __future__ import annotations
 
 from typing import Final
 
-MAX_INGEST_BATCH_EVENTS: Final[int] = 25
-MAX_INGEST_BODY_BYTES: Final[int] = 8 * 1024 * 1024
+from deml_contracts import MAX_INGEST_BATCH_EVENTS, MAX_INGEST_BODY_BYTES
+
+__all__ = [
+  "INGEST_WRITE_PATHS",
+  "MAX_INGEST_BATCH_EVENTS",
+  "MAX_INGEST_BODY_BYTES",
+]
 
 INGEST_WRITE_PATHS: Final[frozenset[str]] = frozenset(
   {

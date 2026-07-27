@@ -1,24 +1,38 @@
 import base64
 import hashlib
 import hmac
+import logging
 import re
 import secrets
 
+from deml_contracts import (
+  APIKeyGenerateIn,
+  APIKeyGenerateOut,
+  APIKeyOut,
+  DeleteAccountOut,
+  DesktopAuthOut,
+  DesktopSessionIn,
+  HandoffGenerateIn,
+  HandoffGenerateOut,
+  HandoffVerifyIn,
+  LogoutIn,
+  SessionOut,
+  SessionRegisterIn,
+  SessionRegisterOut,
+  SuccessSchema,
+)
 from django.core import signing
 from django.db import IntegrityError
-from ninja import Router, Schema
+from monitor.models import APIKey
+from ninja import Router
 from ninja.errors import HttpError
+from utils.structured_log import log_usecase
 
 router = Router()
+logger = logging.getLogger(__name__)
 
 
-class SuccessSchema(Schema):
-  status: str
-  user: str | None = None
-  user_id: int | None = None
-  role: str | None = None
-
-
+# --- UC-AUTH-001 identity probe ---
 @router.get("/register", response=SuccessSchema, auth=None)
 def api_register_health(request):
   """Health probe for monitors; user registration is handled client-side via Firebase."""
@@ -31,6 +45,13 @@ def api_user(request):
     role = "Viewer"
     if hasattr(request.user, "profile"):
       role = request.user.profile.role
+    log_usecase(
+      logger,
+      "UC-AUTH-001",
+      "auth_identity_ok",
+      user_id=request.user.id,
+      role=role,
+    )
     return {
       "status": "success",
       "user": request.user.first_name or request.user.username,
@@ -40,12 +61,7 @@ def api_user(request):
   raise HttpError(401, "Not authenticated")
 
 
-class DeleteAccountOut(Schema):
-  status: str
-  job_id: str | None = None
-  completed: bool = False
-
-
+# --- UC-AUTH-006 account deletion ---
 @router.delete("/delete-account", response=DeleteAccountOut)
 def api_delete_account(request):
   if not request.user.is_authenticated:
@@ -69,20 +85,7 @@ def api_delete_account(request):
   }
 
 
-from monitor.models import APIKey
-
-
-class APIKeyGenerateOut(Schema):
-  status: str
-  name: str
-  key: str
-  prefix: str
-
-
-class APIKeyGenerateIn(Schema):
-  name: str = "Integration Key"
-
-
+# --- UC-AUTH-005 API keys ---
 @router.post("/api-keys/generate", response=APIKeyGenerateOut, summary="Generate API Key")
 def generate_api_key(request, payload: APIKeyGenerateIn):
   if not request.user.is_authenticated:
@@ -106,14 +109,15 @@ def generate_api_key(request, payload: APIKeyGenerateIn):
   if api_key is None:
     raise HttpError(503, "Unable to allocate a unique API key; retry the request")
 
+  log_usecase(
+    logger,
+    "UC-AUTH-005",
+    "api_key_generated",
+    user_id=request.user.id,
+    prefix=api_key.prefix,
+  )
   return {"status": "success", "name": api_key.name, "key": raw_key, "prefix": api_key.prefix}
 
-
-class APIKeyOut(Schema):
-  id: str
-  name: str
-  prefix: str
-  created_at: str
 
 
 @router.get("/api-keys", response=list[APIKeyOut], summary="List API Keys")
@@ -145,19 +149,19 @@ def delete_api_key(request, key_id: str):
     api_key = APIKey.objects.get(id=key_uuid, user=request.user, is_active=True)
     api_key.is_active = False
     api_key.save()
+    log_usecase(
+      logger,
+      "UC-AUTH-005",
+      "api_key_revoked",
+      user_id=request.user.id,
+      prefix=api_key.prefix,
+    )
     return {"status": "success"}
   except (ValueError, APIKey.DoesNotExist) as e:
     raise HttpError(404, "API Key not found") from e
 
 
-class HandoffGenerateOut(Schema):
-  status: str
-  token: str
 
-
-class HandoffGenerateIn(Schema):
-  code_challenge: str | None = None
-  client_name: str = "web"
 
 
 _PKCE_PATTERN = re.compile(r"^[A-Za-z0-9_-]{43,128}$")
@@ -189,21 +193,16 @@ def generate_handoff_token(request, payload: HandoffGenerateIn):
   ):
     raise HttpError(503, "Handoff store unavailable")
 
+  log_usecase(
+    logger,
+    "UC-AUTH-003",
+    "handoff_generated",
+    user_id=request.user.id,
+    has_pkce=bool(challenge),
+  )
   return {"status": "success", "token": token}
 
 
-class HandoffVerifyIn(Schema):
-  token: str
-  code_verifier: str | None = None
-
-
-class DesktopAuthOut(Schema):
-  status: str
-  user: str
-  email: str
-  user_id: int
-  role: str
-  desktop_token: str | None = None
 
 
 @router.post(
@@ -255,9 +254,6 @@ def verify_handoff_token(request, payload: HandoffVerifyIn):
     raise HttpError(404, "User not found") from None
 
 
-class DesktopSessionIn(Schema):
-  desktop_token: str
-
 
 @router.post(
   "/desktop/session",
@@ -294,22 +290,7 @@ def validate_desktop_session(request, payload: DesktopSessionIn):
   }
 
 
-class SessionRegisterIn(Schema):
-  session_id: str
-  user_agent: str = ""
 
-
-class SessionOut(Schema):
-  session_id: str
-  user_agent: str = ""
-  ip: str = ""
-  created_at: int = 0
-  last_seen: int = 0
-
-
-class SessionRegisterOut(Schema):
-  status: str
-  session_id: str
 
 
 @router.post("/sessions", response=SessionRegisterOut, summary="Register browser session")
@@ -331,6 +312,12 @@ def register_session_endpoint(request, payload: SessionRegisterIn):
     ip=ip,
   ):
     raise HttpError(503, "Session registry unavailable")
+  log_usecase(
+    logger,
+    "UC-AUTH-002",
+    "session_registered",
+    user_id=request.user.id,
+  )
   return {"status": "success", "session_id": payload.session_id}
 
 
@@ -363,10 +350,6 @@ def revoke_session_endpoint(request, session_id: str):
   return {"status": "success"}
 
 
-class LogoutIn(Schema):
-  session_id: str | None = None
-  revoke_all: bool = False
-
 
 @router.post("/logout", response=SuccessSchema, summary="Sign out server session")
 def logout_session_endpoint(request, payload: LogoutIn):
@@ -386,11 +369,16 @@ def logout_session_endpoint(request, payload: LogoutIn):
       auth_mod.revoke_refresh_tokens(firebase_uid)
     except Exception:
       # Session registry already revoked; Firebase revoke is best-effort.
-      import logging
-
-      logging.getLogger(__name__).exception("Firebase session revoke failed uid=%s", firebase_uid)
+      logger.exception("Firebase session revoke failed uid_prefix=%s", firebase_uid[:8])
   elif payload.session_id:
     revoke_session(payload.session_id, firebase_uid)
     notify_force_logout(firebase_uid, session_id=payload.session_id, reason="logout")
 
+  log_usecase(
+    logger,
+    "UC-AUTH-004",
+    "logout_completed",
+    user_id=request.user.id,
+    revoke_all=bool(payload.revoke_all),
+  )
   return {"status": "success"}

@@ -19,9 +19,11 @@ from collections.abc import AsyncIterator
 from typing import Any, Final
 from urllib.parse import quote
 
+from deml_contracts import ErrorCode
 from django.conf import settings
 from django.http import HttpRequest, JsonResponse, StreamingHttpResponse
 
+# --- FORJD live bridge ---
 from forjd.client import ForjdClient, ForjdError
 from forjd.cutover import reads_from_forjd
 from forjd.policy import ForjdPolicyError, policy_error_response
@@ -130,7 +132,7 @@ async def _event_stream(
     yield sse_event("end", {"cursor": cursor})
   except ForjdError as exc:
     logger.warning("forjd_live_degraded status=%s request_id=%s", exc.status, request_id)
-    yield sse_event("degraded", {"code": "forjd_degraded"})
+    yield sse_event("degraded", {"code": ErrorCode.FORJD_DEGRADED.value})
   except asyncio.CancelledError:
     # Client disconnected — normal lifecycle, nothing to emit.
     raise
@@ -143,12 +145,18 @@ async def live_updates_stream(request: HttpRequest) -> StreamingHttpResponse | J
     return JsonResponse({"detail": "Method not allowed"}, status=405)
   if not _live_updates_enabled():
     return JsonResponse(
-      {"detail": "Live updates are disabled", "code": "live_updates_disabled"},
+      {
+        "detail": "Live updates are disabled",
+        "code": ErrorCode.LIVE_UPDATES_DISABLED.value,
+      },
       status=503,
     )
   if not reads_from_forjd():
     return JsonResponse(
-      {"detail": "FORJD reads are disabled", "code": "forjd_reads_disabled"},
+      {
+        "detail": "FORJD reads are disabled",
+        "code": ErrorCode.FORJD_READS_DISABLED.value,
+      },
       status=503,
     )
 
@@ -163,11 +171,11 @@ async def live_updates_stream(request: HttpRequest) -> StreamingHttpResponse | J
   except AdapterError as exc:
     if exc.status in {401, 403}:
       return JsonResponse(
-        {"detail": exc.detail, "code": "forjd_forbidden", "source": "deml"},
+        {"detail": exc.detail, "code": ErrorCode.FORJD_FORBIDDEN.value, "source": "deml"},
         status=exc.status,
       )
     return JsonResponse(
-      {"detail": exc.detail, "code": "forjd_degraded", "source": "forjd"},
+      {"detail": exc.detail, "code": ErrorCode.FORJD_DEGRADED.value, "source": "forjd"},
       status=503,
     )
 

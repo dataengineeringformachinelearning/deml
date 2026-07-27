@@ -41,6 +41,22 @@ def log_event(logger: logging.Logger, level: int, event: str, **fields: Any) -> 
   logger.log(level, json.dumps(payload, default=str))
 
 
+def log_usecase(
+  logger: logging.Logger,
+  use_case: str,
+  event: str,
+  *,
+  level: int = logging.INFO,
+  **fields: Any,
+) -> None:
+  """Boundary log for a canonical use-case (docs/use-cases/CANONICAL.md).
+
+  Always includes ``use_case`` + ``event`` + ``correlation_id``. Never pass
+  secrets, ciphertext, emails, or signed URLs in ``fields``.
+  """
+  log_event(logger, level, event, use_case=use_case, **fields)
+
+
 class StructuredJsonFormatter(logging.Formatter):
   """Console formatter that outputs one JSON object per log record."""
 

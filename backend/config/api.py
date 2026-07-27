@@ -85,10 +85,13 @@ def api_ready(request: Any) -> dict[str, Any]:
   Control-plane credentials are hard requirements (503). Upstream FORJD
   dependency health is soft: this endpoint stays 200 with ``mode=degraded``
   so Vercel/Fly can still admit DEML while product surfaces show continuity.
+
+  Response shape: ``deml_contracts.ReadyResponse`` (UC-HEALTH-001).
   """
   import http.client
   from urllib.parse import urlparse
 
+  from deml_contracts import ReadyResponse
   from django.db import connection
   from ninja.errors import HttpError
 
@@ -147,13 +150,17 @@ def api_ready(request: Any) -> dict[str, Any]:
   if forjd_health != "ok":
     logger.warning("ready: FORJD soft-degraded forjd_health=%s mode=%s", forjd_health, mode)
 
-  return {
-    "status": "ready",
-    "role": "user-control-plane",
-    "mode": mode,
-    "database": "ok",
-    "forjd_api_url": forjd_url,
-    "forjd_token_configured": True,
-    "forjd_tenant_configured": True,
-    "forjd_health": forjd_health,
-  }
+  # Validate against the shared contract without changing the public JSON keys.
+  payload = ReadyResponse.model_validate(
+    {
+      "status": "ready",
+      "role": "user-control-plane",
+      "mode": mode,
+      "database": "ok",
+      "forjd_api_url": forjd_url,
+      "forjd_token_configured": True,
+      "forjd_tenant_configured": True,
+      "forjd_health": forjd_health,
+    }
+  )
+  return payload.model_dump(exclude_none=True)

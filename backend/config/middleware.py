@@ -1,6 +1,7 @@
 import logging
 import re
 
+from deml_contracts import ErrorCode
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import JsonResponse
@@ -263,7 +264,10 @@ class HeadlessRateLimitMiddleware(MiddlewareMixin):
       if settings.DEBUG:
         return None
       return JsonResponse(
-        {"detail": "Rate limiter unavailable", "code": "rate_limiter_unavailable"},
+        {
+          "detail": "Rate limiter unavailable",
+          "code": ErrorCode.RATE_LIMITER_UNAVAILABLE.value,
+        },
         status=503,
         headers={"Retry-After": "5"},
       )
@@ -276,7 +280,10 @@ class HeadlessRateLimitMiddleware(MiddlewareMixin):
     if any(not decision.allowed for decision in decisions):
       retry_after = max(1, request.headless_rate_limit["retry_after"])
       return JsonResponse(
-        {"detail": "Rate limit exceeded", "code": "rate_limit_exceeded"},
+        {
+          "detail": "Rate limit exceeded",
+          "code": ErrorCode.RATE_LIMIT_EXCEEDED.value,
+        },
         status=429,
         headers={"Retry-After": str(retry_after)},
       )

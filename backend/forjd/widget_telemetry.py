@@ -14,6 +14,7 @@ from typing import Any
 from uuid import UUID
 
 from asgiref.sync import sync_to_async
+from deml_contracts import ErrorCode
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from monitor.models import ForjdTenantMapping
@@ -160,7 +161,11 @@ async def widget_telemetry_proxy(request: HttpRequest) -> JsonResponse:
   except ForjdError as exc:
     logger.warning("widget sealed ingest failed status=%s slug=%s", exc.status, slug)
     return JsonResponse(
-      {"ok": False, "detail": "FORJD is temporarily unavailable", "code": "forjd_degraded"},
+      {
+        "ok": False,
+        "detail": "FORJD is temporarily unavailable",
+        "code": ErrorCode.FORJD_DEGRADED.value,
+      },
       status=503,
     )
   except ForjdTenantConfigurationError:

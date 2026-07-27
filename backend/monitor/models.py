@@ -22,6 +22,8 @@ class CookieConsent(models.Model):
   user = models.ForeignKey(
     User, on_delete=models.CASCADE, related_name="cookie_consents", null=True, blank=True
   )
+  # Anonymous banner writes are platform-scoped (migration 0033); never null.
+  is_platform = models.BooleanField(default=False, db_index=True)
   necessary = models.BooleanField(default=True)
   analytical = models.BooleanField(default=False)
   marketing = models.BooleanField(default=False)
