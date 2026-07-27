@@ -455,14 +455,14 @@
                       : 'A legacy paid plan is still active. You can cancel it; new paid upgrades are not offered.'
                   "
           />
+          }
           <ng-container vikingFormActions>
-            @if (!subscriptionCancelAtPeriodEnd()) {
+            @if (subscriptionActive() && !subscriptionCancelAtPeriodEnd()) {
             <viking-button variant="danger" type="button" (pressed)="cancelSubscription()">
               Cancel paid plan
             </viking-button>
             }
           </ng-container>
-          }
           <ng-container vikingFormFooter>
             @if (billingError()) {
             <viking-callout tone="danger">{{ billingError() }}</viking-callout>

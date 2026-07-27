@@ -67,7 +67,7 @@ import { VikingKbd } from "../kbd/kbd";
           >
             <ng-content />
           </div>
-          <footer class="viking-search-palette-footer">
+          <div class="viking-search-palette-footer">
             <ng-content select="[vikingSearchPaletteFooter]" />
             <span class="viking-search-palette-shortcut">
               <viking-kbd>{{ modKey }}</viking-kbd
@@ -77,7 +77,7 @@ import { VikingKbd } from "../kbd/kbd";
               <viking-kbd>Esc</viking-kbd> close ·
               <viking-kbd>?</viking-kbd> all shortcuts
             </span>
-          </footer>
+          </div>
         </div>
       </div>
     }

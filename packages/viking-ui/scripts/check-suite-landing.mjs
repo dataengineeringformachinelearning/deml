@@ -37,13 +37,20 @@ const required = [
   "suite-landing-band",
   "suite-landing-metric-list",
   "suite-landing-meta",
-  "suite-hero-in",
   "suite-pulse",
 ];
 
 for (const name of required) {
   if (!css.includes(name)) {
     failures.push(`Missing suite landing contract: ${name}`);
+  }
+}
+
+// The suite intentionally retired staggered hero entrance animation across
+// DEML, FORJD, and community surfaces. Keep the checker from reintroducing it.
+for (const retired of ["suite-hero-in"]) {
+  if (css.includes(retired)) {
+    failures.push(`Retired suite landing animation found: ${retired}`);
   }
 }
 

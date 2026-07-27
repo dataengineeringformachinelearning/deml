@@ -16,11 +16,11 @@ export type WorkflowCatalogRow = {
   default?: boolean;
   content_types?: string[];
   event_types?: string[];
-  catalog_event_types?: Array<{
+  catalog_event_types?: {
     name: string;
     content_type?: string;
     description?: string;
-  }>;
+  }[];
   aliases?: {
     workflow_ids?: string[];
     event_types?: Record<string, string[]>;

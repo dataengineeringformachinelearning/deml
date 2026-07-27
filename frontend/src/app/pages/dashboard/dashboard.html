@@ -68,7 +68,7 @@
   <viking-callout tone="accent" heading="Connect a site to begin">
     Add a monitored endpoint in Sites so latency, uptime, and threat telemetry can populate this
     command center.
-    <a routerLink="/sites" class="viking-link">Go to Sites</a>
+    <a routerLink="/settings" class="viking-link">Go to Sites</a>
   </viking-callout>
   } @if (showOnboardingGuide() && !isLoading()) {
   <viking-onboarding-checklist
@@ -200,7 +200,10 @@
                   </span>
                   <div class="kpi-card-meta">
                     <span class="kpi-label">Uptime</span>
-                    <span class="kpi-value">{{ uptimePercent() | number:'1.1-1' }}%</span>
+                    <span class="kpi-value"
+                      >{{ uptimePercent() === null ? '—' : (uptimePercent() | number:'1.1-1') +
+                      '%' }}</span
+                    >
                   </div>
                 </div>
                 <div class="kpi-sparkline-slot">
@@ -288,7 +291,7 @@
               <div class="snapshot-stats">
                 <div class="snapshot-stat">
                   <span class="snapshot-label">P99 Latency</span>
-                  <span class="snapshot-value">{{ p99Latency() | number:'1.0-0' }} ms</span>
+                  <span class="snapshot-value">{{ formatLatencyMs(p99Latency()) }}</span>
                 </div>
                 <div class="snapshot-stat">
                   <span class="snapshot-label">Requests (24h)</span>
@@ -300,7 +303,7 @@
                 </div>
                 <div class="snapshot-stat">
                   <span class="snapshot-label">Platform Score</span>
-                  <span class="snapshot-value">{{ cesLevel() | number:'1.0-0' }}</span>
+                  <span class="snapshot-value">{{ formatCesScore(cesLevel()) }}</span>
                 </div>
                 <div class="snapshot-stat">
                   <span class="snapshot-label">Model Benchmark</span>
@@ -343,15 +346,15 @@
           <viking-metric-row>
             <viking-metric-card
               label="Network Stability"
-              [value]="(stabilityLevel() | number:'1.0-0') + '%'"
+              [value]="formatCesPercent(stabilityLevel())"
             />
             <viking-metric-card
               label="SLA Forecast"
-              [value]="(slaLevel() | number:'1.0-0') + '%'"
+              [value]="formatCesPercent(slaLevel())"
             />
             <viking-metric-card
               label="P99 Latency"
-              [value]="(p99Latency() | number:'1.0-0') + ' ms'"
+              [value]="formatLatencyMs(p99Latency())"
             />
             <viking-metric-card
               label="Model Benchmark"
@@ -367,7 +370,7 @@
                 <viking-chart-card-header
                   title="Latency Trend (24h)"
                   [hasData]="hasLatencyData()"
-                  [value]="p99Latency() + ' ms'"
+                  [value]="formatLatencyMs(p99Latency())"
                   emptyLabel="Awaiting signal"
                 />
                 @if (hasLatencyData()) {

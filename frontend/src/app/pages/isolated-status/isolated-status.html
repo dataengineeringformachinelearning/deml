@@ -45,9 +45,9 @@
       liveLabel="Current status"
     >
       <section class="viking-status-section-block" aria-labelledby="announcements-heading">
-        <h3 class="viking-status-section-heading" id="announcements-heading">
+        <h2 class="viking-status-section-heading" id="announcements-heading">
           Latest System Announcements
-        </h3>
+        </h2>
 
         @if (sanityService.error()) {
         <viking-callout tone="danger" heading="Announcements Unavailable">
@@ -78,9 +78,9 @@
       </section>
 
       <section class="viking-status-section-block" aria-labelledby="metrics-heading">
-        <h3 class="viking-status-section-heading" id="metrics-heading">
+        <h2 class="viking-status-section-heading" id="metrics-heading">
           Analytics & Service Level
-        </h3>
+        </h2>
         <div class="viking-status-section-metrics">
           <viking-metric-card
             icon="clock"
@@ -127,9 +127,9 @@
       </section>
 
       <section class="viking-status-section-block" aria-labelledby="intelligence-heading">
-        <h3 class="viking-status-section-heading" id="intelligence-heading">
+        <h2 class="viking-status-section-heading" id="intelligence-heading">
           Predictive Intelligence
-        </h3>
+        </h2>
         <div class="viking-status-section-metrics">
           <viking-metric-card
             icon="bolt"
@@ -160,9 +160,9 @@
       </section>
 
       <section class="viking-status-section-block" aria-labelledby="services-heading">
-        <h3 class="viking-status-section-heading" id="services-heading">
+        <h2 class="viking-status-section-heading" id="services-heading">
           Active Monitored Services
-        </h3>
+        </h2>
         @if (isLoading()) {
         <viking-page-skeleton layout="list" label="Loading monitored services" />
         } @else if (!servicesMap()[page.id] || servicesMap()[page.id].length === 0) {
@@ -175,7 +175,7 @@
           <article class="viking-status-service">
             <div class="viking-status-section-row">
               <div>
-                <h4 class="viking-status-service-name">{{ formatServiceName(service.name) }}</h4>
+                <h3 class="viking-status-service-name">{{ formatServiceName(service.name) }}</h3>
                 <p class="viking-status-section-subtitle">{{ service.url }}</p>
               </div>
               <viking-status-badge
@@ -218,7 +218,7 @@
       </section>
 
       <section class="viking-status-section-block" aria-labelledby="uptime-heading">
-        <h3 class="viking-status-section-heading" id="uptime-heading">Platform Uptime</h3>
+        <h2 class="viking-status-section-heading" id="uptime-heading">Platform Uptime</h2>
         <viking-uptime-history
           [data]="pageHistory(page)"
           [percentage]="page.overall_uptime ?? page.cumulative_sla ?? null"
@@ -235,9 +235,9 @@
 
       @if (incidentsMap()[page.id]?.length) {
       <section class="viking-status-section-block" aria-labelledby="incidents-heading">
-        <h3 class="viking-status-section-heading" id="incidents-heading">
+        <h2 class="viking-status-section-heading" id="incidents-heading">
           Recent Incidents & Maintenance
-        </h3>
+        </h2>
         @for (incident of incidentsMap()[page.id]; track incident.id || incident.title) {
         <viking-announcement-card
           [tone]="incidentTone(incident.status) === 'warning' ? 'warning' : 'info'"

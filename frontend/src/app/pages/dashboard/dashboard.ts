@@ -73,11 +73,19 @@ import {
   VikingDonutSegment,
   hasChartValues,
   hasDonutValues,
+  measuredMetricPoints,
   toVikingBarSeries,
   toVikingDonutSegments,
   toVikingLineSeries,
   toVikingSparklineSeries,
 } from '../../core/chart-data.util';
+import { formatLatencyMs } from '../../core/utils/formatter.utils';
+import {
+  type CesTelemetryPayload,
+  formatCesPercent,
+  formatCesScore,
+  resolveCesTelemetry,
+} from '../../core/ces-telemetry.util';
 
 type DashboardTab = 'overview' | 'performance' | 'security';
 
@@ -108,22 +116,19 @@ type DashboardOverviewResponse = {
   code?: string;
   data?: {
     benchmarking?: { current_scope?: BenchmarkSummary | null };
-    ces?: {
-      level?: number;
+    ces?: CesTelemetryPayload & {
       threat?: number;
-      sla?: number;
-      stability?: number;
       spiking_temporal_forecast?: number;
     };
     user_metrics?: {
-      p99_latency_ms?: number;
+      p99_latency_ms?: number | null;
       uptime_percent?: number | null;
       total_requests_24h?: number;
       active_incidents?: number;
       unique_visitors?: number;
       available_sites?: string[];
-      time_series?: { latency: number }[];
-      uptime_series?: { uptime: number }[];
+      time_series?: { label?: string; time?: string; latency: number | null }[];
+      uptime_series?: { label?: string; time?: string; uptime: number | null }[];
       threat_severity?: { severity: string; count: number }[];
       security_alerts?: { count: number }[];
     };
@@ -188,8 +193,8 @@ export class Dashboard implements OnInit, OnDestroy {
       id: 'endpoint',
       title: 'Add a health check',
       description: 'Monitor an HTTPS endpoint so uptime telemetry can populate.',
-      routerLink: '/sites',
-      actionLabel: 'Go to Sites',
+      routerLink: '/settings',
+      actionLabel: 'Sites settings',
     },
     {
       id: 'publish',
@@ -254,15 +259,18 @@ export class Dashboard implements OnInit, OnDestroy {
 
   // --- Analytics metrics (signal-owned for zoneless / OnPush) ---
   threatLevel = signal(0);
-  cesLevel = signal(0);
-  stabilityLevel = signal(0);
-  slaLevel = signal(0);
-  p99Latency = signal(0);
-  uptimePercent = signal(0);
+  cesLevel = signal<number | null>(null);
+  stabilityLevel = signal<number | null>(null);
+  slaLevel = signal<number | null>(null);
+  p99Latency = signal<number | null>(null);
+  uptimePercent = signal<number | null>(null);
   totalRequests = signal(0);
   activeIncidents = signal(0);
   uniqueVisitors = signal(0);
   benchmarkSummary = signal<BenchmarkSummary | null>(null);
+  protected readonly formatLatencyMs = formatLatencyMs;
+  protected readonly formatCesPercent = formatCesPercent;
+  protected readonly formatCesScore = formatCesScore;
 
   selectedTenantId = signal<string | null>(null);
   selectedSite = signal<string | null>(null);
@@ -324,9 +332,10 @@ export class Dashboard implements OnInit, OnDestroy {
   );
 
   healthScore = computed(() => {
-    if (!this.metricsReady() || this.metricsDegraded()) return null;
+    const stability = this.stabilityLevel();
+    if (!this.metricsReady() || this.metricsDegraded() || stability === null) return null;
     const threatPenalty = Math.min(this.threatLevel(), 100) * 0.35;
-    const stabilityBonus = Math.min(this.stabilityLevel(), 100) * 0.35;
+    const stabilityBonus = Math.min(stability, 100) * 0.35;
     const vulnPenalty = Math.min(this.openVulnCount() * 8, 30);
     return Math.round(
       Math.max(0, Math.min(100, stabilityBonus + (100 - threatPenalty) * 0.3 - vulnPenalty + 15)),
@@ -363,9 +372,7 @@ export class Dashboard implements OnInit, OnDestroy {
 
   setupComplete = computed(() => this.myPages().length > 0);
 
-  hasLatencyData = computed(() =>
-    hasChartValues(this.latencySeries().flatMap(series => series.data)),
-  );
+  hasLatencyData = computed(() => (this.latencySeries()[0]?.data.length ?? 0) > 0);
 
   hasSecurityAlertData = computed(() =>
     hasChartValues(this.securityAlertSeries().flatMap(series => series.data)),
@@ -464,6 +471,10 @@ export class Dashboard implements OnInit, OnDestroy {
     if (this.liveRefreshTimer) return;
     this.liveRefreshTimer = setTimeout(() => {
       this.liveRefreshTimer = undefined;
+      // A projection tick means the cached overview is no longer fresh.
+      // Invalidate before reloading so the Updating state corresponds to
+      // newly projected telemetry instead of a 15-second SWR cache hit.
+      this.analyticsQuery.invalidateOverview(this.selectedTenantId());
       this.refreshData();
     }, 2000);
   }
@@ -556,13 +567,14 @@ export class Dashboard implements OnInit, OnDestroy {
       const degraded =
         response?.degraded === true || response?.code === ERROR_CODES.FORJD_DEGRADED;
       const { benchmarking, ces, user_metrics } = response.data;
-      this.cesLevel.set(ces?.level ?? 0);
+      const resolvedCes = resolveCesTelemetry(ces, degraded);
+      this.cesLevel.set(resolvedCes.level);
       this.threatLevel.set(ces?.threat ?? 0);
-      this.slaLevel.set(ces?.sla ?? 0);
-      this.stabilityLevel.set(ces?.stability ?? 0);
+      this.slaLevel.set(resolvedCes.sla);
+      this.stabilityLevel.set(resolvedCes.stability);
       this.temporalForecast.set(ces?.spiking_temporal_forecast ?? 0);
-      this.p99Latency.set(user_metrics?.p99_latency_ms ?? 0);
-      this.uptimePercent.set(user_metrics?.uptime_percent ?? 0);
+      this.p99Latency.set(user_metrics?.p99_latency_ms ?? null);
+      this.uptimePercent.set(user_metrics?.uptime_percent ?? null);
       this.totalRequests.set(user_metrics?.total_requests_24h ?? 0);
       this.activeIncidents.set(user_metrics?.active_incidents ?? 0);
       this.uniqueVisitors.set(user_metrics?.unique_visitors ?? 0);
@@ -579,18 +591,20 @@ export class Dashboard implements OnInit, OnDestroy {
       }
 
       const timeSeries = user_metrics?.time_series || [];
+      const measuredLatency = measuredMetricPoints(timeSeries, point => point.latency);
       this.latencySeries.set(
         toVikingLineSeries(
           'Latency (ms)',
-          timeSeries.map((d: { latency: number }) => d.latency ?? 0),
+          measuredLatency.map(({ value }) => value),
         ),
       );
 
       const uptimeSeriesData = user_metrics?.uptime_series || [];
+      const measuredUptime = measuredMetricPoints(uptimeSeriesData, point => point.uptime);
       this.uptimeSeries.set(
         toVikingLineSeries(
           'Uptime (%)',
-          uptimeSeriesData.map((d: { uptime: number }) => d.uptime ?? 100),
+          measuredUptime.map(({ value }) => value),
           'success',
         ),
       );

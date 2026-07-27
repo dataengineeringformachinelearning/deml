@@ -104,16 +104,6 @@ export class Status implements OnInit {
     return 'muted';
   }
 
-  /** Seed card for headless crawlers only (not used as a loading UI). */
-  private readonly crawlerPlaceholder: StatusPageData = {
-    id: 'loading-placeholder',
-    title: 'Platform Status Feed',
-    slug: 'platform-status',
-    description: 'Telemetry and status monitoring for machine learning pipelines.',
-    created_at: new Date().toISOString(),
-    user_id: null,
-  };
-
   getPageStatus(pageId: string): string {
     const active = this.activeIncidents(pageId);
     if (active.length > 0) {
@@ -151,8 +141,8 @@ export class Status implements OnInit {
     return (this.incidentsMap()[pageId] || []).filter(incident => incident.status !== 'Resolved');
   }
 
-  serviceUptime(page: StatusPageData, service: MonitoredServiceData): number {
-    return service.sla ?? page.overall_uptime ?? page.cumulative_sla ?? 100;
+  serviceUptime(page: StatusPageData, service: MonitoredServiceData): number | null {
+    return service.sla ?? page.overall_uptime ?? page.cumulative_sla ?? null;
   }
 
   dashboardMetrics = (page: StatusPageData): StatusDashboardMetric[] => {
@@ -204,38 +194,19 @@ export class Status implements OnInit {
 
   dashboardServices = (page: StatusPageData): StatusDashboardService[] => {
     const services = this.servicesMap()[page.id] ?? [];
-    if (services.length === 0 && page.id === this.crawlerPlaceholder.id) {
-      return [
-        {
-          name: 'Primary Site',
-          url: 'https://example.com',
-          status: 'operational',
-          statusLabel: 'Operational',
-          latency: `${page.p99_latency ?? 0}ms`,
-          uptime: '—',
-          history: this.dashboardHistory(page),
-        },
-        {
-          name: 'API Gateway',
-          url: 'https://api.example.com',
-          status: 'operational',
-          statusLabel: 'Operational',
-          latency: `${page.p99_latency ?? 0}ms`,
-          uptime: '—',
-          history: this.dashboardHistory(page, { name: 'API Gateway' }),
-        },
-      ];
-    }
-
-    return services.map(service => ({
-      name: this.formatServiceName(service.name),
-      url: service.url,
-      status: this.statusVariant(service.status),
-      statusLabel: service.status || 'Operational',
-      latency: `${page.p99_latency ?? 0}ms`,
-      uptime: `${this.serviceUptime(page, service).toFixed(2)}%`,
-      history: this.dashboardHistory(page, service),
-    }));
+    return services.map(service => {
+      const latency = service.p99_latency ?? page.p99_latency;
+      const uptime = this.serviceUptime(page, service);
+      return {
+        name: this.formatServiceName(service.name),
+        url: service.url,
+        status: this.statusVariant(service.status),
+        statusLabel: service.status || 'Operational',
+        latency: latency == null ? '—' : `${latency}ms`,
+        uptime: uptime == null ? '—' : `${uptime.toFixed(2)}%`,
+        history: this.dashboardHistory(page, service),
+      };
+    });
   };
 
   dashboardAnnouncements = (page: StatusPageData): StatusDashboardAnnouncement[] => {
@@ -333,13 +304,6 @@ export class Status implements OnInit {
 
   loadData() {
     this.loadFailed.set(false);
-    const isCrawler = typeof navigator !== 'undefined' && navigator.webdriver;
-    if (isCrawler) {
-      this.statusPages.set([this.crawlerPlaceholder]);
-      this.isLoading.set(false);
-      this.loadFailed.set(false);
-      return;
-    }
     if (this.authService.isAuthenticated()) {
       const applySorted = (data: StatusPageData[]): void => {
         // Include user's own pages AND the platform status page

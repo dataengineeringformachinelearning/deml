@@ -69,6 +69,21 @@ export const hasChartValues = (data: number[]): boolean => data.some(value => va
 export const hasDonutValues = (segments: VikingDonutSegment[]): boolean =>
   segments.some(segment => segment.value > 0);
 
+export type MeasuredMetricPoint<T> = {
+  point: T;
+  value: number;
+};
+
+/** Keep only finite observations while retaining their labels/categories. */
+export const measuredMetricPoints = <T>(
+  points: readonly T[],
+  readValue: (point: T) => number | null | undefined,
+): MeasuredMetricPoint<T>[] =>
+  points.flatMap(point => {
+    const value = readValue(point);
+    return typeof value === 'number' && Number.isFinite(value) ? [{ point, value }] : [];
+  });
+
 /** Build a single-series sparkline payload when enough points exist. */
 export const toVikingSparklineSeries = (
   name: string,

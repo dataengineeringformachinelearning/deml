@@ -5,10 +5,10 @@ const { findViolations, shouldScanFile, toPixels } = require('./check_mobile_fir
 
 test('accepts canonical media and container breakpoints', () => {
   const source = `
-    @media (min-width: 640px) {}
+    @media (min-width: 600px) {}
     @media (min-width: 48rem) {}
     @container card (min-width: 64em) {}
-    @container page (min-width: 1280px) {}
+    @container page (min-width: 90rem) {}
     window.matchMedia("(min-width: 1024px)");
   `;
 
@@ -18,7 +18,7 @@ test('accepts canonical media and container breakpoints', () => {
 test('rejects desktop-first and noncanonical responsive queries', () => {
   const source = `
     @media (max-width: 767px) {}
-    @media (min-width: 600px) {}
+    @media (min-width: 640px) {}
     @container nav (min-width: 880px) and (max-width: 1120px) {}
   `;
 
@@ -26,7 +26,7 @@ test('rejects desktop-first and noncanonical responsive queries', () => {
     findViolations(source).map(({ line, reason }) => ({ line, reason })),
     [
       { line: 2, reason: 'media max-width queries are not mobile-first' },
-      { line: 3, reason: '600px is not an allowed breakpoint' },
+      { line: 3, reason: '640px is not an allowed breakpoint' },
       { line: 4, reason: '880px is not an allowed breakpoint' },
       { line: 4, reason: 'container max-width queries are not mobile-first' },
     ],
@@ -39,6 +39,7 @@ test('ignores properties, dynamic Sass mixins, and accessibility queries', () =>
     @media (min-width: $value) {}
     @media (prefers-reduced-motion: reduce) {}
     @media (forced-colors: active) {}
+    @media (max-width: 600px), (prefers-reduced-data: reduce) {}
   `;
 
   assert.deepEqual(findViolations(source), []);
@@ -49,7 +50,7 @@ test('rejects invalid concrete units, range syntax, and runtime media queries', 
     @media (min-width: 600vw) {}
     @container card (min-width: calc(640px)) {}
     @media (width >= 640px) {}
-    window.matchMedia("(min-width: 901px)");
+    window.matchMedia("(min-width: 900px)");
     matchMedia("(max-width: 1280px)");
     matchMedia("(640px <= width)");
   `;
@@ -71,7 +72,7 @@ test('rejects invalid concrete units, range syntax, and runtime media queries', 
       },
       {
         line: 5,
-        reason: '901px is not an allowed breakpoint',
+        reason: '900px is not an allowed breakpoint',
       },
       {
         line: 6,
@@ -91,7 +92,7 @@ test('ignores responsive examples inside source and inline CSS comments', () => 
     '/* @container card (min-width: 600px) {} */',
     'const styles = `',
     '  /* @media (max-width: 520px) {} */',
-    '  @media (min-width: 640px) {}',
+    '  @media (min-width: 600px) {}',
     '`;',
     '// window.matchMedia("(min-width: 901px)");',
   ].join('\n');
@@ -105,6 +106,7 @@ test('scans authored and copied JavaScript but skips generated bundles', () => {
   assert.equal(shouldScanFile('frontend/scripts/check.mjs'), true);
   assert.equal(shouldScanFile('backend/static/viking-ui-elements.js'), false);
   assert.equal(shouldScanFile('frontend/public/assets/viking-ui.css'), false);
+  assert.equal(shouldScanFile('backend/static/vendor/swagger-ui.css'), false);
 });
 
 test('normalizes px, rem, and em values', () => {

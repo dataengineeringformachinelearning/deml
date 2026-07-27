@@ -567,14 +567,14 @@ export class VikingSearchPaletteWc extends HTMLElementBase {
             <slot></slot>
             <div class="viking-search-results-host"></div>
           </div>
-          <footer class="viking-search-palette-footer" part="footer">
+          <div class="viking-search-palette-footer" part="footer">
             <span class="viking-kbd">${mod}</span><span class="viking-kbd">K</span> /
             <span class="viking-kbd">/</span> open ·
             <span class="viking-kbd">↑</span><span class="viking-kbd">↓</span> navigate ·
             <span class="viking-kbd">Enter</span> open ·
             <span class="viking-kbd">Esc</span> close ·
             <span class="viking-kbd">?</span> all shortcuts
-          </footer>
+          </div>
         </div>
       </dialog>
     `;

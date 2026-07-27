@@ -125,16 +125,18 @@
             <viking-app-icon name="analytics" />
           </div>
           <div class="gauge-wrapper main-gauge">
-            <viking-gauge-arc tone="danger" [value]="cesLevel()" />
+            <viking-gauge-arc tone="danger" [value]="cesLevel() ?? 0" />
             <div class="gauge-center-text main-text">
               <viking-app-icon name="stars" hostClass="gauge-inner-icon" />
               <span class="unit">SCORE</span>
-              <span class="value">{{ cesLevel() | number:'1.0-0' }}</span>
+              <span class="value">{{ formatCesScore(cesLevel()) }}</span>
             </div>
           </div>
           <div class="gauge-card-footer">
             <viking-app-icon name="info" />
-            <span>Overall CES performance metric</span>
+            <span>{{
+              cesLevel() === null ? 'Awaiting probe telemetry' : 'Overall CES performance metric'
+            }}</span>
           </div>
         </viking-card>
 
@@ -222,18 +224,18 @@
             <viking-app-icon name="health_and_safety" />
           </div>
           <div class="gauge-wrapper stability-gauge">
-            <viking-gauge-arc tone="primary" [value]="stabilityLevel()" />
+            <viking-gauge-arc tone="primary" [value]="stabilityLevel() ?? 0" />
             <div class="gauge-center-text stability-text">
               <viking-app-icon name="monitor_heart" hostClass="gauge-inner-icon" />
               <span class="unit">UPTIME</span>
-              <span class="value"
-                >{{ stabilityLevel() | number:'1.0-0' }}<span class="unit-symbol">%</span></span
-              >
+              <span class="value">{{ formatCesPercent(stabilityLevel()) }}</span>
             </div>
           </div>
           <div class="gauge-card-footer">
             <viking-app-icon name="info" />
-            <span>System resilience index</span>
+            <span>{{
+              stabilityLevel() === null ? 'Awaiting probe telemetry' : 'System resilience index'
+            }}</span>
           </div>
         </viking-card>
       </viking-panel-grid>
@@ -268,7 +270,7 @@
           />
           <viking-metric-card
             label="P99 latency"
-            [value]="(p99Latency() | number:'1.2-2') + ' ms'"
+            [value]="formatLatencyMs(p99Latency(), 2)"
             sublabel="99th percentile response time"
             icon="speed"
             tone="info"
@@ -328,7 +330,7 @@
           <viking-chart-card-header
             title="System Latency (Last 24h)"
             [hasData]="hasLatencyData()"
-            [value]="p99Latency() + ' ms'"
+            [value]="formatLatencyMs(p99Latency(), 2)"
             [trend]="latencyTrend()"
             emptyLabel="Awaiting signal"
           />

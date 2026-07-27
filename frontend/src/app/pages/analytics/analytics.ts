@@ -66,11 +66,19 @@ import {
   VikingDonutSegment,
   hasChartValues,
   hasDonutValues,
+  measuredMetricPoints,
   toVikingBarSeries,
   toVikingDonutSegments,
   toVikingLineSeries,
   toVikingStackedStatusSeries,
 } from '../../core/chart-data.util';
+import { formatLatencyMs } from '../../core/utils/formatter.utils';
+import {
+  type CesTelemetryPayload,
+  formatCesPercent,
+  formatCesScore,
+  resolveCesTelemetry,
+} from '../../core/ces-telemetry.util';
 import type { CircleMarker, LatLngExpression, Map as LeafletMap } from 'leaflet';
 
 type LeafletNS = typeof import('leaflet');
@@ -176,7 +184,7 @@ type TenantListResponse = {
 type TimeSeriesPoint = {
   label?: string;
   time?: string;
-  latency: number;
+  latency: number | null;
   requests: number;
 };
 
@@ -210,11 +218,8 @@ type AnalyticsOverviewResponse = {
     };
     honeypot_score?: number;
     spiking_temporal_forecast?: number;
-    ces?: {
-      level?: number;
+    ces?: CesTelemetryPayload & {
       threat?: number;
-      sla?: number;
-      stability?: number;
       spiking_temporal_forecast?: number;
       latest_benchmark_score?: number | null;
       latest_benchmark?: BenchmarkRollup | null;
@@ -222,7 +227,7 @@ type AnalyticsOverviewResponse = {
     user_metrics?: {
       data_available?: boolean;
       available_sites?: string[];
-      p99_latency_ms?: number;
+      p99_latency_ms?: number | null;
       uptime_percent?: number | null;
       total_requests_24h?: number;
       active_incidents?: number;
@@ -309,8 +314,8 @@ export class AnalyticsComponent implements OnDestroy {
   );
 
   // --- Metric / filter signals ---
-  public p99Latency = signal(0);
-  public uptimePercent = signal<number | null>(0);
+  public p99Latency = signal<number | null>(null);
+  public uptimePercent = signal<number | null>(null);
   public totalRequests = signal(0);
   public activeIncidents = signal(0);
   public widgetInteractions = signal(0);
@@ -321,6 +326,9 @@ export class AnalyticsComponent implements OnDestroy {
   isRetrying = signal(false);
   metricsDegraded = signal(false);
   loadError = signal<string | null>(null);
+  protected readonly formatLatencyMs = formatLatencyMs;
+  protected readonly formatCesPercent = formatCesPercent;
+  protected readonly formatCesScore = formatCesScore;
 
   public apiUsageCurrent = signal(0);
   public apiUsageQuota = signal(60);
@@ -340,10 +348,10 @@ export class AnalyticsComponent implements OnDestroy {
   public selectedSite = signal<string | null>(null);
   public tenantOptions = signal<SelectOption[]>([]);
 
-  public cesLevel = signal(0);
+  public cesLevel = signal<number | null>(null);
   public threatLevel = signal(0);
-  public slaLevel = signal(0);
-  public stabilityLevel = signal(0);
+  public slaLevel = signal<number | null>(null);
+  public stabilityLevel = signal<number | null>(null);
   public temporalForecast = signal(0);
   public honeypotScore = signal(0);
   public latestBenchmarkScore = signal<number | null>(null);
@@ -368,9 +376,7 @@ export class AnalyticsComponent implements OnDestroy {
   topRegionsCategories = signal<string[]>([]);
   securityAlertCategories = signal<string[]>([]);
 
-  hasLatencyData = computed(() =>
-    hasChartValues(this.latencySeries().flatMap(series => series.data)),
-  );
+  hasLatencyData = computed(() => this.latencyCategories().length > 0);
   hasFrequencyData = computed(() =>
     hasChartValues(this.frequencySeries().flatMap(series => series.data)),
   );
@@ -509,7 +515,8 @@ export class AnalyticsComponent implements OnDestroy {
 
   private loadAnalyticsData() {
     // Keep prior charts visible while SWR revalidates.
-    const hasPainted = this.cesLevel() > 0 || this.totalRequests() > 0 || this.metricsDegraded();
+    const hasPainted =
+      this.cesLevel() !== null || this.totalRequests() > 0 || this.metricsDegraded();
     if (!hasPainted) {
       this.isLoading.set(true);
     }
@@ -540,10 +547,11 @@ export class AnalyticsComponent implements OnDestroy {
               ]);
             }
 
-            this.cesLevel.set(degraded ? 0 : (ces?.level ?? 0));
+            const resolvedCes = resolveCesTelemetry(ces, degraded);
+            this.cesLevel.set(resolvedCes.level);
             this.threatLevel.set(degraded ? 0 : (ces?.threat ?? 0));
-            this.slaLevel.set(degraded ? 0 : (ces?.sla ?? 0));
-            this.stabilityLevel.set(degraded ? 0 : (ces?.stability ?? 0));
+            this.slaLevel.set(resolvedCes.sla);
+            this.stabilityLevel.set(resolvedCes.stability);
             this.temporalForecast.set(
               degraded
                 ? 0
@@ -557,7 +565,7 @@ export class AnalyticsComponent implements OnDestroy {
               degraded ? null : (benchmarking?.platform_reference ?? null),
             );
 
-            this.p99Latency.set(degraded ? 0 : (user_metrics?.p99_latency_ms ?? 0));
+            this.p99Latency.set(degraded ? null : (user_metrics?.p99_latency_ms ?? null));
             this.uptimePercent.set(degraded ? null : (user_metrics?.uptime_percent ?? null));
             this.totalRequests.set(degraded ? 0 : (user_metrics?.total_requests_24h ?? 0));
             this.activeIncidents.set(degraded ? 0 : (user_metrics?.active_incidents ?? 0));
@@ -578,15 +586,16 @@ export class AnalyticsComponent implements OnDestroy {
             }
 
             const timeSeries = degraded ? [] : user_metrics?.time_series || [];
+            const measuredLatency = measuredMetricPoints(timeSeries, point => point.latency);
             this.latencyCategories.set(
-              timeSeries.map((d: { label?: string; time?: string }) =>
-                String(d.label ?? d.time ?? '').slice(-5),
+              measuredLatency.map(({ point }) =>
+                String(point.label ?? point.time ?? '').slice(-5),
               ),
             );
             this.latencySeries.set(
               toVikingLineSeries(
                 'Latency (ms)',
-                timeSeries.map((d: { latency: number }) => d.latency ?? 0),
+                measuredLatency.map(({ value }) => value),
               ),
             );
 
@@ -789,6 +798,8 @@ export class AnalyticsComponent implements OnDestroy {
     }
     this.liveRefreshTimer = setTimeout(() => {
       this.liveRefreshTimer = undefined;
+      // Projection events supersede the overview cache immediately.
+      this.analyticsQuery.invalidateOverview(this.selectedTenantId());
       this.loadAnalyticsData();
     }, 2000);
   }
