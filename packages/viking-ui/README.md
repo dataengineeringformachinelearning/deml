@@ -5,6 +5,9 @@ Single source of truth: **`packages/viking-ui/`** (framework-agnostic styles, to
 
 Universal DEML component library for Astro, Angular, and Django.
 
+Product use-cases (control plane): [`docs/use-cases/CANONICAL.md`](../../docs/use-cases/CANONICAL.md).
+Monorepo health: [`docs/MONOREPO_HEALTH.md`](../../docs/MONOREPO_HEALTH.md).
+
 This release reflects the DEML premium restrained luxury visual direction with machined borders, high-contrast depth, and restrained teal/crimson accents.
 
 ## Architecture

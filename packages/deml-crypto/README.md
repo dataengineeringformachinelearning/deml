@@ -6,6 +6,10 @@ Standalone AES-256-GCM + GCP KMS envelope encryption with DEK rotation.
 import this package today; FORJD owns sealed AES-256-GCM envelopes at the data
 plane. Keep DEK/KEK handling free of pickle for any consumer that embeds models.
 
+Control-plane architecture and sealed-ingest use-cases:
+[`docs/use-cases/CANONICAL.md`](../../docs/use-cases/CANONICAL.md) (UC-INGEST-*) ·
+[`docs/MONOREPO_HEALTH.md`](../../docs/MONOREPO_HEALTH.md).
+
 ## Installation
 
 ```bash

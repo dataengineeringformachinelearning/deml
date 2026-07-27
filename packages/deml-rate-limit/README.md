@@ -7,6 +7,9 @@ API quotas via Postgres-backed `HeadlessRateLimitBucket` (`config/headless_rate_
 `REDIS_URL` is forbidden on the primary Fly backend profile. Use this package only
 when you deliberately run a Redis-adjacent edge quota service outside DEML.
 
+Platform boundary / use-cases: [`docs/use-cases/CANONICAL.md`](../../docs/use-cases/CANONICAL.md) ·
+[`docs/MONOREPO_HEALTH.md`](../../docs/MONOREPO_HEALTH.md).
+
 ## Installation
 
 ```bash

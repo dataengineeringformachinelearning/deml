@@ -27,6 +27,8 @@ Firebase-authenticated user control plane: Angular product UI (`deml.app`) + Dja
 **Platform boundary:** DEML owns identity, billing, consent, and product UI. FORJD owns sealed intake, workflows, projections, analytics, replay, threat processing, and ML. DEML calls FORJD with tenant-bound opaque `fjsvc_` tokens and AES-256-GCM sealed envelopes — never Firebase end-user tokens.
 Integration: [`docs/FORJD_INTEGRATION.md`](docs/FORJD_INTEGRATION.md) · FORJD extend: [`EXTENDING.md`](https://github.com/dataengineeringformachinelearning/forjd/blob/main/docs/EXTENDING.md).
 
+**Canonical use-cases (37):** [`docs/use-cases/CANONICAL.md`](docs/use-cases/CANONICAL.md) · diagrams [`DIAGRAMS.md`](docs/use-cases/DIAGRAMS.md) · machine contracts [`packages/deml-contracts/`](packages/deml-contracts/).
+
 ## What's in this repo
 
 | Path | Purpose |
@@ -34,10 +36,12 @@ Integration: [`docs/FORJD_INTEGRATION.md`](docs/FORJD_INTEGRATION.md) · FORJD e
 | `frontend/` | Angular 22+ product app (Signals + Viking-UI) |
 | `backend/` | Django BFF / control plane (Fly) |
 | `packages/viking-ui/` | Suite design system (`@dataengineeringformachinelearning/viking-ui`) |
-| `packages/deml-crypto`, `packages/deml-rate-limit` | Shared Python libs |
+| `packages/deml-contracts/` | Shared OpenAPI / JSON Schema / TS / Python wire contracts |
+| `packages/deml-crypto`, `packages/deml-rate-limit` | Optional shared Python libs (see package READMEs) |
+| `config/deml.catalog.json` | Env / ports / health inventory SoT |
 | `viking-ui-docs/` | Package docs / Storybook consumers |
 | `native/` | macOS security workbench |
-| `docs/` | Deploy, FORJD integration, suite UI law |
+| `docs/` | Deploy, FORJD integration, suite UI law, use-cases |
 | `BOOK.md` / `WHITEPAPER.md` | Architecture narrative (also published on the community site) |
 
 ## Deploy map
@@ -56,8 +60,9 @@ Operator runbooks: [`docs/VERCEL.md`](docs/VERCEL.md) · [`docs/FLY.md`](docs/FL
 npx vercel link --project deml --yes
 npx vercel deploy --prod --yes
 
-# Django BFF (from backend/)
-fly deploy -a deml-backend
+# Django BFF (stage contracts, then deploy from backend/)
+node scripts/sync_deml_contracts_docker.mjs
+cd backend && fly deploy -a deml-backend
 ```
 
 ## Product surfaces (`deml.app`)
@@ -72,20 +77,35 @@ fly deploy -a deml-backend
 
 ## Local development
 
-```bash
-# Frontend
-cd frontend && npm install --legacy-peer-deps && npm start
+Prefer the bootstrap path ([`docs/START_HERE.md`](docs/START_HERE.md)):
 
-# Backend
-cd backend && uv sync && uv run python manage.py runserver
+```bash
+npm run bootstrap
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+npm run verify
 ```
 
-Quality gates: see [`AGENTS.md`](AGENTS.md) · [`CONTRIBUTING.md`](CONTRIBUTING.md).
+```bash
+# Frontend
+cd frontend && npm start   # http://127.0.0.1:4200
+
+# Backend
+cd backend && uv run python manage.py runserver 127.0.0.1:8000
+# Health: GET /api/v1/health · ready: /api/v1/ready
+```
+
+Config inventory: [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md).  
+Monorepo health checklist: [`docs/MONOREPO_HEALTH.md`](docs/MONOREPO_HEALTH.md).  
+Quality gates: [`AGENTS.md`](AGENTS.md) · [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Docs
 
 | Doc | Purpose |
 |-----|---------|
+| [docs/use-cases/CANONICAL.md](docs/use-cases/CANONICAL.md) | **Canonical use-case contracts** |
+| [docs/MONOREPO_HEALTH.md](docs/MONOREPO_HEALTH.md) | Install → build → test checklist |
+| [docs/CONFIGURATION.md](docs/CONFIGURATION.md) | Env / secrets shape |
 | [BOOK.md](BOOK.md) | Full architecture & operations |
 | [WHITEPAPER.md](WHITEPAPER.md) | Executive summary |
 | [THEME.md](THEME.md) | Viking-UI token law |
