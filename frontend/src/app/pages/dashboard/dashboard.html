@@ -4,7 +4,7 @@
     title="Command Center"
     subtitle="Monitor performance, review threats, and triage vulnerabilities — all in one place."
   >
-    <div vikingPageHeaderActions class="scope-filters">
+    <div vikingPageHeaderActions class="page-header-toolbar">
       @if (streamStatus(); as stream) { @if (stream.visible) {
       <viking-stream-status
         [phase]="stream.phase"
@@ -14,22 +14,25 @@
         [ariaLabel]="stream.ariaLabel"
       />
       } } @if (tenantOptions().length > 0) {
-      <app-unified-select
-        id="dashboardTenant"
-        label="Workspace"
-        [options]="tenantOptions()"
-        [value]="selectedTenantId()"
-        (valueChange)="onTenantChange($event)"
-      ></app-unified-select>
-      @if (siteOptions().length > 1) {
-      <app-unified-select
-        id="dashboardSite"
-        label="Site"
-        [options]="siteOptions()"
-        [value]="selectedSite() || 'All'"
-        (valueChange)="onSiteChange($event)"
-      ></app-unified-select>
-      } }
+      <div class="scope-filters">
+        <app-unified-select
+          id="dashboardTenant"
+          label="Workspace"
+          [options]="tenantOptions()"
+          [value]="selectedTenantId()"
+          (valueChange)="onTenantChange($event)"
+        ></app-unified-select>
+        @if (siteOptions().length > 1) {
+        <app-unified-select
+          id="dashboardSite"
+          label="Site"
+          [options]="siteOptions()"
+          [value]="selectedSite() || 'All'"
+          (valueChange)="onSiteChange($event)"
+        ></app-unified-select>
+        }
+      </div>
+      }
     </div>
   </viking-page-header>
 

@@ -1,0 +1,116 @@
+// Partial of app-pages.scss — workspace onboarding wizard (modal step chrome)
+
+.wizard-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--viking-space-2);
+  min-width: 0;
+}
+
+.wizard-step h2 {
+  margin: 0;
+  font-size: var(--viking-font-size-xl);
+  font-weight: var(--viking-font-weight-bold);
+  color: var(--viking-text);
+  line-height: var(--viking-line-height-tight);
+}
+
+.wizard-step > p {
+  margin: 0;
+  color: var(--viking-text-muted);
+  line-height: var(--viking-line-height-relaxed);
+  max-width: var(--viking-content-readable-max-width);
+}
+
+.wizard-step-center {
+  align-items: center;
+  text-align: center;
+}
+
+.wizard-icon {
+  color: var(--viking-accent);
+}
+
+.wizard-icon.success {
+  color: var(--viking-success);
+}
+
+/* Icon rows — suppress default list markers (icons are the bullets) */
+.wizard-benefits {
+  list-style: none;
+  margin: var(--viking-space-1) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--viking-space-1);
+}
+
+.wizard-benefits li {
+  display: flex;
+  align-items: center;
+  gap: var(--viking-space-1);
+  margin: 0;
+  padding: 0;
+  color: var(--viking-text);
+  font-size: var(--viking-font-size-sm);
+  line-height: var(--viking-line-height-snug);
+}
+
+.wizard-benefits li::marker {
+  content: "";
+}
+
+.wizard-benefits viking-app-icon,
+.wizard-benefits viking-icon {
+  flex-shrink: 0;
+  color: var(--viking-accent);
+}
+
+/* Footer: Back left / primary actions right, single horizontal row */
+.wizard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--viking-space-1);
+  width: 100%;
+  min-width: 0;
+}
+
+.wizard-actions-right {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--viking-space-1);
+  margin-inline-start: auto;
+}
+
+.widget-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--viking-space-2);
+  margin-top: var(--viking-space-2);
+}
+
+.widget-label {
+  margin: 0;
+  font-size: var(--viking-font-size-xs);
+  font-weight: var(--viking-font-weight-semibold);
+  color: var(--viking-text-muted);
+  letter-spacing: var(--viking-letter-spacing-wide);
+  text-transform: uppercase;
+}
+
+.widget-code {
+  margin: 0;
+  padding: var(--viking-space-2);
+  overflow-x: auto;
+  border: 1px solid var(--viking-border);
+  border-radius: var(--viking-radius);
+  background: var(--viking-surface-alt, var(--viking-surface));
+  color: var(--viking-text);
+  font-family: var(--viking-font-mono, ui-monospace, monospace);
+  font-size: var(--viking-font-size-xs);
+  line-height: var(--viking-line-height-relaxed);
+}

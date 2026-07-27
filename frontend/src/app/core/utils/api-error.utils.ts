@@ -9,6 +9,25 @@ export function apiErrorMessage(err: unknown, fallback: string): string {
     }
     if (body && typeof body === 'object') {
       const record = body as Record<string, unknown>;
+      const code = typeof record['code'] === 'string' ? record['code'] : '';
+
+      // --- Known DEML / FORJD policy codes (prefer over raw detail) ---
+      if (code === 'forjd_action_forbidden') {
+        return (
+          'Your account role cannot perform this action. ' +
+          'Site and status-page changes require Operator or Security Admin.'
+        );
+      }
+      if (code === 'pro_required') {
+        return 'This action requires an active Pro subscription.';
+      }
+      if (code === 'authentication_required') {
+        return 'Your session expired. Sign in again and retry.';
+      }
+      if (code === 'account_required') {
+        return 'Your account is not fully provisioned yet. Finish sign-in and try again.';
+      }
+
       const detail = record['detail'];
       if (typeof detail === 'string' && detail) {
         return detail;

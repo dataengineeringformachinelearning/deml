@@ -319,6 +319,13 @@ export class Account implements OnInit {
   }
 
   loadWorkflows() {
+    if (!this.authService.isAuthenticated()) {
+      this.workflows.set([]);
+      this.workflowsDegraded.set(false);
+      this.workflowsError.set(null);
+      this.workflowsLoading.set(false);
+      return;
+    }
     this.workflowsLoading.set(true);
     this.workflowsError.set(null);
     this.http.get<WorkflowListResponse>(`${environment.backendUrl}/api/v1/workflows`).subscribe({
@@ -328,10 +335,19 @@ export class Account implements OnInit {
         this.workflowsLoading.set(false);
         this.cdr.markForCheck();
       },
-      error: () => {
+      error: err => {
         this.workflows.set([]);
         this.workflowsDegraded.set(false);
-        this.workflowsError.set('Could not load pipeline configuration. Try again shortly.');
+        const status = err?.status as number | undefined;
+        if (status === 401) {
+          this.workflowsError.set('Sign in again to load pipeline configuration.');
+        } else if (status === 403) {
+          this.workflowsError.set(
+            'Pipeline catalog is unavailable for this account role or FORJD binding.',
+          );
+        } else {
+          this.workflowsError.set('Could not load pipeline configuration. Try again shortly.');
+        }
         this.workflowsLoading.set(false);
         this.cdr.markForCheck();
       },

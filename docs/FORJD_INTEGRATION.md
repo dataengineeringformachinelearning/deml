@@ -125,8 +125,8 @@ service credential. API keys do not bypass user roles.
 | DEML role      | FORJD-backed permissions                                                                                                                                                               |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Viewer         | Read-only tenant analytics, SIEM, cases, playbooks/runs, vulnerabilities, compliance, exports, replay/DLQ state, status, and ML results                                                |
-| Operator       | Viewer plus sealed ingest, case/vulnerability changes, replay/DLQ actions, export creation, SIEM signal submission, approved playbook execution, and SOAR action acknowledgement/retry |
-| Security Admin | Operator plus playbook/status/integration/model administration and destructive domain actions                                                                                          |
+| Operator       | Viewer plus sealed ingest, status-page/site CRUD, case/vulnerability changes, replay/DLQ actions, export creation, SIEM signal submission, approved playbook execution, and SOAR action acknowledgement/retry |
+| Security Admin | Operator plus playbook/integration/model administration and destructive domain actions                                                                                          |
 
 **Pro entitlement (DEML-side):** role alone is not enough for premium writes. Exports,
 ML admin, SIEM signal writes, projections run, vulnerability/case writes, and playbook

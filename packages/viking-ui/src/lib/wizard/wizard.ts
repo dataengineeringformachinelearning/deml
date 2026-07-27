@@ -53,10 +53,17 @@ export interface VikingWizardStep {
       .viking-wizard-actions {
         display: flex;
         flex-wrap: wrap;
+        align-items: center;
         justify-content: flex-end;
         gap: var(--viking-space-1);
+        width: 100%;
         padding-top: var(--viking-space-2);
         border-top: 1px solid var(--viking-border);
+        box-sizing: border-box;
+      }
+      .viking-wizard-actions > * {
+        min-width: 0;
+        max-width: 100%;
       }
     `,
   ],

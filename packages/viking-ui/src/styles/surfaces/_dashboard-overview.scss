@@ -1,14 +1,36 @@
 // Partial of app-pages.scss — dashboard overview (scope filters, overview grid, health, KPIs, threats, metrics, panels, charts, detail grid)
 
 /* ── dashboard ── */
+.page-header-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--viking-space-2);
+  width: 100%;
+  min-width: 0;
+
+  viking-stream-status,
+  .suite-stream-status,
+  .viking-stream-status {
+    flex: 0 0 auto;
+    width: fit-content;
+    max-width: 100%;
+  }
+}
+
 .scope-filters {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--viking-space-3);
-  width: 100%;
+  flex: 1 1 12rem;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
 
   @media (min-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: min(100%, 28rem);
   }
 
   app-unified-select {

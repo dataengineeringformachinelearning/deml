@@ -40,6 +40,9 @@ export type VikingStreamStatusPhase =
         display: inline-flex;
         align-items: center;
         gap: var(--viking-space-1);
+        width: fit-content;
+        max-width: 100%;
+        flex: 0 0 auto;
         box-sizing: border-box;
       }
     `,

@@ -39,7 +39,7 @@ _PRO_ACTIONS = frozenset(
     ("export.write", {"Operator", "Security Admin"}),
     ("export.download", {"Operator", "Security Admin"}),
     ("playbook.execute", {"Operator", "Security Admin"}),
-    ("status.admin", {"Security Admin"}),
+    ("status.admin", {"Operator", "Security Admin"}),
     ("playbook.admin", {"Security Admin"}),
     ("integration.admin", {"Security Admin"}),
     ("model.admin", {"Security Admin"}),

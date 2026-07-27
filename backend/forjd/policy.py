@@ -53,7 +53,8 @@ ACTION_POLICIES: Final[dict[str, ActionPolicy]] = {
   "session.write": ActionPolicy(OPERATOR_ROLES),
   "siem.signal.write": ActionPolicy(OPERATOR_ROLES, requires_pro=True),
   "security-alert.write": ActionPolicy(OPERATOR_ROLES),
-  "status.admin": ActionPolicy(ADMIN_ROLES),
+  # Site / status-page CRUD matches product canMutateSites (Operator+), not Viewer.
+  "status.admin": ActionPolicy(OPERATOR_ROLES),
   "playbook.admin": ActionPolicy(ADMIN_ROLES, requires_pro=True),
   "integration.admin": ActionPolicy(ADMIN_ROLES),
   "model.admin": ActionPolicy(ADMIN_ROLES, requires_pro=True),
