@@ -1,3 +1,4 @@
+import { ERROR_CODES } from '@dataengineeringformachinelearning/deml-contracts';
 import { describe, expect, it } from 'vitest';
 import { parseSseFrames } from './live-updates.service';
 
@@ -31,8 +32,12 @@ describe('parseSseFrames', () => {
   });
 
   it('parses typed degraded frames from the Django SSE bridge', () => {
-    const { events } = parseSseFrames('event: degraded\ndata: {"code":"forjd_degraded"}\n\n');
-    expect(events).toEqual([{ type: 'degraded', data: { code: 'forjd_degraded' } }]);
+    const { events } = parseSseFrames(
+      `event: degraded\ndata: {"code":"${ERROR_CODES.FORJD_DEGRADED}"}\n\n`,
+    );
+    expect(events).toEqual([
+      { type: 'degraded', data: { code: ERROR_CODES.FORJD_DEGRADED } },
+    ]);
   });
 
   it('defaults the event type to message when only data is present', () => {

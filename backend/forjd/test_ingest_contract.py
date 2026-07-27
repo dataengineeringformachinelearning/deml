@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-import base64
-import hashlib
 import json
 from typing import Any
 from unittest.mock import AsyncMock, patch
 from uuid import UUID, uuid4
 
 import pytest
+from deml_contracts import make_sealed_event_dict
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import Client, override_settings
@@ -37,24 +36,7 @@ def _authorization(username: str) -> str:
 
 
 def _sealed_event(tenant_id: UUID, index: int, ciphertext: bytes = b"sealed-event-body-1") -> dict:
-  encoded_ciphertext = base64.b64encode(ciphertext).decode()
-  return {
-    "tenant_id": str(tenant_id),
-    "client_event_id": f"contract-event-{index}",
-    "content_type": "application/forjd-telemetry+v1",
-    "event_type": "deml.metric",
-    "schema_version": 1,
-    "workflow_id": "deml_telemetry",
-    "encryption": {"mode": "e2ee", "algo": "aes-256-gcm"},
-    "envelope": {
-      "algo": "aes-256-gcm",
-      "key_id": "contract-key-1",
-      "nonce": base64.b64encode(b"0123456789ab").decode(),
-      "ciphertext": encoded_ciphertext,
-      "ciphertext_sha256": hashlib.sha256(ciphertext).hexdigest(),
-    },
-    "metadata": {"source": "deml-web", "channel": "telemetry"},
-  }
+  return make_sealed_event_dict(str(tenant_id), index=index, ciphertext=ciphertext)
 
 
 @pytest.mark.django_db

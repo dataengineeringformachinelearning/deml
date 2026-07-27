@@ -7,6 +7,19 @@ import pytest
 from utils import env
 
 
+def _paas_forjd_env(monkeypatch) -> None:
+  """Minimum FORJD + identity keys required on PaaS when modes are forjd."""
+  monkeypatch.setenv("FORJD_API_URL", "https://backend.forjd.co")
+  monkeypatch.setenv("FORJD_SERVICE_TOKEN", "fjsvc_abcdefgh_secret")
+  monkeypatch.setenv("FORJD_TENANT_ID", "00000000-0000-0000-0000-000000000001")
+  monkeypatch.setenv("FORJD_WRITE_MODE", "forjd")
+  monkeypatch.setenv("FORJD_READ_MODE", "forjd")
+  monkeypatch.setenv("ENCRYPTION_MASTER_KEY", "test-master-key-not-for-prod")
+  monkeypatch.setenv("FIREBASE_SERVICE_ACCOUNT_JSON", '{"type":"service_account"}')
+  monkeypatch.setenv("ALLOWED_HOSTS", "backend.deml.app,deml-backend.fly.dev")
+  monkeypatch.setenv("DEML_TRANSPORT_SECURITY", "required")
+
+
 def test_get_str_strips_whitespace(monkeypatch):
   monkeypatch.setenv("TEST_VAR", "  hello  ")
   assert env.get_str("TEST_VAR") == "hello"
@@ -59,6 +72,7 @@ def test_validate_production_config_defaults_debug_false_on_railway(monkeypatch)
     "postgresql://user:pass@host:5432/db?sslmode=verify-full",
   )
   monkeypatch.setenv("REDIS_URL", "rediss://user:pass@cache.example:6379")
+  _paas_forjd_env(monkeypatch)
   env.validate_production_config()
   assert os.getenv("DEBUG") == "False"
 
@@ -119,6 +133,7 @@ def test_validate_production_config_requires_forjd_on_fly(monkeypatch):
     "DATABASE_URL",
     "postgresql://user:pass@host:5432/db?sslmode=verify-full",
   )
+  monkeypatch.setenv("ALLOWED_HOSTS", "deml-backend.fly.dev")
   monkeypatch.delenv("FORJD_API_URL", raising=False)
   monkeypatch.delenv("FORJD_SERVICE_TOKEN", raising=False)
   monkeypatch.delenv("FORJD_TENANT_ID", raising=False)
@@ -135,11 +150,25 @@ def test_validate_production_config_accepts_fly_with_forjd(monkeypatch):
     "DATABASE_URL",
     "postgresql://user:pass@host:5432/db?sslmode=verify-full",
   )
-  monkeypatch.setenv("FORJD_API_URL", "https://backend.forjd.co")
-  monkeypatch.setenv("FORJD_SERVICE_TOKEN", "fjsvc_abcdefgh_secret")
-  monkeypatch.setenv("FORJD_TENANT_ID", "00000000-0000-0000-0000-000000000001")
+  _paas_forjd_env(monkeypatch)
   env.validate_production_config()
   assert os.getenv("DEBUG") == "False"
+
+
+def test_validate_production_config_requires_forjd_on_railway(monkeypatch):
+  monkeypatch.setenv("RAILWAY_ENVIRONMENT", "production")
+  monkeypatch.setenv("DEBUG", "False")
+  monkeypatch.setenv("SECRET_KEY", "railway-test-secret-key")
+  monkeypatch.setenv(
+    "DATABASE_URL",
+    "postgresql://user:pass@host:5432/db?sslmode=verify-full",
+  )
+  monkeypatch.setenv("ALLOWED_HOSTS", "backend.deml.app")
+  monkeypatch.delenv("FORJD_SERVICE_TOKEN", raising=False)
+  monkeypatch.setenv("FORJD_API_URL", "https://backend.forjd.co")
+  monkeypatch.setenv("FORJD_TENANT_ID", "00000000-0000-0000-0000-000000000001")
+  with pytest.raises(RuntimeError, match="FORJD_SERVICE_TOKEN"):
+    env.validate_production_config()
 
 
 def test_production_transport_rejects_plaintext_postgres(monkeypatch):

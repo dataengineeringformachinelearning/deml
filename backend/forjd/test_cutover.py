@@ -1,4 +1,8 @@
-"""Cutover phase flags — dual-write shadow + dual-read Angular-stable fallbacks."""
+"""Cutover phase flags — dual-write shadow + dual-read Angular-stable fallbacks.
+
+Quarantined: steady-state production is FORJD_WRITE_MODE=forjd / FORJD_READ_MODE=forjd.
+These tests guard legacy phase knobs and are not live product use-cases.
+"""
 
 from __future__ import annotations
 
@@ -13,6 +17,8 @@ from monitor.models import ForjdShadowReceipt, ForjdTenantMapping
 
 from forjd.client import ForjdError, ForjdResponse
 from forjd.cutover import empty_read_envelope, read_mode, write_mode
+
+pytestmark = pytest.mark.quarantine
 
 User = get_user_model()
 

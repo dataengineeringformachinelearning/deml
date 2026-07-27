@@ -393,3 +393,34 @@ def test_sync_subscriptions_command_downgrades_canceled(
   assert profile.tier == "Standard"
   assert profile.subscription_active is False
   assert "downgraded=1" in out.getvalue()
+
+
+@pytest.mark.django_db
+@pytest.mark.usecase("UC-BILL-003")
+@override_settings(STRIPE_SECRET_KEY="sk_test")  # pragma: allowlist secret
+@patch("billing.api.stripe.Subscription.modify")
+def test_cancel_and_resume_subscription(
+  modify_subscription,
+  authenticated_client,
+  test_user,
+) -> None:
+  from deml_contracts import SubscriptionMutateOut
+
+  profile = test_user.profile
+  profile.role = "Operator"
+  profile.tier = "Pro"
+  profile.subscription_active = True
+  profile.stripe_subscription_id = "sub_live"
+  profile.save(update_fields=["role", "tier", "subscription_active", "stripe_subscription_id"])
+
+  modify_subscription.return_value = _Obj(cancel_at_period_end=True)
+  with patch("billing.api.stripe.api_key", "sk_test"):  # pragma: allowlist secret
+    cancelled = authenticated_client.post("/api/v1/billing/cancel-subscription")
+  assert cancelled.status_code == 200
+  assert SubscriptionMutateOut.model_validate(cancelled.json()).status == "cancelled"
+
+  modify_subscription.return_value = _Obj(cancel_at_period_end=False)
+  with patch("billing.api.stripe.api_key", "sk_test"):  # pragma: allowlist secret
+    resumed = authenticated_client.post("/api/v1/billing/resume-subscription")
+  assert resumed.status_code == 200
+  assert SubscriptionMutateOut.model_validate(resumed.json()).status == "resumed"

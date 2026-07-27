@@ -7,6 +7,7 @@ from utils.structured_log import (
   StructuredJsonFormatter,
   get_correlation_id,
   log_event,
+  log_usecase,
   set_correlation_id,
 )
 
@@ -45,3 +46,14 @@ def test_structured_json_formatter():
   output = json.loads(formatter.format(record))
   assert output["message"] == "hello"
   assert output["correlation_id"] == "fmt-test"
+
+
+def test_log_usecase_includes_use_case_id(caplog):
+  logger = logging.getLogger("test.usecase")
+  set_correlation_id("corr-uc")
+  with caplog.at_level(logging.INFO, logger="test.usecase"):
+    log_usecase(logger, "UC-HEALTH-001", "ready_probe", status="ok")
+  payload = json.loads(caplog.records[0].message)
+  assert payload["use_case"] == "UC-HEALTH-001"
+  assert payload["event"] == "ready_probe"
+  assert payload["status"] == "ok"
