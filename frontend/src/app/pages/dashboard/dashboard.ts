@@ -21,7 +21,6 @@ import {
   VikingBadge,
   VikingChartSeries,
   VikingGaugeArc,
-  VikingChartEmptyState,
   VikingPageHeader,
   VikingPageTemplate,
   VikingMetricRow,
@@ -71,13 +70,14 @@ import {
 import { VikingAppIcon } from '../../components/viking-app-icon/viking-app-icon';
 import {
   VikingDonutSegment,
-  hasChartValues,
-  hasDonutValues,
   measuredMetricPoints,
   toVikingBarSeries,
   toVikingDonutSegments,
   toVikingLineSeries,
   toVikingSparklineSeries,
+  withIdleThreatDonut,
+  withZeroBaselineBarSeries,
+  withZeroBaselineSeries,
 } from '../../core/chart-data.util';
 import { formatLatencyMs } from '../../core/utils/formatter.utils';
 import {
@@ -148,7 +148,6 @@ type DashboardOverviewResponse = {
     VikingButton,
     VikingBadge,
     VikingGaugeArc,
-    VikingChartEmptyState,
     VikingPageHeader,
     VikingPageTemplate,
     VikingMetricRow,
@@ -344,7 +343,7 @@ export class Dashboard implements OnInit, OnDestroy {
 
   healthLabel = computed(() => {
     const score = this.healthScore();
-    if (score === null) return 'Awaiting';
+    if (score === null) return '—';
     if (score >= 85) return 'Healthy';
     if (score >= 65) return 'Watch';
     if (score >= 40) return 'At Risk';
@@ -353,7 +352,7 @@ export class Dashboard implements OnInit, OnDestroy {
 
   healthGaugeTone = computed<'amber' | 'danger' | 'info' | 'success'>(() => {
     const label = this.healthLabel();
-    if (label === 'Awaiting') return 'info';
+    if (label === '—') return 'info';
     if (label === 'At Risk') return 'amber';
     if (label === 'Critical') return 'danger';
     if (label === 'Watch') return 'info';
@@ -372,20 +371,36 @@ export class Dashboard implements OnInit, OnDestroy {
 
   setupComplete = computed(() => this.myPages().length > 0);
 
-  hasLatencyData = computed(() => (this.latencySeries()[0]?.data.length ?? 0) > 0);
-
-  hasSecurityAlertData = computed(() =>
-    hasChartValues(this.securityAlertSeries().flatMap(series => series.data)),
+  /** Charts always paint after load — zero baseline when telemetry is empty. */
+  displayLatencySeries = computed(() =>
+    withZeroBaselineSeries(this.latencySeries(), 'Latency (ms)'),
   );
 
-  hasThreatDonutData = computed(() => hasDonutValues(this.threatDonutSegments()));
+  displayUptimeSeries = computed(() =>
+    withZeroBaselineSeries(this.uptimeSeries(), 'Uptime (%)', 'success'),
+  );
+
+  displaySecurityAlertSeries = computed(() =>
+    withZeroBaselineBarSeries(this.securityAlertSeries(), 'Anomalies', 'warning'),
+  );
+
+  displayThreatDonutSegments = computed(() => withIdleThreatDonut(this.threatDonutSegments()));
+
+  anomalyCountLabel = computed(() => {
+    const total = this.securityAlertSeries().flatMap(series => series.data).reduce((sum, n) => sum + n, 0);
+    return String(total);
+  });
 
   uptimeSparkline = computed(() =>
-    toVikingSparklineSeries('Uptime', this.uptimeSeries()[0]?.data ?? [], 'success'),
+    toVikingSparklineSeries('Uptime', this.displayUptimeSeries()[0]?.data ?? [], 'success'),
   );
 
   threatSparkline = computed(() =>
-    toVikingSparklineSeries('Threats', this.threatTrendSeries()[0]?.data ?? [], 'warning'),
+    toVikingSparklineSeries(
+      'Threats',
+      withZeroBaselineSeries(this.threatTrendSeries(), 'Threat events', 'warning')[0]?.data ?? [],
+      'warning',
+    ),
   );
 
   constructor() {
@@ -495,10 +510,6 @@ export class Dashboard implements OnInit, OnDestroy {
     void this.onboardingService.openWizard()?.then(() => {
       this.loadUserPages(false);
     });
-  }
-
-  goToSettings() {
-    void this.router.navigate(['/settings']);
   }
 
   private loadUserPages(autoOpenWizard = true) {
@@ -684,7 +695,7 @@ export class Dashboard implements OnInit, OnDestroy {
 
   benchmarkScoreLabel(): string {
     const score = this.benchmarkSummary()?.score_percent;
-    return score === null || score === undefined ? 'Awaiting run' : `${score.toFixed(0)}%`;
+    return score === null || score === undefined ? '—' : `${score.toFixed(0)}%`;
   }
 
   benchmarkSampleLabel(): string {

@@ -4,7 +4,6 @@ import {
   inject,
   ChangeDetectionStrategy,
   signal,
-  computed,
   ChangeDetectorRef,
   effect,
 } from '@angular/core';
@@ -28,11 +27,9 @@ import {
   VikingCardHeader,
   VikingCardTitle,
   VikingDisclosure,
-  VikingPipelineFlow,
   VikingPreferencesPanel,
   VikingPreferencesService,
   VikingStack,
-  type VikingPipelineStep,
 } from '@dataengineeringformachinelearning/viking-ui';
 import { VikingAppIcon } from '../../components/viking-app-icon/viking-app-icon';
 import { FormsModule } from '@angular/forms';
@@ -64,22 +61,6 @@ type BillingSyncResponse = {
 type SubscriptionUpdateResponse = { cancel_at_period_end: boolean };
 type ApiKeyGenerateResponse = { key: string };
 
-type WorkflowSummaryRow = {
-  id: string;
-  name: string;
-  description?: string;
-  default?: boolean;
-  steps?: string[];
-  pipeline_steps?: VikingPipelineStep[];
-};
-
-type WorkflowListResponse = {
-  ok?: boolean;
-  count?: number;
-  workflows?: WorkflowSummaryRow[];
-  degraded?: boolean;
-};
-
 @Component({
   selector: 'app-account',
   standalone: true,
@@ -100,7 +81,6 @@ type WorkflowListResponse = {
     VikingCardHeader,
     VikingCardTitle,
     VikingDisclosure,
-    VikingPipelineFlow,
     VikingPreferencesPanel,
     VikingStack,
     VikingAppIcon,
@@ -164,27 +144,6 @@ export class Account implements OnInit {
   billingSuccess = signal<string | null>(null);
   billingError = signal<string | null>(null);
 
-  workflows = signal<WorkflowSummaryRow[]>([]);
-  workflowsLoading = signal<boolean>(false);
-  workflowsError = signal<string | null>(null);
-  workflowsDegraded = signal<boolean>(false);
-
-  /** Prefer DEML telemetry workflow, then platform default, then first catalog row. */
-  primaryWorkflow = computed(() => {
-    const list = this.workflows();
-    return (
-      list.find(w => w.id === 'threat_telemetry') ?? list.find(w => w.default) ?? list[0] ?? null
-    );
-  });
-
-  otherWorkflows = computed(() => {
-    const primary = this.primaryWorkflow();
-    if (!primary) {
-      return this.workflows();
-    }
-    return this.workflows().filter(w => w.id !== primary.id);
-  });
-
   protected readonly phoneHint = phoneFormatHint;
 
   constructor() {
@@ -196,7 +155,6 @@ export class Account implements OnInit {
           void this.checkMfaStatus();
           this.checkLinkedProviders();
           this.loadApiKeys();
-          this.loadWorkflows();
         }
       }
     });
@@ -296,62 +254,6 @@ export class Account implements OnInit {
           },
         });
     }
-  }
-
-  openPipelineStudio(): void {
-    void this.router.navigate(['/pipeline']);
-  }
-
-  /** Map FORJD catalog rows into visual pipeline steps (YAML remains SoT). */
-  pipelineStepsFor(workflow: WorkflowSummaryRow | null): VikingPipelineStep[] {
-    if (!workflow) {
-      return [];
-    }
-    if (workflow.pipeline_steps?.length) {
-      return workflow.pipeline_steps;
-    }
-    return (workflow.steps ?? []).map(id => ({
-      id,
-      title: id.replace(/[_-]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-      detail: '',
-      kind: 'unknown',
-    }));
-  }
-
-  loadWorkflows() {
-    if (!this.authService.isAuthenticated()) {
-      this.workflows.set([]);
-      this.workflowsDegraded.set(false);
-      this.workflowsError.set(null);
-      this.workflowsLoading.set(false);
-      return;
-    }
-    this.workflowsLoading.set(true);
-    this.workflowsError.set(null);
-    this.http.get<WorkflowListResponse>(`${environment.backendUrl}/api/v1/workflows`).subscribe({
-      next: res => {
-        this.workflows.set(Array.isArray(res.workflows) ? res.workflows : []);
-        this.workflowsDegraded.set(Boolean(res.degraded));
-        this.workflowsLoading.set(false);
-        this.cdr.markForCheck();
-      },
-      error: err => {
-        this.workflows.set([]);
-        this.workflowsDegraded.set(false);
-        const status = err?.status as number | undefined;
-        if (status === 401) {
-          this.workflowsError.set('Sign in again to load pipeline configuration.');
-        } else if (status === 403) {
-          this.workflowsError.set(
-            'Pipeline catalog is unavailable for this account role or FORJD binding.',
-          );
-        } else {
-          this.workflowsError.set('Could not load pipeline configuration. Try again shortly.');
-        }
-        this.workflowsLoading.set(false);
-        this.cdr.markForCheck();
-      },
-    });
   }
 
   loadApiKeys() {

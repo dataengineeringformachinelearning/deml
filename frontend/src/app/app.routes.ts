@@ -67,10 +67,13 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/account/account').then(m => m.Account),
   },
   {
+    // Sealed ingest is auto-configured (threat_telemetry). Pipeline Studio is
+    // ops-only YAML export — keep the module for deep links but send product
+    // users to the command center.
     path: 'pipeline',
     canActivate: [authGuard],
-    data: { preload: 'auth' },
-    loadComponent: () => import('./pages/pipeline/pipeline').then(m => m.Pipeline),
+    redirectTo: 'dashboard',
+    pathMatch: 'full',
   },
   {
     path: 'success',

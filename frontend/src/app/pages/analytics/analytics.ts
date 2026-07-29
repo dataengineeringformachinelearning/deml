@@ -66,11 +66,16 @@ import {
   VikingDonutSegment,
   hasChartValues,
   hasDonutValues,
+  idleHourCategories,
   measuredMetricPoints,
   toVikingBarSeries,
   toVikingDonutSegments,
   toVikingLineSeries,
   toVikingStackedStatusSeries,
+  withIdleThreatDonut,
+  withZeroBaselineBarSeries,
+  withZeroBaselineSeries,
+  zeroBaselineBarSeries,
 } from '../../core/chart-data.util';
 import { formatLatencyMs } from '../../core/utils/formatter.utils';
 import {
@@ -395,6 +400,64 @@ export class AnalyticsComponent implements OnDestroy {
   hasThreatSeverityData = computed(() => hasDonutValues(this.threatSeveritySegments()));
   hasSecurityAlertsData = computed(() =>
     hasChartValues(this.securityAlertsSeries().flatMap(series => series.data)),
+  );
+
+  /** Loaded empty → zero / idle charts instead of empty-state CTAs. */
+  displayLatencySeries = computed(() =>
+    withZeroBaselineSeries(this.latencySeries(), 'Latency (ms)'),
+  );
+  displayLatencyCategories = computed(() =>
+    this.hasLatencyData() ? this.latencyCategories() : idleHourCategories(),
+  );
+  displayFrequencySeries = computed(() =>
+    withZeroBaselineSeries(this.frequencySeries(), 'Requests', 'muted'),
+  );
+  displayFrequencyCategories = computed(() =>
+    this.frequencyCategories().length > 0 ? this.frequencyCategories() : idleHourCategories(),
+  );
+  displayTopRegionsSeries = computed(() =>
+    withZeroBaselineBarSeries(this.topRegionsSeries(), 'Requests', 'warning', 5),
+  );
+  displayTopRegionsCategories = computed(() =>
+    this.topRegionsCategories().length > 0
+      ? this.topRegionsCategories()
+      : ['—', '—', '—', '—', '—'],
+  );
+  displayEndpointSeries = computed(() =>
+    withZeroBaselineBarSeries(this.endpointSeries(), 'Calls', 'accent', 5),
+  );
+  displayEndpointCategories = computed(() =>
+    this.endpointCategories().length > 0
+      ? this.endpointCategories()
+      : ['—', '—', '—', '—', '—'],
+  );
+  displayThreatSeveritySegments = computed(() =>
+    withIdleThreatDonut(this.threatSeveritySegments()),
+  );
+  displaySecurityAlertsSeries = computed(() =>
+    withZeroBaselineBarSeries(this.securityAlertsSeries(), 'Anomalies', 'warning', 5),
+  );
+  displaySecurityAlertCategories = computed(() =>
+    this.securityAlertCategories().length > 0
+      ? this.securityAlertCategories()
+      : ['—', '—', '—', '—', '—'],
+  );
+  displayStatusSeries = computed(() => {
+    if (this.hasStatusStackedData()) {
+      return this.statusStackedSeries();
+    }
+    if (this.hasStatusData()) {
+      return this.statusSeries();
+    }
+    return zeroBaselineBarSeries('Count', 'accent', 4);
+  });
+  displayStatusCategories = computed(() =>
+    this.statusCategories().length > 0
+      ? this.statusCategories()
+      : ['2xx', '3xx', '4xx', '5xx'],
+  );
+  displayStatusKind = computed<'stacked-bar' | 'bar'>(() =>
+    this.hasStatusStackedData() ? 'stacked-bar' : 'bar',
   );
 
   public originMapData = signal<OriginMapPoint[]>([]);
@@ -941,11 +1004,11 @@ export class AnalyticsComponent implements OnDestroy {
   }
 
   public formatOptionalPercent(value: number | null | undefined): string {
-    return value === null || value === undefined ? 'Awaiting run' : `${value.toFixed(1)}%`;
+    return value === null || value === undefined ? '—' : `${value.toFixed(1)}%`;
   }
 
   public formatBenchmarkError(value: number | null | undefined): string {
-    return value === null || value === undefined ? 'Awaiting run' : value.toFixed(4);
+    return value === null || value === undefined ? '—' : value.toFixed(4);
   }
 
   public benchmarkScoreSublabel(): string {

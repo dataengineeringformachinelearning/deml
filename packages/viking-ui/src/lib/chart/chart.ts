@@ -299,23 +299,31 @@ const buildSmoothPath = (points: { x: number; y: number }[]): string => {
                 [style.fill]="toneVar(slice.tone)"
               />
             }
-            @if (donutSlices().length > 0) {
+            @if (donutSlices().length === 0) {
               <circle
-                class="viking-chart-donut-hole"
+                class="viking-chart-donut-track"
                 [attr.cx]="width() / 2"
                 [attr.cy]="plotCy()"
-                [attr.r]="donutInnerRadius()"
+                [attr.r]="donutOuterRadius()"
+                fill="none"
+                [attr.stroke-width]="donutOuterRadius() - donutInnerRadius()"
               />
-              <text
-                class="viking-chart-donut-total"
-                [attr.x]="width() / 2"
-                [attr.y]="plotCy()"
-                text-anchor="middle"
-                dominant-baseline="central"
-              >
-                {{ donutTotalLabel() }}
-              </text>
             }
+            <circle
+              class="viking-chart-donut-hole"
+              [attr.cx]="width() / 2"
+              [attr.cy]="plotCy()"
+              [attr.r]="donutInnerRadius()"
+            />
+            <text
+              class="viking-chart-donut-total"
+              [attr.x]="width() / 2"
+              [attr.y]="plotCy()"
+              text-anchor="middle"
+              dominant-baseline="central"
+            >
+              {{ donutTotalLabel() }}
+            </text>
           } @else {
             <defs>
               <clipPath [attr.id]="plotClipId">
@@ -746,6 +754,9 @@ const buildSmoothPath = (points: { x: number; y: number }[]): string => {
       .viking-chart-donut-slice {
         stroke: var(--viking-surface);
         stroke-width: 2;
+      }
+      .viking-chart-donut-track {
+        stroke: var(--viking-border-subtle, var(--suite-border-subtle));
       }
       .viking-chart-donut-hole {
         fill: var(--viking-surface);
@@ -1183,13 +1194,14 @@ export class VikingChart implements AfterViewInit, OnDestroy {
   protected readonly plotTop = computed(() => this.resolvedGutter().top);
   protected readonly plotCy = computed(() => this.height() / 2);
 
-  protected readonly donutInnerRadius = computed(() => {
+  protected readonly donutOuterRadius = computed(() => {
     const plotH = this.plotBottom() - this.plotTop();
     const plotW =
       this.width() - this.resolvedGutter().left - this.resolvedGutter().right;
-    const outer = Math.min(plotW, plotH) / 2 - 6;
-    return outer * 0.58;
+    return Math.min(plotW, plotH) / 2 - 6;
   });
+
+  protected readonly donutInnerRadius = computed(() => this.donutOuterRadius() * 0.58);
 
   protected readonly isBarKind = computed(() => {
     const kind = this.kind();
