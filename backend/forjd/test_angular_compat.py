@@ -54,8 +54,14 @@ def test_deml_analytics_overview_maps_ces_fields() -> None:
         "temporal_scored_at": "2026-07-23T00:00:00Z",
         "uses_norse": True,
       },
-      "time_series": [{"label": "10:00", "latency": 42.0, "requests": 10}],
-      "uptime_series": [{"label": "10:00", "uptime": 99.5}],
+      "time_series": [
+        {"label": "10:00", "latency": 42.0, "requests": 10},
+        {"label": "11:00", "latency": None, "requests": 2},
+      ],
+      "uptime_series": [
+        {"label": "10:00", "uptime": 99.5},
+        {"label": "11:00", "uptime": None},
+      ],
       "threat_series": [{"label": "10:00", "count": 2}],
       "threat_severity": [{"severity": "Detected", "count": 2}],
       "origin_distribution": [{"region": "iad", "count": 5}],
@@ -72,10 +78,13 @@ def test_deml_analytics_overview_maps_ces_fields() -> None:
   assert body["data"]["ces"]["temporal_sample_count"] == 128
   assert body["data"]["ces"]["uses_norse"] is True
   assert body["data"]["user_metrics"]["total_requests_24h"] == 10
+  assert body["data"]["user_metrics"]["p99_latency_ms"] == 42.0
   assert body["data"]["user_metrics"]["unique_visitors"] == 4
   assert body["data"]["user_metrics"]["time_series"][0]["latency"] == 42.0
+  assert body["data"]["user_metrics"]["time_series"][1]["latency"] is None
   assert body["data"]["user_metrics"]["request_frequency"][0]["requests"] == 10
   assert body["data"]["user_metrics"]["uptime_series"][0]["uptime"] == 99.5
+  assert body["data"]["user_metrics"]["uptime_series"][1]["uptime"] is None
   assert body["data"]["user_metrics"]["security_alerts"][0]["count"] == 2
   assert body["data"]["user_metrics"]["threat_severity"][0]["count"] == 2
   assert body["data"]["user_metrics"]["origin_distribution"][0]["region"] == "iad"
@@ -83,13 +92,40 @@ def test_deml_analytics_overview_maps_ces_fields() -> None:
   assert body["data"]["user_metrics"]["endpoint_counts"][0]["endpoint"] == "analytics.overview"
 
 
+def test_deml_analytics_overview_preserves_nullable_ces_metrics_and_zero_aliases() -> None:
+  explicit_nulls = deml_analytics_overview(
+    {
+      "ces": {
+        "ces_level": None,
+        "ces_sla": None,
+        "ces_stability": None,
+        # Canonical keys are authoritative when both shapes are present.
+        "level": 75,
+        "sla": 98,
+        "stability": 90,
+      }
+    }
+  )
+  assert explicit_nulls["data"]["ces"]["level"] is None
+  assert explicit_nulls["data"]["ces"]["sla"] is None
+  assert explicit_nulls["data"]["ces"]["stability"] is None
+
+  measured_zero_aliases = deml_analytics_overview({"ces": {"level": 0, "sla": 0, "stability": 0}})
+  assert measured_zero_aliases["data"]["ces"]["level"] == 0.0
+  assert measured_zero_aliases["data"]["ces"]["sla"] == 0.0
+  assert measured_zero_aliases["data"]["ces"]["stability"] == 0.0
+
+
 def test_empty_analytics_overview_is_degraded_not_healthy() -> None:
   body = empty_analytics_overview()
   assert body["degraded"] is True
   assert body["code"] == "forjd_read_fallback"
   assert body["data"]["user_metrics"]["uptime_percent"] is None
+  assert body["data"]["user_metrics"]["p99_latency_ms"] is None
   assert body["data"]["user_metrics"]["data_available"] is False
-  assert body["data"]["ces"]["level"] == 0
+  assert body["data"]["ces"]["level"] is None
+  assert body["data"]["ces"]["sla"] is None
+  assert body["data"]["ces"]["stability"] is None
   assert body["data"]["ces"]["spiking_temporal_forecast"] is None
   assert body["data"]["ces"]["temporal_status"] == "unavailable"
 

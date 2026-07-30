@@ -78,6 +78,17 @@ def sync_design_system() -> None:
     if _optional_target(t)
   ]
 
+  # API docs skin SoT — fan out to Django static (not folded into viking-ui.css).
+  suite_apidocs_src = os.path.join(
+    package_dir, "src", "tokens", "suite-apidocs.css"
+  )
+  suite_apidocs_targets = [
+    os.path.join(root_dir, "backend", "static", "suite-apidocs.css"),
+  ]
+  suite_backend_src = os.path.join(
+    package_dir, "src", "tokens", "suite-backend.css"
+  )
+
   viking_app_css_targets = [
     os.path.join(root_dir, "frontend", "public", "assets", "viking-app.css"),
   ]
@@ -102,11 +113,19 @@ def sync_design_system() -> None:
   if not os.path.isfile(suite_fonts_src):
     print(f"Expected build output missing: {suite_fonts_src}", file=sys.stderr)
     sys.exit(1)
+  if not os.path.isfile(suite_apidocs_src):
+    print(f"Expected suite-apidocs missing: {suite_apidocs_src}", file=sys.stderr)
+    sys.exit(1)
+  if not os.path.isfile(suite_backend_src):
+    print(f"Expected suite-backend missing: {suite_backend_src}", file=sys.stderr)
+    sys.exit(1)
 
   for src, targets in (
     (dist_viking, viking_css_targets),
     (dist_viking_app, viking_app_css_targets),
     (suite_fonts_src, suite_fonts_targets),
+    (suite_apidocs_src, suite_apidocs_targets),
+    (suite_backend_src, [os.path.join(root_dir, "backend", "static", "suite-backend.css")]),
     (dist_elements, elements_targets),
     (dist_tokens_json, tokens_json_targets),
   ):

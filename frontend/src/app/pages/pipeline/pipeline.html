@@ -32,7 +32,7 @@
     <!-- Catalog + visual flow -->
     <viking-section-template
       heading="Catalog"
-      description="Start from a published sealed-stream definition, or draft a blank partner stream."
+      description="Pick a FORJD workflow template to compose and export as YAML. DEML’s backend is the only caller that uses a tenant service token — your browser never holds one."
     >
       <viking-card class="status-card-outlined">
         <viking-stack spacing="compact">
@@ -46,17 +46,18 @@
               (valueChange)="selectWorkflow($event)"
               [disabled]="workflows().length === 0"
             />
-            <div>
+            <viking-field label="Or start empty">
               <viking-button variant="outline" type="button" icon="plus" (pressed)="startBlank()">
                 Blank draft
               </viking-button>
-            </div>
+            </viking-field>
           </viking-form-grid>
 
           @if (selected(); as row) {
           <p class="embed-desc">
             @if (row.description) { {{ row.description }} } @else { Sealed metadata pipeline —
             ciphertext never opens in FORJD. }
+            This studio only exports YAML for operators to place on the FORJD host.
           </p>
           }
 

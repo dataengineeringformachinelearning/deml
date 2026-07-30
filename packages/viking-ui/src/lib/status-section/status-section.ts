@@ -28,10 +28,12 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: "viking-status-section",
-    "[attr.aria-label]": "ariaLabel()",
   },
   template: `
-    <section class="viking-status-section-shell">
+    <section
+      class="viking-status-section-shell"
+      [attr.aria-label]="ariaLabel()"
+    >
       <header class="viking-status-section-hero">
         <div class="viking-status-section-hero-copy">
           <viking-status-badge

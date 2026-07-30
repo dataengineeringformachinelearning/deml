@@ -119,6 +119,17 @@ def _optional_number(value: Any) -> float | None:
     return None
 
 
+def _optional_ces_metric(
+  ces: dict[str, Any],
+  *,
+  canonical_key: str,
+  alias_key: str,
+) -> float | None:
+  """Preserve explicit canonical nulls while accepting legacy CES aliases."""
+  key = canonical_key if canonical_key in ces else alias_key
+  return _optional_number(ces.get(key))
+
+
 def _optional_int(value: Any) -> int | None:
   if value is None or value == "" or isinstance(value, bool):
     return None
@@ -142,7 +153,13 @@ def _optional_text(value: Any) -> str | None:
   return text or None
 
 
-def _series_points(rows: list[Any], *, value_key: str, out_key: str) -> list[dict[str, Any]]:
+def _series_points(
+  rows: list[Any],
+  *,
+  value_key: str,
+  out_key: str,
+  missing_value: Any = 0,
+) -> list[dict[str, Any]]:
   points: list[dict[str, Any]] = []
   for row in rows:
     if not isinstance(row, dict):
@@ -152,7 +169,7 @@ def _series_points(rows: list[Any], *, value_key: str, out_key: str) -> list[dic
       {
         "label": label,
         "time": label,
-        out_key: row.get(value_key) if row.get(value_key) is not None else 0,
+        out_key: row.get(value_key) if row.get(value_key) is not None else missing_value,
       }
     )
   return points
@@ -163,7 +180,12 @@ def deml_analytics_overview(forjd_body: dict[str, Any]) -> dict[str, Any]:
   """Shape FORJD ``/api/v1/analytics/overview`` into the Angular CES envelope."""
   ces_raw = forjd_body.get("ces") if isinstance(forjd_body.get("ces"), dict) else {}
   raw_time_series = _as_list(forjd_body.get("time_series"))
-  time_series = _series_points(raw_time_series, value_key="latency", out_key="latency")
+  time_series = _series_points(
+    raw_time_series,
+    value_key="latency",
+    out_key="latency",
+    missing_value=None,
+  )
   # Angular Request Frequency chart still reads ``request_frequency``; FORJD
   # only emits requests on ``time_series`` — mirror them for the product UI.
   request_frequency = _series_points(raw_time_series, value_key="requests", out_key="requests")
@@ -172,7 +194,10 @@ def deml_analytics_overview(forjd_body: dict[str, Any]) -> dict[str, Any]:
       time_series[idx]["requests"] = int(row.get("requests") or 0)
 
   uptime_series = _series_points(
-    _as_list(forjd_body.get("uptime_series")), value_key="uptime", out_key="uptime"
+    _as_list(forjd_body.get("uptime_series")),
+    value_key="uptime",
+    out_key="uptime",
+    missing_value=None,
   )
   security_alerts = _series_points(
     _as_list(forjd_body.get("threat_series")), value_key="count", out_key="count"
@@ -232,10 +257,22 @@ def deml_analytics_overview(forjd_body: dict[str, Any]) -> dict[str, Any]:
       "benchmarking": forjd_benchmarking,
       "honeypot_score": float(honeypot_score or 0),
       "ces": {
-        "level": float(ces_raw.get("ces_level") or 0),
+        "level": _optional_ces_metric(
+          ces_raw,
+          canonical_key="ces_level",
+          alias_key="level",
+        ),
         "threat": float(ces_raw.get("ces_threat") or 0),
-        "sla": float(ces_raw.get("ces_sla") or 0),
-        "stability": float(ces_raw.get("ces_stability") or 0),
+        "sla": _optional_ces_metric(
+          ces_raw,
+          canonical_key="ces_sla",
+          alias_key="sla",
+        ),
+        "stability": _optional_ces_metric(
+          ces_raw,
+          canonical_key="ces_stability",
+          alias_key="stability",
+        ),
         "predicted_sla": _optional_number(
           ces_raw.get("predicted_sla")
           if ces_raw.get("predicted_sla") is not None
@@ -251,7 +288,7 @@ def deml_analytics_overview(forjd_body: dict[str, Any]) -> dict[str, Any]:
         "latest_benchmark": latest_benchmark,
       },
       "user_metrics": {
-        "p99_latency_ms": float(forjd_body.get("p99_latency_ms") or 0),
+        "p99_latency_ms": _optional_number(forjd_body.get("p99_latency_ms")),
         "uptime_percent": (
           None if forjd_body.get("uptime_pct") is None else float(forjd_body.get("uptime_pct") or 0)
         ),
@@ -336,14 +373,14 @@ def empty_analytics_overview() -> dict[str, Any]:
       "active_incidents": 0,
       "threats_detected": 0,
       "unique_visitors": 0,
-      "p99_latency_ms": 0,
+      "p99_latency_ms": None,
       "uptime_pct": None,
       "data_available": False,
       "ces": {
-        "ces_level": 0,
+        "ces_level": None,
         "ces_threat": 0,
-        "ces_sla": 0,
-        "ces_stability": 0,
+        "ces_sla": None,
+        "ces_stability": None,
         "spiking_temporal_forecast": None,
         "temporal_status": "unavailable",
         "temporal_backend": None,

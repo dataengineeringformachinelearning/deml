@@ -151,7 +151,9 @@ export class MonitorService {
         this.http.get<StatusPageData[]>(API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES, {
           withCredentials: true,
         }),
-      { freshMs: 30_000, staleMs: 5 * 60_000, scope: 'auth' },
+      // Status telemetry is time-sensitive: paint a warm value immediately,
+      // then always revalidate it instead of treating it as fresh for 30s.
+      { freshMs: 0, staleMs: 5 * 60_000, scope: 'auth' },
     );
   }
 
@@ -170,7 +172,7 @@ export class MonitorService {
           `${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES}/slug/${encodeURIComponent(slug)}`,
           { withCredentials: true },
         ),
-      { freshMs: 60_000, staleMs: 10 * 60_000, scope: 'public-status' },
+      { freshMs: 0, staleMs: 10 * 60_000, scope: 'public-status' },
     );
   }
 

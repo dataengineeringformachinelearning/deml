@@ -15,6 +15,7 @@ const SCAN_DIRS = [
 // max-width must not be mistaken for @media (max-width: …) breakpoints.
 const GENERATED_ASSET =
   /(?:^|\/)(?:(?:viking-ui|deml-components|design-tokens|viking-components)\.css|viking-ui-elements\.js)$/;
+const VENDORED_SOURCE = /(?:^|\/)vendor(?:\/|$)/;
 const SOURCE_FILE = /\.(?:css|scss|[cm]?[jt]sx?)$/i;
 const RESPONSIVE_QUERY = /@(media|container)\b[^{]*/gi;
 const WIDTH_CLAUSE = /\(\s*(min|max)-width\s*:\s*((?:[^()]|\([^()]*\))+)\)/gi;
@@ -24,9 +25,14 @@ const MATCH_MEDIA_CALL = /\bmatchMedia\s*\(\s*(["'`])([\s\S]*?)\1\s*\)/gi;
 // Values are px; rem queries convert via toPixels (16px root), so 37.5rem ≡ 600.
 const ALLOWED_BREAKPOINTS = new Set([600, 768, 901, 1024, 1440, 1920]);
 const DYNAMIC_SASS_BREAKPOINT = /^(?:\$[\w-]+|#\{\$[\w-]+\})$/;
+const REDUCED_DATA_QUERY = /\(\s*prefers-reduced-data\s*:\s*reduce\s*\)/i;
 
 function shouldScanFile(filePath) {
-  return SOURCE_FILE.test(filePath) && !GENERATED_ASSET.test(filePath);
+  return (
+    SOURCE_FILE.test(filePath) &&
+    !GENERATED_ASSET.test(filePath) &&
+    !VENDORED_SOURCE.test(filePath)
+  );
 }
 
 function getFiles(dir, fileList = []) {
@@ -153,7 +159,15 @@ function inspectQuery(content, queryText, kind, queryIndex, displayQuery) {
     const index = queryIndex + (clause.index ?? 0);
     const line = content.slice(0, index).split('\n').length;
 
-    if (direction.toLowerCase() === 'max') {
+    const pixels = toPixels(value);
+    const isConstrainedDeliveryQuery =
+      kind === 'media' &&
+      pixels === 600 &&
+      REDUCED_DATA_QUERY.test(queryText);
+
+    // This one non-layout query disables expensive paint on narrow screens
+    // and for reduced-data users. Responsive layout still remains min-width.
+    if (direction.toLowerCase() === 'max' && !isConstrainedDeliveryQuery) {
       violations.push({
         line,
         query: displayQuery,
@@ -162,7 +176,10 @@ function inspectQuery(content, queryText, kind, queryIndex, displayQuery) {
       continue;
     }
 
-    const pixels = toPixels(value);
+    if (direction.toLowerCase() === 'max') {
+      continue;
+    }
+
     const breakpoint = value.trim();
     if (pixels === null && !DYNAMIC_SASS_BREAKPOINT.test(breakpoint)) {
       violations.push({

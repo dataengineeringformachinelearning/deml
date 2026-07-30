@@ -111,97 +111,17 @@
       </div>
     </viking-card>
 
-    <!-- Sealed pipeline configuration (read-only visual; YAML remains SoT) -->
+    <!-- Sealed ingest is auto-configured — no catalog UI for product users -->
     <viking-card class="status-card-outlined">
       <viking-card-header>
         <viking-card-title icon="network">Data pipeline</viking-card-title>
       </viking-card-header>
       <div>
         <p class="embed-desc">
-          Your sealed ingest path as a simple sequence. Configuration stays in FORJD workflow YAML —
-          this view is read-only so complex flows stay easy to scan. Use
-          <a routerLink="/pipeline" class="inline-status-link">Pipeline</a> to compose and export
-          YAML.
+          Sealed telemetry is configured automatically when you connect a site. DEML’s backend
+          forwards envelopes to FORJD with a tenant service token — you do not pick a workflow or
+          hold that credential.
         </p>
-
-        @if (workflowsLoading()) {
-        <viking-progress [indeterminate]="true" label="Loading pipeline configuration" />
-        } @else if (workflowsError()) {
-        <viking-callout tone="warning" heading="Pipeline unavailable" icon="alert-triangle">
-          {{ workflowsError() }}
-          <viking-button
-            variant="secondary"
-            type="button"
-            [compact]="true"
-            (pressed)="loadWorkflows()"
-          >
-            Try again
-          </viking-button>
-        </viking-callout>
-        } @else if (workflowsDegraded()) {
-        <viking-callout
-          tone="warning"
-          heading="Catalog temporarily unavailable"
-          icon="alert-triangle"
-        >
-          Pipeline definitions could not be loaded from FORJD. Credentials still work; try again
-          shortly.
-        </viking-callout>
-        } @else if (primaryWorkflow(); as workflow) {
-        <viking-stack spacing="compact">
-          <div>
-            <p class="data-title">{{ workflow.name }}</p>
-            @if (workflow.description) {
-            <p class="embed-desc">{{ workflow.description }}</p>
-            }
-          </div>
-          <viking-pipeline-flow
-            [steps]="pipelineStepsFor(workflow)"
-            orientation="horizontal"
-            [label]="workflow.name + ' steps'"
-          />
-          <viking-button
-            variant="secondary"
-            type="button"
-            icon="network"
-            [compact]="true"
-            (pressed)="openPipelineStudio()"
-          >
-            Open Pipeline studio
-          </viking-button>
-          @if (otherWorkflows().length > 0) {
-          <viking-disclosure
-            sectionId="deml.account.pipeline-catalog"
-            heading="Other workflows"
-            description="Additional sealed-stream definitions available to this tenant."
-            [defaultOpen]="false"
-            level="inset"
-          >
-            <viking-stack spacing="compact">
-              @for (row of otherWorkflows(); track row.id) {
-              <div>
-                <p class="data-title">{{ row.name }}</p>
-                <viking-pipeline-flow
-                  [steps]="pipelineStepsFor(row)"
-                  orientation="vertical"
-                  [label]="row.name + ' steps'"
-                />
-              </div>
-              }
-            </viking-stack>
-          </viking-disclosure>
-          }
-        </viking-stack>
-        } @else {
-        <div class="empty-data-text">
-          <viking-app-icon name="lan" hostClass="empty-icon" />
-          <p class="empty-title">No workflows yet</p>
-          <p class="empty-subtitle">
-            When FORJD publishes sealed-stream workflows, they will appear here as a visual
-            sequence.
-          </p>
-        </div>
-        }
       </div>
     </viking-card>
 
@@ -455,14 +375,14 @@
                       : 'A legacy paid plan is still active. You can cancel it; new paid upgrades are not offered.'
                   "
           />
+          }
           <ng-container vikingFormActions>
-            @if (!subscriptionCancelAtPeriodEnd()) {
+            @if (subscriptionActive() && !subscriptionCancelAtPeriodEnd()) {
             <viking-button variant="danger" type="button" (pressed)="cancelSubscription()">
               Cancel paid plan
             </viking-button>
             }
           </ng-container>
-          }
           <ng-container vikingFormFooter>
             @if (billingError()) {
             <viking-callout tone="danger">{{ billingError() }}</viking-callout>

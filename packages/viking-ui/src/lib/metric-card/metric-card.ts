@@ -22,6 +22,7 @@ export class VikingMetricRow {}
   imports: [VikingIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
+    role: "group",
     "[class]": "hostClass()",
     "[attr.aria-label]": "ariaLabel()",
     "[class.viking-metric-card-warning]": "variant() === 'warning'",

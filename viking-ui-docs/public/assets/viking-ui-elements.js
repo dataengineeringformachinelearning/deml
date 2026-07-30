@@ -1540,14 +1540,14 @@ input:disabled {
             <slot></slot>
             <div class="viking-search-results-host"></div>
           </div>
-          <footer class="viking-search-palette-footer" part="footer">
+          <div class="viking-search-palette-footer" part="footer">
             <span class="viking-kbd">${i}</span><span class="viking-kbd">K</span> /
             <span class="viking-kbd">/</span> open \xB7
             <span class="viking-kbd">\u2191</span><span class="viking-kbd">\u2193</span> navigate \xB7
             <span class="viking-kbd">Enter</span> open \xB7
             <span class="viking-kbd">Esc</span> close \xB7
             <span class="viking-kbd">?</span> all shortcuts
-          </footer>
+          </div>
         </div>
       </dialog>
     `,this.dialogEl=this.shadow.querySelector("dialog"),this.inputEl=this.shadow.querySelector("input"),this.resultsEl=this.shadow.querySelector(".viking-search-results-host"),this.shadow.querySelector(".viking-search-palette-close")?.addEventListener("click",()=>this.closePalette()),this.dialogEl?.addEventListener("keydown",r=>{r.key==="Escape"&&(r.preventDefault(),this.closePalette())})}};function ui(t){if(!(t instanceof HTMLElement))return!1;let e=t.tagName;return e==="INPUT"||e==="TEXTAREA"||e==="SELECT"||t.isContentEditable?!0:!!t.closest("[contenteditable='true']")}var G=()=>{g(S.tag,S),v(S.searchTag,S),v(S.legacyTag,S)};var vi=new Set(["accent","secondary","success","warning","danger","info","muted"]),N=class extends u{static tag="viking-status-card";static legacyTag="viking-status-card-wc";static get observedAttributes(){return["title","subtitle","status","status-tone","status-dot","href","target","compact","loading","interactive","aria-label"]}shadow=this.attachShadow({mode:"open"});connectedCallback(){this.render()}attributeChangedCallback(){this.isConnected&&this.render()}get compact(){let e=this.getAttribute("compact");return e!==null&&e!=="false"}get loading(){let e=this.getAttribute("loading");return e!==null&&e!=="false"}get interactive(){let e=this.getAttribute("interactive");return e!==null&&e!=="false"}get href(){return this.getAttribute("href")}get target(){return this.getAttribute("target")}get statusTone(){let e=this.getAttribute("status-tone")??"muted";return vi.has(e)?e:"muted"}get statusDot(){let e=this.getAttribute("status-dot");return e!==null&&e!=="false"}get cardTitle(){return this.getAttribute("title")??""}get subtitle(){return this.getAttribute("subtitle")??""}get status(){return this.getAttribute("status")??""}render(){let e=this.status.length>0,i=this.cardTitle,r=this.subtitle,a=this.compact?" status-card--compact":"",n=this.loading?" status-card--loading":"",o=this.interactive?" status-card--interactive":"",c=`status-card${a}${n}${o}`,s=this.target==="_blank"?' rel="noopener noreferrer"':"",d=this.statusDot?'<span class="status-card__status-dot" aria-hidden="true"></span>':"",h=e?`<span class="status-card__status status-card__status-${this.statusTone}" part="status">${d}<span>${l(this.status)}</span></span>`:"",m=this.href?l(this.href):"",f=l(this.getAttribute("aria-label")??""),x=m?"a":"div",A=`

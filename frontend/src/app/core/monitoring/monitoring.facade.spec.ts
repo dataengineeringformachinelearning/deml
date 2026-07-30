@@ -1,12 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { captureExceptionMock, initMock } = vi.hoisted(() => ({
+const { captureExceptionMock, consoleLoggingIntegrationMock, initMock } = vi.hoisted(() => ({
   captureExceptionMock: vi.fn(),
+  consoleLoggingIntegrationMock: vi.fn(),
   initMock: vi.fn(),
 }));
 
 vi.mock('@sentry/angular', () => ({
   captureException: captureExceptionMock,
+  consoleLoggingIntegration: consoleLoggingIntegrationMock,
   init: initMock,
 }));
 
@@ -19,6 +21,8 @@ describe('monitoring facade', () => {
   beforeEach(() => {
     vi.resetModules();
     captureExceptionMock.mockReset();
+    consoleLoggingIntegrationMock.mockReset();
+    consoleLoggingIntegrationMock.mockReturnValue({ name: 'consoleLoggingIntegration' });
     initMock.mockReset();
   });
 
@@ -32,7 +36,15 @@ describe('monitoring facade', () => {
 
     expect(results).toEqual([true, true]);
     expect(initMock).toHaveBeenCalledTimes(1);
-    expect(initMock).toHaveBeenCalledWith(configuration);
+    expect(consoleLoggingIntegrationMock).toHaveBeenCalledWith({
+      levels: ['log', 'warn', 'error'],
+    });
+    expect(initMock).toHaveBeenCalledWith({
+      ...configuration,
+      enableLogs: true,
+      integrations: [{ name: 'consoleLoggingIntegration' }],
+      tracesSampleRate: 0.1,
+    });
   });
 
   it('waits for initialization before capturing an exception', async () => {

@@ -50,4 +50,17 @@ describe("Viking metric card layout", () => {
     expect(card.querySelector(".viking-metric-card-icon")).not.toBeNull();
     expect(card.querySelector(".viking-metric-card-copy")).not.toBeNull();
   });
+
+  it("exposes the labelled metric as an accessible group", () => {
+    const fixture = TestBed.createComponent(HostComponent);
+    fixture.detectChanges();
+    const card = fixture.nativeElement.querySelector(
+      "viking-metric-card",
+    ) as HTMLElement;
+
+    expect(card.getAttribute("role")).toBe("group");
+    expect(card.getAttribute("aria-label")).toBe(
+      "Cumulative SLA: 100.00%",
+    );
+  });
 });

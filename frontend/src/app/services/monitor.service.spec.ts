@@ -75,7 +75,7 @@ describe('MonitorService', () => {
     req.flush(mockPages);
   });
 
-  it('coalesces concurrent status-page requests without caching stale results', () => {
+  it('coalesces concurrent status-page requests and revalidates the warm value', async () => {
     const results: number[] = [];
     service.getStatusPages().subscribe(pages => results.push(pages.length));
     service.getStatusPages().subscribe(pages => results.push(pages.length));
@@ -84,6 +84,9 @@ describe('MonitorService', () => {
     first.flush([]);
     expect(results).toEqual([0, 0]);
 
+    // In-flight cleanup is deferred one microtask so synchronous subscribers
+    // can share the same request.
+    await Promise.resolve();
     service.getStatusPages().subscribe();
     httpMock.expectOne(API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES).flush([]);
   });

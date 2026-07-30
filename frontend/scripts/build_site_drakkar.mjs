@@ -13,6 +13,13 @@ if (!fs.existsSync(vikingUiDir)) {
   process.exit(0);
 }
 
+// Marketing lives in the community repo — never create a stub tree here.
+const marketingAlive = fs.existsSync(
+  path.join(rootDir, 'marketing', 'src', 'layouts', 'Layout.astro'),
+);
+const isMarketingPath = (targetPath) =>
+  targetPath.split(path.sep).includes('marketing');
+
 /** Hardcoded extractors — avoids dynamic RegExp (Semgrep ReDoS rule). */
 const EXPORT_ARRAY_PATTERNS = {
   SITE_NAV_LINKS: /export const SITE_NAV_LINKS[\s\S]*?= (\[[\s\S]*?\]) as const/,
@@ -539,25 +546,34 @@ const templateOutputs = [
   },
 ];
 
-for (const out of outputs) {
+const writeTargets = (targets, write) => {
+  for (const target of targets) {
+    if (!marketingAlive && isMarketingPath(typeof target === 'string' ? target : target.path)) {
+      continue;
+    }
+    write(target);
+  }
+};
+
+writeTargets(outputs, (out) => {
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.writeFileSync(out, `${JSON.stringify(siteDrakkar, null, 2)}\n`);
-}
+});
 
-for (const out of iconOutputs) {
+writeTargets(iconOutputs, (out) => {
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.writeFileSync(out, `${JSON.stringify(iconPaths, null, 2)}\n`);
-}
+});
 
-for (const out of iconFilledOutputs) {
+writeTargets(iconFilledOutputs, (out) => {
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.writeFileSync(out, `${JSON.stringify(iconFilledPaths, null, 2)}\n`);
-}
+});
 
-for (const { path: outPath, content } of templateOutputs) {
+writeTargets(templateOutputs, ({ path: outPath, content }) => {
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.writeFileSync(outPath, content);
-}
+});
 
 const faviconSource = path.join(
   rootDir,
@@ -581,19 +597,23 @@ const navbarOutputs = [
   path.join(rootDir, 'viking-ui-docs', 'public', 'assets', 'widgets', 'navbar.js'),
 ];
 
-for (const out of faviconOutputs) {
+writeTargets(faviconOutputs, (out) => {
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.copyFileSync(faviconSource, out);
-}
+});
 
-for (const out of navbarOutputs) {
+writeTargets(navbarOutputs, (out) => {
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.copyFileSync(navbarSource, out);
-}
+});
 
 console.log(
-  'Wrote site-drakkar.json, viking-icon-paths.json, viking-icon-filled-paths.json, favicon.svg, and navbar.js to frontend, marketing, backend, and viking-ui-docs assets.',
+  marketingAlive
+    ? 'Wrote site-drakkar.json, viking-icon-paths.json, viking-icon-filled-paths.json, favicon.svg, and navbar.js to frontend, marketing, backend, and viking-ui-docs assets.'
+    : 'Wrote site-drakkar.json, viking-icon-paths.json, viking-icon-filled-paths.json, favicon.svg, and navbar.js to frontend, backend, and viking-ui-docs assets (skipped deml/marketing stub).',
 );
 console.log(
-  'Wrote backend/templates/partials/site_navbar.html, site_footer.html, marketing Navbar.astro, and viking-ui-docs SiteNavbar.astro from site-drakkar.config.ts.',
+  marketingAlive
+    ? 'Wrote backend/templates/partials/site_navbar.html, site_footer.html, marketing Navbar.astro, and viking-ui-docs SiteNavbar.astro from site-drakkar.config.ts.'
+    : 'Wrote backend/templates/partials/site_navbar.html, site_footer.html, and viking-ui-docs SiteNavbar.astro from site-drakkar.config.ts (skipped deml/marketing stub).',
 );

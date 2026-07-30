@@ -66,13 +66,6 @@ export type VikingOnboardingStep = {
           >
             {{ heading() }}
           </h2>
-          @if (description()) {
-            <p
-              class="suite-onboarding-description viking-onboarding-description fj-onboarding-description"
-            >
-              {{ description() }}
-            </p>
-          }
         </div>
         <p
           class="suite-onboarding-progress viking-onboarding-progress fj-onboarding-progress"
@@ -80,6 +73,13 @@ export type VikingOnboardingStep = {
         >
           {{ completedCount() }} of {{ steps().length }} complete
         </p>
+        @if (description()) {
+          <p
+            class="suite-onboarding-description viking-onboarding-description fj-onboarding-description"
+          >
+            {{ description() }}
+          </p>
+        }
       </header>
 
       <ol
