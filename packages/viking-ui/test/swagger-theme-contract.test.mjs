@@ -67,11 +67,12 @@ test("Swagger cascade: vendor CSS → viking-ui → suite-apidocs", () => {
 test("suite-apidocs uses quiet method chips (token surfaces)", () => {
   assert.match(
     apidocs,
-    /\.swagger-ui \.opblock \.opblock-summary-method \{[^}]*--suite-surface-2/,
+    /\.swagger-ui \.opblock \.opblock-summary \.opblock-summary-method \{[^}]*--suite-surface-2/,
   );
   assert.doesNotMatch(
     apidocs,
     /\.swagger-ui \.opblock\.opblock-post \.opblock-summary-method/,
   );
+  assert.match(apidocs, /#redoc-container/);
   assert.match(apidocs, /--suite-/);
 });

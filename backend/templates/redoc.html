@@ -25,7 +25,11 @@
         <a href="/api/v1/ready">ready</a>
       </nav>
     </header>
-    <redoc spec-url="{{ openapi_url }}"></redoc>
+    <main id="redoc-container" aria-label="DEML API reference"></main>
     <script src="{% static 'vendor/redoc/redoc.standalone.js' %}"></script>
+    <script
+      src="{% static 'redoc-init.js' %}"
+      data-openapi-url="{{ openapi_url|escapejs }}"
+    ></script>
   </body>
 </html>
