@@ -1,118 +1,59 @@
----
-title: DEML Control Plane
-emoji: 🧠
-colorFrom: blue
-colorTo: indigo
-sdk: static
-app_file: frontend/dist/frontend/browser/index.html
-app_build_command: cd frontend && npm ci && npm run build
-pinned: false
-license: apache-2.0
----
+# Deml
 
-# DEML — Control Plane
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.2.
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdataengineeringformachinelearning%2Fdeml.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdataengineeringformachinelearning%2Fdeml?ref=badge_large&issueType=license)
+## Development server
 
-Firebase-authenticated user control plane: Angular product UI (`deml.app`) + Django BFF (`backend.deml.app`) + Viking-UI.
-
-> **Repo map**
->
-> | Repo | Role | Production |
-> |------|------|------------|
-> | **This repo (`deml`)** | Control plane | Vercel `deml` → `deml.app` · Fly `deml-backend` → `backend.deml.app` |
-> | [`forjd`](https://github.com/dataengineeringformachinelearning/forjd) | Data plane | Vercel `forjd` → `forjd.co` · Fly `forjd-backend` / `forjd-engine` |
-> | [`dataengineeringformachinelearning`](https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning) | Community / BOOK | Vercel `marketing` → `dataengineeringformachinelearning.com` |
-
-**Platform boundary:** DEML owns identity, billing, consent, and product UI. FORJD owns sealed intake, workflows, projections, analytics, replay, threat processing, and ML. DEML calls FORJD with tenant-bound opaque `fjsvc_` tokens and AES-256-GCM sealed envelopes — never Firebase end-user tokens.
-Integration: [`docs/FORJD_INTEGRATION.md`](docs/FORJD_INTEGRATION.md) · FORJD extend: [`EXTENDING.md`](https://github.com/dataengineeringformachinelearning/forjd/blob/main/docs/EXTENDING.md).
-
-**Canonical use-cases (37):** [`docs/use-cases/CANONICAL.md`](docs/use-cases/CANONICAL.md) · diagrams [`DIAGRAMS.md`](docs/use-cases/DIAGRAMS.md) · machine contracts [`packages/deml-contracts/`](packages/deml-contracts/).
-
-## What's in this repo
-
-| Path | Purpose |
-|------|---------|
-| `frontend/` | Angular 22+ product app (Signals + Viking-UI) |
-| `backend/` | Django BFF / control plane (Fly) |
-| `packages/viking-ui/` | Suite design system (`@dataengineeringformachinelearning/viking-ui`) |
-| `packages/deml-contracts/` | Shared OpenAPI / JSON Schema / TS / Python wire contracts |
-| `packages/deml-crypto`, `packages/deml-rate-limit` | Optional shared Python libs (see package READMEs) |
-| `config/deml.catalog.json` | Env / ports / health inventory SoT |
-| `viking-ui-docs/` | Package docs / Storybook consumers |
-| `native/` | macOS security workbench |
-| `docs/` | Deploy, FORJD integration, suite UI law, use-cases |
-| `BOOK.md` / `WHITEPAPER.md` | Architecture narrative (also published on the community site) |
-
-## Deploy map
-
-| Surface | Host | Deploy from |
-|---------|------|-------------|
-| Product UI | [deml.app](https://deml.app) | Vercel project `deml`, root `frontend`, GitHub `…/deml` |
-| Django BFF | [backend.deml.app](https://backend.deml.app) | Fly app `deml-backend` (`backend/fly.toml`) |
-| Community site | [dataengineeringformachinelearning.com](https://dataengineeringformachinelearning.com) | **Other repo** — community `marketing/` |
-| Data plane | [forjd.co](https://forjd.co) / [backend.forjd.co](https://backend.forjd.co) | **Other repo** — `forjd` |
-
-Operator runbooks: [`docs/VERCEL.md`](docs/VERCEL.md) · [`docs/FLY.md`](docs/FLY.md) · [`docs/PRODUCTION_DEPLOY.md`](docs/PRODUCTION_DEPLOY.md).
+To start a local development server, run:
 
 ```bash
-# Angular (from frontend/)
-npx vercel link --project deml --yes
-npx vercel deploy --prod --yes
-
-# Django BFF (stage contracts, then deploy from backend/)
-node scripts/sync_deml_contracts_docker.mjs
-cd backend && fly deploy -a deml-backend
+ng serve
 ```
 
-## Product surfaces (`deml.app`)
+Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
-| Route | Purpose |
-|-------|---------|
-| `/dashboard` | CES / KPI overview (Signals + Django SSE) |
-| `/analytics` | Telemetry & threats (FORJD via BFF) |
-| `/pipeline` | Pipeline Studio — compose/export FORJD YAML |
-| `/status`, `/explore` | Public status pages |
-| `/settings` | Account / billing / consent |
+## Code scaffolding
 
-## Local development
-
-Prefer the bootstrap path ([`docs/START_HERE.md`](docs/START_HERE.md)):
+Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
 
 ```bash
-npm run bootstrap
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
-npm run verify
+ng generate component component-name
 ```
+
+For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
 
 ```bash
-# Frontend
-cd frontend && npm start   # http://127.0.0.1:4200
-
-# Backend
-cd backend && uv run python manage.py runserver 127.0.0.1:8000
-# Health: GET /api/v1/health · ready: /api/v1/ready
+ng generate --help
 ```
 
-Config inventory: [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md).  
-Monorepo health checklist: [`docs/MONOREPO_HEALTH.md`](docs/MONOREPO_HEALTH.md).  
-Quality gates: [`AGENTS.md`](AGENTS.md) · [`CONTRIBUTING.md`](CONTRIBUTING.md).
+## Building
 
-## Docs
+To build the project run:
 
-| Doc | Purpose |
-|-----|---------|
-| [docs/use-cases/CANONICAL.md](docs/use-cases/CANONICAL.md) | **Canonical use-case contracts** |
-| [docs/MONOREPO_HEALTH.md](docs/MONOREPO_HEALTH.md) | Install → build → test checklist |
-| [docs/CONFIGURATION.md](docs/CONFIGURATION.md) | Env / secrets shape |
-| [BOOK.md](BOOK.md) | Full architecture & operations |
-| [WHITEPAPER.md](WHITEPAPER.md) | Executive summary |
-| [THEME.md](THEME.md) | Viking-UI token law |
-| [AGENTS.md](AGENTS.md) | Agent / invariant briefing |
+```bash
+ng build
+```
 
-**Resources:** [GitHub](https://github.com/dataengineeringformachinelearning/deml) · [Community / BOOK](https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning) · [FORJD](https://github.com/dataengineeringformachinelearning/forjd) · [SECURITY](SECURITY.md)
+This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdataengineeringformachinelearning%2Fdeml.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdataengineeringformachinelearning%2Fdeml?ref=badge_large&issueType=license)
+## Running unit tests
 
-![GitHub Repo stars](https://img.shields.io/github/stars/dataengineeringformachinelearning/deml?style=social)
+To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+
+```bash
+ng test
+```
+
+## Running end-to-end tests
+
+For end-to-end (e2e) testing, run:
+
+```bash
+ng e2e
+```
+
+Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+
+## Additional Resources
+
+For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

@@ -1,101 +1,44 @@
-# System
-.DS_Store
-Thumbs.db
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
-# IDEs
-.vscode/
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-.idea/
-*.swp
+!.vscode/mcp.json
+.history/*
 
-# Poolside / local agent tooling (session secrets, machine-local settings)
-.poolside/
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+__screenshots__/
 
-# Environment Variables
-.env
-.env.*
-!.env.example
-
-# Service account keys (use FIREBASE_SERVICE_ACCOUNT_JSON / GCP_SERVICE_ACCOUNT_JSON env vars)
-firebase-service-account.json
-**/firebase-service-account.json
-deml-ui-service-account.json
-**/deml-ui-service-account.json
-gcp-service-account.json
-
-# Python General
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-.venv/
-env.bak/
-venv.bak/
-
-# Databases
-*.sqlite3
-db.sqlite3
-db.sqlite3-journal
-backend/.chromatic-test.sqlite3
-
-# Python Tools
-.ruff_cache/
-.pytest_cache/
-
-# Rust — build artifacts and local tooling (source + Cargo.lock are committed)
-**/target/
-**/*.rs.bk
-**/*.pdb
-.cargo-cache/
-# Keep rust/.env.example; never commit real secrets (covered by .env / .env.* above)
-
-# Firebase emulator / CLI debug output
-firebase-debug.log
-**/firebase-debug.log
-
-# Node / JS
-node_modules/
-dist/
-/studio/.sanity/
-/studio/dist/
-
-# Playwright / Chromatic
-/test-results/
-**/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-chromatic.log
-chromatic-build-*.xml
-build-archive.log
-
-# Terraform
-**/.terraform/*
-*.tfstate
-*.tfstate.*
-crash.log
-crash.*.log
-*.tfvars
-*.tfvars.json
-override.tf
-override.tf.json
-_override.tf
-_override.tf.json
-.terraform.lock.hcl
-
-# Deprecated local design-system package (merged into frontend/projects/viking-ui)
-packages/deml-design-system/
-
-# Local Railway CLI config pull dumps (never commit)
-.railway-config-pull-*/
-.vercel
-.firebase/
-
-# Staged contracts for Docker/Fly (generated)
-backend/vendor/deml-contracts/
+# System files
+.DS_Store
+Thumbs.db
