@@ -1,40 +1,42 @@
-<header id="masthead" class="site-header">
+<header id="navbar" class="site-navbar grid grid-cols-navbar items-center gap-4">
 
-  <div class="flex-row site-heading">
+  <div id="site-navbar-branding" class="site-navbar-branding place-start row items-center">
+    <a href="/" target="_self" rel="noreferrer noopener" aria-label="DEML Logo Link">
+      <img
+        ngSrc="/images/logo.svg"
+        width="48"
+        height="48"
+        alt="DEML Logo"
+        priority
+        disableOptimizedSrcset
+      />
+    </a>
+  </div>
 
-    <div id="site-branding" class="flex-row-item">
-      <a class="" href="/" target="_self" rel="noreferrer noopener" aria-label="DEML Logo Link" type="link">
-        <img
-          ngSrc="/images/logo.svg"
-          width="50"
-          height="50"
-          alt="DEML Logo"
-          priority
-          disableOptimizedSrcset
-        />
-      </a>
-    </div>
+  <nav id="site-navigation" class="main-navigation place-center" aria-label="Primary">
+    <ul class="row wrap items-center justify-center gap-4">
+      <li class="item-fixed">
+        <a href="/" target="_self" rel="noreferrer noopener" aria-label="DEML Home Navigation Link">
+          Home
+        </a>
+      </li>
+      <li class="item-fixed">
+        <a href="/about/" target="_self" rel="noreferrer noopener" aria-label="DEML About Navigation Link">
+          About
+        </a>
+      </li>
+      <li class="item-fixed">
+        <a href="/blog/" target="_self" rel="noreferrer noopener" aria-label="DEML Blog Navigation Link">
+          Blog
+        </a>
+      </li>
+    </ul>
+  </nav>
 
-    <nav id="site-navigation" class="main-navigation flex-row-item">
-      <ul class="flex-row">
-        <li class="flex-row-item">
-          <a class="" href="/" target="_self" rel="noreferrer noopener" aria-label="DEML Home Navigation Link" type="link">
-            Home
-          </a>
-        </li>
-        <li class="flex-row-item">
-          <a class="" href="/about/" target="_self" rel="noreferrer noopener" aria-label="DEML About Navigation Link" type="link">
-            About
-          </a>
-        </li>
-        <li class="flex-row-item">
-          <a class="" href="/blog/" target="_self" rel="noreferrer noopener" aria-label="DEML Blog Navigation Link" type="link">
-            Blog
-          </a>
-        </li>
-      </ul>
-    </nav>
-
+  <div id="site-button-group" class="site-button-group place-end row wrap items-center justify-end gap-2">
+    <button type="button" class="button">
+      Login
+    </button>
   </div>
 
 </header>

@@ -1,0 +1,12 @@
+/* Container — full-width layout shell */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  gap: 0;
+}
