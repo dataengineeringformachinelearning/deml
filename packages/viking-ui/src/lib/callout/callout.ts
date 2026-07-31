@@ -28,9 +28,17 @@ const TONE_ICONS: Record<string, VikingIconName> = {
   imports: [VikingIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
+    class: "suite-callout viking-callout fj-callout",
     "[attr.role]": "liveRole()",
     "[attr.aria-live]": "liveRole() === 'alert' ? 'assertive' : null",
-    "[class]": "'viking-callout-' + tone()",
+    "[attr.data-tone]": "tone()",
+    "[class.viking-callout-accent]": "tone() === 'accent'",
+    "[class.viking-callout-secondary]": "tone() === 'secondary'",
+    "[class.viking-callout-info]": "tone() === 'info'",
+    "[class.viking-callout-success]": "tone() === 'success'",
+    "[class.viking-callout-warning]": "tone() === 'warning'",
+    "[class.viking-callout-danger]": "tone() === 'danger'",
+    "[class.viking-callout-muted]": "tone() === 'muted'",
     "[style.display]": "dismissed() ? 'none' : null",
   },
   template: `
@@ -60,16 +68,20 @@ const TONE_ICONS: Record<string, VikingIconName> = {
     `
       :host {
         display: flex;
+        flex-wrap: nowrap;
         align-items: flex-start;
-        gap: var(--viking-space-3); /* Improved gap for polish */
-        padding: var(--viking-space-4); /* Generous breathing room */
-        border-radius: var(--viking-radius-xl); /* Consistent softer */
+        gap: var(--viking-space-3);
+        padding: var(--viking-space-4);
+        border-radius: var(--viking-radius-xl);
         background: var(--viking-surface);
         color: var(--viking-text);
         font-family: var(--viking-font-family);
         font-size: var(--viking-font-size-sm);
         transition: var(--viking-transition-interactive);
         box-shadow: var(--viking-shadow-xs);
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
       }
       .viking-callout-icon {
         margin-top: var(--viking-space-0-5);
@@ -138,10 +150,10 @@ const TONE_ICONS: Record<string, VikingIconName> = {
         color: var(--viking-text);
       }
       .viking-callout-body {
-        flex: 1;
+        flex: 1 1 auto;
         min-width: 0;
         display: grid;
-        gap: var(--viking-space-1); /* Consistent typography spacing */
+        gap: var(--viking-space-2);
       }
       .viking-callout-heading {
         margin: 0;
@@ -151,9 +163,16 @@ const TONE_ICONS: Record<string, VikingIconName> = {
         line-height: var(--viking-line-height-tight);
       }
       .viking-callout-text {
+        display: grid;
+        gap: var(--viking-space-2);
+        justify-items: start;
         color: var(--viking-text-muted);
         line-height: var(--viking-line-height-relaxed);
         font-size: var(--viking-font-size-sm);
+        min-width: 0;
+      }
+      .viking-callout-text ::ng-deep > p {
+        margin: 0;
       }
       .viking-callout-close {
         border: none;

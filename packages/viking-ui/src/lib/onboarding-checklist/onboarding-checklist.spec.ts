@@ -69,6 +69,15 @@ describe("VikingOnboardingChecklist (integration)", () => {
     expect(getDefaultOnboardingStore().isStepComplete("welcome")).toBe(true);
   });
 
+  it("keeps a flex host so checklist chrome does not collapse", () => {
+    const host = fixture.nativeElement.querySelector(
+      "viking-onboarding-checklist",
+    ) as HTMLElement;
+    expect(host).toBeTruthy();
+    expect(getComputedStyle(host).display).toBe("flex");
+    expect(getComputedStyle(host).flexDirection).toBe("column");
+  });
+
   it("records activity when dismissed", () => {
     const el = fixture.nativeElement as HTMLElement;
     const buttons = [...el.querySelectorAll("button")];

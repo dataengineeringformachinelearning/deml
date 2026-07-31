@@ -7,8 +7,10 @@ import { ChangeDetectionStrategy, Component, input } from "@angular/core";
   selector: "viking-skeleton",
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
+    class: "suite-skeleton viking-skeleton fj-skeleton",
     "aria-hidden": "true",
     "[class.viking-skeleton-circle]": "shape() === 'circle'",
+    "[attr.data-variant]": "shape() === 'line' ? 'text' : shape()",
     "[style.width]": "width()",
     "[style.height]": "height()",
   },
@@ -17,6 +19,9 @@ import { ChangeDetectionStrategy, Component, input } from "@angular/core";
     `
       :host {
         display: block;
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
         border-radius: var(--viking-radius-sm);
         background: linear-gradient(
           100deg,

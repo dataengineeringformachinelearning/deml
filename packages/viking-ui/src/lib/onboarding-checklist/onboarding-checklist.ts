@@ -154,8 +154,13 @@ export type VikingOnboardingStep = {
   `,
   styles: [
     `
+      /* Must stay flex — a block host overrides .suite-onboarding and collapses layout. */
       :host {
-        display: block;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
       }
       :host[hidden] {
         display: none;

@@ -18,12 +18,23 @@ export type VikingPageSkeletonLayout =
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [VikingCard, VikingSkeleton],
   host: {
-    class: "suite-page-skeleton viking-page-skeleton",
+    class: "suite-page-skeleton viking-page-skeleton fj-page-skeleton",
     role: "status",
     "aria-busy": "true",
     "[attr.aria-label]": "label()",
     "[attr.data-layout]": "layout()",
   },
+  styles: [
+    `
+      :host {
+        display: grid;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+    `,
+  ],
   template: `
     @switch (layout()) {
       @case ("dashboard") {
@@ -32,16 +43,16 @@ export type VikingPageSkeletonLayout =
           <viking-card [loading]="true" [compact]="true" />
         </div>
         <div class="suite-page-skeleton__charts">
-          <div class="suite-skeleton-stack" aria-hidden="true">
+          <viking-card>
             <viking-skeleton shape="rect" height="12rem" />
             <viking-skeleton width="55%" />
             <viking-skeleton width="40%" />
-          </div>
-          <div class="suite-skeleton-stack" aria-hidden="true">
+          </viking-card>
+          <viking-card>
             <viking-skeleton shape="rect" height="12rem" />
             <viking-skeleton width="62%" />
             <viking-skeleton width="36%" />
-          </div>
+          </viking-card>
         </div>
       }
       @case ("cards") {

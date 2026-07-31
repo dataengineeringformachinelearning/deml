@@ -41,6 +41,7 @@ import {
   VikingSectionTemplate,
   VikingActivityList,
   VikingHudPanel,
+  VikingStack,
   type VikingOnboardingStep,
   type SuiteActivityEntry,
 } from '@dataengineeringformachinelearning/viking-ui';
@@ -168,6 +169,7 @@ type DashboardOverviewResponse = {
     VikingSectionTemplate,
     VikingActivityList,
     VikingHudPanel,
+    VikingStack,
   ],
   templateUrl: './dashboard.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

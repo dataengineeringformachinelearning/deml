@@ -71,20 +71,22 @@
     <a routerLink="/settings" class="viking-link">Go to Sites</a>
   </viking-callout>
   } @if (showOnboardingGuide() && !isLoading()) {
-  <viking-onboarding-checklist
-    flowId="deml-status"
-    heading="Get your status page live"
-    description="Follow these steps once. The guided wizard covers the same path with forms."
-    [steps]="onboardingSteps"
-  />
-  <viking-button
-    variant="primary"
-    type="button"
-    icon="sparkle"
-    (pressed)="openOnboardingWizard()"
-  >
-    Open setup wizard
-  </viking-button>
+  <viking-stack spacing="compact">
+    <viking-onboarding-checklist
+      flowId="deml-status"
+      heading="Get your status page live"
+      description="Follow these steps once. The guided wizard covers the same path with forms."
+      [steps]="onboardingSteps"
+    />
+    <viking-button
+      variant="primary"
+      type="button"
+      icon="sparkle"
+      (pressed)="openOnboardingWizard()"
+    >
+      Open setup wizard
+    </viking-button>
+  </viking-stack>
   } @if (isLoading()) {
   <viking-page-skeleton layout="dashboard" label="Loading command center" />
   } @else {

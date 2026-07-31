@@ -28,6 +28,9 @@ describe("VikingPageSkeleton", () => {
     const host = fixture.nativeElement as HTMLElement;
     expect(host.querySelector(".suite-page-skeleton__metrics")).toBeTruthy();
     expect(host.querySelector(".suite-page-skeleton__charts")).toBeTruthy();
+    expect(
+      host.querySelectorAll(".suite-page-skeleton__charts viking-card").length,
+    ).toBe(2);
   });
 
   it("renders list layout rows", () => {
