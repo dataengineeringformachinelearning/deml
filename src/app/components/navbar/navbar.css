@@ -1,24 +1,47 @@
-/* Navbar — mobile-first; layout via global .grid / .row utilities */
+/* Navbar — Spotify-inspired fixed top bar; mobile-first */
 
 :host {
   display: block;
+  --navbar-inset: var(--space-2);
+  --navbar-icon-size: 32px;
+  /* Theme tokens — Spotify-like shapes, site colors */
+  --navbar-bg: var(--color-background);
+  --navbar-fg: var(--color-text-primary);
+  --navbar-muted: var(--color-text-secondary);
+  --navbar-accent: var(--color-accent);
+  --navbar-accent-hover: var(--color-accent-hover);
+  --navbar-pill: var(--color-accent);
+  --navbar-pill-hover: var(--color-accent-hover);
+  --navbar-on-pill: var(--color-on-accent);
+  --navbar-surface: var(--color-surface);
+  --navbar-focus: var(--color-focus);
+  /* Keep document flow clear of the fixed bar (closed height). */
+  --navbar-bar-height: calc(var(--navbar-inset) * 2 + var(--navbar-icon-size));
+  min-height: var(--navbar-bar-height);
 }
 
 .site-navbar {
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 1000;
   box-sizing: border-box;
-  /* Override .grid { width: 100% } so side margins aren't clipped */
-  width: auto;
-  margin: var(--space-2);
-  padding: var(--space-2);
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding-top: var(--navbar-inset);
+  padding-right: var(--navbar-inset);
+  padding-bottom: var(--navbar-inset);
+  padding-left: var(--navbar-inset);
+  color: var(--navbar-fg);
+  background-color: var(--navbar-bg);
   grid-template-columns: 1fr auto;
   grid-template-areas:
     "brand toggle"
     "nav nav"
     "actions actions";
-  column-gap: var(--space-2);
-  row-gap: var(--space-2);
+  gap: var(--navbar-inset);
   align-items: center;
 }
 
@@ -30,16 +53,29 @@
 
 .site-navbar-icon {
   display: inline-flex;
-  color: var(--navbar-icon-color, var(--color-text-primary));
+  align-items: center;
+  justify-content: center;
+  width: var(--navbar-icon-size);
+  height: var(--navbar-icon-size);
+  color: var(--navbar-icon-color, var(--navbar-accent));
+  transition: color 120ms ease, transform 120ms ease;
+}
+
+.site-navbar-icon svg,
+.site-navbar-menu-toggle svg {
+  width: var(--navbar-icon-size);
+  height: var(--navbar-icon-size);
 }
 
 .site-navbar-icon:hover {
-  color: var(--navbar-icon-color-hover, var(--color-accent-hover));
+  color: var(--navbar-icon-color-hover, var(--navbar-accent-hover));
+  transform: scale(1.06);
 }
 
 .site-navbar-icon:focus-visible {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
+  outline: 2px solid var(--navbar-focus);
+  outline-offset: 3px;
+  border-radius: 50%;
 }
 
 .site-navbar-menu-toggle {
@@ -50,24 +86,27 @@
   align-self: center;
   justify-self: end;
   box-sizing: border-box;
-  width: 48px;
-  height: 48px;
+  width: var(--navbar-icon-size);
+  height: var(--navbar-icon-size);
   padding: 0;
   margin: 0;
   border: 0;
+  border-radius: 50%;
   background: transparent;
-  color: var(--color-text-primary);
+  color: var(--navbar-fg);
   cursor: pointer;
   appearance: none;
+  transition: color 120ms ease, background-color 120ms ease;
 }
 
 .site-navbar-menu-toggle:hover {
-  color: var(--color-accent-hover);
+  color: var(--navbar-accent-hover);
+  background-color: var(--navbar-surface);
 }
 
 .site-navbar-menu-toggle:focus-visible {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
+  outline: 2px solid var(--navbar-focus);
+  outline-offset: 3px;
 }
 
 .main-navigation {
@@ -80,38 +119,77 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  gap: var(--space-3);
+  gap: var(--space-1);
 }
 
 .main-navigation ul li a {
+  display: inline-flex;
+  align-items: center;
   font-family: var(--font-sans);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  text-transform: none;
   text-decoration: none;
   white-space: nowrap;
-  color: var(--color-text-primary);
+  color: var(--navbar-muted);
+  padding: var(--space-1) var(--space-2);
+  border-radius: 9999px;
+  transition: color 120ms ease, background-color 120ms ease;
 }
 
 .main-navigation ul li a:hover {
-  color: var(--color-accent-hover);
+  color: var(--navbar-accent-hover);
+  background-color: transparent;
 }
 
 .main-navigation ul li a:focus-visible {
-  outline: 2px solid var(--color-focus);
+  outline: 2px solid var(--navbar-focus);
   outline-offset: 2px;
+  color: var(--navbar-accent);
 }
 
 .site-button-group {
   display: none;
   grid-area: actions;
   justify-content: flex-start;
+  gap: var(--space-1);
 }
 
 .site-button-group .button {
   max-width: none;
   width: auto;
+  min-height: 40px;
+  padding: 8px 32px !important;
+  border-radius: 9999px;
+  border-width: 0;
+  border-color: transparent;
+  background-color: var(--navbar-pill);
+  color: var(--navbar-on-pill);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  text-transform: none;
+  box-shadow: none;
+  transition:
+    transform 120ms ease,
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.site-button-group .button:hover {
+  background-color: var(--navbar-pill-hover);
+  border-color: transparent;
+  color: var(--navbar-on-pill);
+  box-shadow: none;
+  transform: scale(1.04);
+}
+
+.site-button-group .button:focus-visible {
+  outline: 2px solid var(--navbar-focus);
+  outline-offset: 3px;
 }
 
 .site-navbar.is-menu-open .main-navigation,
@@ -119,12 +197,17 @@
   display: flex;
 }
 
+.site-navbar.is-menu-open {
+  max-height: 100dvh;
+  overflow-y: auto;
+  background-color: var(--navbar-bg);
+}
+
 @media screen and (min-width: 800px) {
   .site-navbar {
     grid-template-columns: 1fr auto 1fr;
     grid-template-areas: none;
-    column-gap: var(--space-4);
-    row-gap: var(--space-2);
+    gap: var(--navbar-inset);
   }
 
   .site-navbar-branding,
@@ -146,12 +229,13 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: var(--space-4);
+    gap: var(--space-1);
   }
 
   .site-button-group {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
   }
 
   .site-navbar.is-menu-open .main-navigation {
@@ -160,11 +244,5 @@
 
   .site-navbar.is-menu-open .site-button-group {
     display: flex;
-  }
-}
-
-@media screen and (min-width: 1400px) {
-  .site-navbar {
-    margin: var(--space-2) auto;
   }
 }
