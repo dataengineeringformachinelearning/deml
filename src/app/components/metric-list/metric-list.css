@@ -1,10 +1,11 @@
-/* Metric list — fluid panel matching --chart-aspect */
+/* Metric list — fills the chart-card plot band; content stays inside */
 
 :host {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   width: 100%;
+  height: 100%;
   min-width: 0;
   min-height: var(--chart-min-block);
   flex: 1 1 auto;
@@ -28,16 +29,15 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   gap: 0;
   box-sizing: border-box;
-  width: min(100%, calc(var(--chart-max-block) * var(--chart-aspect)));
-  aspect-ratio: var(--chart-aspect);
-  height: auto;
+  width: 100%;
+  height: 100%;
   min-height: var(--chart-min-block);
-  max-height: var(--chart-max-block);
-  margin: 0 auto;
+  margin: 0;
   padding: var(--space-3);
+  overflow: auto;
   list-style: none;
   background-color: var(--color-plot);
   border: var(--border-width) solid var(--color-plot-border);
@@ -49,6 +49,7 @@
   grid-template-columns: var(--space-4) 1fr auto;
   align-items: center;
   gap: var(--space-2);
+  flex: 0 0 auto;
   margin: 0;
   padding: var(--space-2) 0;
   border-bottom: var(--border-width) solid color-mix(in srgb, var(--color-plot-muted) 14%, transparent);
