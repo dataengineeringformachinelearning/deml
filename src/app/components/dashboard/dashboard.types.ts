@@ -3,6 +3,10 @@ export type DashSize = 'sm' | 'md' | 'lg' | 'wide' | 'tall' | 'hero';
 
 export type DashAccent = 'primary' | 'gold' | 'red';
 
+/** Re-export chart scale so consumers can import from one dashboard module. */
+export { CHART_SCALE } from './chart-scale';
+export type { ChartScale } from './chart-scale';
+
 export interface DashPoint {
   readonly label: string;
   readonly value: number;

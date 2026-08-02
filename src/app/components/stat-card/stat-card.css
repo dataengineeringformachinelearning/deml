@@ -1,4 +1,4 @@
-/* Stat card — KPI tile that fills its grid cell */
+/* Stat card — KPI tile; spark fills remaining width with shared aspect */
 
 :host {
   display: block;
@@ -49,6 +49,7 @@
   justify-content: space-between;
   gap: var(--space-2);
   margin: 0 0 var(--space-2);
+  flex: 0 0 auto;
 }
 
 .stat-card-label {
@@ -65,7 +66,7 @@
 .stat-card-delta {
   display: inline-flex;
   align-items: center;
-  gap: calc(var(--grid) / 2);
+  gap: var(--space-1);
   margin: 0;
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
@@ -76,7 +77,6 @@
   white-space: nowrap;
 }
 
-/* Nested spans must keep card/trend color (not page --color-text) */
 .stat-card-delta span {
   color: inherit;
 }
@@ -91,6 +91,7 @@
 
 .stat-card-value {
   margin: 0;
+  flex: 0 0 auto;
   font-family: var(--font-sans);
   font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 700;
@@ -101,6 +102,7 @@
 
 .stat-card-meta {
   margin: var(--space-1) 0 0;
+  flex: 0 0 auto;
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: 400;
@@ -113,8 +115,13 @@
   flex: 1 1 auto;
   align-items: stretch;
   width: 100%;
-  min-height: var(--space-10);
-  margin-top: var(--space-2);
+  min-height: var(--chart-spark-min-block);
+  margin-top: var(--space-3);
+}
+
+.stat-card-spark > :first-child {
+  width: 100%;
+  min-height: 100%;
 }
 
 :host([data-size='sm']) .stat-card-spark {

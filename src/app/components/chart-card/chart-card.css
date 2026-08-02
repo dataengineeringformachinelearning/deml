@@ -1,4 +1,4 @@
-/* Chart card — titled shell for projected charts / lists */
+/* Chart card — titled shell; plot fills the body edge-to-edge */
 
 :host {
   display: block;
@@ -46,7 +46,7 @@
 .chart-card-header {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--grid) / 2);
+  gap: var(--space-1);
   margin: 0 0 var(--space-3);
   flex: 0 0 auto;
 }
@@ -75,15 +75,17 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  justify-content: stretch;
-  min-height: var(--space-28);
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 0;
+  min-height: var(--chart-min-block);
   width: 100%;
 }
 
-.chart-card-body > :first-child {
-  flex: 1 1 auto;
+:host ::ng-deep .chart-card-body > * {
   width: 100%;
-  min-height: var(--space-28);
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 :host([data-size='hero']) .chart-card-heading,
@@ -93,40 +95,8 @@
   letter-spacing: var(--tracking-display);
 }
 
-:host([data-size='hero']) .chart-card-body,
-:host([data-size='wide']) .chart-card-body {
-  min-height: var(--space-36);
-}
-
-:host([data-size='hero']) .chart-card-body > :first-child,
-:host([data-size='wide']) .chart-card-body > :first-child {
-  min-height: var(--space-36);
-}
-
 @media screen and (min-width: 800px) {
   .chart-card {
     padding: var(--space-4);
-  }
-
-  :host([data-size='hero']) .chart-card-body,
-  :host([data-size='wide']) .chart-card-body {
-    min-height: var(--space-40);
-  }
-
-  :host([data-size='hero']) .chart-card-body > :first-child,
-  :host([data-size='wide']) .chart-card-body > :first-child {
-    min-height: var(--space-40);
-  }
-}
-
-@media screen and (min-width: 1200px) {
-  :host([data-size='hero']) .chart-card-body,
-  :host([data-size='wide']) .chart-card-body {
-    min-height: var(--space-45);
-  }
-
-  :host([data-size='hero']) .chart-card-body > :first-child,
-  :host([data-size='wide']) .chart-card-body > :first-child {
-    min-height: var(--space-45);
   }
 }

@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 
 import type { DashAccent, DashSize } from '../dashboard/dashboard.types';
 
+export type ChartCardHeadingLevel = 2 | 3 | 4 | 5 | 6;
+
 let chartCardIdSeq = 0;
 
 @Component({
@@ -24,6 +26,8 @@ export class ChartCard {
   readonly size = input<DashSize>('md');
 
   readonly accent = input<DashAccent>('primary');
+
+  readonly headingLevel = input<ChartCardHeadingLevel>(3);
 
   readonly headingId = input<string>();
 

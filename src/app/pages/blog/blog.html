@@ -11,9 +11,9 @@
     headingId="blog-list-heading"
   />
 
-  <ul class="blog-microcards" role="list">
+  <app-microcard-grid ariaLabel="Blog posts" [columns]="3">
     @for (post of posts; track post.slug) {
-      <li class="blog-microcards-item">
+      <li>
         <app-microcard
           [heading]="post.title"
           [subtext]="post.excerpt"
@@ -25,5 +25,5 @@
         />
       </li>
     }
-  </ul>
+  </app-microcard-grid>
 </section>

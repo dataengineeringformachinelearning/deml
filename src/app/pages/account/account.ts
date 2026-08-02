@@ -28,7 +28,6 @@ import { ThemeService } from '../../services/theme';
     Card,
   ],
   templateUrl: './account.html',
-  styleUrl: './account.css',
   host: { class: 'page page--catalog' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

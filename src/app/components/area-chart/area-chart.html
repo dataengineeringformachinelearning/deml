@@ -20,7 +20,7 @@
   <svg
     class="area-chart"
     [attr.viewBox]="viewBox"
-    [attr.preserveAspectRatio]="preserveAspectRatio()"
+    [attr.preserveAspectRatio]="preserveAspectRatio"
     aria-hidden="true"
     focusable="false"
   >
@@ -87,7 +87,7 @@
         <text
           class="area-chart-x"
           [attr.x]="node.x"
-          [attr.y]="192"
+          [attr.y]="axisLabelY"
           text-anchor="middle"
         >{{ node.label }}</text>
       }

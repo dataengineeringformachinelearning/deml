@@ -44,10 +44,11 @@
 
 .button.is-disabled,
 .button:disabled {
-  color: var(--color-text-secondary);
-  background-color: var(--color-surface);
+  color: var(--color-text);
+  background-color: color-mix(in srgb, var(--color-surface) 88%, var(--color-text-secondary));
   background-image: none;
   border-color: var(--color-border);
+  opacity: 0.72;
   cursor: not-allowed;
   pointer-events: none;
 }
@@ -56,10 +57,11 @@
 .button:disabled.button--primary,
 .button.is-disabled.button--accent,
 .button:disabled.button--accent {
-  color: var(--color-text-secondary);
-  background-color: color-mix(in srgb, var(--color-surface) 70%, var(--color-border));
+  color: var(--color-on-primary);
+  background-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-surface));
   background-image: none;
-  border-color: var(--color-border);
+  border-color: transparent;
+  opacity: 0.72;
 }
 
 /* Primary fill — main CTA */

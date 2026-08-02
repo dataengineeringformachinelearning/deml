@@ -1,9 +1,12 @@
+/* Metric list — fluid panel matching --chart-aspect */
+
 :host {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   width: 100%;
   min-width: 0;
-  min-height: 0;
+  min-height: var(--chart-min-block);
   flex: 1 1 auto;
   --chart-accent: var(--color-primary);
   background-color: transparent;
@@ -29,13 +32,15 @@
   gap: 0;
   box-sizing: border-box;
   width: 100%;
-  height: 100%;
+  aspect-ratio: var(--chart-aspect);
+  height: auto;
+  min-height: var(--chart-min-block);
   margin: 0;
   padding: var(--space-3);
   list-style: none;
-  background-color: var(--color-olive);
-  border: var(--border-width) solid color-mix(in srgb, var(--color-text-secondary) 28%, var(--color-olive));
-  color: #f2f0ed;
+  background-color: var(--color-plot);
+  border: var(--border-width) solid var(--color-plot-border);
+  color: var(--color-plot-ink);
 }
 
 .metric-list-item {
@@ -45,7 +50,7 @@
   gap: var(--space-2);
   margin: 0;
   padding: var(--space-2) 0;
-  border-bottom: var(--border-width) solid color-mix(in srgb, #c4bfb8 14%, transparent);
+  border-bottom: var(--border-width) solid color-mix(in srgb, var(--color-plot-muted) 14%, transparent);
   background-color: transparent;
 }
 
@@ -70,7 +75,7 @@
 .metric-list-copy {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--grid) / 2);
+  gap: var(--space-1);
   min-width: 0;
 }
 
@@ -80,7 +85,7 @@
   font-weight: 700;
   letter-spacing: var(--tracking-tight);
   line-height: 1.25;
-  color: #f2f0ed;
+  color: var(--color-plot-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -92,7 +97,7 @@
   font-weight: 500;
   letter-spacing: var(--tracking-intro);
   line-height: 1.2;
-  color: #c4bfb8;
+  color: var(--color-plot-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -103,6 +108,6 @@
   font-size: var(--font-size-sm);
   font-weight: 700;
   letter-spacing: var(--tracking-tight);
-  color: #f2f0ed;
+  color: var(--color-plot-ink);
   white-space: nowrap;
 }

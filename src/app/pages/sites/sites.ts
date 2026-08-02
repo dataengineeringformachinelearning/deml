@@ -34,7 +34,6 @@ import {
     Card,
   ],
   templateUrl: './sites.html',
-  styleUrl: './sites.css',
   host: { class: 'page page--catalog' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

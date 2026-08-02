@@ -1,6 +1,6 @@
 <article class="stat-card" [attr.aria-labelledby]="resolvedLabelId()">
   <header class="stat-card-header">
-    <p class="stat-card-label" [id]="resolvedLabelId()">{{ label() }}</p>
+    <h3 class="stat-card-label" [id]="resolvedLabelId()">{{ label() }}</h3>
     @if (delta(); as d) {
       <p class="stat-card-delta">
         @if (trend() === 'up') {

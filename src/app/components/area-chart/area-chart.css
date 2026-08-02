@@ -1,22 +1,20 @@
-/* Area chart — dark plot, accent line, light nodes, soft fill.
-   Full plots lock aspect ratio so the series is never vertically squashed. */
+/* Area chart — fluid width, aspect-locked; never squash or stretch.
+   Fills the card like a full-bleed plot band. */
 
 :host {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   width: 100%;
   min-width: 0;
   min-height: 0;
   flex: 1 1 auto;
   --chart-accent: var(--color-primary);
-  --chart-plot: var(--color-olive);
-  --chart-grid: color-mix(in srgb, var(--color-text-secondary) 22%, transparent);
-  --chart-baseline: color-mix(in srgb, var(--color-text-secondary) 35%, transparent);
-  --chart-label: #c4bfb8;
-  --chart-node: #f2f0ed;
-  /* Matches VIEW_W / VIEW_H in area-chart.ts (360 / 200) */
-  --chart-aspect: 1.8;
-  --chart-min-block: var(--space-28);
+  --chart-plot: var(--color-plot);
+  --chart-grid: var(--color-plot-grid);
+  --chart-baseline: var(--color-plot-baseline);
+  --chart-label: var(--color-plot-muted);
+  --chart-node: var(--color-plot-ink);
   background-color: transparent;
 }
 
@@ -34,23 +32,23 @@
 
 .area-chart-frame {
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   align-items: stretch;
   justify-content: center;
   box-sizing: border-box;
   width: 100%;
   margin: 0;
-  padding: var(--space-2);
+  padding: var(--chart-inset);
   background-color: var(--chart-plot);
-  border: var(--border-width) solid color-mix(in srgb, var(--color-text-secondary) 22%, var(--chart-plot));
+  border: var(--border-width) solid var(--color-plot-border);
 }
 
-/* Full plot: width-driven height from aspect-ratio — never shorter than min-block */
+/* Full plot — fill card width; height from aspect (soft floor only) */
 :host(:not([data-variant='spark'])) .area-chart-frame {
   aspect-ratio: var(--chart-aspect);
+  width: 100%;
   height: auto;
   min-height: var(--chart-min-block);
-  max-height: none;
 }
 
 .area-chart {
@@ -79,7 +77,7 @@
 
 .area-chart-line {
   stroke: var(--chart-accent);
-  stroke-width: 3;
+  stroke-width: 3.5;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
@@ -88,17 +86,17 @@
 .area-chart-node {
   fill: var(--chart-node);
   stroke: var(--chart-plot);
-  stroke-width: 1.25;
+  stroke-width: 1.5;
 }
 
 .area-chart-stop--top {
   stop-color: var(--chart-accent);
-  stop-opacity: 0.55;
+  stop-opacity: 0.62;
 }
 
 .area-chart-stop--mid {
   stop-color: var(--chart-accent);
-  stop-opacity: 0.18;
+  stop-opacity: 0.22;
 }
 
 .area-chart-stop--bottom {
@@ -110,54 +108,50 @@
 .area-chart-x {
   fill: var(--chart-label);
   font-family: var(--font-sans);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .area-chart-y {
-  font-size: 8px;
+  font-size: 10px;
 }
 
-/* Compact sparkline — may fill its slot; still has a floor height */
+/* Spark — fills the KPI slot width; same aspect contract as full plots */
+:host([data-variant='spark']) {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: var(--chart-spark-min-block);
+  justify-content: flex-end;
+}
+
 :host([data-variant='spark']) .area-chart-frame {
-  aspect-ratio: auto;
-  height: 100%;
-  min-height: var(--space-10);
+  width: 100%;
+  aspect-ratio: var(--chart-spark-aspect);
+  height: auto;
+  min-height: var(--chart-spark-min-block);
   padding: 0;
   border: 0;
   background-color: transparent;
 }
 
 :host([data-variant='spark']) .area-chart {
-  min-height: var(--space-10);
+  min-height: 0;
 }
 
 :host([data-variant='spark']) .area-chart-line {
-  stroke-width: 2.25;
+  stroke-width: 2.75;
 }
 
 :host([data-variant='spark']) .area-chart-grid-v {
-  stroke: color-mix(in srgb, var(--color-card-text) 10%, transparent);
+  stroke: color-mix(in srgb, var(--color-card-text) 12%, transparent);
 }
 
 :host([data-variant='spark']) .area-chart-baseline {
-  stroke: color-mix(in srgb, var(--color-card-text) 12%, transparent);
+  stroke: color-mix(in srgb, var(--color-card-text) 14%, transparent);
 }
 
 :host([data-variant='spark']) .area-chart-node {
   fill: var(--chart-accent);
   stroke: var(--color-card);
-}
-
-@media screen and (min-width: 800px) {
-  :host(:not([data-variant='spark'])) {
-    --chart-min-block: var(--space-36);
-  }
-}
-
-@media screen and (min-width: 1200px) {
-  :host(:not([data-variant='spark'])) {
-    --chart-min-block: var(--space-40);
-  }
 }

@@ -1,16 +1,17 @@
-/* Bar chart — dark plot tracks with accent fills */
+/* Bar chart — fluid panel matching --chart-aspect */
 
 :host {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   width: 100%;
   min-width: 0;
-  min-height: 0;
+  min-height: var(--chart-min-block);
   flex: 1 1 auto;
   --chart-accent: var(--color-primary);
-  --chart-plot: var(--color-olive);
-  --chart-label: #c4bfb8;
-  --chart-value: #f2f0ed;
+  --chart-plot: var(--color-plot);
+  --chart-label: var(--color-plot-muted);
+  --chart-value: var(--color-plot-ink);
   background-color: transparent;
 }
 
@@ -34,18 +35,20 @@
   gap: var(--space-2);
   box-sizing: border-box;
   width: 100%;
-  height: 100%;
+  aspect-ratio: var(--chart-aspect);
+  height: auto;
+  min-height: var(--chart-min-block);
   margin: 0;
   padding: var(--space-3);
   list-style: none;
   background-color: var(--chart-plot);
-  border: var(--border-width) solid color-mix(in srgb, var(--color-text-secondary) 28%, var(--chart-plot));
+  border: var(--border-width) solid var(--color-plot-border);
 }
 
 .bar-chart-row {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--grid) / 2);
+  gap: var(--space-1);
   margin: 0;
   padding: 0;
   background-color: transparent;
@@ -84,7 +87,7 @@
 .bar-chart-track {
   width: 100%;
   height: var(--space-1);
-  background-color: color-mix(in srgb, #c4bfb8 16%, var(--chart-plot));
+  background-color: color-mix(in srgb, var(--color-plot-muted) 16%, var(--chart-plot));
   overflow: hidden;
 }
 

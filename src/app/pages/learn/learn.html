@@ -16,14 +16,17 @@
       class="learn-group"
       [attr.aria-labelledby]="'learn-' + group.id"
     >
-      <header class="learn-group-header">
-        <h2 class="learn-group-title" [id]="'learn-' + group.id">{{ group.title }}</h2>
-        <p class="learn-group-summary type-intro">{{ group.summary }}</p>
-      </header>
+      <app-section-header
+        [heading]="group.title"
+        [lede]="group.summary"
+        [headingId]="'learn-' + group.id"
+        [headingLevel]="2"
+        tone="card"
+      />
 
-      <ul class="learn-microcards" role="list">
+      <app-microcard-grid [ariaLabel]="group.title" [columns]="3">
         @for (topic of group.topics; track topic.slug) {
-          <li class="learn-microcards-item">
+          <li>
             <app-microcard
               [heading]="topic.title"
               [subtext]="topic.excerpt"
@@ -35,7 +38,7 @@
             />
           </li>
         }
-      </ul>
+      </app-microcard-grid>
     </section>
   }
 </div>

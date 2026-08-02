@@ -31,7 +31,6 @@ import {
     MetricList,
   ],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css',
   host: { class: 'page page--catalog' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

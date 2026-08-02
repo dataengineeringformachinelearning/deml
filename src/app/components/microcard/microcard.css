@@ -110,7 +110,7 @@
 }
 
 .microcard:hover .microcard-cta {
-  color: color-mix(in srgb, var(--microcard-visual, var(--color-primary)) 72%, #1a1816);
+  color: color-mix(in srgb, var(--microcard-visual, var(--color-primary)) 72%, var(--color-card-text));
 }
 
 .microcard-visual {
@@ -122,7 +122,7 @@
   background-image: linear-gradient(
     90deg,
     var(--microcard-visual, var(--color-primary)) 0%,
-    color-mix(in srgb, var(--microcard-visual, var(--color-primary)) 55%, #1a1816) 100%
+    color-mix(in srgb, var(--microcard-visual, var(--color-primary)) 55%, var(--color-plot)) 100%
   );
 }
 

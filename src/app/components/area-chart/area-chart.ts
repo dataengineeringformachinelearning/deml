@@ -1,14 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
+import { CHART_SCALE } from '../dashboard/chart-scale';
 import type { DashAccent, DashPoint } from '../dashboard/dashboard.types';
 
-/** Intrinsic plot box — CSS aspect-ratio and SVG meet must match these. */
-const VIEW_W = 360;
-const VIEW_H = 200;
-const PAD_L = 36;
+/** SVG viewBox — aspect locked to CHART_SCALE.fullAspect (360/150 = 2.4). */
+const VIEW_W = CHART_SCALE.viewInline;
+const VIEW_H = CHART_SCALE.viewBlock;
+const PAD_L = 32;
 const PAD_R = 12;
-const PAD_T = 16;
-const PAD_B = 28;
+const PAD_T = 14;
+const PAD_B = 26;
 
 let areaChartSeq = 0;
 
@@ -40,11 +41,10 @@ export class AreaChart {
 
   readonly viewBox = `0 0 ${VIEW_W} ${VIEW_H}`;
   readonly viewRight = VIEW_W - PAD_R;
+  readonly axisLabelY = VIEW_H - 8;
 
-  /** Full plots keep proportions; sparks may fill their slot. */
-  readonly preserveAspectRatio = computed(() =>
-    this.variant() === 'spark' ? 'none' : 'xMidYMid meet',
-  );
+  /** Full and spark plots always meet — never stretch the series. */
+  readonly preserveAspectRatio = 'xMidYMid meet' as const;
 
   readonly plot = computed(() => {
     const pts = this.points();
