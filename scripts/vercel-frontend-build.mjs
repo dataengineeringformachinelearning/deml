@@ -9,8 +9,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const frontendDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const root = path.resolve(frontendDir, '..');
+const scriptsDir = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(scriptsDir, '..');
+const frontendDir = path.join(root, 'frontend');
 
 function run(command, args, cwd) {
   const result = spawnSync(command, args, { cwd, stdio: 'inherit', env: process.env });
