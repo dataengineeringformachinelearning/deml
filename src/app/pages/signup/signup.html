@@ -1,0 +1,78 @@
+<app-page-section variant="auth" ariaLabel="Sign up">
+  <app-form-panel
+    eyebrow="Account"
+    title="Create account"
+    description="Set up your workspace with a name, email, and password."
+  >
+    <form class="auth-form" (submit)="submit($event)" novalidate>
+      <app-text-field
+        label="Name"
+        type="text"
+        name="name"
+        autocomplete="name"
+        placeholder="Your name"
+        [required]="true"
+        [value]="name()"
+        (valueChange)="name.set($event)"
+        [error]="nameError()"
+      />
+
+      <app-text-field
+        label="Email"
+        type="email"
+        name="email"
+        autocomplete="email"
+        placeholder="you@example.com"
+        [required]="true"
+        [value]="email()"
+        (valueChange)="email.set($event)"
+        [error]="emailError()"
+      />
+
+      <app-text-field
+        label="Password"
+        type="password"
+        name="password"
+        autocomplete="new-password"
+        placeholder="At least 8 characters"
+        [required]="true"
+        [value]="password()"
+        (valueChange)="password.set($event)"
+        [error]="passwordError()"
+      />
+
+      <app-text-field
+        label="Confirm password"
+        type="password"
+        name="confirmPassword"
+        autocomplete="new-password"
+        placeholder="Repeat password"
+        [required]="true"
+        [value]="confirmPassword()"
+        (valueChange)="confirmPassword.set($event)"
+        [error]="confirmError()"
+      />
+
+      <app-checkbox-field
+        label="I agree to the terms of use"
+        name="terms"
+        [required]="true"
+        [checked]="acceptTerms()"
+        (checkedChange)="acceptTerms.set($event)"
+      />
+
+      @if (formError()) {
+        <p class="auth-form__error" role="alert">{{ formError() }}</p>
+      }
+
+      <app-button-group align="start" layout="column">
+        <app-button variant="primary" shape="pill" type="submit">Sign up</app-button>
+      </app-button-group>
+    </form>
+
+    <p formFooter>
+      Already have an account?
+      <a routerLink="/login">Log in</a>
+    </p>
+  </app-form-panel>
+</app-page-section>

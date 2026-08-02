@@ -232,3 +232,6 @@ Update this file whenever BOOK.md evolves core principles.
 (https://agents.md/). Nested AGENTS.md files are supported for subprojects.
 
 For Astro-specific (marketing site): See `marketing/AGENTS.md` and `marketing/CLAUDE.md`.
+
+
+> **Note (new-from-the-start):** Product UI lives at repo-root `src/` and consumes sibling `deml-ui`. `frontend/` and `packages/viking-ui` are retired.

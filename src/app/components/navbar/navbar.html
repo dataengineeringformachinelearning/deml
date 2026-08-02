@@ -1,0 +1,79 @@
+<header
+  id="navbar"
+  class="site-navbar items-center"
+  [class.is-menu-open]="menuOpen()"
+>
+  <div id="site-navbar-branding" class="site-navbar-branding row items-center">
+    <a
+      class="site-navbar-icon"
+      [routerLink]="brandHref()"
+      [attr.aria-label]="brandLabel()"
+      (click)="closeMenu()"
+    >
+      <svg lucideBoxes [size]="32" aria-hidden="true" focusable="false"></svg>
+    </a>
+  </div>
+
+  <button
+    #menuToggle
+    type="button"
+    class="site-navbar-menu-toggle"
+    [attr.aria-expanded]="menuOpen()"
+    aria-controls="site-navbar-panel"
+    aria-haspopup="true"
+    [attr.aria-label]="menuOpen() ? 'Close menu' : 'Open menu'"
+    (click)="toggleMenu()"
+  >
+    @if (menuOpen()) {
+      <svg lucideX [size]="32" aria-hidden="true" focusable="false"></svg>
+    } @else {
+      <svg lucideMenu [size]="32" aria-hidden="true" focusable="false"></svg>
+    }
+  </button>
+
+  <div
+    #menuPanel
+    id="site-navbar-panel"
+    class="site-navbar-panel"
+    [attr.role]="menuOpen() ? 'dialog' : null"
+    [attr.aria-modal]="menuOpen() ? true : null"
+    [attr.aria-label]="menuOpen() ? 'Site menu' : null"
+  >
+    <nav
+      id="site-navigation"
+      class="main-navigation place-center"
+      aria-label="Primary"
+    >
+      <ul id="site-navbar-menu" class="row wrap items-center justify-center gap-4" role="list">
+        @for (link of navLinks(); track link.path) {
+          <li class="item-fixed">
+            <a
+              [routerLink]="link.path"
+              routerLinkActive="is-active"
+              [routerLinkActiveOptions]="{ exact: link.path === '/' }"
+              ariaCurrentWhenActive="page"
+              (click)="closeMenu()"
+            >
+              {{ link.label }}
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <app-button-group id="site-button-group" align="end">
+      <app-theme-toggle />
+
+      @if (!loggedIn()) {
+        <app-button variant="secondary" shape="pill" routerLink="/login" (pressed)="closeMenu(true)">
+          Log in
+        </app-button>
+        <app-button variant="primary" shape="pill" routerLink="/signup" (pressed)="closeMenu(true)">
+          Sign up
+        </app-button>
+      } @else {
+        <app-button variant="secondary" shape="pill" (pressed)="logout()">Log out</app-button>
+      }
+    </app-button-group>
+  </div>
+</header>

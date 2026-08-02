@@ -1,0 +1,19 @@
+<section class="form-panel" [attr.aria-labelledby]="resolvedTitleId()">
+  <header class="form-panel__header">
+    @if (eyebrow()) {
+      <p class="form-panel__eyebrow">{{ eyebrow() }}</p>
+    }
+    <h1 class="form-panel__title" [id]="resolvedTitleId()">{{ title() }}</h1>
+    @if (description()) {
+      <p class="form-panel__description">{{ description() }}</p>
+    }
+  </header>
+
+  <div class="form-panel__body">
+    <ng-content />
+  </div>
+
+  <footer class="form-panel__footer">
+    <ng-content select="[formFooter]" />
+  </footer>
+</section>

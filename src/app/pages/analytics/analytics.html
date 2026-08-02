@@ -1,0 +1,16 @@
+<div class="page-body page-body--catalog">
+  <app-banner preheader="DEML" heading="Analytics" [lede]="note()" />
+  <app-page-section variant="catalog" labelledBy="analytics-heading">
+    <app-section-header
+      eyebrow="Telemetry"
+      heading="Analytics"
+      [lede]="note()"
+      headingId="analytics-heading"
+    />
+    <app-dashboard-grid>
+      @for (metric of metrics(); track metric.label) {
+        <app-stat-card [label]="metric.label" [value]="metric.value" />
+      }
+    </app-dashboard-grid>
+  </app-page-section>
+</div>

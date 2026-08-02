@@ -1,0 +1,91 @@
+<app-banner
+  preheader="DEML"
+  heading="Sites"
+  lede="Manage the sites connected to your account."
+>
+  <app-button-group>
+    <app-button variant="primary" shape="pill" routerLink="/dashboard">View metrics</app-button>
+    <app-button variant="secondary" shape="pill" routerLink="/learn">Learn</app-button>
+  </app-button-group>
+</app-banner>
+
+<app-page-section variant="catalog" labelledBy="sites-heading">
+  <app-section-header
+    eyebrow="Connected"
+    heading="Your sites"
+    lede="Status, traffic, and recent deployments across environments."
+    headingId="sites-heading"
+  />
+
+  <app-dashboard-grid>
+    @for (tile of tiles; track tile.id) {
+      @switch (tile.kind) {
+        @case ('stat') {
+          <app-stat-card
+            [size]="tile.size"
+            [accent]="tile.accent"
+            [label]="tile.label"
+            [value]="tile.value"
+            [delta]="tile.delta"
+            [meta]="tile.meta"
+            [sparkline]="tile.sparkline"
+          />
+        }
+        @case ('bar') {
+          <app-chart-card
+            [size]="tile.size"
+            [accent]="tile.accent"
+            [heading]="tile.heading"
+            [meta]="tile.meta"
+          >
+            <app-bar-chart
+              [items]="tile.items"
+              [accent]="tile.accent"
+              [ariaLabel]="tile.ariaLabel"
+            />
+          </app-chart-card>
+        }
+        @case ('metrics') {
+          <app-chart-card
+            [size]="tile.size"
+            [accent]="tile.accent"
+            [heading]="tile.heading"
+            [meta]="tile.meta"
+          >
+            <app-metric-list
+              [items]="tile.items"
+              [accent]="tile.accent"
+              [ariaLabel]="tile.ariaLabel"
+            />
+          </app-chart-card>
+        }
+      }
+    }
+  </app-dashboard-grid>
+
+  <app-section-header
+    heading="Environments"
+    lede="Open a site card for presence details."
+    headingId="sites-environments-heading"
+  />
+
+  <app-card-grid>
+    @for (site of sites; track site.id) {
+      <app-card
+        [heading]="site.heading"
+        [subtext]="site.subtext"
+        [meta]="site.meta"
+        [visual]="site.visual"
+      >
+        <app-button-group align="center" layout="row">
+          <app-button variant="primary" shape="pill" routerLink="/dashboard">
+            {{ site.status }}
+          </app-button>
+          <app-button variant="secondary" shape="pill" routerLink="/learn">
+            Docs
+          </app-button>
+        </app-button-group>
+      </app-card>
+    }
+  </app-card-grid>
+</app-page-section>

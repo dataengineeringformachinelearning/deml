@@ -1,0 +1,34 @@
+<article class="stat-card" [attr.aria-labelledby]="resolvedLabelId()">
+  <header class="stat-card-header">
+    <h3 class="stat-card-label" [id]="resolvedLabelId()">{{ label() }}</h3>
+    @if (delta(); as d) {
+      <p class="stat-card-delta">
+        @if (trend() === 'up') {
+          <svg lucideTrendingUp [size]="16" aria-hidden="true" focusable="false"></svg>
+          <span class="visually-hidden">Increase </span>
+        } @else if (trend() === 'down') {
+          <svg lucideTrendingDown [size]="16" aria-hidden="true" focusable="false"></svg>
+          <span class="visually-hidden">Decrease </span>
+        }
+        <span>{{ d }}</span>
+      </p>
+    }
+  </header>
+
+  <p class="stat-card-value">{{ value() }}</p>
+
+  @if (meta(); as m) {
+    <p class="stat-card-meta">{{ m }}</p>
+  }
+
+  @if (hasSparkline()) {
+    <div class="stat-card-spark">
+      <app-area-chart
+        [points]="sparkline()!"
+        [accent]="accent()"
+        variant="spark"
+        [ariaLabel]="label() + ' trend'"
+      />
+    </div>
+  }
+</article>

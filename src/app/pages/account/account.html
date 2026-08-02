@@ -1,0 +1,75 @@
+<app-banner
+  preheader="DEML"
+  heading="Account"
+  lede="Profile and account settings."
+>
+  <app-button-group>
+    <app-button variant="primary" shape="pill" routerLink="/sites">Manage sites</app-button>
+    <app-button variant="secondary" shape="pill" (pressed)="toggleTheme()">
+      {{ isDark() ? 'Use light mode' : 'Use dark mode' }}
+    </app-button>
+  </app-button-group>
+</app-banner>
+
+<app-page-section variant="catalog" labelledBy="account-heading">
+  <app-section-header
+    eyebrow="Settings"
+    heading="Your account"
+    lede="Preferences, security, and recent activity — same components as the rest of DEML."
+    headingId="account-heading"
+  />
+
+  <app-dashboard-grid>
+    @for (tile of tiles(); track tile.id) {
+      @switch (tile.kind) {
+        @case ('stat') {
+          <app-stat-card
+            [size]="tile.size"
+            [accent]="tile.accent"
+            [label]="tile.label"
+            [value]="tile.value"
+            [delta]="tile.delta"
+            [meta]="tile.meta"
+            [sparkline]="tile.sparkline"
+          />
+        }
+        @case ('metrics') {
+          <app-chart-card
+            [size]="tile.size"
+            [accent]="tile.accent"
+            [heading]="tile.heading"
+            [meta]="tile.meta"
+          >
+            <app-metric-list
+              [items]="tile.items"
+              [accent]="tile.accent"
+              [ariaLabel]="tile.ariaLabel"
+            />
+          </app-chart-card>
+        }
+      }
+    }
+  </app-dashboard-grid>
+
+  <app-section-header
+    heading="Preferences"
+    lede="Open a card to manage that area of your account."
+    headingId="account-prefs-heading"
+  />
+
+  <app-card-grid>
+    @for (pref of prefs; track pref.id) {
+      <app-card
+        [heading]="pref.heading"
+        [subtext]="pref.subtext"
+        [visual]="pref.visual"
+      >
+        <app-button-group align="center" layout="row">
+          <app-button variant="primary" shape="pill" [routerLink]="pref.href">
+            {{ pref.cta }}
+          </app-button>
+        </app-button-group>
+      </app-card>
+    }
+  </app-card-grid>
+</app-page-section>

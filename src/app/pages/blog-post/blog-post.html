@@ -1,0 +1,17 @@
+@if (post(); as entry) {
+  <app-article
+    [title]="entry.title"
+    [lede]="entry.meta"
+    [body]="entry.body"
+    backLink="/blog"
+    backLabel="All posts"
+    [headingId]="headingId()"
+  />
+} @else {
+  <app-article
+    backLink="/blog"
+    backLabel="Back to blog"
+    missingHeading="Post not found"
+    missingLede="That note is not in the archive."
+  />
+}

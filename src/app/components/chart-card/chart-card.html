@@ -1,0 +1,28 @@
+<section class="chart-card" [attr.aria-labelledby]="resolvedHeadingId()">
+  <header class="chart-card-header">
+    @switch (headingLevel()) {
+      @case (2) {
+        <h2 class="chart-card-heading" [id]="resolvedHeadingId()">{{ heading() }}</h2>
+      }
+      @case (4) {
+        <h4 class="chart-card-heading" [id]="resolvedHeadingId()">{{ heading() }}</h4>
+      }
+      @case (5) {
+        <h5 class="chart-card-heading" [id]="resolvedHeadingId()">{{ heading() }}</h5>
+      }
+      @case (6) {
+        <h6 class="chart-card-heading" [id]="resolvedHeadingId()">{{ heading() }}</h6>
+      }
+      @default {
+        <h3 class="chart-card-heading" [id]="resolvedHeadingId()">{{ heading() }}</h3>
+      }
+    }
+    @if (meta(); as m) {
+      <p class="chart-card-meta">{{ m }}</p>
+    }
+  </header>
+
+  <div class="chart-card-body">
+    <ng-content />
+  </div>
+</section>

@@ -1,0 +1,44 @@
+<app-banner
+  preheader="DEML"
+  heading="Build with clarity."
+  lede="A focused space for ideas, writing, and work that stays out of the way."
+>
+  <app-button-group>
+    @if (!loggedIn()) {
+      <app-button variant="primary" shape="pill" routerLink="/signup">Sign up</app-button>
+      <app-button variant="secondary" shape="pill" routerLink="/login">Log in</app-button>
+    } @else {
+      <app-button variant="primary" shape="pill" routerLink="/blog">Read the blog</app-button>
+    }
+  </app-button-group>
+</app-banner>
+
+<app-page-section variant="catalog" labelledBy="home-cards-heading">
+  <app-section-header
+    heading="Explore"
+    lede="Jump into writing, sites, metrics, and account controls."
+    headingId="home-cards-heading"
+  />
+
+  <app-card-grid>
+    @for (card of cards(); track card.id) {
+      <app-card
+        [heading]="card.heading"
+        [subtext]="card.subtext"
+        [visual]="card.visual"
+      >
+        <app-button-group align="center" layout="row">
+          @for (action of card.actions; track action.label) {
+            <app-button
+              [variant]="action.variant"
+              shape="pill"
+              [routerLink]="action.routerLink"
+            >
+              {{ action.label }}
+            </app-button>
+          }
+        </app-button-group>
+      </app-card>
+    }
+  </app-card-grid>
+</app-page-section>

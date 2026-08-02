@@ -1,0 +1,20 @@
+<label class="checkbox-field" [attr.for]="controlId()">
+  <input
+    class="checkbox-field__input"
+    [id]="controlId()"
+    type="checkbox"
+    [name]="name() || null"
+    [required]="required()"
+    [attr.aria-required]="required() ? true : null"
+    [disabled]="disabled()"
+    [checked]="checked()"
+    (change)="onChange($event)"
+  />
+  <span class="checkbox-field__box" aria-hidden="true"></span>
+  <span class="checkbox-field__label">
+    {{ label() }}
+    @if (required()) {
+      <span class="visually-hidden"> (required)</span>
+    }
+  </span>
+</label>

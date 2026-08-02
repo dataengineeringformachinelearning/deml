@@ -1,0 +1,29 @@
+<app-banner
+  preheader="DEML"
+  heading="Blog"
+  lede="Notes and writing on clarity, craft, and calm software."
+/>
+
+<app-page-section variant="catalog" labelledBy="blog-list-heading">
+  <app-section-header
+    heading="Latest"
+    lede="Essays and notes, newest first."
+    headingId="blog-list-heading"
+  />
+
+  <app-microcard-grid ariaLabel="Blog posts" [columns]="3">
+    @for (post of posts; track post.slug) {
+      <li>
+        <app-microcard
+          [heading]="post.title"
+          [subtext]="post.excerpt"
+          [meta]="post.meta"
+          [visual]="post.visual"
+          [headingId]="'blog-' + post.slug"
+          [routerLink]="['/blog', post.slug]"
+          cta="Read"
+        />
+      </li>
+    }
+  </app-microcard-grid>
+</app-page-section>

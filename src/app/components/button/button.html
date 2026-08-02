@@ -1,0 +1,35 @@
+<!-- ng-template keeps a single projection slot across @if branches -->
+<ng-template #content>
+  <ng-content />
+</ng-template>
+
+@if (isRouterLink()) {
+  <a
+    [class]="controlClass()"
+    [routerLink]="routerLink()!"
+    [attr.aria-disabled]="disabled() ? true : null"
+    [attr.tabindex]="disabled() ? -1 : null"
+    (click)="onActivate($event)"
+  >
+    <ng-container [ngTemplateOutlet]="content" />
+  </a>
+} @else if (isHref()) {
+  <a
+    [class]="controlClass()"
+    [href]="href()"
+    [attr.aria-disabled]="disabled() ? true : null"
+    [attr.tabindex]="disabled() ? -1 : null"
+    (click)="onActivate($event)"
+  >
+    <ng-container [ngTemplateOutlet]="content" />
+  </a>
+} @else {
+  <button
+    [class]="controlClass()"
+    [type]="type()"
+    [disabled]="disabled()"
+    (click)="onActivate($event)"
+  >
+    <ng-container [ngTemplateOutlet]="content" />
+  </button>
+}

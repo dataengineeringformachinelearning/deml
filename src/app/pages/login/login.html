@@ -1,0 +1,53 @@
+<app-page-section variant="auth" ariaLabel="Log in">
+  <app-form-panel
+    eyebrow="Account"
+    title="Log in"
+    description="Welcome back. Enter your email and password to continue."
+  >
+    <form class="auth-form" (submit)="submit($event)" novalidate>
+      <app-text-field
+        label="Email"
+        type="email"
+        name="email"
+        autocomplete="email"
+        placeholder="you@example.com"
+        [required]="true"
+        [value]="email()"
+        (valueChange)="email.set($event)"
+        [error]="emailError()"
+      />
+
+      <app-text-field
+        label="Password"
+        type="password"
+        name="password"
+        autocomplete="current-password"
+        placeholder="Your password"
+        [required]="true"
+        [value]="password()"
+        (valueChange)="password.set($event)"
+        [error]="passwordError()"
+      />
+
+      <app-checkbox-field
+        label="Keep me signed in"
+        name="remember"
+        [checked]="remember()"
+        (checkedChange)="remember.set($event)"
+      />
+
+      @if (formError()) {
+        <p class="auth-form__error" role="alert">{{ formError() }}</p>
+      }
+
+      <app-button-group align="start" layout="column">
+        <app-button variant="primary" shape="pill" type="submit">Log in</app-button>
+      </app-button-group>
+    </form>
+
+    <p formFooter>
+      New here?
+      <a routerLink="/signup">Create an account</a>
+    </p>
+  </app-form-panel>
+</app-page-section>

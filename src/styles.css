@@ -1,0 +1,7 @@
+/* App entry — deml-ui styles are loaded via angular.json.
+   Keep only app-shell offsets here. */
+
+/* Navbar offset for fixed shell from deml-ui navbar styles */
+body {
+  padding-top: calc(var(--space-2) * 2 + var(--hit-target));
+}

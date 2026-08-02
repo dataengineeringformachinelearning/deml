@@ -1,0 +1,36 @@
+<section class="banner" [attr.aria-labelledby]="labelledBy()">
+  @if (preheader()) {
+    <p class="preheader">{{ preheader() }}</p>
+  }
+
+  @if (heading()) {
+    @switch (headingLevel()) {
+      @case (2) {
+        <h2 class="banner-heading" [id]="resolvedHeadingId()">{{ heading() }}</h2>
+      }
+      @case (3) {
+        <h3 class="banner-heading" [id]="resolvedHeadingId()">{{ heading() }}</h3>
+      }
+      @case (4) {
+        <h4 class="banner-heading" [id]="resolvedHeadingId()">{{ heading() }}</h4>
+      }
+      @case (5) {
+        <h5 class="banner-heading" [id]="resolvedHeadingId()">{{ heading() }}</h5>
+      }
+      @case (6) {
+        <h6 class="banner-heading" [id]="resolvedHeadingId()">{{ heading() }}</h6>
+      }
+      @default {
+        <h1 class="banner-heading" [id]="resolvedHeadingId()">{{ heading() }}</h1>
+      }
+    }
+  }
+
+  @if (lede()) {
+    <p class="lede">{{ lede() }}</p>
+  }
+
+  <div class="banner-actions">
+    <ng-content />
+  </div>
+</section>
