@@ -27,32 +27,38 @@
   padding: var(--space-6) var(--space-2);
   color: var(--color-text);
   background-color: var(--color-bg);
+  /* Blue-hour wash over charcoal / pavement, with taillight + palm accents */
   background-image:
     radial-gradient(
-      120% 80% at 0% 0%,
-      color-mix(in srgb, var(--color-primary) 28%, transparent) 0%,
-      transparent 55%
+      110% 85% at 50% 120%,
+      color-mix(in srgb, var(--color-primary) 42%, transparent) 0%,
+      transparent 58%
     ),
     radial-gradient(
-      90% 70% at 100% 100%,
-      color-mix(in srgb, var(--color-accent-red) 14%, transparent) 0%,
-      transparent 50%
+      70% 55% at 12% 18%,
+      color-mix(in srgb, var(--color-primary) 22%, transparent) 0%,
+      transparent 62%
     ),
     radial-gradient(
-      70% 50% at 80% 20%,
-      color-mix(in srgb, var(--color-accent-gold) 10%, transparent) 0%,
+      55% 45% at 92% 30%,
+      color-mix(in srgb, var(--color-accent-red) 16%, transparent) 0%,
       transparent 60%
+    ),
+    radial-gradient(
+      50% 40% at 78% 12%,
+      color-mix(in srgb, var(--color-accent-gold) 12%, transparent) 0%,
+      transparent 65%
     ),
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--color-surface) 55%, var(--color-bg)) 0%,
+      color-mix(in srgb, var(--color-surface) 35%, var(--color-bg)) 0%,
       var(--color-bg) 100%
     );
 }
 
 .banner .preheader {
   margin: 0 0 var(--space-3);
-  color: var(--color-highlight);
+  color: var(--color-primary);
 }
 
 .banner .banner-heading {

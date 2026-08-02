@@ -1,4 +1,4 @@
-/* Card — feature (centered) or teaser (full-width); mobile-first */
+/* Card — planter-white modules with saturated accent color */
 
 :host {
   display: block;
@@ -22,14 +22,16 @@
   padding: var(--space-6) var(--space-3) 0;
   overflow: hidden;
   text-align: center;
-  color: var(--color-text);
-  background-color: var(--color-surface);
+  color: var(--color-card-text);
+  background-color: var(--color-card);
   background-image: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--card-visual, var(--color-primary)) 8%, var(--color-surface)) 0%,
-    var(--color-surface) 40%
+    color-mix(in srgb, var(--card-visual, var(--color-primary)) 14%, var(--color-card)) 0%,
+    var(--color-card) 42%
   );
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--card-visual, var(--color-primary));
+  box-shadow: var(--shadow-card);
 }
 
 .card-copy {
@@ -49,7 +51,7 @@
   letter-spacing: 0.12em;
   line-height: 1.2;
   text-transform: uppercase;
-  color: var(--color-highlight);
+  color: var(--card-visual, var(--color-primary));
 }
 
 .card-heading {
@@ -58,7 +60,7 @@
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.1;
-  color: var(--color-text);
+  color: var(--color-card-text);
 }
 
 .card-subtext {
@@ -67,7 +69,7 @@
   font-size: var(--font-size-sm);
   font-weight: 400;
   line-height: 1.45;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .card-actions {
@@ -91,7 +93,7 @@
   width: 100%;
   min-height: var(--space-16);
   margin-top: auto;
-  background-color: var(--color-surface);
+  background-color: var(--color-card);
 }
 
 .card-media:empty:not(.has-visual) {
@@ -105,14 +107,19 @@
   background-color: var(--color-olive);
   background-image:
     radial-gradient(
-      80% 70% at 50% 100%,
-      color-mix(in srgb, var(--card-visual, var(--color-primary)) 36%, transparent) 0%,
+      85% 75% at 50% 110%,
+      color-mix(in srgb, var(--card-visual, var(--color-primary)) 72%, transparent) 0%,
+      transparent 68%
+    ),
+    radial-gradient(
+      60% 50% at 80% 20%,
+      color-mix(in srgb, var(--card-visual, var(--color-primary)) 28%, transparent) 0%,
       transparent 70%
     ),
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--color-surface) 70%, transparent) 0%,
-      color-mix(in srgb, var(--color-bg) 40%, var(--color-olive)) 100%
+      color-mix(in srgb, var(--color-olive) 70%, var(--card-visual, var(--color-primary))) 0%,
+      var(--color-olive) 100%
     );
 }
 
@@ -177,12 +184,14 @@
     align-items: stretch;
     min-height: var(--space-28);
     padding: 0;
+    border-top-width: var(--border-width);
+    border-left: calc(var(--border-width) * 4) solid var(--card-visual, var(--color-primary));
   }
 
   :host([data-layout='teaser']) .card-copy {
     justify-content: center;
     padding: var(--space-6) var(--space-6);
-    background-color: var(--color-surface);
+    background-color: var(--color-card);
   }
 
   :host([data-layout='teaser']) .card-media {
@@ -200,12 +209,12 @@
     background-image:
       radial-gradient(
         90% 80% at 70% 50%,
-        color-mix(in srgb, var(--card-visual, var(--color-primary)) 40%, transparent) 0%,
+        color-mix(in srgb, var(--card-visual, var(--color-primary)) 70%, transparent) 0%,
         transparent 70%
       ),
       linear-gradient(
         135deg,
-        color-mix(in srgb, var(--card-visual, var(--color-primary)) 22%, var(--color-olive)) 0%,
+        color-mix(in srgb, var(--card-visual, var(--color-primary)) 40%, var(--color-olive)) 0%,
         var(--color-olive) 100%
       );
   }

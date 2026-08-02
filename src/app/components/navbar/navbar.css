@@ -10,11 +10,11 @@
   --navbar-inset: var(--space-2);
   --navbar-icon-size: var(--icon-size);
   --navbar-hit: var(--hit-target);
-  --navbar-bg: var(--color-bg);
+  --navbar-bg: var(--color-surface);
   --navbar-fg: var(--color-text);
   --navbar-muted: var(--color-text-secondary);
-  --navbar-accent: var(--color-highlight);
-  --navbar-accent-hover: var(--color-highlight-hover);
+  --navbar-accent: var(--color-primary);
+  --navbar-accent-hover: var(--color-primary-hover);
   --navbar-surface: var(--color-surface);
   --navbar-focus: var(--color-focus);
   --navbar-bar-height: calc(var(--navbar-inset) * 2 + var(--navbar-hit));
@@ -37,7 +37,7 @@
   background-color: var(--navbar-bg);
   background-image: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--color-primary) 10%, var(--navbar-bg)) 0%,
+    color-mix(in srgb, var(--color-primary) 18%, var(--navbar-bg)) 0%,
     var(--navbar-bg) 100%
   );
   border-bottom: var(--border-width) solid var(--color-border);

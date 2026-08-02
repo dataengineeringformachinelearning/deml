@@ -72,7 +72,7 @@ export class ThemeService {
 
     const themeColor = this.document.querySelector('meta[name="theme-color"]');
     if (themeColor) {
-      themeColor.setAttribute('content', mode === 'dark' ? '#121212' : '#BDBDBD');
+      themeColor.setAttribute('content', mode === 'dark' ? '#3D3D3D' : '#BDBDBD');
     }
 
     try {

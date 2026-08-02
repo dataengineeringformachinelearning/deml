@@ -19,13 +19,15 @@
   width: 100%;
   margin: 0 0 var(--space-2);
   padding: var(--space-4);
-  background-color: var(--color-surface);
+  background-color: var(--color-card);
   background-image: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--color-primary) 8%, var(--color-surface)) 0%,
-    var(--color-surface) var(--space-8)
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) var(--space-8)
   );
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
+  box-shadow: var(--shadow-card);
 }
 
 .learn-group:last-child {
@@ -42,7 +44,7 @@
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.15;
-  color: var(--color-text);
+  color: var(--color-card-text);
 }
 
 .learn-group-summary {
@@ -50,7 +52,7 @@
   max-width: var(--reading-width);
   font-size: var(--font-size-sm);
   line-height: 1.45;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .learn-microcards {

@@ -1,33 +1,39 @@
 /* 8px grid + WCAG 2.1 AA / 508 palette from GT3 RS photo
-   Car Blue, Building Charcoal, Pavement Gray, Wheel Black, Planter White,
-   Palm Green, Taillight Red */
+   Scene: charcoal façade, pavement, planter-white cards, car blue focal,
+   palm green + taillight red accents */
 
 :root {
   color-scheme: dark;
 
-  /* Core – extracted from the GT3 RS image */
-  --color-bg: #121212; /* Wheel/Frame Black */
-  --color-surface: #3d3d3d; /* Building Charcoal */
-  --color-primary: #0066b2; /* Car Blue — filled buttons/links with white text */
+  /* Scene — dark mode mirrors the photo (charcoal wall + white planters) */
+  --color-bg: #3d3d3d; /* Building Charcoal façade */
+  --color-surface: #121212; /* Wheel/Frame Black chrome */
+  --color-card: #ffffff; /* Planter White elevated modules */
+  --color-card-text: #121212;
+  --color-card-text-secondary: #3d3d3d;
+  --color-card-border: color-mix(in srgb, #bdbdbd 55%, #ffffff);
+  --color-primary: #0066b2; /* Car Blue */
   --color-primary-hover: color-mix(in srgb, #0066b2 78%, #ffffff);
-  --color-accent-gold: #3c7a4a; /* Palm Green — decorative accents, badges */
+  --color-accent-gold: #3c7a4a; /* Palm Green */
   --color-accent-gold-hover: color-mix(in srgb, #3c7a4a 78%, #ffffff);
-  --color-accent-red: #c41e3a; /* Taillight Red — CTAs, alerts */
+  --color-accent-red: #c41e3a; /* Taillight Red */
   --color-accent-red-hover: color-mix(in srgb, #c41e3a 78%, #ffffff);
 
-  /* Text */
+  /* Text on charcoal */
   --color-text: #ffffff; /* Planter White */
   --color-text-secondary: #bdbdbd; /* Pavement Gray */
 
   /* UI */
-  --color-border: color-mix(in srgb, #bdbdbd 45%, #3d3d3d); /* Pavement on Charcoal */
+  --color-border: color-mix(in srgb, #bdbdbd 40%, #3d3d3d);
   --color-focus: #ffffff;
   --color-error: #c41e3a;
   --color-success: #3c7a4a;
 
-  /* Shadows (8px-grid friendly depth) */
-  --shadow-sm: 0 0 0 1px color-mix(in srgb, var(--color-border) 80%, transparent);
-  --shadow-md: 0 8px 16px color-mix(in srgb, #121212 50%, transparent);
+  /* Shadows — soft depth like planters on the façade */
+  --shadow-sm: 0 0 0 1px color-mix(in srgb, #121212 35%, transparent);
+  --shadow-md: 0 8px 24px color-mix(in srgb, #121212 45%, transparent);
+  --shadow-card: 0 8px 24px color-mix(in srgb, #121212 40%, transparent),
+    0 0 0 1px color-mix(in srgb, #121212 20%, transparent);
 
   /* Aliases used across the codebase */
   --color-background: var(--color-bg);
@@ -35,20 +41,20 @@
   --color-accent: var(--color-accent-red);
   --color-accent-hover: var(--color-accent-red-hover);
   --color-accent-strong: var(--color-accent-red-hover);
-  --color-dark: var(--color-bg);
-  --color-sky-soft: var(--color-surface);
-  --color-olive: #3d3d3d; /* Building Charcoal wash for decorative visuals */
-  /* Pavement Gray on Wheel Black (9.97:1) — AA text accents on dark */
-  --color-highlight: #bdbdbd;
-  --color-highlight-hover: #ffffff;
+  --color-dark: var(--color-surface);
+  --color-sky-soft: var(--color-bg);
+  --color-olive: #121212; /* Frame-black media panels */
+  /* Car Blue accents on charcoal / planter surfaces */
+  --color-highlight: #0066b2;
+  --color-highlight-hover: color-mix(in srgb, #0066b2 70%, #ffffff);
   /* White on Car Blue (5.93:1); White on Taillight Red (5.84:1) */
   --color-on-primary: #ffffff;
   --color-on-accent: #ffffff;
   --color-on-dark: var(--color-text);
   --color-text-muted: var(--color-text-secondary);
   --color-selection: color-mix(in srgb, var(--color-primary) 28%, transparent);
-  --shadow-color: color-mix(in srgb, #121212 50%, transparent);
-  --shadow-color-soft: color-mix(in srgb, #121212 40%, transparent);
+  --shadow-color: color-mix(in srgb, #121212 45%, transparent);
+  --shadow-color-soft: color-mix(in srgb, #121212 30%, transparent);
 
   --grid: 8px;
   --space-1: calc(var(--grid) * 1); /* 8 */
@@ -105,8 +111,12 @@
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --color-bg: #121212;
-  --color-surface: #3d3d3d;
+  --color-bg: #3d3d3d;
+  --color-surface: #121212;
+  --color-card: #ffffff;
+  --color-card-text: #121212;
+  --color-card-text-secondary: #3d3d3d;
+  --color-card-border: color-mix(in srgb, #bdbdbd 55%, #ffffff);
   --color-primary: #0066b2;
   --color-primary-hover: color-mix(in srgb, #0066b2 78%, #ffffff);
   --color-accent-gold: #3c7a4a;
@@ -117,29 +127,35 @@
   --color-accent-hover: var(--color-accent-red-hover);
   --color-text: #ffffff;
   --color-text-secondary: #bdbdbd;
-  --color-border: color-mix(in srgb, #bdbdbd 45%, #3d3d3d);
+  --color-border: color-mix(in srgb, #bdbdbd 40%, #3d3d3d);
   --color-focus: #ffffff;
   --color-error: #c41e3a;
   --color-success: #3c7a4a;
-  --color-olive: #3d3d3d;
-  --color-highlight: #bdbdbd;
-  --color-highlight-hover: #ffffff;
+  --color-olive: #121212;
+  --color-highlight: #0066b2;
+  --color-highlight-hover: color-mix(in srgb, #0066b2 70%, #ffffff);
   --color-on-primary: #ffffff;
   --color-on-accent: #ffffff;
   --color-selection: color-mix(in srgb, var(--color-primary) 28%, transparent);
-  --shadow-sm: 0 0 0 1px color-mix(in srgb, var(--color-border) 80%, transparent);
-  --shadow-md: 0 8px 16px color-mix(in srgb, #121212 50%, transparent);
-  --shadow-color: color-mix(in srgb, #121212 50%, transparent);
-  --shadow-color-soft: color-mix(in srgb, #121212 40%, transparent);
+  --shadow-sm: 0 0 0 1px color-mix(in srgb, #121212 35%, transparent);
+  --shadow-md: 0 8px 24px color-mix(in srgb, #121212 45%, transparent);
+  --shadow-card: 0 8px 24px color-mix(in srgb, #121212 40%, transparent),
+    0 0 0 1px color-mix(in srgb, #121212 20%, transparent);
+  --shadow-color: color-mix(in srgb, #121212 45%, transparent);
+  --shadow-color-soft: color-mix(in srgb, #121212 30%, transparent);
 }
 
 [data-theme="light"] {
   color-scheme: light;
 
-  /* Pavement Gray + Planter White with Car Blue + Palm Green / Taillight Red */
+  /* Day scene — pavement ground, planter-white cards, charcoal type, car blue accent */
   --color-bg: #bdbdbd; /* Pavement Gray */
-  --color-surface: #ffffff; /* Planter White */
-  --color-primary: #0066b2; /* Car Blue */
+  --color-surface: #ffffff; /* Planter White chrome */
+  --color-card: #ffffff;
+  --color-card-text: #121212;
+  --color-card-text-secondary: #3d3d3d;
+  --color-card-border: color-mix(in srgb, #3d3d3d 28%, #bdbdbd);
+  --color-primary: #0066b2;
   --color-primary-hover: color-mix(in srgb, #0066b2 78%, #121212);
   --color-accent-gold: #3c7a4a; /* Palm Green — AA on white (5.15:1) */
   --color-accent-gold-hover: color-mix(in srgb, #3c7a4a 78%, #121212);
@@ -147,20 +163,22 @@
   --color-accent-red-hover: color-mix(in srgb, #c41e3a 78%, #121212);
   --color-accent: var(--color-accent-red);
   --color-accent-hover: var(--color-accent-red-hover);
-  --color-text: #121212; /* Wheel/Frame Black */
-  --color-text-secondary: #3d3d3d; /* Building Charcoal */
+  --color-text: #121212;
+  --color-text-secondary: #3d3d3d;
   --color-border: color-mix(in srgb, #3d3d3d 35%, #bdbdbd);
   --color-focus: #0066b2;
   --color-error: #c41e3a;
   --color-success: #3c7a4a;
-  --color-olive: #bdbdbd;
-  --color-highlight: #3c7a4a;
-  --color-highlight-hover: color-mix(in srgb, #3c7a4a 78%, #121212);
+  --color-olive: #3d3d3d; /* Charcoal media panels */
+  --color-highlight: #0066b2;
+  --color-highlight-hover: color-mix(in srgb, #0066b2 78%, #121212);
   --color-on-primary: #ffffff;
   --color-on-accent: #ffffff;
   --color-selection: color-mix(in srgb, var(--color-primary) 18%, transparent);
-  --shadow-sm: 0 0 0 1px color-mix(in srgb, var(--color-border) 90%, transparent);
-  --shadow-md: 0 8px 16px color-mix(in srgb, #121212 14%, transparent);
+  --shadow-sm: 0 0 0 1px color-mix(in srgb, #3d3d3d 18%, transparent);
+  --shadow-md: 0 8px 24px color-mix(in srgb, #121212 14%, transparent);
+  --shadow-card: 0 8px 24px color-mix(in srgb, #121212 12%, transparent),
+    0 0 0 1px color-mix(in srgb, #3d3d3d 16%, transparent);
   --shadow-color: color-mix(in srgb, #121212 14%, transparent);
   --shadow-color-soft: color-mix(in srgb, #121212 8%, transparent);
 }
