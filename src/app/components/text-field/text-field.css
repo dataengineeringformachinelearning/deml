@@ -1,0 +1,111 @@
+:host {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.text-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.text-field__label {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-eyebrow);
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--color-card-text-secondary);
+}
+
+.text-field__required {
+  margin-left: var(--space-1);
+  color: var(--color-error);
+}
+
+.text-field__control {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--hit-target);
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-card-border);
+  border-radius: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  letter-spacing: var(--tracking-intro);
+  line-height: 1.3;
+  color: var(--color-card-text);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
+  appearance: none;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.text-field__control::placeholder {
+  color: var(--color-card-text-secondary);
+  opacity: 0.72;
+}
+
+.text-field__control:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-card-border));
+}
+
+.text-field__control:focus {
+  outline: none;
+}
+
+.text-field__control:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+  border-color: var(--color-primary);
+}
+
+.text-field__control:disabled {
+  opacity: 0.64;
+  cursor: not-allowed;
+}
+
+:host([data-invalid='true']) .text-field__control {
+  border-color: var(--color-error);
+}
+
+:host([data-invalid='true']) .text-field__control:focus-visible {
+  outline-color: var(--color-error);
+}
+
+.text-field__hint,
+.text-field__error {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+  letter-spacing: var(--tracking-intro);
+  line-height: 1.35;
+}
+
+.text-field__hint {
+  color: var(--color-card-text-secondary);
+}
+
+.text-field__error {
+  font-weight: 600;
+  color: var(--color-error);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-field__control {
+    transition: none;
+  }
+}

@@ -65,8 +65,12 @@
       <app-theme-toggle />
 
       @if (!loggedIn()) {
-        <app-button variant="secondary" shape="pill" (pressed)="login()">Log in</app-button>
-        <app-button variant="primary" shape="pill" (pressed)="login()">Sign up</app-button>
+        <app-button variant="secondary" shape="pill" routerLink="/login" (pressed)="closeMenu(true)">
+          Log in
+        </app-button>
+        <app-button variant="primary" shape="pill" routerLink="/signup" (pressed)="closeMenu(true)">
+          Sign up
+        </app-button>
       } @else {
         <app-button variant="secondary" shape="pill" (pressed)="logout()">Log out</app-button>
       }

@@ -5,8 +5,8 @@
 >
   <app-button-group>
     @if (!loggedIn()) {
-      <app-button variant="primary" shape="pill" (pressed)="login()">Sign up</app-button>
-      <app-button variant="secondary" shape="pill" (pressed)="login()">Log in</app-button>
+      <app-button variant="primary" shape="pill" routerLink="/signup">Sign up</app-button>
+      <app-button variant="secondary" shape="pill" routerLink="/login">Log in</app-button>
     } @else {
       <app-button variant="primary" shape="pill" routerLink="/blog">Read the blog</app-button>
     }
@@ -41,7 +41,7 @@
         @if (loggedIn()) {
           <app-button variant="primary" shape="pill" routerLink="/sites">Open Sites</app-button>
         } @else {
-          <app-button variant="primary" shape="pill" (pressed)="login()">Get started</app-button>
+          <app-button variant="primary" shape="pill" routerLink="/signup">Get started</app-button>
         }
         <app-button variant="secondary" shape="pill" routerLink="/learn">Learn more</app-button>
       </app-button-group>
@@ -56,7 +56,7 @@
         @if (loggedIn()) {
           <app-button variant="primary" shape="pill" routerLink="/dashboard">Open</app-button>
         } @else {
-          <app-button variant="primary" shape="pill" (pressed)="login()">Sign in</app-button>
+          <app-button variant="primary" shape="pill" routerLink="/login">Sign in</app-button>
         }
         <app-button variant="secondary" shape="pill" routerLink="/blog">Read</app-button>
       </app-button-group>
@@ -71,7 +71,7 @@
         @if (loggedIn()) {
           <app-button variant="primary" shape="pill" routerLink="/account">Manage</app-button>
         } @else {
-          <app-button variant="primary" shape="pill" (pressed)="login()">Sign up</app-button>
+          <app-button variant="primary" shape="pill" routerLink="/signup">Sign up</app-button>
         }
         <app-button variant="secondary" shape="pill" routerLink="/learn">Learn more</app-button>
       </app-button-group>

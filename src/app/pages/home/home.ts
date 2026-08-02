@@ -19,8 +19,4 @@ export class Home {
   private readonly auth = inject(AuthService);
 
   readonly loggedIn = this.auth.loggedIn;
-
-  login(): void {
-    this.auth.login();
-  }
 }

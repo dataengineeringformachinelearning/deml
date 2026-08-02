@@ -99,11 +99,6 @@ export class Navbar {
     });
   }
 
-  login(): void {
-    this.auth.login();
-    this.closeMenu(true);
-  }
-
   logout(): void {
     this.auth.logout();
     this.closeMenu(true);

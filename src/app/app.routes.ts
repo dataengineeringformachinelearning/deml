@@ -41,6 +41,16 @@ export const routes: Routes = [
     },
   },
   {
+    path: 'login',
+    loadComponent: () => import('./pages/login/login').then((m) => m.Login),
+    title: 'Log in · DEML',
+  },
+  {
+    path: 'signup',
+    loadComponent: () => import('./pages/signup/signup').then((m) => m.Signup),
+    title: 'Sign up · DEML',
+  },
+  {
     path: 'dashboard',
     loadComponent: () => import('./pages/dashboard/dashboard').then((m) => m.Dashboard),
     title: 'Dashboard · DEML',
