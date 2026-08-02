@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { Button } from '../../components/button/button';
 import { ButtonGroup } from '../../components/button-group/button-group';
@@ -7,7 +7,7 @@ import { CheckboxField } from '../../components/checkbox-field/checkbox-field';
 import { FormPanel } from '../../components/form-panel/form-panel';
 import { PageSection } from '../../components/page-section/page-section';
 import { TextField } from '../../components/text-field/text-field';
-import { AuthService } from '../../services/auth';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -20,6 +20,7 @@ import { AuthService } from '../../services/auth';
 export class Login {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly email = signal('');
   readonly password = signal('');
@@ -27,8 +28,9 @@ export class Login {
   readonly emailError = signal('');
   readonly passwordError = signal('');
   readonly formError = signal('');
+  readonly busy = signal(false);
 
-  submit(event: Event): void {
+  async submit(event: Event): Promise<void> {
     event.preventDefault();
 
     const email = this.email().trim();
@@ -56,8 +58,17 @@ export class Login {
       return;
     }
 
-    const name = email.split('@')[0] || 'Demo';
-    this.auth.login({ id: email.toLowerCase(), name });
-    void this.router.navigateByUrl('/dashboard');
+    this.busy.set(true);
+    try {
+      const result = await this.auth.login({ username: email.toLowerCase(), password });
+      if (!result.success) {
+        this.formError.set(result.error ?? 'Unable to log in.');
+        return;
+      }
+      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
+      await this.router.navigateByUrl(returnUrl);
+    } finally {
+      this.busy.set(false);
+    }
   }
 }

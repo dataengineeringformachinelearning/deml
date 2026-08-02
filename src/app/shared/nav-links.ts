@@ -8,14 +8,16 @@ export const GUEST_NAV_LINKS: NavLink[] = [
   { label: 'Home', path: '/' },
   { label: 'Learn', path: '/learn' },
   { label: 'Blog', path: '/blog' },
+  { label: 'Status', path: '/status' },
+  { label: 'Explore', path: '/explore' },
 ];
 
 /** Primary nav when logged in. */
 export const AUTH_NAV_LINKS: NavLink[] = [
-  { label: 'Home', path: '/' },
-  { label: 'Learn', path: '/learn' },
-  { label: 'Blog', path: '/blog' },
   { label: 'Dashboard', path: '/dashboard' },
+  { label: 'Analytics', path: '/analytics' },
+  { label: 'Vulnerabilities', path: '/vulnerabilities' },
   { label: 'Sites', path: '/sites' },
+  { label: 'Settings', path: '/settings' },
   { label: 'Account', path: '/account' },
 ];

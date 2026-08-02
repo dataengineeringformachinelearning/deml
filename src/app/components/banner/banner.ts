@@ -1,13 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  ViewEncapsulation,
+} from '@angular/core';
 
 export type BannerHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
 let bannerIdSeq = 0;
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-banner',
   templateUrl: './banner.html',
-  styleUrl: './banner.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Banner {

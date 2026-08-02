@@ -1,11 +1,16 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  ViewEncapsulation,
+} from '@angular/core';
 
 import type { DashAccent, DashMetricItem } from '../dashboard/dashboard.types';
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-metric-list',
   templateUrl: './metric-list.html',
-  styleUrl: './metric-list.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-accent]': 'accent()',

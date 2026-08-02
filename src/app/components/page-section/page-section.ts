@@ -1,11 +1,16 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  ViewEncapsulation,
+} from '@angular/core';
 
 export type PageSectionVariant = 'catalog' | 'prose' | 'auth';
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-page-section',
   templateUrl: './page-section.html',
-  styleUrl: './page-section.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'page-section',

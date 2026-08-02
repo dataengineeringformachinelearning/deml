@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  ViewEncapsulation,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { Banner } from '../banner/banner';
@@ -8,10 +14,10 @@ import { ButtonGroup } from '../button-group/button-group';
 let articleIdSeq = 0;
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-article',
   imports: [Banner, Button, ButtonGroup, RouterLink],
   templateUrl: './article.html',
-  styleUrl: './article.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Article {

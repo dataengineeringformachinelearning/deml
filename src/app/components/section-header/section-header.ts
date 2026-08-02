@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  ViewEncapsulation,
+} from '@angular/core';
 
 export type SectionHeadingLevel = 2 | 3 | 4 | 5 | 6;
 
@@ -12,9 +18,9 @@ let sectionHeaderIdSeq = 0;
  * bold heading, and tracked lede — all on the 8px grid.
  */
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-section-header',
   templateUrl: './section-header.html',
-  styleUrl: './section-header.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-tone]': 'tone()',

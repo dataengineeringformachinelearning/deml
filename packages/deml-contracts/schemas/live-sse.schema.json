@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deml.app/schemas/live-sse.json",
+  "title": "LiveSseEvents",
+  "description": "UC-ANALYTICS-001 SSE event payloads (never ciphertext).",
+  "oneOf": [
+    { "$ref": "#/$defs/Ready" },
+    { "$ref": "#/$defs/Projections" },
+    { "$ref": "#/$defs/Degraded" },
+    { "$ref": "#/$defs/End" }
+  ],
+  "$defs": {
+    "Ready": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "ready" },
+        "tenant_id": { "type": "string", "format": "uuid" }
+      }
+    },
+    "Projections": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "count", "cursor"],
+      "properties": {
+        "type": { "const": "projections" },
+        "count": { "type": "integer", "minimum": 0 },
+        "cursor": { "type": "string", "minLength": 1 }
+      }
+    },
+    "Degraded": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "code"],
+      "properties": {
+        "type": { "const": "degraded" },
+        "code": { "const": "forjd_degraded" },
+        "detail": { "type": "string" }
+      }
+    },
+    "End": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "end" },
+        "reason": { "type": "string" }
+      }
+    }
+  }
+}

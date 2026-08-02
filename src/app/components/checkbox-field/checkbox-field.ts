@@ -1,9 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, input, model } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  model,
+  ViewEncapsulation,
+} from '@angular/core';
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-checkbox-field',
   templateUrl: './checkbox-field.html',
-  styleUrl: './checkbox-field.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CheckboxField {

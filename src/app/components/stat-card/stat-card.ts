@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  ViewEncapsulation,
+} from '@angular/core';
 import { LucideTrendingDown, LucideTrendingUp } from '@lucide/angular';
 
 import { AreaChart } from '../area-chart/area-chart';
@@ -7,10 +13,10 @@ import type { DashAccent, DashPoint, DashSize } from '../dashboard/dashboard.typ
 let statCardIdSeq = 0;
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-stat-card',
   imports: [AreaChart, LucideTrendingDown, LucideTrendingUp],
   templateUrl: './stat-card.html',
-  styleUrl: './stat-card.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-size]': 'size()',

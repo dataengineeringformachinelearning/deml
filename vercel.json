@@ -1,0 +1,40 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "node set-env.js && npm run build:contracts && npx ng build --configuration production",
+  "outputDirectory": "dist/deml/browser",
+  "framework": null,
+  "installCommand": "npm install --include=dev",
+  "redirects": [
+    {
+      "source": "/docs",
+      "destination": "https://backend.deml.app/api/v1/docs",
+      "permanent": false
+    },
+    {
+      "source": "/docs/",
+      "destination": "https://backend.deml.app/api/v1/docs",
+      "permanent": false
+    },
+    {
+      "source": "/redoc",
+      "destination": "https://backend.deml.app/api/v1/redoc",
+      "permanent": false
+    },
+    {
+      "source": "/redoc/",
+      "destination": "https://backend.deml.app/api/v1/redoc",
+      "permanent": false
+    },
+    {
+      "source": "/swagger",
+      "destination": "https://backend.deml.app/api/v1/docs",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/((?!.*\\.(?:js|mjs|css|map|png|jpe?g|gif|ico|svg|webp|woff2?|json|webmanifest|txt|xml)$).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

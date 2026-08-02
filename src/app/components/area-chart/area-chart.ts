@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  ViewEncapsulation,
+} from '@angular/core';
 
 import { CHART_SCALE } from '../dashboard/chart-scale';
 import type { DashAccent, DashPoint } from '../dashboard/dashboard.types';
@@ -16,9 +22,9 @@ let areaChartSeq = 0;
 export type AreaChartVariant = 'full' | 'spark';
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-area-chart',
   templateUrl: './area-chart.html',
-  styleUrl: './area-chart.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-accent]': 'accent()',

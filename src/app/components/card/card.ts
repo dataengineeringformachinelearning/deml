@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  ViewEncapsulation,
+} from '@angular/core';
 
 export type CardVisual = 'none' | 'gold' | 'red' | 'olive';
 export type CardHeadingLevel = 2 | 3 | 4 | 5 | 6;
@@ -8,9 +14,9 @@ export type CardLayout = 'feature' | 'teaser';
 let cardIdSeq = 0;
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-card',
   templateUrl: './card.html',
-  styleUrl: './card.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-visual]': 'visual()',

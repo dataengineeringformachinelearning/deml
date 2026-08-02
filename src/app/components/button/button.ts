@@ -1,15 +1,22 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  output,
+  ViewEncapsulation,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'accent';
 export type ButtonShape = 'default' | 'pill';
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-button',
   imports: [NgTemplateOutlet, RouterLink],
   templateUrl: './button.html',
-  styleUrl: './button.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-variant]': 'variant()',

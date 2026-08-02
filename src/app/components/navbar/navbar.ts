@@ -11,11 +11,12 @@ import {
   input,
   signal,
   viewChild,
+  ViewEncapsulation,
 } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { LucideBoxes, LucideMenu, LucideX } from '@lucide/angular';
 
-import { AuthService } from '../../services/auth';
+import { AuthService } from '../../services/auth.service';
 import { BREAKPOINT_MD_MQ } from '../../shared/breakpoints';
 import { AUTH_NAV_LINKS, GUEST_NAV_LINKS, type NavLink } from '../../shared/nav-links';
 import { Button } from '../button/button';
@@ -25,6 +26,7 @@ import { ThemeToggle } from '../theme-toggle/theme-toggle';
 export type { NavLink };
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-navbar',
   imports: [
     LucideBoxes,
@@ -37,7 +39,6 @@ export type { NavLink };
     ThemeToggle,
   ],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[style.--navbar-icon-color]': 'iconColor() || null',
@@ -67,7 +68,7 @@ export class Navbar {
   /** Optional full override of primary navigation links. */
   readonly links = input<NavLink[]>();
 
-  readonly loggedIn = this.auth.loggedIn;
+  readonly loggedIn = this.auth.isAuthenticated;
 
   /** Guest vs auth link set, unless `links` is provided. */
   readonly navLinks = computed(() => {
@@ -100,8 +101,7 @@ export class Navbar {
   }
 
   logout(): void {
-    this.auth.logout();
-    this.closeMenu(true);
+    void this.auth.logout().finally(() => this.closeMenu(true));
   }
 
   toggleMenu(): void {

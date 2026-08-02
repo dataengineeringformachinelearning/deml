@@ -1,11 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  ViewEncapsulation,
+} from '@angular/core';
 
 let formPanelIdSeq = 0;
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-form-panel',
   templateUrl: './form-panel.html',
-  styleUrl: './form-panel.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormPanel {

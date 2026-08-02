@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deml.app/schemas/auth.json",
+  "title": "AuthContracts",
+  "description": "UC-AUTH-001..006 control-plane auth DTOs.",
+  "$defs": {
+    "AuthUserResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "type": "string" },
+        "user": { "type": ["string", "null"] },
+        "user_id": { "type": ["integer", "null"] },
+        "role": {
+          "type": ["string", "null"],
+          "enum": ["Viewer", "Operator", "Security Admin", null]
+        }
+      }
+    },
+    "DeleteAccountOut": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "completed"],
+      "properties": {
+        "status": { "type": "string" },
+        "job_id": { "type": ["string", "null"], "format": "uuid" },
+        "completed": { "type": "boolean" }
+      }
+    },
+    "APIKeyGenerateIn": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "default": "Integration Key" }
+      }
+    },
+    "APIKeyGenerateOut": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "name", "key", "prefix"],
+      "properties": {
+        "status": { "type": "string" },
+        "name": { "type": "string" },
+        "key": { "type": "string", "pattern": "^deml_" },
+        "prefix": { "type": "string" }
+      }
+    },
+    "APIKeyOut": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "prefix", "created_at"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "prefix": { "type": "string" },
+        "created_at": { "type": "string" }
+      }
+    },
+    "SessionOut": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "created_at": { "type": "string" },
+        "last_seen_at": { "type": "string" },
+        "user_agent": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

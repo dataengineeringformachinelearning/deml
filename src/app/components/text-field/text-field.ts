@@ -1,11 +1,18 @@
-import { ChangeDetectionStrategy, Component, computed, input, model } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  model,
+  ViewEncapsulation,
+} from '@angular/core';
 
 export type TextFieldType = 'text' | 'email' | 'password' | 'search' | 'url' | 'tel';
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-text-field',
   templateUrl: './text-field.html',
-  styleUrl: './text-field.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-invalid]': 'invalid() ? true : null',

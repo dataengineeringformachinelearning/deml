@@ -8,7 +8,7 @@ import { CardGrid } from '../../components/card-grid/card-grid';
 import { PageSection } from '../../components/page-section/page-section';
 import { SectionHeader } from '../../components/section-header/section-header';
 import { HOME_CARDS, resolveHomeCardActions } from '../../data/home';
-import { AuthService } from '../../services/auth';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -20,7 +20,7 @@ import { AuthService } from '../../services/auth';
 export class Home {
   private readonly auth = inject(AuthService);
 
-  readonly loggedIn = this.auth.loggedIn;
+  readonly loggedIn = this.auth.isAuthenticated;
 
   readonly cards = computed(() =>
     HOME_CARDS.map((card) => ({

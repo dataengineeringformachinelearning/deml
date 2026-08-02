@@ -1,0 +1,315 @@
+{
+  "version": 1,
+  "description": "Use-case test + observability registry. Validated by scripts/check_usecase_coverage.py",
+  "use_cases": {
+    "UC-AUTH-001": {
+      "unit": ["backend/config/test_auth.py::test_get_current_user_authenticated"],
+      "integration": ["backend/config/test_auth.py::test_register_health_probe"],
+      "observability": {
+        "sources": ["backend/config/api_auth.py", "backend/config/middleware.py"],
+        "events": ["auth_identity_ok"]
+      }
+    },
+    "UC-AUTH-002": {
+      "unit": ["backend/utils/test_session_registry.py::test_register_and_validate_session"],
+      "integration": ["backend/config/test_auth_usecases.py::test_session_register_list_revoke"],
+      "observability": {
+        "sources": ["backend/config/api_auth.py"],
+        "events": ["session_registered"]
+      }
+    },
+    "UC-AUTH-003": {
+      "unit": ["backend/utils/test_session_registry.py::test_handoff_store_and_consume"],
+      "integration": ["backend/config/test_auth.py::test_desktop_handoff_uses_pkce_and_restores_session"],
+      "observability": {
+        "sources": ["backend/config/api_auth.py"],
+        "events": ["handoff_generated"]
+      }
+    },
+    "UC-AUTH-004": {
+      "unit": ["frontend/src/app/services/auth.service.spec.ts"],
+      "integration": ["backend/config/test_auth_usecases.py::test_logout_revokes_session"],
+      "observability": {
+        "sources": ["backend/config/api_auth.py"],
+        "events": ["logout_completed"]
+      }
+    },
+    "UC-AUTH-005": {
+      "unit": ["backend/config/test_auth.py::test_deml_api_key_authenticates_headless_request"],
+      "integration": ["backend/config/test_auth_usecases.py::test_api_key_generate_list_revoke"],
+      "observability": {
+        "sources": ["backend/config/api_auth.py"],
+        "events": ["api_key_generated", "api_key_revoked"]
+      }
+    },
+    "UC-AUTH-006": {
+      "unit": ["backend/config/test_auth.py::test_delete_account_completes_after_forjd_erase"],
+      "integration": ["backend/config/test_auth.py::test_delete_account_blocks_when_forjd_erase_fails"],
+      "observability": {
+        "sources": ["backend/account/lifecycle.py"],
+        "deferred_observability": "Lifecycle already emits structured erase/completion logs"
+      }
+    },
+    "UC-BILL-001": {
+      "unit": ["backend/billing/test_billing.py::test_subscription_period_end_top_level_dict"],
+      "integration": ["backend/billing/test_billing.py::test_checkout_disabled_does_not_create_stripe_session"],
+      "observability": {
+        "sources": ["backend/billing/api.py"],
+        "events": ["checkout_disabled"]
+      }
+    },
+    "UC-BILL-002": {
+      "unit": ["backend/billing/test_billing.py::test_subscription_period_end_from_items_dict"],
+      "integration": ["backend/billing/test_billing.py::test_sync_without_stripe_ids_downgrades_manual_pro"],
+      "observability": {
+        "sources": ["backend/billing/api.py"],
+        "deferred_observability": "Webhook/sync emit warning/error structured logs today"
+      }
+    },
+    "UC-BILL-003": {
+      "unit": ["backend/billing/test_billing.py::test_subscription_period_end_missing_returns_none"],
+      "integration": ["backend/billing/test_billing.py::test_cancel_and_resume_subscription"],
+      "observability": {
+        "sources": ["backend/billing/api.py"],
+        "events": ["subscription_cancelled", "subscription_resumed"]
+      }
+    },
+    "UC-CONSENT-001": {
+      "unit": [
+        "packages/deml-contracts (factories ConsentIn)",
+        "backend/monitor/test_consent_contracts.py::test_consent_in_factory_matches_contract"
+      ],
+      "integration": ["backend/monitor/test_consent_contracts.py::test_cookie_consent_telemetry_and_users_paths"],
+      "observability": {
+        "sources": ["backend/monitor/views.py", "backend/monitor/api.py"],
+        "events": ["consent_recorded"]
+      }
+    },
+    "UC-CONSENT-002": {
+      "unit": ["backend/monitor/test_consent_contracts.py::test_newsletter_rejects_without_consent"],
+      "integration": ["backend/monitor/test_consent_contracts.py::test_newsletter_subscribe_paths"],
+      "observability": {
+        "sources": ["backend/monitor/views.py", "backend/monitor/api.py"],
+        "events": ["newsletter_subscribed"]
+      }
+    },
+    "UC-DASH-001": {
+      "unit": ["backend/forjd/test_angular_compat.py::test_deml_analytics_overview_maps_ces_fields"],
+      "integration": ["backend/forjd/test_angular_compat.py::test_analytics_overview_proxy_maps_forjd"],
+      "observability": {
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "Shared FORJD adapter warnings; page latency metric deferred"
+      }
+    },
+    "UC-ANALYTICS-001": {
+      "unit": ["frontend/src/app/services/live-updates.service.spec.ts"],
+      "integration": ["backend/forjd/test_live.py::test_live_stream_emits_ready_and_projection_events"],
+      "observability": {
+        "sources": ["backend/forjd/live.py"],
+        "deferred_observability": "forjd_live_degraded warning with request_id already emitted"
+      }
+    },
+    "UC-ANALYTICS-002": {
+      "unit": ["backend/forjd/test_policy.py::test_action_policy_matrix"],
+      "integration": ["backend/forjd/test_headless_contract.py::test_headless_route_contracts_are_tenant_bound_and_typed"],
+      "observability": {
+        "sources": ["backend/forjd/policy.py"],
+        "deferred_observability": "Mutations audited via record_forjd_audit"
+      }
+    },
+    "UC-ANALYTICS-003": {
+      "unit": ["backend/config/test_csrf_header_auth.py::test_authorization_header_required_rejects_cookie_only_session"],
+      "integration": ["backend/forjd/test_headless_contract.py::test_playbook_action_controls_are_tenant_bound_and_csrf_exempt"],
+      "observability": {
+        "sources": ["backend/forjd/policy.py"],
+        "deferred_observability": "Playbook actions audited via policy decorator"
+      }
+    },
+    "UC-SIEM-001": {
+      "unit": ["backend/forjd/test_policy.py::test_action_policy_matrix"],
+      "integration": ["backend/forjd/test_usecase_proxies.py::test_siem_signals_require_tenant_mapping"],
+      "observability": {
+        "sources": ["backend/forjd/policy.py"],
+        "deferred_observability": "SIEM writes audited via shared FORJD policy path"
+      }
+    },
+    "UC-VULN-001": {
+      "unit": ["frontend/src/app/services/vulnerability.service.spec.ts"],
+      "integration": ["backend/forjd/test_angular_compat.py::test_vulnerabilities_proxy_maps_forjd"],
+      "observability": {
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "Adapter 5xx warnings"
+      }
+    },
+    "UC-STATUS-001": {
+      "unit": ["frontend/src/app/services/monitor.service.spec.ts"],
+      "integration": ["backend/forjd/test_angular_compat.py::test_status_pages_list_fallback_on_outage"],
+      "observability": {
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "Admin mutations via FORJD audit path"
+      }
+    },
+    "UC-STATUS-002": {
+      "unit": ["backend/forjd/test_angular_compat.py::test_public_status_slug_candidates_domain_and_stem"],
+      "integration": ["backend/forjd/test_compatibility.py::test_public_status_page_unknown_slug_returns_clean_404"],
+      "observability": {
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "Public proxy fail-closed logging"
+      }
+    },
+    "UC-INGEST-001": {
+      "unit": ["backend/forjd/test_sealed_telemetry.py::test_seal_bytes_produces_valid_gcm_envelope"],
+      "integration": ["backend/forjd/test_ingest_contract.py::test_processing_status_is_tenant_bound_through_deml"],
+      "observability": {
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "Ingest audited via record_forjd_audit"
+      }
+    },
+    "UC-INGEST-002": {
+      "unit": [
+        "packages/deml-contracts (factories SealedEvent)",
+        "backend/forjd/test_ingest_contract.py::test_native_batch_rejects_more_than_forjd_event_limit"
+      ],
+      "integration": ["backend/forjd/test_ingest_contract.py::test_native_ingest_accepts_valid_body_above_django_global_limit"],
+      "observability": {
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "Batch processing audited via shared ingest path"
+      }
+    },
+    "UC-INGEST-003": {
+      "unit": ["backend/forjd/test_usecase_proxies.py::test_crypto_sessions_list_requires_mapping"],
+      "integration": ["backend/forjd/test_compatibility.py::test_session_and_replay_routes_require_tenant_mapping"],
+      "observability": {
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "Crypto session proxy uses shared adapter logging"
+      }
+    },
+    "UC-PIPE-001": {
+      "unit": ["frontend/src/app/core/workflow-yaml.spec.ts"],
+      "integration": ["backend/forjd/test_usecase_proxies.py::test_workflows_list_proxy"],
+      "observability": {
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "Workflows GET uses shared adapter logging"
+      }
+    },
+    "UC-PROJ-001": {
+      "unit": ["backend/forjd/test_client.py::test_list_projections_binds_tenant_query"],
+      "integration": ["backend/forjd/test_compatibility.py::test_authenticated_adapter_uses_native_path_and_mapped_tenant"],
+      "observability": {
+        "sources": ["backend/forjd/client.py"],
+        "deferred_observability": "Client warnings on projection list failures"
+      }
+    },
+    "UC-EXPORT-001": {
+      "unit": ["frontend/src/app/pages/analytics/analytics.spec.ts"],
+      "integration": ["backend/forjd/test_headless_contract.py::test_export_create_detail_and_signed_download_are_tenant_bound"],
+      "observability": {
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "Must never log signed download URLs"
+      }
+    },
+    "UC-ML-001": {
+      "unit": ["frontend/src/app/services/ml.service.spec.ts"],
+      "integration": ["backend/forjd/test_angular_compat.py::test_deml_export_jobs_and_ml_latest"],
+      "observability": {
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "ML proxy uses shared adapter logging"
+      }
+    },
+    "UC-COMPLY-001": {
+      "unit": ["backend/forjd/test_usecase_proxies.py::test_soc_status_requires_mapping"],
+      "integration": ["backend/forjd/test_usecase_proxies.py::test_soc_status_requires_mapping"],
+      "observability": {
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "Compliance proxy uses shared adapter logging"
+      }
+    },
+    "UC-REPORT-001": {
+      "unit": ["backend/agent/test_agent.py::test_redact_report_text_strips_identifiers_and_credentials"],
+      "integration": ["backend/monitor/test_report_reconciliation.py::test_reconciliation_claim_excludes_dead_letter_reports"],
+      "observability": {
+        "sources": ["backend/agent/api.py"],
+        "deferred_observability": "Delivery state changes logged in agent/report path"
+      }
+    },
+    "UC-INTEG-001": {
+      "unit": ["backend/monitor/test_analytics_sync.py::test_fetch_google_missing_token"],
+      "integration": ["backend/monitor/test_integrations.py::test_list_and_delete_scoped_to_account"],
+      "observability": {
+        "sources": ["backend/monitor/integrations.py"],
+        "deferred_observability": "OAuth/connect/disconnect audit logs present"
+      }
+    },
+    "UC-INTEG-002": {
+      "unit": ["backend/forjd/test_policy.py::test_core_product_actions_do_not_require_pro"],
+      "integration": ["backend/forjd/test_usecase_proxies.py::test_security_alert_requires_tenant_mapping"],
+      "observability": {
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "Security-alert writes use shared adapter/audit"
+      }
+    },
+    "UC-WIDGET-001": {
+      "unit": ["backend/forjd/test_widget_telemetry.py::test_widget_telemetry_requires_slug"],
+      "integration": ["backend/forjd/test_widget_telemetry.py::test_widget_telemetry_seals_when_mapped"],
+      "observability": {
+        "sources": ["backend/forjd/widget_telemetry.py"],
+        "deferred_observability": "Slug/status info+warning logs already present"
+      }
+    },
+    "UC-HEALTH-001": {
+      "unit": ["frontend/src/app/core/continuity-health.spec.ts"],
+      "integration": ["backend/config/test_ready_contract.py::test_ready_exposes_forjd_health_and_mode"],
+      "observability": {
+        "sources": ["backend/config/api.py"],
+        "deferred_observability": "Ready soft-degrade warnings already present"
+      }
+    },
+    "UC-SETTINGS-001": {
+      "unit": ["frontend/src/app/pages/settings/settings.spec.ts"],
+      "integration": ["frontend/src/app/pages/settings/settings.spec.ts"],
+      "observability": {
+        "deferred_observability": "Composed UI; child UC boundaries own server logs"
+      }
+    },
+    "UC-ACCOUNT-001": {
+      "unit": ["frontend/src/app/pages/account/account.spec.ts"],
+      "integration": ["frontend/src/app/pages/account/account.spec.ts"],
+      "observability": {
+        "deferred_observability": "Client preferences; billing/auth child UCs own server logs"
+      }
+    },
+    "UC-ONBOARD-001": {
+      "unit": ["frontend/src/app/services/onboarding.service.spec.ts"],
+      "integration": ["packages/viking-ui/src/lib/onboarding-checklist/onboarding-checklist.spec.ts"],
+      "observability": {
+        "deferred_observability": "Client-only checklist; no server boundary"
+      }
+    },
+    "UC-CORS-001": {
+      "unit": ["backend/monitor/test_cors_utils.py::test_verified_registered_domain_is_allowed_dynamically"],
+      "integration": ["backend/config/test_cors_headers.py::test_cors_preflight_allows_deml_session_header"],
+      "observability": {
+        "sources": ["backend/monitor/cors_utils.py"],
+        "deferred_observability": "Fail-closed without per-request info logs"
+      }
+    },
+    "UC-LEARN-001": {
+      "deferred": "Learning progress UC not shipped; reserved workflow id must stay rejected",
+      "unit": ["backend/forjd/test_api.py::test_ingest_rejects_unshipped_learning_and_plaintext_metadata"],
+      "integration": ["backend/config/test_openapi.py::test_openapi_exposes_forjd_handoff_and_no_local_processing"],
+      "observability": {
+        "deferred_observability": "Anti-regression only — no product boundary"
+      }
+    }
+  },
+  "quarantine": [
+    {
+      "path": "backend/forjd/test_cutover.py",
+      "reason": "Legacy cutover dual-write phases; steady-state is FORJD_WRITE_MODE=forjd. Kept for regression; marked quarantine."
+    },
+    {
+      "path": "backend/forjd/test_api.py::test_ingest_rejects_unshipped_learning_and_plaintext_metadata",
+      "reason": "UC-LEARN-001 anti-regression (not a live product path)"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
 import { AreaChart } from '../../components/area-chart/area-chart';
 import { Banner } from '../../components/banner/banner';
@@ -10,6 +10,8 @@ import { PageSection } from '../../components/page-section/page-section';
 import { SectionHeader } from '../../components/section-header/section-header';
 import { StatCard } from '../../components/stat-card/stat-card';
 import { DASH_TILES } from '../../data/dashboard';
+import { LiveUpdatesService } from '../../services/live-updates.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -29,5 +31,8 @@ import { DASH_TILES } from '../../data/dashboard';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard {
+  private readonly live = inject(LiveUpdatesService);
+  private readonly auth = inject(AuthService);
   readonly tiles = DASH_TILES;
+  readonly authenticated = this.auth.isAuthenticated;
 }

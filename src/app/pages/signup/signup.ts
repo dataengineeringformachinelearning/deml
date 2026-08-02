@@ -7,7 +7,7 @@ import { CheckboxField } from '../../components/checkbox-field/checkbox-field';
 import { FormPanel } from '../../components/form-panel/form-panel';
 import { PageSection } from '../../components/page-section/page-section';
 import { TextField } from '../../components/text-field/text-field';
-import { AuthService } from '../../services/auth';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-signup',
@@ -32,8 +32,9 @@ export class Signup {
   readonly passwordError = signal('');
   readonly confirmError = signal('');
   readonly formError = signal('');
+  readonly busy = signal(false);
 
-  submit(event: Event): void {
+  async submit(event: Event): Promise<void> {
     event.preventDefault();
 
     const name = this.name().trim();
@@ -86,7 +87,20 @@ export class Signup {
       return;
     }
 
-    this.auth.login({ id: email.toLowerCase(), name });
-    void this.router.navigateByUrl('/dashboard');
+    this.busy.set(true);
+    try {
+      const result = await this.auth.register({
+        username: name,
+        email: email.toLowerCase(),
+        password,
+      });
+      if (!result.success) {
+        this.formError.set(result.error ?? 'Unable to create account.');
+        return;
+      }
+      await this.router.navigateByUrl('/dashboard');
+    } finally {
+      this.busy.set(false);
+    }
   }
 }

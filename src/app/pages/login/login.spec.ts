@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { vi } from 'vitest';
 
-import { AuthService } from '../../services/auth';
+import { AuthService } from '../../services/auth.service';
 import { Login } from './login';
 
 describe('Login', () => {
@@ -40,7 +40,7 @@ describe('Login', () => {
 
     expect(fixture.componentInstance.emailError()).toContain('email');
     expect(fixture.componentInstance.passwordError()).toContain('password');
-    expect(auth.loggedIn()).toBe(false);
+    expect(auth.isAuthenticated()).toBe(false);
   });
 
   it('should log in and navigate when the form is valid', async () => {
@@ -53,7 +53,7 @@ describe('Login', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(auth.loggedIn()).toBe(true);
+    expect(auth.isAuthenticated()).toBe(true);
     expect(auth.currentUser()?.name).toBe('ada');
     expect(navigateSpy).toHaveBeenCalledWith('/dashboard');
   });

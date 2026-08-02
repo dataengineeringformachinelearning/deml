@@ -1,13 +1,18 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  ViewEncapsulation,
+} from '@angular/core';
 import { LucideMoon, LucideSun } from '@lucide/angular';
 
 import { ThemeService } from '../../services/theme';
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-theme-toggle',
   imports: [LucideMoon, LucideSun],
   templateUrl: './theme-toggle.html',
-  styleUrl: './theme-toggle.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ThemeToggle {

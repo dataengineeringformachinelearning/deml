@@ -1,9 +1,13 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ViewEncapsulation,
+} from '@angular/core';
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-container',
   templateUrl: './container.html',
-  styleUrl: './container.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Container {}

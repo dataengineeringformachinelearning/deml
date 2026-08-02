@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  ViewEncapsulation,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import type { CardVisual } from '../card/card';
@@ -8,10 +14,10 @@ export type MicrocardHeadingLevel = 2 | 3 | 4 | 5 | 6;
 let microcardIdSeq = 0;
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-microcard',
   imports: [RouterLink],
   templateUrl: './microcard.html',
-  styleUrl: './microcard.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-visual]': 'visual()',

@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  ViewEncapsulation,
+} from '@angular/core';
 
 import type { DashAccent, DashSize } from '../dashboard/dashboard.types';
 
@@ -7,9 +13,9 @@ export type ChartCardHeadingLevel = 2 | 3 | 4 | 5 | 6;
 let chartCardIdSeq = 0;
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-chart-card',
   templateUrl: './chart-card.html',
-  styleUrl: './chart-card.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-size]': 'size()',

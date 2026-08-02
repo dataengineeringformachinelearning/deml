@@ -19,6 +19,34 @@ export const serverRoutes: ServerRoute[] = [
     },
   },
   {
+    path: 'status/:slug',
+    renderMode: RenderMode.Server,
+  },
+  {
+    path: 'dashboard',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'analytics',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'vulnerabilities',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'settings',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'account',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'sites',
+    renderMode: RenderMode.Client,
+  },
+  {
     path: '**',
     renderMode: RenderMode.Prerender,
   },

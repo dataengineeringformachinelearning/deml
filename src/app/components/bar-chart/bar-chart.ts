@@ -1,11 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  ViewEncapsulation,
+} from '@angular/core';
 
 import type { DashAccent, DashBarItem } from '../dashboard/dashboard.types';
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   selector: 'app-bar-chart',
   templateUrl: './bar-chart.html',
-  styleUrl: './bar-chart.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-accent]': 'accent()',
