@@ -1,0 +1,41 @@
+<app-banner
+  preheader="DEML"
+  heading="Learn"
+  lede="Packages in the stack. Direct dependencies only — open a card to learn more, then star it on GitHub."
+/>
+
+<div class="learn">
+  <p class="learn-intro">
+    The catalog below lists first-party direct dependencies for backend, optional add-ons,
+    frontend, Rust engine, and infra. Optional groups note the
+    <code>uv sync --group …</code> install path where it applies.
+  </p>
+
+  @for (group of sections; track group.id) {
+    <section
+      class="learn-group"
+      [attr.aria-labelledby]="'learn-' + group.id"
+    >
+      <header class="learn-group-header">
+        <h2 class="learn-group-title" [id]="'learn-' + group.id">{{ group.title }}</h2>
+        <p class="learn-group-summary">{{ group.summary }}</p>
+      </header>
+
+      <ul class="learn-microcards" role="list">
+        @for (topic of group.topics; track topic.slug) {
+          <li class="learn-microcards-item">
+            <app-microcard
+              [heading]="topic.title"
+              [subtext]="topic.excerpt"
+              [meta]="topic.note || group.title"
+              [visual]="topic.visual"
+              [headingId]="'learn-card-' + topic.slug"
+              [routerLink]="['/learn', topic.slug]"
+              cta="Learn"
+            />
+          </li>
+        }
+      </ul>
+    </section>
+  }
+</div>

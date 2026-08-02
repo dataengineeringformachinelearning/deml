@@ -1,13 +1,8 @@
 import type { CardVisual } from '../components/card/card';
+import type { ArticleEntry } from '../shared/article-entry';
 
-export interface BlogPost {
-  slug: string;
-  title: string;
-  excerpt: string;
-  /** Display meta, e.g. "Jul 2026 · Design". */
-  meta: string;
+export interface BlogPost extends ArticleEntry {
   visual: Exclude<CardVisual, 'none'>;
-  body: string[];
 }
 
 export const BLOG_POSTS: BlogPost[] = [

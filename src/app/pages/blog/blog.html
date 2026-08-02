@@ -7,24 +7,18 @@
 <section class="blog-list" aria-labelledby="blog-list-heading">
   <h2 id="blog-list-heading" class="blog-list-heading">Latest</h2>
 
-  <ul class="blog-teasers" role="list">
+  <ul class="blog-microcards" role="list">
     @for (post of posts; track post.slug) {
-      <li class="blog-teasers-item">
-        <app-card
-          layout="teaser"
+      <li class="blog-microcards-item">
+        <app-microcard
           [heading]="post.title"
           [subtext]="post.excerpt"
           [meta]="post.meta"
           [visual]="post.visual"
-          [headingLevel]="3"
           [headingId]="'blog-' + post.slug"
-        >
-          <app-button-group align="start" layout="row">
-            <app-button variant="primary" shape="pill" [routerLink]="['/blog', post.slug]">
-              Read
-            </app-button>
-          </app-button-group>
-        </app-card>
+          [routerLink]="['/blog', post.slug]"
+          cta="Read"
+        />
       </li>
     }
   </ul>

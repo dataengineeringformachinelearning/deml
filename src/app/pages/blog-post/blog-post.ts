@@ -1,16 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
 
-import { Banner } from '../../components/banner/banner';
-import { Button } from '../../components/button/button';
-import { ButtonGroup } from '../../components/button-group/button-group';
+import { Article } from '../../components/article/article';
 import { getBlogPost } from '../../data/blog-posts';
 
 @Component({
   selector: 'app-blog-post',
-  imports: [Banner, Button, ButtonGroup, RouterLink],
+  imports: [Article],
   templateUrl: './blog-post.html',
-  styleUrl: './blog-post.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlogPostPage {

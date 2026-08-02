@@ -1,0 +1,35 @@
+@if (hasEntry()) {
+  <article class="article" [attr.aria-labelledby]="resolvedHeadingId()">
+    <app-banner
+      [preheader]="preheader()"
+      [heading]="title()"
+      [lede]="lede()"
+      [headingId]="resolvedHeadingId()"
+    >
+      <app-button-group>
+        <app-button variant="secondary" shape="pill" [routerLink]="backLink()">
+          {{ backLabel() }}
+        </app-button>
+        <ng-content select="app-button" />
+      </app-button-group>
+    </app-banner>
+
+    <div class="article-body">
+      @for (paragraph of body(); track $index) {
+        <p>{{ paragraph }}</p>
+      }
+    </div>
+  </article>
+} @else {
+  <app-banner
+    [preheader]="preheader()"
+    [heading]="missingHeading()"
+    [lede]="missingLede()"
+  >
+    <app-button-group>
+      <app-button variant="primary" shape="pill" [routerLink]="backLink()">
+        {{ backLabel() }}
+      </app-button>
+    </app-button-group>
+  </app-banner>
+}

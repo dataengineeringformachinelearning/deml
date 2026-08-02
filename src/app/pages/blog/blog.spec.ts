@@ -22,13 +22,14 @@ describe('Blog', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render full-width teaser cards for each post', () => {
+  it('should render microcards for each post', () => {
     const host = fixture.nativeElement as HTMLElement;
-    const teasers = host.querySelectorAll('app-card[data-layout="teaser"]');
+    const cards = host.querySelectorAll('app-microcard');
 
     expect(host.querySelector('h1.banner-heading')?.textContent).toContain('Blog');
-    expect(teasers.length).toBe(BLOG_POSTS.length);
-    expect(host.querySelector('.card-meta')?.textContent).toContain('Jul 2026');
+    expect(cards.length).toBe(BLOG_POSTS.length);
+    expect(host.querySelector('.microcard-meta')?.textContent).toContain('Jul 2026');
     expect(host.textContent).toContain('Build with clarity');
+    expect(host.querySelector('.microcard-cta')?.textContent?.trim()).toBe('Read');
   });
 });

@@ -40,7 +40,7 @@ describe('Navbar', () => {
     const host = fixture.nativeElement as HTMLElement;
     const links = Array.from(host.querySelectorAll('#site-navbar-menu a'));
 
-    expect(links.map((el) => el.textContent?.trim())).toEqual(['Home', 'About', 'Blog']);
+    expect(links.map((el) => el.textContent?.trim())).toEqual(['Home', 'Learn', 'Blog']);
     for (const link of links) {
       expect(link.hasAttribute('aria-label')).toBe(false);
     }
@@ -56,7 +56,7 @@ describe('Navbar', () => {
 
     expect(links.map((el) => el.textContent?.trim())).toEqual([
       'Home',
-      'About',
+      'Learn',
       'Blog',
       'Dashboard',
       'Sites',

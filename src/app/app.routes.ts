@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { getBlogPost } from './data/blog-posts';
+import { getLearnTopic } from './data/packages';
 
 export const routes: Routes = [
   {
@@ -9,9 +10,22 @@ export const routes: Routes = [
     title: 'DEML',
   },
   {
+    path: 'learn',
+    loadComponent: () => import('./pages/learn/learn').then((m) => m.Learn),
+    title: 'Learn · DEML',
+  },
+  {
+    path: 'learn/:slug',
+    loadComponent: () => import('./pages/learn-topic/learn-topic').then((m) => m.LearnTopicPage),
+    title: (route) => {
+      const topic = getLearnTopic(String(route.params['slug'] ?? ''));
+      return topic ? `${topic.title} · Learn · DEML` : 'Topic not found · DEML';
+    },
+  },
+  {
     path: 'about',
-    loadComponent: () => import('./pages/about/about').then((m) => m.About),
-    title: 'About · DEML',
+    redirectTo: 'learn',
+    pathMatch: 'full',
   },
   {
     path: 'blog',

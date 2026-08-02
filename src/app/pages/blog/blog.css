@@ -23,9 +23,9 @@
   color: var(--color-text);
 }
 
-.blog-teasers {
-  display: flex;
-  flex-direction: column;
+.blog-microcards {
+  display: grid;
+  grid-template-columns: 1fr;
   gap: var(--space-2);
   width: 100%;
   margin: 0;
@@ -33,10 +33,11 @@
   list-style: none;
 }
 
-.blog-teasers-item {
+.blog-microcards-item {
   width: 100%;
   margin: 0;
   padding: 0;
+  min-width: 0;
 }
 
 @media screen and (min-width: 800px) {
@@ -49,7 +50,8 @@
     margin-bottom: var(--space-4);
   }
 
-  .blog-teasers {
+  .blog-microcards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     padding: 0 var(--space-4);
     gap: var(--space-3);
   }
@@ -57,8 +59,12 @@
 
 @media screen and (min-width: 1200px) {
   .blog-list-heading,
-  .blog-teasers {
+  .blog-microcards {
     padding-left: var(--space-6);
     padding-right: var(--space-6);
+  }
+
+  .blog-microcards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

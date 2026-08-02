@@ -2,15 +2,18 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { Banner } from '../../components/banner/banner';
 import { Microcard } from '../../components/microcard/microcard';
-import { BLOG_POSTS } from '../../data/blog-posts';
+import { PACKAGE_GROUPS, topicsForGroup } from '../../data/packages';
 
 @Component({
-  selector: 'app-blog',
+  selector: 'app-learn',
   imports: [Banner, Microcard],
-  templateUrl: './blog.html',
-  styleUrl: './blog.css',
+  templateUrl: './learn.html',
+  styleUrl: './learn.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Blog {
-  readonly posts = BLOG_POSTS;
+export class Learn {
+  readonly sections = PACKAGE_GROUPS.map((group) => ({
+    ...group,
+    topics: topicsForGroup(group.id),
+  }));
 }
