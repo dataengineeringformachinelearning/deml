@@ -2,11 +2,12 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { Banner } from '../../components/banner/banner';
 import { Microcard } from '../../components/microcard/microcard';
+import { SectionHeader } from '../../components/section-header/section-header';
 import { PACKAGE_GROUPS, topicsForGroup } from '../../data/packages';
 
 @Component({
   selector: 'app-learn',
-  imports: [Banner, Microcard],
+  imports: [Banner, Microcard, SectionHeader],
   templateUrl: './learn.html',
   styleUrl: './learn.css',
   host: { class: 'page page--catalog' },

@@ -2,6 +2,99 @@
   preheader="DEML"
   heading="Sites"
   lede="Manage the sites connected to your account."
-/>
+>
+  <app-button-group>
+    <app-button variant="primary" shape="pill" routerLink="/dashboard">View metrics</app-button>
+    <app-button variant="secondary" shape="pill" routerLink="/learn">Learn</app-button>
+  </app-button-group>
+</app-banner>
 
-<section class="page-body" aria-label="Sites"></section>
+<section class="page-body page-body--catalog sites" aria-labelledby="sites-heading">
+  <app-section-header
+    eyebrow="Connected"
+    heading="Your sites"
+    lede="Status, traffic, and recent deployments across environments."
+    headingId="sites-heading"
+  />
+
+  <app-dashboard-grid>
+    <app-stat-card
+      size="sm"
+      accent="primary"
+      label="Live sites"
+      value="2"
+      delta="+1"
+      meta="Connected environments"
+    />
+
+    <app-stat-card
+      size="sm"
+      accent="gold"
+      label="Uptime"
+      value="99.8%"
+      delta="+0.2%"
+      meta="Rolling 30 days"
+      [sparkline]="uptimeSpark"
+    />
+
+    <app-stat-card
+      size="sm"
+      accent="red"
+      label="Open previews"
+      value="1"
+      meta="Pull request environments"
+    />
+
+    <app-chart-card
+      size="lg"
+      accent="primary"
+      heading="Traffic by site"
+      meta="Sessions · last 7 days"
+    >
+      <app-bar-chart
+        [items]="traffic"
+        accent="primary"
+        ariaLabel="Sessions by site"
+      />
+    </app-chart-card>
+
+    <app-chart-card
+      size="lg"
+      accent="gold"
+      heading="Recent deployments"
+      meta="Latest releases"
+    >
+      <app-metric-list
+        [items]="deployments"
+        accent="gold"
+        ariaLabel="Recent site deployments"
+      />
+    </app-chart-card>
+  </app-dashboard-grid>
+
+  <app-section-header
+    heading="Environments"
+    lede="Open a site card for presence details."
+    headingId="sites-environments-heading"
+  />
+
+  <app-card-grid>
+    @for (site of sites; track site.id) {
+      <app-card
+        [heading]="site.heading"
+        [subtext]="site.subtext"
+        [meta]="site.meta"
+        [visual]="site.visual"
+      >
+        <app-button-group align="center" layout="row">
+          <app-button variant="primary" shape="pill" routerLink="/dashboard">
+            {{ site.status }}
+          </app-button>
+          <app-button variant="secondary" shape="pill" routerLink="/learn">
+            Docs
+          </app-button>
+        </app-button-group>
+      </app-card>
+    }
+  </app-card-grid>
+</section>

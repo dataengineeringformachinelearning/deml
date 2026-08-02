@@ -1,4 +1,4 @@
-/* Bar chart — dark Spotify-style tracks with accent fills */
+/* Bar chart — dark plot tracks with accent fills */
 
 :host {
   display: flex;
@@ -8,9 +8,9 @@
   min-height: 0;
   flex: 1 1 auto;
   --chart-accent: var(--color-primary);
-  --chart-plot: #121212;
-  --chart-label: #bdbdbd;
-  --chart-value: #ffffff;
+  --chart-plot: var(--color-olive);
+  --chart-label: #c4bfb8;
+  --chart-value: #f2f0ed;
   background-color: transparent;
 }
 
@@ -34,11 +34,12 @@
   gap: var(--space-2);
   box-sizing: border-box;
   width: 100%;
+  height: 100%;
   margin: 0;
   padding: var(--space-3);
   list-style: none;
   background-color: var(--chart-plot);
-  border: var(--border-width) solid color-mix(in srgb, #bdbdbd 18%, #121212);
+  border: var(--border-width) solid color-mix(in srgb, var(--color-text-secondary) 28%, var(--chart-plot));
 }
 
 .bar-chart-row {
@@ -61,7 +62,8 @@
 .bar-chart-label {
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
   line-height: 1.2;
   color: var(--chart-value);
   min-width: 0;
@@ -73,16 +75,16 @@
 .bar-chart-value {
   flex: 0 0 auto;
   font-family: var(--font-sans);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--tracking-intro);
   color: var(--chart-label);
 }
 
 .bar-chart-track {
   width: 100%;
-  height: 6px;
-  background-color: color-mix(in srgb, #bdbdbd 16%, #121212);
+  height: var(--space-1);
+  background-color: color-mix(in srgb, #c4bfb8 16%, var(--chart-plot));
   overflow: hidden;
 }
 
@@ -94,5 +96,10 @@
     var(--chart-accent) 0%,
     color-mix(in srgb, var(--chart-accent) 55%, #ffffff) 100%
   );
-  box-shadow: 0 0 12px color-mix(in srgb, var(--chart-accent) 45%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar-chart-fill {
+    transition: none;
+  }
 }

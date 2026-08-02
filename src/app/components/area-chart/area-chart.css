@@ -1,4 +1,5 @@
-/* Spotify EQ–style area chart: dark plot, glow line, white nodes, soft fill */
+/* Area chart — dark plot, accent line, light nodes, soft fill.
+   Full plots lock aspect ratio so the series is never vertically squashed. */
 
 :host {
   display: flex;
@@ -8,11 +9,14 @@
   min-height: 0;
   flex: 1 1 auto;
   --chart-accent: var(--color-primary);
-  --chart-plot: #121212;
-  --chart-grid: color-mix(in srgb, #bdbdbd 22%, transparent);
-  --chart-baseline: color-mix(in srgb, #bdbdbd 35%, transparent);
-  --chart-label: #bdbdbd;
-  --chart-node: #ffffff;
+  --chart-plot: var(--color-olive);
+  --chart-grid: color-mix(in srgb, var(--color-text-secondary) 22%, transparent);
+  --chart-baseline: color-mix(in srgb, var(--color-text-secondary) 35%, transparent);
+  --chart-label: #c4bfb8;
+  --chart-node: #f2f0ed;
+  /* Matches VIEW_W / VIEW_H in area-chart.ts (360 / 200) */
+  --chart-aspect: 1.8;
+  --chart-min-block: var(--space-28);
   background-color: transparent;
 }
 
@@ -32,20 +36,28 @@
   display: flex;
   flex: 1 1 auto;
   align-items: stretch;
+  justify-content: center;
   box-sizing: border-box;
   width: 100%;
-  min-height: var(--space-16);
   margin: 0;
   padding: var(--space-2);
   background-color: var(--chart-plot);
-  border: var(--border-width) solid color-mix(in srgb, #bdbdbd 18%, #121212);
+  border: var(--border-width) solid color-mix(in srgb, var(--color-text-secondary) 22%, var(--chart-plot));
+}
+
+/* Full plot: width-driven height from aspect-ratio — never shorter than min-block */
+:host(:not([data-variant='spark'])) .area-chart-frame {
+  aspect-ratio: var(--chart-aspect);
+  height: auto;
+  min-height: var(--chart-min-block);
+  max-height: none;
 }
 
 .area-chart {
   display: block;
   width: 100%;
   height: 100%;
-  min-height: var(--space-14);
+  min-height: 0;
   overflow: visible;
 }
 
@@ -107,8 +119,10 @@
   font-size: 8px;
 }
 
-/* Compact sparkline — no frame chrome / axes */
+/* Compact sparkline — may fill its slot; still has a floor height */
 :host([data-variant='spark']) .area-chart-frame {
+  aspect-ratio: auto;
+  height: 100%;
   min-height: var(--space-10);
   padding: 0;
   border: 0;
@@ -134,4 +148,16 @@
 :host([data-variant='spark']) .area-chart-node {
   fill: var(--chart-accent);
   stroke: var(--color-card);
+}
+
+@media screen and (min-width: 800px) {
+  :host(:not([data-variant='spark'])) {
+    --chart-min-block: var(--space-36);
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  :host(:not([data-variant='spark'])) {
+    --chart-min-block: var(--space-40);
+  }
 }

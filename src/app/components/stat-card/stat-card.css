@@ -1,4 +1,4 @@
-/* Stat card — Spotify-like KPI tile on planter surface */
+/* Stat card — KPI tile that fills its grid cell */
 
 :host {
   display: block;
@@ -27,7 +27,7 @@
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  min-height: var(--space-16);
+  min-height: 100%;
   margin: 0;
   padding: var(--space-3);
   overflow: hidden;
@@ -54,9 +54,9 @@
 .stat-card-label {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-eyebrow);
   line-height: 1.2;
   text-transform: uppercase;
   color: var(--stat-accent);
@@ -68,12 +68,17 @@
   gap: calc(var(--grid) / 2);
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--tracking-intro);
   line-height: 1;
   color: var(--color-card-text-secondary);
   white-space: nowrap;
+}
+
+/* Nested spans must keep card/trend color (not page --color-text) */
+.stat-card-delta span {
+  color: inherit;
 }
 
 :host([data-trend='up']) .stat-card-delta {
@@ -89,7 +94,7 @@
   font-family: var(--font-sans);
   font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 700;
-  letter-spacing: -0.04em;
+  letter-spacing: var(--tracking-display);
   line-height: 0.95;
   color: var(--color-card-text);
 }

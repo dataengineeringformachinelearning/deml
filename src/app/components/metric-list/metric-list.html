@@ -1,4 +1,4 @@
-<ol class="metric-list" [attr.aria-label]="ariaLabel()">
+<ol class="metric-list" role="list" [attr.aria-label]="ariaLabel()">
   @for (item of items(); track item.label; let i = $index) {
     <li class="metric-list-item">
       <span class="metric-list-rank" aria-hidden="true">{{ i + 1 }}</span>

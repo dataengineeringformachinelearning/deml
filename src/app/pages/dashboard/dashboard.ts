@@ -6,6 +6,7 @@ import { BarChart } from '../../components/bar-chart/bar-chart';
 import { ChartCard } from '../../components/chart-card/chart-card';
 import { DashboardGrid } from '../../components/dashboard-grid/dashboard-grid';
 import { MetricList } from '../../components/metric-list/metric-list';
+import { SectionHeader } from '../../components/section-header/section-header';
 import { StatCard } from '../../components/stat-card/stat-card';
 import {
   DASH_DEVICE_MIX,
@@ -21,6 +22,7 @@ import {
   selector: 'app-dashboard',
   imports: [
     Banner,
+    SectionHeader,
     DashboardGrid,
     StatCard,
     ChartCard,

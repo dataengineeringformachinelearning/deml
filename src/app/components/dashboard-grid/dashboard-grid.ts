@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 /**
- * Bento-style grid for dashboard cards.
+ * Equal-cell dashboard grid.
  * Children set `data-size` (sm | md | lg | wide | tall | hero) on their host.
  */
 @Component({

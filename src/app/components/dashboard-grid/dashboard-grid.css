@@ -1,62 +1,98 @@
-/* Bento grid — Spotify-like varying card spans; mobile stacks full-width */
+/* Dashboard grid — fixed row rhythm on the 8px scale; dense pack, no leftover gaps */
 
 :host {
+  --dash-gap: var(--space-2);
+  --dash-row: var(--space-18);
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-2);
+  /* Floor on the 8px rhythm; rows may grow so plots are never clipped short */
+  grid-auto-rows: minmax(var(--dash-row), auto);
+  grid-auto-flow: dense;
+  gap: var(--dash-gap);
+  align-items: stretch;
   width: 100%;
   margin: 0;
   padding: 0;
   background-color: transparent;
 }
 
-/* Projected card hosts carry data-size */
+/* Every tile fills its cell completely */
 :host ::ng-deep > [data-size] {
   min-width: 0;
   min-height: 0;
+  width: 100%;
   height: 100%;
+  align-self: stretch;
+}
+
+:host ::ng-deep > [data-size='sm'],
+:host ::ng-deep > [data-size='md'] {
+  grid-column: 1 / -1;
+  grid-row: span 2;
+}
+
+:host ::ng-deep > [data-size='lg'],
+:host ::ng-deep > [data-size='wide'],
+:host ::ng-deep > [data-size='tall'],
+:host ::ng-deep > [data-size='hero'] {
+  grid-column: 1 / -1;
+  grid-row: span 3;
 }
 
 @media screen and (min-width: 800px) {
   :host {
+    --dash-gap: var(--space-3);
+    --dash-row: var(--space-16);
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    grid-auto-rows: minmax(9.5rem, auto);
-    gap: var(--space-3);
+    grid-auto-rows: minmax(var(--dash-row), auto);
   }
 
   :host ::ng-deep > [data-size='sm'] {
     grid-column: span 2;
-    grid-row: span 1;
+    grid-row: span 2;
   }
 
   :host ::ng-deep > [data-size='md'] {
     grid-column: span 3;
-    grid-row: span 1;
+    grid-row: span 2;
   }
 
   :host ::ng-deep > [data-size='lg'] {
     grid-column: span 3;
-    grid-row: span 2;
+    grid-row: span 3;
   }
 
   :host ::ng-deep > [data-size='wide'] {
     grid-column: span 4;
-    grid-row: span 1;
+    grid-row: span 3;
   }
 
   :host ::ng-deep > [data-size='tall'] {
     grid-column: span 2;
-    grid-row: span 2;
+    grid-row: span 3;
   }
 
+  /* Full-bleed series need extra rows so plots keep readable height */
   :host ::ng-deep > [data-size='hero'] {
     grid-column: span 6;
-    grid-row: span 2;
+    grid-row: span 4;
   }
 }
 
 @media screen and (min-width: 1200px) {
   :host {
-    grid-auto-rows: minmax(10.5rem, auto);
+    --dash-row: var(--space-18);
+  }
+
+  :host ::ng-deep > [data-size='wide'] {
+    grid-row: span 4;
+  }
+
+  :host ::ng-deep > [data-size='tall'] {
+    grid-row: span 4;
+  }
+
+  :host ::ng-deep > [data-size='hero'] {
+    grid-row: span 5;
   }
 }

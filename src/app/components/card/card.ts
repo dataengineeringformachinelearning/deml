@@ -35,7 +35,7 @@ export class Card {
   /** Accessible id for the heading. */
   readonly headingId = input<string>();
 
-  /** Optional crest-toned media wash when no projected media is used. */
+  /** Optional accent media wash when no projected media is used. */
   readonly visual = input<CardVisual>('none');
 
   /** Layout variant. */

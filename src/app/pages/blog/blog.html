@@ -5,7 +5,11 @@
 />
 
 <section class="page-body page-body--catalog blog-list" aria-labelledby="blog-list-heading">
-  <h2 id="blog-list-heading" class="blog-list-heading">Latest</h2>
+  <app-section-header
+    heading="Latest"
+    lede="Essays and notes, newest first."
+    headingId="blog-list-heading"
+  />
 
   <ul class="blog-microcards" role="list">
     @for (post of posts; track post.slug) {

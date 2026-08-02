@@ -35,11 +35,16 @@ describe('AreaChart', () => {
     await fixture.whenStable();
   });
 
-  it('should render an accessible Spotify-style svg chart', () => {
+  it('should render an accessible svg chart with a data table', () => {
     const chart = (fixture.nativeElement as HTMLElement).querySelector('app-area-chart');
-    expect(chart?.getAttribute('role')).toBe('img');
-    expect(chart?.getAttribute('aria-label')).toBe('Weekly sessions');
+    const svg = chart?.querySelector('svg.area-chart');
     expect(chart?.getAttribute('data-accent')).toBe('gold');
+    expect(chart?.querySelector('table.visually-hidden caption')?.textContent?.trim()).toBe(
+      'Weekly sessions',
+    );
+    expect(chart?.querySelectorAll('table.visually-hidden tbody tr').length).toBe(3);
+    expect(svg?.getAttribute('preserveAspectRatio')).toBe('xMidYMid meet');
+    expect(svg?.getAttribute('viewBox')).toBe('0 0 360 200');
     expect(chart?.querySelector('path.area-chart-line')).toBeTruthy();
     expect(chart?.querySelector('path.area-chart-fill')).toBeTruthy();
     expect(chart?.querySelectorAll('circle.area-chart-node').length).toBe(3);
@@ -47,3 +52,5 @@ describe('AreaChart', () => {
     expect(chart?.querySelector('line.area-chart-baseline')).toBeTruthy();
   });
 });
+
+

@@ -1,4 +1,4 @@
-/* Chart card — titled planter shell for projected charts / lists */
+/* Chart card — titled shell for projected charts / lists */
 
 :host {
   display: block;
@@ -27,10 +27,10 @@
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  min-height: var(--space-22);
+  min-height: 100%;
   margin: 0;
   padding: var(--space-3);
-  overflow: hidden;
+  overflow: clip;
   color: var(--color-card-text);
   background-color: var(--color-card);
   background-image: linear-gradient(
@@ -56,7 +56,7 @@
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--tracking-tight);
   line-height: 1.2;
   color: var(--color-card-text);
 }
@@ -64,9 +64,9 @@
 .chart-card-meta {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
   color: var(--chart-accent);
 }
@@ -75,24 +75,58 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  min-height: 0;
+  justify-content: stretch;
+  min-height: var(--space-28);
   width: 100%;
 }
 
-/* Let Spotify-style plot frames fill the card body */
 .chart-card-body > :first-child {
   flex: 1 1 auto;
-  min-height: 0;
+  width: 100%;
+  min-height: var(--space-28);
 }
 
 :host([data-size='hero']) .chart-card-heading,
-:host([data-size='lg']) .chart-card-heading {
+:host([data-size='lg']) .chart-card-heading,
+:host([data-size='wide']) .chart-card-heading {
   font-size: clamp(1.25rem, 2.5vw, var(--font-size-md));
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-display);
+}
+
+:host([data-size='hero']) .chart-card-body,
+:host([data-size='wide']) .chart-card-body {
+  min-height: var(--space-36);
+}
+
+:host([data-size='hero']) .chart-card-body > :first-child,
+:host([data-size='wide']) .chart-card-body > :first-child {
+  min-height: var(--space-36);
 }
 
 @media screen and (min-width: 800px) {
   .chart-card {
     padding: var(--space-4);
+  }
+
+  :host([data-size='hero']) .chart-card-body,
+  :host([data-size='wide']) .chart-card-body {
+    min-height: var(--space-40);
+  }
+
+  :host([data-size='hero']) .chart-card-body > :first-child,
+  :host([data-size='wide']) .chart-card-body > :first-child {
+    min-height: var(--space-40);
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  :host([data-size='hero']) .chart-card-body,
+  :host([data-size='wide']) .chart-card-body {
+    min-height: var(--space-45);
+  }
+
+  :host([data-size='hero']) .chart-card-body > :first-child,
+  :host([data-size='wide']) .chart-card-body > :first-child {
+    min-height: var(--space-45);
   }
 }

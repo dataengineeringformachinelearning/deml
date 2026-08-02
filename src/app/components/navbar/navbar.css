@@ -13,8 +13,9 @@
   --navbar-bg: var(--color-surface);
   --navbar-fg: var(--color-text);
   --navbar-muted: var(--color-text-secondary);
-  --navbar-accent: var(--color-primary);
-  --navbar-accent-hover: var(--color-primary-hover);
+  /* On-surface text accents must meet AA (fill primary alone fails on dark surface) */
+  --navbar-accent: var(--color-highlight);
+  --navbar-accent-hover: var(--color-highlight-hover);
   --navbar-surface: var(--color-surface);
   --navbar-focus: var(--color-focus);
   --navbar-bar-height: calc(var(--navbar-inset) * 2 + var(--navbar-hit));
@@ -76,8 +77,8 @@
 }
 
 .site-navbar-icon:hover {
-  color: var(--navbar-icon-color-hover, var(--color-primary-hover));
-  background-color: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--navbar-icon-color-hover, var(--navbar-accent-hover));
+  background-color: color-mix(in srgb, var(--navbar-accent) 12%, transparent);
   transform: scale(1.06);
 }
 
@@ -153,14 +154,14 @@
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: 700;
-  letter-spacing: 0.01em;
+  letter-spacing: var(--tracking-intro);
   line-height: 1.2;
   text-transform: none;
   text-decoration: none;
   white-space: nowrap;
   color: var(--navbar-muted);
   padding: var(--space-1) var(--space-2);
-  border-radius: 9999px;
+  border-radius: var(--radius-pill);
   background-color: transparent;
   transition: color 120ms ease, background-color 120ms ease;
 }

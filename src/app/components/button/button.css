@@ -1,4 +1,4 @@
-/* Buttons — Car Blue primary, outline secondary, Taillight Red accent */
+/* Buttons — primary fill, outline secondary, accent fill */
 
 :host {
   display: contents;
@@ -22,7 +22,8 @@
   border-radius: 0;
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
-  font-weight: 300;
+  font-weight: 700;
+  letter-spacing: var(--tracking-intro);
   line-height: 1;
   text-decoration: none;
   appearance: none;
@@ -61,7 +62,7 @@
   border-color: var(--color-border);
 }
 
-/* Car Blue fill — main CTA */
+/* Primary fill — main CTA */
 .button--primary {
   color: var(--color-on-primary);
   background-color: var(--color-primary);
@@ -87,7 +88,7 @@
   box-shadow: var(--shadow-md);
 }
 
-/* Outline — secondary action; gold accent on hover */
+/* Outline — secondary action */
 .button--secondary {
   color: var(--color-text);
   background-color: var(--color-surface);
@@ -102,7 +103,7 @@
   box-shadow: none;
 }
 
-/* Crest red fill — high-energy / destructive accent */
+/* Accent fill — high-energy / destructive */
 .button--accent {
   color: var(--color-on-accent);
   background-color: var(--color-accent-red);
@@ -134,11 +135,11 @@
   max-width: none;
   min-height: var(--hit-target);
   padding: var(--space-1) var(--space-4);
-  border-radius: 9999px;
+  border-radius: var(--radius-pill);
   border-width: 0;
   font-size: var(--font-size-sm);
   font-weight: 700;
-  letter-spacing: 0.01em;
+  letter-spacing: var(--tracking-intro);
   white-space: nowrap;
   box-shadow: none;
 }

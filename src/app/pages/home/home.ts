@@ -5,11 +5,12 @@ import { Button } from '../../components/button/button';
 import { ButtonGroup } from '../../components/button-group/button-group';
 import { Card } from '../../components/card/card';
 import { CardGrid } from '../../components/card-grid/card-grid';
+import { SectionHeader } from '../../components/section-header/section-header';
 import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-home',
-  imports: [Banner, Button, ButtonGroup, Card, CardGrid],
+  imports: [Banner, Button, ButtonGroup, Card, CardGrid, SectionHeader],
   templateUrl: './home.html',
   styleUrl: './home.css',
   host: { class: 'page' },

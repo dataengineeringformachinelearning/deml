@@ -1,19 +1,3 @@
-.learn-intro {
-  width: 100%;
-  max-width: var(--reading-width);
-  margin: 0 0 var(--space-6);
-  padding: 0;
-  font-size: var(--font-size-sm);
-  font-weight: 400;
-  line-height: 1.55;
-  color: var(--color-text-secondary);
-}
-
-.learn-intro code {
-  font-size: var(--font-size-sm);
-  color: var(--color-highlight);
-}
-
 .learn-group {
   box-sizing: border-box;
   width: 100%;
@@ -42,7 +26,7 @@
   margin: 0 0 var(--space-2);
   font-size: clamp(1.5rem, 3vw, var(--font-size-lg));
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-display);
   line-height: 1.15;
   color: var(--color-card-text);
 }
@@ -50,15 +34,16 @@
 .learn-group-summary {
   margin: 0;
   max-width: var(--reading-width);
-  font-size: var(--font-size-sm);
-  line-height: 1.45;
   color: var(--color-card-text-secondary);
 }
 
 .learn-microcards {
   display: grid;
   grid-template-columns: 1fr;
+  grid-auto-rows: minmax(var(--space-22), auto);
+  grid-auto-flow: dense;
   gap: var(--space-2);
+  align-items: stretch;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -70,7 +55,12 @@
   margin: 0;
   padding: 0;
   min-width: 0;
+  height: 100%;
   background-color: transparent;
+}
+
+.learn-microcards-item > * {
+  height: 100%;
 }
 
 @media screen and (min-width: 800px) {
@@ -82,6 +72,7 @@
   .learn-microcards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-3);
+    grid-auto-rows: minmax(var(--space-22), 1fr);
   }
 }
 

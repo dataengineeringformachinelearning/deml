@@ -5,8 +5,10 @@
       <p class="stat-card-delta">
         @if (trend() === 'up') {
           <svg lucideTrendingUp [size]="16" aria-hidden="true" focusable="false"></svg>
+          <span class="visually-hidden">Increase </span>
         } @else if (trend() === 'down') {
           <svg lucideTrendingDown [size]="16" aria-hidden="true" focusable="false"></svg>
+          <span class="visually-hidden">Decrease </span>
         }
         <span>{{ d }}</span>
       </p>

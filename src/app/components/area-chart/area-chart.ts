@@ -2,8 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 
 import type { DashAccent, DashPoint } from '../dashboard/dashboard.types';
 
+/** Intrinsic plot box — CSS aspect-ratio and SVG meet must match these. */
 const VIEW_W = 360;
-const VIEW_H = 160;
+const VIEW_H = 200;
 const PAD_L = 36;
 const PAD_R = 12;
 const PAD_T = 16;
@@ -21,8 +22,6 @@ export type AreaChartVariant = 'full' | 'spark';
   host: {
     '[attr.data-accent]': 'accent()',
     '[attr.data-variant]': 'variant()',
-    role: 'img',
-    '[attr.aria-label]': 'ariaLabel()',
   },
 })
 export class AreaChart {
@@ -34,13 +33,18 @@ export class AreaChart {
 
   readonly accent = input<DashAccent>('primary');
 
-  /** `full` = Spotify EQ panel; `spark` = compact sparkline. */
+  /** `full` = labelled plot; `spark` = compact sparkline. */
   readonly variant = input<AreaChartVariant>('full');
 
   readonly ariaLabel = input('Area chart');
 
   readonly viewBox = `0 0 ${VIEW_W} ${VIEW_H}`;
   readonly viewRight = VIEW_W - PAD_R;
+
+  /** Full plots keep proportions; sparks may fill their slot. */
+  readonly preserveAspectRatio = computed(() =>
+    this.variant() === 'spark' ? 'none' : 'xMidYMid meet',
+  );
 
   readonly plot = computed(() => {
     const pts = this.points();

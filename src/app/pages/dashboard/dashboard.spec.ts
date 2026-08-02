@@ -21,7 +21,7 @@ describe('Dashboard', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render banner and bento grid with stats and charts', () => {
+  it('should render banner and grid with stats and charts', () => {
     const host = fixture.nativeElement as HTMLElement;
     expect(host.querySelector('app-banner')).toBeTruthy();
     expect(host.querySelector('h1.banner-heading')?.textContent).toContain('Dashboard');

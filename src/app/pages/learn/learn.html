@@ -5,11 +5,11 @@
 />
 
 <div class="page-body page-body--catalog learn">
-  <p class="learn-intro">
-    The catalog below lists first-party direct dependencies for backend, optional add-ons,
-    frontend, Rust engine, and infra. Optional groups note the
-    <code>uv sync --group …</code> install path where it applies.
-  </p>
+  <app-section-header
+    heading="Catalog"
+    lede="First-party direct dependencies for backend, optional add-ons, frontend, Rust engine, and infra. Optional groups note the uv sync --group … install path where it applies."
+    headingId="learn-catalog-heading"
+  />
 
   @for (group of sections; track group.id) {
     <section
@@ -18,7 +18,7 @@
     >
       <header class="learn-group-header">
         <h2 class="learn-group-title" [id]="'learn-' + group.id">{{ group.title }}</h2>
-        <p class="learn-group-summary">{{ group.summary }}</p>
+        <p class="learn-group-summary type-intro">{{ group.summary }}</p>
       </header>
 
       <ul class="learn-microcards" role="list">

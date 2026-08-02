@@ -27,7 +27,6 @@
   padding: var(--space-6) var(--space-2);
   color: var(--color-text);
   background-color: var(--color-bg);
-  /* Blue-hour wash over charcoal / pavement, with taillight + palm accents */
   background-image:
     radial-gradient(
       110% 85% at 50% 120%,
@@ -58,18 +57,24 @@
 
 .banner .preheader {
   margin: 0 0 var(--space-3);
-  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  letter-spacing: var(--tracking-eyebrow);
+  color: var(--color-highlight);
 }
 
 .banner .banner-heading {
   max-width: 16ch;
   margin-bottom: var(--space-3);
+  font-weight: 700;
+  letter-spacing: var(--tracking-display);
   color: var(--color-text);
 }
 
 .banner .lede {
-  max-width: 36ch;
+  max-width: 40ch;
   margin: 0 0 var(--space-5);
+  letter-spacing: var(--tracking-intro);
   color: var(--color-text-secondary);
 }
 

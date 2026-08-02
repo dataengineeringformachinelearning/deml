@@ -1,0 +1,9 @@
+.sites app-section-header:not(:first-child) {
+  margin-top: var(--space-6);
+}
+
+@media screen and (min-width: 800px) {
+  .sites app-section-header:not(:first-child) {
+    margin-top: var(--space-8);
+  }
+}
