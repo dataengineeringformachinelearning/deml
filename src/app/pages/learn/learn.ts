@@ -9,6 +9,7 @@ import { PACKAGE_GROUPS, topicsForGroup } from '../../data/packages';
   imports: [Banner, Microcard],
   templateUrl: './learn.html',
   styleUrl: './learn.css',
+  host: { class: 'page page--catalog' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Learn {

@@ -1,45 +1,54 @@
-/* 8px grid + WCAG 2.1 AA / 508 crest palette (Porsche gold + red on olive-black) */
+/* 8px grid + WCAG 2.1 AA / 508 palette from GT3 RS photo
+   Car Blue, Building Charcoal, Pavement Gray, Wheel Black, Planter White,
+   Palm Green, Taillight Red */
 
 :root {
   color-scheme: dark;
 
-  /* Core – crest gold primary, crest red accent, olive-black foundation */
-  --color-bg: #0f110f;
-  --color-surface: #1a1d1a;
-  --color-olive: #2a322a;
-  --color-primary: #c5a653;
-  --color-primary-hover: #d4b563;
-  --color-accent: #d5001c;
-  --color-accent-hover: #f01a33;
+  /* Core – extracted from the GT3 RS image */
+  --color-bg: #121212; /* Wheel/Frame Black */
+  --color-surface: #3d3d3d; /* Building Charcoal */
+  --color-primary: #0066b2; /* Car Blue — filled buttons/links with white text */
+  --color-primary-hover: color-mix(in srgb, #0066b2 78%, #ffffff);
+  --color-accent-gold: #3c7a4a; /* Palm Green — decorative accents, badges */
+  --color-accent-gold-hover: color-mix(in srgb, #3c7a4a 78%, #ffffff);
+  --color-accent-red: #c41e3a; /* Taillight Red — CTAs, alerts */
+  --color-accent-red-hover: color-mix(in srgb, #c41e3a 78%, #ffffff);
 
   /* Text */
-  --color-text: #f5f5f0;
-  --color-text-secondary: #b8b8b0;
+  --color-text: #ffffff; /* Planter White */
+  --color-text-secondary: #bdbdbd; /* Pavement Gray */
 
   /* UI */
-  --color-border: #2e322e;
-  --color-focus: #e8f4ff;
-  --color-error: #d5001c;
-  --color-success: #5a9e6a;
+  --color-border: color-mix(in srgb, #bdbdbd 45%, #3d3d3d); /* Pavement on Charcoal */
+  --color-focus: #ffffff;
+  --color-error: #c41e3a;
+  --color-success: #3c7a4a;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
-  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.55);
+  /* Shadows (8px-grid friendly depth) */
+  --shadow-sm: 0 0 0 1px color-mix(in srgb, var(--color-border) 80%, transparent);
+  --shadow-md: 0 8px 16px color-mix(in srgb, #121212 50%, transparent);
 
   /* Aliases used across the codebase */
   --color-background: var(--color-bg);
   --color-text-primary: var(--color-text);
-  --color-accent-strong: var(--color-accent-hover);
+  --color-accent: var(--color-accent-red);
+  --color-accent-hover: var(--color-accent-red-hover);
+  --color-accent-strong: var(--color-accent-red-hover);
   --color-dark: var(--color-bg);
   --color-sky-soft: var(--color-surface);
-  /* Dark on gold; light on red (never small red body text on dark bg) */
-  --color-on-primary: #0f110f;
-  --color-on-accent: #f5f5f0;
+  --color-olive: #3d3d3d; /* Building Charcoal wash for decorative visuals */
+  /* Pavement Gray on Wheel Black (9.97:1) — AA text accents on dark */
+  --color-highlight: #bdbdbd;
+  --color-highlight-hover: #ffffff;
+  /* White on Car Blue (5.93:1); White on Taillight Red (5.84:1) */
+  --color-on-primary: #ffffff;
+  --color-on-accent: #ffffff;
   --color-on-dark: var(--color-text);
   --color-text-muted: var(--color-text-secondary);
   --color-selection: color-mix(in srgb, var(--color-primary) 28%, transparent);
-  --shadow-color: rgba(0, 0, 0, 0.55);
-  --shadow-color-soft: rgba(0, 0, 0, 0.45);
+  --shadow-color: color-mix(in srgb, #121212 50%, transparent);
+  --shadow-color-soft: color-mix(in srgb, #121212 40%, transparent);
 
   --grid: 8px;
   --space-1: calc(var(--grid) * 1); /* 8 */
@@ -54,6 +63,8 @@
   --space-10: calc(var(--grid) * 10); /* 80 */
   --space-12: calc(var(--grid) * 12); /* 96 */
   --space-16: calc(var(--grid) * 16); /* 128 */
+  --space-22: calc(var(--grid) * 22); /* 176 */
+  --space-26: calc(var(--grid) * 26); /* 208 */
   --space-28: calc(var(--grid) * 28); /* 224 */
   --space-36: calc(var(--grid) * 36); /* 288 */
   --space-40: calc(var(--grid) * 40); /* 320 */
@@ -63,6 +74,14 @@
   --space-80: calc(var(--grid) * 80); /* 640 */
   --space-90: calc(var(--grid) * 90); /* 720 */
   --space-160: calc(var(--grid) * 160); /* 1280 */
+
+  /* Interactive / chrome sizes on the 8px grid (48px meets WCAG target size) */
+  --hit-target: var(--space-6);
+  --icon-size: var(--space-4);
+  --icon-size-sm: var(--space-3);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --border-width: 1px;
 
   --font-size-sm: var(--space-2); /* 16 */
   --font-size-md: var(--space-3); /* 24 */
@@ -75,6 +94,8 @@
   --content-width-md: 800px;
   --content-width-lg: 1200px;
   --content-width-xl: 1400px;
+  /* ~65 characters — comfortable measure; under WCAG 1.4.8’s 80-character guidance */
+  --reading-width: 65ch;
   --gap: var(--space-2);
 
   /* Layout breakpoint token (keep in sync with BREAKPOINT_MD_PX / CSS media queries) */
@@ -84,54 +105,64 @@
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --color-bg: #0f110f;
-  --color-surface: #1a1d1a;
-  --color-olive: #2a322a;
-  --color-primary: #c5a653;
-  --color-primary-hover: #d4b563;
-  --color-accent: #d5001c;
-  --color-accent-hover: #f01a33;
-  --color-text: #f5f5f0;
-  --color-text-secondary: #b8b8b0;
-  --color-border: #2e322e;
-  --color-focus: #e8f4ff;
-  --color-error: #d5001c;
-  --color-success: #5a9e6a;
-  --color-on-primary: #0f110f;
-  --color-on-accent: #f5f5f0;
+  --color-bg: #121212;
+  --color-surface: #3d3d3d;
+  --color-primary: #0066b2;
+  --color-primary-hover: color-mix(in srgb, #0066b2 78%, #ffffff);
+  --color-accent-gold: #3c7a4a;
+  --color-accent-gold-hover: color-mix(in srgb, #3c7a4a 78%, #ffffff);
+  --color-accent-red: #c41e3a;
+  --color-accent-red-hover: color-mix(in srgb, #c41e3a 78%, #ffffff);
+  --color-accent: var(--color-accent-red);
+  --color-accent-hover: var(--color-accent-red-hover);
+  --color-text: #ffffff;
+  --color-text-secondary: #bdbdbd;
+  --color-border: color-mix(in srgb, #bdbdbd 45%, #3d3d3d);
+  --color-focus: #ffffff;
+  --color-error: #c41e3a;
+  --color-success: #3c7a4a;
+  --color-olive: #3d3d3d;
+  --color-highlight: #bdbdbd;
+  --color-highlight-hover: #ffffff;
+  --color-on-primary: #ffffff;
+  --color-on-accent: #ffffff;
   --color-selection: color-mix(in srgb, var(--color-primary) 28%, transparent);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
-  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.55);
-  --shadow-color: rgba(0, 0, 0, 0.55);
-  --shadow-color-soft: rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 0 0 1px color-mix(in srgb, var(--color-border) 80%, transparent);
+  --shadow-md: 0 8px 16px color-mix(in srgb, #121212 50%, transparent);
+  --shadow-color: color-mix(in srgb, #121212 50%, transparent);
+  --shadow-color-soft: color-mix(in srgb, #121212 40%, transparent);
 }
 
 [data-theme="light"] {
   color-scheme: light;
 
-  --color-bg: #f5f5f0;
-  --color-surface: #ffffff;
-  --color-olive: #e8ebe6;
-  /* Darker gold for AA link/text contrast on light surfaces */
-  --color-primary: #8b7320;
-  /* Keep hover ≥ AA on light surfaces */
-  --color-primary-hover: #6f5c19;
-  --color-accent: #d5001c;
-  --color-accent-hover: #a80016;
-  --color-text: #0f110f;
-  --color-text-secondary: #4a4a45;
-  --color-border: #d0d4d0;
-  --color-focus: #0f110f;
-  --color-error: #d5001c;
-  --color-success: #3a7e4a;
-  /* Dark on gold fills; light on red fills (same crest pairing as dark) */
-  --color-on-primary: #0f110f;
-  --color-on-accent: #f5f5f0;
-  --color-selection: color-mix(in srgb, var(--color-primary) 22%, transparent);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
-  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.16);
-  --shadow-color: rgba(0, 0, 0, 0.16);
-  --shadow-color-soft: rgba(0, 0, 0, 0.1);
+  /* Pavement Gray + Planter White with Car Blue + Palm Green / Taillight Red */
+  --color-bg: #bdbdbd; /* Pavement Gray */
+  --color-surface: #ffffff; /* Planter White */
+  --color-primary: #0066b2; /* Car Blue */
+  --color-primary-hover: color-mix(in srgb, #0066b2 78%, #121212);
+  --color-accent-gold: #3c7a4a; /* Palm Green — AA on white (5.15:1) */
+  --color-accent-gold-hover: color-mix(in srgb, #3c7a4a 78%, #121212);
+  --color-accent-red: #c41e3a; /* Taillight Red — AA on white (5.84:1) */
+  --color-accent-red-hover: color-mix(in srgb, #c41e3a 78%, #121212);
+  --color-accent: var(--color-accent-red);
+  --color-accent-hover: var(--color-accent-red-hover);
+  --color-text: #121212; /* Wheel/Frame Black */
+  --color-text-secondary: #3d3d3d; /* Building Charcoal */
+  --color-border: color-mix(in srgb, #3d3d3d 35%, #bdbdbd);
+  --color-focus: #0066b2;
+  --color-error: #c41e3a;
+  --color-success: #3c7a4a;
+  --color-olive: #bdbdbd;
+  --color-highlight: #3c7a4a;
+  --color-highlight-hover: color-mix(in srgb, #3c7a4a 78%, #121212);
+  --color-on-primary: #ffffff;
+  --color-on-accent: #ffffff;
+  --color-selection: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  --shadow-sm: 0 0 0 1px color-mix(in srgb, var(--color-border) 90%, transparent);
+  --shadow-md: 0 8px 16px color-mix(in srgb, #121212 14%, transparent);
+  --shadow-color: color-mix(in srgb, #121212 14%, transparent);
+  --shadow-color-soft: color-mix(in srgb, #121212 8%, transparent);
 }
 
 /* Structure */
@@ -150,13 +181,21 @@ html {
   font-style: normal;
   font-size: 16px;
   line-height: 1;
+  min-height: 100%;
+  background-color: var(--color-bg);
+  /* Reserve scrollbar space so routes with/without overflow do not shift */
+  overflow-y: auto;
+  scrollbar-gutter: stable;
 }
 
 body {
   height: auto;
   width: 100%;
+  min-height: 100dvh;
   margin: 0;
   padding: 0;
+  background-color: var(--color-bg);
+  overflow-x: clip;
 }
 
 html,
@@ -169,8 +208,6 @@ body {
   -khtml-appearance: none;
   appearance: none;
   color: var(--color-text-primary);
-  background-color: var(--color-background);
-  overflow-x: hidden;
   font-family: var(--font-sans);
 }
 
@@ -192,8 +229,8 @@ body {
 
 .skip-link:focus,
 .skip-link:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
   transform: translateY(0);
 }
 
@@ -203,8 +240,80 @@ main {
   padding: 0;
   margin: 0;
   height: auto;
+  min-height: 0;
   width: 100%;
   max-width: none;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+/*
+ * Shared routed-page shell.
+ * Every page host uses class "page": banner + .page-body (flex-fill).
+ */
+.page {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 auto;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+.page-body {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  /* Mobile: full-width content with page gutters */
+  padding: var(--space-4) var(--space-2) var(--space-8);
+  flex: 1 1 auto;
+  min-height: 0;
+  background-color: var(--color-bg);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-surface) 40%, var(--color-bg)) 0%,
+    var(--color-bg) var(--space-8)
+  );
+}
+
+/*
+ * Centered measures on larger viewports (bg stays full-bleed).
+ * --prose: long-form reading (blog posts, learn topics)
+ * --catalog: blog/learn index grids
+ */
+@media screen and (min-width: 800px) {
+  .page-body {
+    padding: var(--space-6) var(--space-4) var(--space-10);
+  }
+
+  .page-body--prose {
+    padding-inline: max(var(--space-4), calc((100% - var(--reading-width)) / 2));
+  }
+
+  .page-body--catalog {
+    padding-inline: max(var(--space-4), calc((100% - var(--content-width-lg)) / 2));
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .page-body {
+    padding: var(--space-6) var(--space-6) var(--space-10);
+  }
+
+  .page-body--prose {
+    padding-inline: max(var(--space-6), calc((100% - var(--reading-width)) / 2));
+  }
+
+  .page-body--catalog {
+    padding-inline: max(var(--space-6), calc((100% - var(--content-width-lg)) / 2));
+  }
 }
 
 main:focus:not(:focus-visible) {
@@ -212,8 +321,8 @@ main:focus:not(:focus-visible) {
 }
 
 main:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
 }
 
 footer {
@@ -335,7 +444,7 @@ h6 {
   letter-spacing: 0.12em;
   line-height: 1;
   text-transform: uppercase;
-  color: var(--color-primary);
+  color: var(--color-highlight);
 }
 
 .lede {
@@ -366,7 +475,7 @@ a {
 }
 
 a:hover {
-  color: var(--color-primary-hover);
+  color: var(--color-highlight-hover);
   transition: color;
   transition-delay: 24ms;
   transition-duration: 96ms;
@@ -375,8 +484,8 @@ a:hover {
 }
 
 a:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
 }
 
 blockquote {
@@ -386,7 +495,7 @@ blockquote {
   margin: var(--space-8) auto;
   font-style: italic;
   background-color: transparent;
-  border-color: var(--color-primary);
+  border-color: var(--color-highlight);
   border-style: solid;
   border-width: 0 0 0 var(--space-1);
   border-radius: 0;
@@ -493,7 +602,7 @@ code {
   letter-spacing: 0.12em;
   line-height: 1;
   text-transform: uppercase;
-  color: var(--color-primary);
+  color: var(--color-highlight);
 }
 
 .alt-article-date {

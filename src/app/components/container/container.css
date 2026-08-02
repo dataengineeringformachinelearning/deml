@@ -11,6 +11,7 @@
   margin: 0;
   padding: 0 var(--space-2);
   gap: 0;
+  background-color: transparent;
 }
 
 @media screen and (min-width: 800px) {

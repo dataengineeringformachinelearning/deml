@@ -5,6 +5,9 @@
   width: 100%;
   min-width: 0;
   height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
 }
 
 .microcard {
@@ -13,26 +16,41 @@
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  min-height: 11rem;
+  min-height: var(--space-22);
   margin: 0;
   padding: 0;
   overflow: hidden;
   text-decoration: none;
   color: inherit;
   background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--microcard-visual, var(--color-primary)) 10%, var(--color-surface)) 0%,
+    var(--color-surface) 48%
+  );
+  border: var(--border-width) solid var(--color-border);
   transition:
     border-color 160ms ease,
-    transform 160ms ease;
+    transform 160ms ease,
+    background-image 160ms ease;
 }
 
 .microcard:hover {
-  border-color: color-mix(in srgb, var(--microcard-visual, var(--color-primary)) 55%, var(--color-border));
+  border-color: color-mix(
+    in srgb,
+    var(--microcard-visual, var(--color-primary)) 55%,
+    var(--color-border)
+  );
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--microcard-visual, var(--color-primary)) 16%, var(--color-surface)) 0%,
+    var(--color-surface) 55%
+  );
 }
 
 .microcard:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .microcard-copy {
@@ -44,17 +62,18 @@
   box-sizing: border-box;
   width: 100%;
   padding: var(--space-3);
+  background-color: transparent;
 }
 
 .microcard-meta {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   letter-spacing: 0.1em;
   line-height: 1.2;
   text-transform: uppercase;
-  color: var(--color-primary);
+  color: var(--color-highlight);
 }
 
 .microcard-heading {
@@ -70,7 +89,7 @@
 .microcard-subtext {
   margin: 0;
   flex: 1 1 auto;
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   font-weight: 400;
   line-height: 1.4;
   color: var(--color-text-secondary);
@@ -78,37 +97,40 @@
 
 .microcard-cta {
   margin-top: var(--space-2);
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-primary);
+  color: var(--color-highlight);
 }
 
 .microcard:hover .microcard-cta {
-  color: var(--color-primary-hover);
+  color: var(--color-highlight-hover);
 }
 
 .microcard-visual {
-  flex: 0 0 0.4rem;
+  flex: 0 0 var(--space-1);
   width: 100%;
-  background: linear-gradient(
+  margin: 0;
+  padding: 0;
+  background-color: var(--microcard-visual, var(--color-primary));
+  background-image: linear-gradient(
     90deg,
-    color-mix(in srgb, var(--microcard-visual, var(--color-primary)) 85%, transparent),
-    color-mix(in srgb, var(--microcard-visual, var(--color-primary)) 25%, transparent)
+    var(--microcard-visual, var(--color-primary)) 0%,
+    color-mix(in srgb, var(--microcard-visual, var(--color-primary)) 35%, var(--color-surface)) 100%
   );
 }
 
 :host([data-visual='gold']) {
-  --microcard-visual: var(--color-primary);
+  --microcard-visual: var(--color-accent-gold);
 }
 
 :host([data-visual='red']) {
-  --microcard-visual: var(--color-accent);
+  --microcard-visual: var(--color-accent-red);
 }
 
 :host([data-visual='olive']) {
-  --microcard-visual: var(--color-olive);
+  --microcard-visual: var(--color-primary);
 }
 
 @media (prefers-reduced-motion: reduce) {

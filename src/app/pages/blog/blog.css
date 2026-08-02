@@ -1,20 +1,6 @@
-:host {
-  display: block;
-  width: 100%;
-  max-width: none;
-}
-
-.blog-list {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: none;
-  margin: var(--space-4) 0 var(--space-8);
-  padding: 0;
-}
-
 .blog-list-heading {
   margin: 0 0 var(--space-3);
-  padding: 0 var(--space-2);
+  padding: 0;
   font-family: var(--font-sans);
   font-size: clamp(1.5rem, 3vw, var(--font-size-lg));
   font-weight: 700;
@@ -29,8 +15,9 @@
   gap: var(--space-2);
   width: 100%;
   margin: 0;
-  padding: 0 var(--space-2);
+  padding: 0;
   list-style: none;
+  background-color: transparent;
 }
 
 .blog-microcards-item {
@@ -38,32 +25,21 @@
   margin: 0;
   padding: 0;
   min-width: 0;
+  background-color: transparent;
 }
 
 @media screen and (min-width: 800px) {
-  .blog-list {
-    margin: var(--space-6) 0 var(--space-10);
-  }
-
   .blog-list-heading {
-    padding: 0 var(--space-4);
     margin-bottom: var(--space-4);
   }
 
   .blog-microcards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding: 0 var(--space-4);
     gap: var(--space-3);
   }
 }
 
 @media screen and (min-width: 1200px) {
-  .blog-list-heading,
-  .blog-microcards {
-    padding-left: var(--space-6);
-    padding-right: var(--space-6);
-  }
-
   .blog-microcards {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }

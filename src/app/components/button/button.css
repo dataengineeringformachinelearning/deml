@@ -1,4 +1,4 @@
-/* Crest pattern: gold primary, outline secondary, red accent */
+/* Buttons — Car Blue primary, outline secondary, Taillight Red accent */
 
 :host {
   display: contents;
@@ -13,12 +13,12 @@
   box-sizing: border-box;
   width: auto;
   max-width: 100%;
-  min-height: 44px;
+  min-height: var(--hit-target);
   height: auto;
   margin: 0;
   padding: var(--space-1) var(--space-4);
   border-style: solid;
-  border-width: 1px;
+  border-width: var(--border-width);
   border-radius: 0;
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
@@ -30,20 +30,22 @@
   transition:
     transform 120ms ease,
     background-color 120ms ease,
+    background-image 120ms ease,
     color 120ms ease,
     border-color 120ms ease,
     box-shadow 120ms ease;
 }
 
 .button:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .button.is-disabled,
 .button:disabled {
   color: var(--color-text-secondary);
   background-color: var(--color-surface);
+  background-image: none;
   border-color: var(--color-border);
   cursor: not-allowed;
   pointer-events: none;
@@ -55,48 +57,74 @@
 .button:disabled.button--accent {
   color: var(--color-text-secondary);
   background-color: color-mix(in srgb, var(--color-surface) 70%, var(--color-border));
+  background-image: none;
   border-color: var(--color-border);
 }
 
-/* Gold fill — main CTA */
+/* Car Blue fill — main CTA */
 .button--primary {
   color: var(--color-on-primary);
   background-color: var(--color-primary);
+  background-image: linear-gradient(
+    165deg,
+    var(--color-primary-hover) 0%,
+    var(--color-primary) 48%,
+    color-mix(in srgb, var(--color-primary) 78%, var(--color-bg)) 100%
+  );
   border-color: var(--color-primary);
 }
 
 .button--primary:hover {
   color: var(--color-on-primary);
   background-color: var(--color-primary-hover);
+  background-image: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--color-primary-hover) 88%, var(--color-focus)) 0%,
+    var(--color-primary-hover) 55%,
+    var(--color-primary) 100%
+  );
   border-color: var(--color-primary-hover);
   box-shadow: var(--shadow-md);
 }
 
-/* Outline — secondary action; gold on hover */
+/* Outline — secondary action; gold accent on hover */
 .button--secondary {
   color: var(--color-text);
-  background-color: transparent;
+  background-color: var(--color-surface);
+  background-image: none;
   border-color: var(--color-border);
 }
 
 .button--secondary:hover {
-  color: var(--color-primary);
-  background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
-  border-color: var(--color-primary);
+  color: var(--color-highlight);
+  background-color: color-mix(in srgb, var(--color-highlight) 12%, var(--color-surface));
+  border-color: var(--color-highlight);
   box-shadow: none;
 }
 
-/* Red fill — high-energy / destructive accent */
+/* Crest red fill — high-energy / destructive accent */
 .button--accent {
   color: var(--color-on-accent);
-  background-color: var(--color-accent);
-  border-color: var(--color-accent);
+  background-color: var(--color-accent-red);
+  background-image: linear-gradient(
+    165deg,
+    var(--color-accent-red-hover) 0%,
+    var(--color-accent-red) 55%,
+    color-mix(in srgb, var(--color-accent-red) 80%, var(--color-bg)) 100%
+  );
+  border-color: var(--color-accent-red);
 }
 
 .button--accent:hover {
   color: var(--color-on-accent);
-  background-color: var(--color-accent-hover);
-  border-color: var(--color-accent-hover);
+  background-color: var(--color-accent-red-hover);
+  background-image: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--color-accent-red-hover) 90%, var(--color-focus)) 0%,
+    var(--color-accent-red-hover) 60%,
+    var(--color-accent-red) 100%
+  );
+  border-color: var(--color-accent-red-hover);
   box-shadow: none;
 }
 
@@ -104,11 +132,11 @@
   flex: 0 0 auto;
   min-width: max-content;
   max-width: none;
-  min-height: 44px;
-  padding: 10px 32px;
+  min-height: var(--hit-target);
+  padding: var(--space-1) var(--space-4);
   border-radius: 9999px;
   border-width: 0;
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   letter-spacing: 0.01em;
   white-space: nowrap;
@@ -116,10 +144,18 @@
 }
 
 .button--pill.button--secondary {
-  border-width: 1px;
+  border-width: var(--border-width);
 }
 
 .button--pill:hover {
   box-shadow: none;
   transform: scale(1.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .button--pill:hover {
+    transition: none;
+    transform: none;
+  }
 }

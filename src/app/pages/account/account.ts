@@ -6,7 +6,7 @@ import { Banner } from '../../components/banner/banner';
   selector: 'app-account',
   imports: [Banner],
   templateUrl: './account.html',
-  styleUrl: './account.css',
+  host: { class: 'page' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Account {}

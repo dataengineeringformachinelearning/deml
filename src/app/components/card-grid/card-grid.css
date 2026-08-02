@@ -1,4 +1,4 @@
-/* Card grid — host is the grid; 1 col mobile, 50/50 from 800px */
+/* Card grid — host is the grid; gutters come from .page-body */
 
 :host {
   display: grid;
@@ -8,18 +8,13 @@
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: 0 var(--space-2);
+  padding: 0;
+  background-color: transparent;
 }
 
 @media screen and (min-width: 800px) {
   :host {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding: 0 var(--space-4);
-  }
-}
-
-@media screen and (min-width: 1200px) {
-  :host {
-    padding: 0 var(--space-6);
+    gap: var(--space-3);
   }
 }

@@ -7,6 +7,7 @@ import { getBlogPost } from '../../data/blog-posts';
   selector: 'app-blog-post',
   imports: [Article],
   templateUrl: './blog-post.html',
+  host: { class: 'page page--prose' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlogPostPage {

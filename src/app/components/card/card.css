@@ -5,6 +5,9 @@
   width: 100%;
   height: 100%;
   min-width: 0;
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
 }
 
 .card {
@@ -14,14 +17,19 @@
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  min-height: 22rem;
+  min-height: var(--space-28);
   margin: 0;
   padding: var(--space-6) var(--space-3) 0;
   overflow: hidden;
   text-align: center;
   color: var(--color-text);
   background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--card-visual, var(--color-primary)) 8%, var(--color-surface)) 0%,
+    var(--color-surface) 40%
+  );
+  border: var(--border-width) solid var(--color-border);
 }
 
 .card-copy {
@@ -30,17 +38,18 @@
   align-items: center;
   width: 100%;
   max-width: 36rem;
+  background-color: transparent;
 }
 
 .card-meta {
   margin: 0 0 var(--space-2);
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   letter-spacing: 0.12em;
   line-height: 1.2;
   text-transform: uppercase;
-  color: var(--color-primary);
+  color: var(--color-highlight);
 }
 
 .card-heading {
@@ -66,6 +75,7 @@
   justify-content: center;
   width: 100%;
   margin-bottom: var(--space-5);
+  background-color: transparent;
 }
 
 .card-actions:empty {
@@ -79,8 +89,9 @@
   align-items: flex-end;
   justify-content: center;
   width: 100%;
-  min-height: 8rem;
+  min-height: var(--space-16);
   margin-top: auto;
+  background-color: var(--color-surface);
 }
 
 .card-media:empty:not(.has-visual) {
@@ -90,30 +101,31 @@
 
 .card-media.has-visual:empty,
 .card-media.has-visual {
-  min-height: 10rem;
-  background:
+  min-height: var(--space-22);
+  background-color: var(--color-olive);
+  background-image:
     radial-gradient(
       80% 70% at 50% 100%,
-      color-mix(in srgb, var(--card-visual, var(--color-primary)) 28%, transparent) 0%,
+      color-mix(in srgb, var(--card-visual, var(--color-primary)) 36%, transparent) 0%,
       transparent 70%
     ),
     linear-gradient(
       180deg,
-      transparent 0%,
-      color-mix(in srgb, var(--color-bg) 35%, transparent) 100%
+      color-mix(in srgb, var(--color-surface) 70%, transparent) 0%,
+      color-mix(in srgb, var(--color-bg) 40%, var(--color-olive)) 100%
     );
 }
 
 :host([data-visual='gold']) {
-  --card-visual: var(--color-primary);
+  --card-visual: var(--color-accent-gold);
 }
 
 :host([data-visual='red']) {
-  --card-visual: var(--color-accent);
+  --card-visual: var(--color-accent-red);
 }
 
 :host([data-visual='olive']) {
-  --card-visual: var(--color-olive);
+  --card-visual: var(--color-primary);
 }
 
 /* Full-width blog / list teaser */
@@ -145,31 +157,32 @@
 
 :host([data-layout='teaser']) .card-media.has-visual:empty,
 :host([data-layout='teaser']) .card-media.has-visual {
-  min-height: 8rem;
+  min-height: var(--space-16);
   margin-top: var(--space-4);
 }
 
 @media screen and (min-width: 800px) {
   .card {
-    min-height: 26rem;
+    min-height: calc(var(--grid) * 52);
     padding: var(--space-8) var(--space-4) 0;
   }
 
   .card-media.has-visual:empty,
   .card-media.has-visual {
-    min-height: 12rem;
+    min-height: var(--space-26);
   }
 
   :host([data-layout='teaser']) .card {
     flex-direction: row;
     align-items: stretch;
-    min-height: 16rem;
+    min-height: var(--space-28);
     padding: 0;
   }
 
   :host([data-layout='teaser']) .card-copy {
     justify-content: center;
     padding: var(--space-6) var(--space-6);
+    background-color: var(--color-surface);
   }
 
   :host([data-layout='teaser']) .card-media {
@@ -183,13 +196,18 @@
   :host([data-layout='teaser']) .card-media.has-visual {
     min-height: 100%;
     margin-top: 0;
-    background:
+    background-color: var(--color-olive);
+    background-image:
       radial-gradient(
         90% 80% at 70% 50%,
-        color-mix(in srgb, var(--card-visual, var(--color-primary)) 32%, transparent) 0%,
+        color-mix(in srgb, var(--card-visual, var(--color-primary)) 40%, transparent) 0%,
         transparent 70%
       ),
-      var(--color-olive);
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--card-visual, var(--color-primary)) 22%, var(--color-olive)) 0%,
+        var(--color-olive) 100%
+      );
   }
 }
 

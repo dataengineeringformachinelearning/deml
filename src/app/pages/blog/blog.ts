@@ -9,6 +9,7 @@ import { BLOG_POSTS } from '../../data/blog-posts';
   imports: [Banner, Microcard],
   templateUrl: './blog.html',
   styleUrl: './blog.css',
+  host: { class: 'page page--catalog' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Blog {

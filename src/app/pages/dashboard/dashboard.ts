@@ -6,7 +6,7 @@ import { Banner } from '../../components/banner/banner';
   selector: 'app-dashboard',
   imports: [Banner],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css',
+  host: { class: 'page' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard {}

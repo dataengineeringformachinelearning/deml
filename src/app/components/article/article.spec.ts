@@ -66,6 +66,8 @@ describe('Article', () => {
 
     expect(host.querySelector('h1.banner-heading')?.textContent?.trim()).toBe('Post not found');
     expect(host.textContent).toContain('Back to blog');
-    expect(host.querySelector('.article-body')).toBeNull();
+    // Missing state keeps the shared page-body shell for layout stability.
+    expect(host.querySelector('.article-body')).toBeTruthy();
+    expect(host.querySelector('.article-body p')).toBeNull();
   });
 });

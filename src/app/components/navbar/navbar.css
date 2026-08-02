@@ -4,14 +4,17 @@
   display: block;
   width: 100%;
   max-width: none;
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-bg);
   --navbar-inset: var(--space-2);
-  --navbar-icon-size: 32px;
-  --navbar-hit: 44px;
+  --navbar-icon-size: var(--icon-size);
+  --navbar-hit: var(--hit-target);
   --navbar-bg: var(--color-bg);
   --navbar-fg: var(--color-text);
   --navbar-muted: var(--color-text-secondary);
-  --navbar-accent: var(--color-primary);
-  --navbar-accent-hover: var(--color-primary-hover);
+  --navbar-accent: var(--color-highlight);
+  --navbar-accent-hover: var(--color-highlight-hover);
   --navbar-surface: var(--color-surface);
   --navbar-focus: var(--color-focus);
   --navbar-bar-height: calc(var(--navbar-inset) * 2 + var(--navbar-hit));
@@ -32,6 +35,12 @@
   padding: var(--navbar-inset);
   color: var(--navbar-fg);
   background-color: var(--navbar-bg);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 10%, var(--navbar-bg)) 0%,
+    var(--navbar-bg) 100%
+  );
+  border-bottom: var(--border-width) solid var(--color-border);
   grid-template-columns: 1fr auto;
   grid-template-areas:
     "brand toggle"
@@ -44,6 +53,7 @@
   grid-area: brand;
   align-self: center;
   justify-self: start;
+  background-color: transparent;
 }
 
 .site-navbar-icon {
@@ -54,7 +64,9 @@
   width: var(--navbar-hit);
   height: var(--navbar-hit);
   color: var(--navbar-icon-color, var(--navbar-accent));
-  transition: color 120ms ease, transform 120ms ease;
+  background-color: transparent;
+  border-radius: 9999px;
+  transition: color 120ms ease, transform 120ms ease, background-color 120ms ease;
 }
 
 .site-navbar-icon svg,
@@ -64,13 +76,14 @@
 }
 
 .site-navbar-icon:hover {
-  color: var(--navbar-icon-color-hover, var(--navbar-accent-hover));
+  color: var(--navbar-icon-color-hover, var(--color-primary-hover));
+  background-color: color-mix(in srgb, var(--color-primary) 12%, transparent);
   transform: scale(1.06);
 }
 
 .site-navbar-icon:focus-visible {
-  outline: 3px solid var(--navbar-focus);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--navbar-focus);
+  outline-offset: var(--focus-ring-offset);
   border-radius: 50%;
 }
 
@@ -101,8 +114,8 @@
 }
 
 .site-navbar-menu-toggle:focus-visible {
-  outline: 3px solid var(--navbar-focus);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--navbar-focus);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .site-navbar-panel {
@@ -111,11 +124,14 @@
   flex-direction: column;
   gap: var(--navbar-inset);
   width: 100%;
+  box-sizing: border-box;
+  background-color: transparent;
 }
 
 .main-navigation {
   justify-self: stretch;
   width: 100%;
+  background-color: transparent;
 }
 
 .main-navigation ul {
@@ -124,6 +140,10 @@
   justify-content: flex-start;
   gap: var(--space-1);
   width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background-color: transparent;
 }
 
 .main-navigation ul li a {
@@ -131,7 +151,7 @@
   align-items: center;
   min-height: var(--navbar-hit);
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   letter-spacing: 0.01em;
   line-height: 1.2;
@@ -141,24 +161,26 @@
   color: var(--navbar-muted);
   padding: var(--space-1) var(--space-2);
   border-radius: 9999px;
+  background-color: transparent;
   transition: color 120ms ease, background-color 120ms ease;
 }
 
 .main-navigation ul li a:hover {
   color: var(--navbar-accent-hover);
-  background-color: transparent;
+  background-color: color-mix(in srgb, var(--color-highlight) 10%, transparent);
 }
 
 .main-navigation ul li a.is-active {
   color: var(--navbar-accent);
   text-decoration: underline;
   text-decoration-thickness: 2px;
-  text-underline-offset: 0.2em;
+  text-underline-offset: 0.25em;
+  background-color: color-mix(in srgb, var(--color-highlight) 12%, transparent);
 }
 
 .main-navigation ul li a:focus-visible {
-  outline: 3px solid var(--navbar-focus);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--navbar-focus);
+  outline-offset: var(--focus-ring-offset);
   color: var(--navbar-accent);
 }
 
@@ -171,10 +193,18 @@ app-button-group {
   max-height: 100dvh;
   overflow-y: auto;
   background-color: var(--navbar-bg);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 14%, var(--navbar-bg)) 0%,
+    var(--navbar-bg) 40%,
+    var(--navbar-bg) 100%
+  );
 }
 
 .site-navbar.is-menu-open .site-navbar-panel {
   display: flex;
+  padding-top: var(--space-1);
+  background-color: transparent;
 }
 
 /* Full-width actions when stacked in the mobile menu */
@@ -229,5 +259,15 @@ app-button-group {
     width: var(--navbar-hit);
     min-height: var(--navbar-hit);
     padding: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-navbar-icon,
+  .site-navbar-icon:hover,
+  .site-navbar-menu-toggle,
+  .main-navigation ul li a {
+    transition: none;
+    transform: none;
   }
 }

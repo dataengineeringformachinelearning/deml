@@ -12,6 +12,7 @@ import { AuthService } from '../../services/auth';
   imports: [Banner, Button, ButtonGroup, Card, CardGrid],
   templateUrl: './home.html',
   styleUrl: './home.css',
+  host: { class: 'page' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home {

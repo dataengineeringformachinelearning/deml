@@ -2,8 +2,12 @@
 
 :host {
   display: block;
+  flex-shrink: 0;
   width: 100%;
   max-width: none;
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-bg);
 }
 
 .banner {
@@ -14,34 +18,47 @@
   box-sizing: border-box;
   width: 100%;
   max-width: none;
-  min-height: 16rem;
+  flex-shrink: 0;
+  min-height: var(--space-28);
   height: 42dvh;
-  max-height: 28rem;
+  max-height: calc(var(--grid) * 56);
   margin: 0;
-  overflow: auto;
+  overflow: hidden;
   padding: var(--space-6) var(--space-2);
-  background:
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  background-image:
     radial-gradient(
       120% 80% at 0% 0%,
-      color-mix(in srgb, var(--color-primary) 22%, transparent) 0%,
+      color-mix(in srgb, var(--color-primary) 28%, transparent) 0%,
       transparent 55%
     ),
     radial-gradient(
       90% 70% at 100% 100%,
-      color-mix(in srgb, var(--color-accent) 12%, transparent) 0%,
+      color-mix(in srgb, var(--color-accent-red) 14%, transparent) 0%,
       transparent 50%
     ),
-    var(--color-bg);
+    radial-gradient(
+      70% 50% at 80% 20%,
+      color-mix(in srgb, var(--color-accent-gold) 10%, transparent) 0%,
+      transparent 60%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-surface) 55%, var(--color-bg)) 0%,
+      var(--color-bg) 100%
+    );
 }
 
 .banner .preheader {
   margin: 0 0 var(--space-3);
-  color: var(--color-primary);
+  color: var(--color-highlight);
 }
 
 .banner .banner-heading {
   max-width: 16ch;
   margin-bottom: var(--space-3);
+  color: var(--color-text);
 }
 
 .banner .lede {
@@ -56,14 +73,14 @@
 
 .banner-actions {
   width: 100%;
-  max-width: 22rem;
+  max-width: calc(var(--grid) * 44);
 }
 
 @media screen and (min-width: 800px) {
   .banner {
-    min-height: 18rem;
+    min-height: calc(var(--grid) * 36);
     height: 38dvh;
-    max-height: 26rem;
+    max-height: calc(var(--grid) * 52);
     padding: var(--space-8) var(--space-4);
   }
 
@@ -71,10 +88,27 @@
     width: auto;
     max-width: none;
   }
+
+  /* Align hero copy with page content measures */
+  :host-context(.page--prose) .banner {
+    padding-inline: max(var(--space-4), calc((100% - var(--reading-width)) / 2));
+  }
+
+  :host-context(.page--catalog) .banner {
+    padding-inline: max(var(--space-4), calc((100% - var(--content-width-lg)) / 2));
+  }
 }
 
 @media screen and (min-width: 1200px) {
   .banner {
     padding: var(--space-8) var(--space-6);
+  }
+
+  :host-context(.page--prose) .banner {
+    padding-inline: max(var(--space-6), calc((100% - var(--reading-width)) / 2));
+  }
+
+  :host-context(.page--catalog) .banner {
+    padding-inline: max(var(--space-6), calc((100% - var(--content-width-lg)) / 2));
   }
 }

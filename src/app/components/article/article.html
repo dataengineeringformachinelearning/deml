@@ -14,22 +14,26 @@
       </app-button-group>
     </app-banner>
 
-    <div class="article-body">
+    <div class="page-body page-body--prose article-body">
       @for (paragraph of body(); track $index) {
         <p>{{ paragraph }}</p>
       }
     </div>
   </article>
 } @else {
-  <app-banner
-    [preheader]="preheader()"
-    [heading]="missingHeading()"
-    [lede]="missingLede()"
-  >
-    <app-button-group>
-      <app-button variant="primary" shape="pill" [routerLink]="backLink()">
-        {{ backLabel() }}
-      </app-button>
-    </app-button-group>
-  </app-banner>
+  <div class="article article--missing">
+    <app-banner
+      [preheader]="preheader()"
+      [heading]="missingHeading()"
+      [lede]="missingLede()"
+    >
+      <app-button-group>
+        <app-button variant="primary" shape="pill" [routerLink]="backLink()">
+          {{ backLabel() }}
+        </app-button>
+      </app-button-group>
+    </app-banner>
+
+    <div class="page-body page-body--prose article-body" aria-hidden="true"></div>
+  </div>
 }

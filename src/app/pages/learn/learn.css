@@ -1,18 +1,6 @@
-:host {
-  display: block;
-  width: 100%;
-  max-width: none;
-}
-
-.learn {
-  box-sizing: border-box;
-  width: 100%;
-  margin: 0 0 var(--space-10);
-  padding: var(--space-4) var(--space-2) 0;
-}
-
 .learn-intro {
-  max-width: 48rem;
+  width: 100%;
+  max-width: var(--reading-width);
   margin: 0 0 var(--space-6);
   padding: 0;
   font-size: var(--font-size-sm);
@@ -22,17 +10,26 @@
 }
 
 .learn-intro code {
-  font-size: 0.9em;
-  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  color: var(--color-highlight);
 }
 
 .learn-group {
   box-sizing: border-box;
   width: 100%;
-  margin: 0 0 var(--space-6);
+  margin: 0 0 var(--space-2);
   padding: var(--space-4);
   background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 8%, var(--color-surface)) 0%,
+    var(--color-surface) var(--space-8)
+  );
+  border: var(--border-width) solid var(--color-border);
+}
+
+.learn-group:last-child {
+  margin-bottom: 0;
 }
 
 .learn-group-header {
@@ -50,7 +47,7 @@
 
 .learn-group-summary {
   margin: 0;
-  max-width: 48rem;
+  max-width: var(--reading-width);
   font-size: var(--font-size-sm);
   line-height: 1.45;
   color: var(--color-text-secondary);
@@ -64,21 +61,20 @@
   margin: 0;
   padding: 0;
   list-style: none;
+  background-color: transparent;
 }
 
 .learn-microcards-item {
   margin: 0;
   padding: 0;
   min-width: 0;
+  background-color: transparent;
 }
 
 @media screen and (min-width: 800px) {
-  .learn {
-    padding: var(--space-6) var(--space-4) 0;
-  }
-
   .learn-group {
     padding: var(--space-6);
+    margin-bottom: var(--space-3);
   }
 
   .learn-microcards {
@@ -88,10 +84,6 @@
 }
 
 @media screen and (min-width: 1200px) {
-  .learn {
-    padding: var(--space-6) var(--space-6) 0;
-  }
-
   .learn-microcards {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }

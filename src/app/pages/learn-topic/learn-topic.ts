@@ -8,6 +8,7 @@ import { getLearnTopic, githubUrl } from '../../data/packages';
   selector: 'app-learn-topic',
   imports: [Article, Button],
   templateUrl: './learn-topic.html',
+  host: { class: 'page page--prose' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LearnTopicPage {

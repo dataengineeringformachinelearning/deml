@@ -28,12 +28,12 @@ describe('Navbar', () => {
   });
 
   it('should apply iconColor to the navbar icon CSS variable', async () => {
-    fixture.componentRef.setInput('iconColor', '#c5a653');
+    fixture.componentRef.setInput('iconColor', '#3c7a4a');
     fixture.detectChanges();
     await fixture.whenStable();
 
     const host = fixture.nativeElement as HTMLElement;
-    expect(host.style.getPropertyValue('--navbar-icon-color').trim()).toBe('#c5a653');
+    expect(host.style.getPropertyValue('--navbar-icon-color').trim()).toBe('#3c7a4a');
   });
 
   it('should render guest nav links when logged out', () => {

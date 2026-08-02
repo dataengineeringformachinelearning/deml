@@ -6,7 +6,7 @@ import { Banner } from '../../components/banner/banner';
   selector: 'app-sites',
   imports: [Banner],
   templateUrl: './sites.html',
-  styleUrl: './sites.css',
+  host: { class: 'page' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Sites {}
