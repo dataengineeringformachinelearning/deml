@@ -20,6 +20,7 @@
     class="site-navbar-menu-toggle"
     [attr.aria-expanded]="menuOpen()"
     aria-controls="site-navbar-panel"
+    aria-haspopup="true"
     [attr.aria-label]="menuOpen() ? 'Close menu' : 'Open menu'"
     (click)="toggleMenu()"
   >
@@ -30,14 +31,21 @@
     }
   </button>
 
-  <div #menuPanel id="site-navbar-panel" class="site-navbar-panel">
+  <div
+    #menuPanel
+    id="site-navbar-panel"
+    class="site-navbar-panel"
+    [attr.role]="menuOpen() ? 'dialog' : null"
+    [attr.aria-modal]="menuOpen() ? true : null"
+    [attr.aria-label]="menuOpen() ? 'Site menu' : null"
+  >
     <nav
       id="site-navigation"
       class="main-navigation place-center"
       aria-label="Primary"
     >
-      <ul id="site-navbar-menu" class="row wrap items-center justify-center gap-4">
-        @for (link of links(); track link.path) {
+      <ul id="site-navbar-menu" class="row wrap items-center justify-center gap-4" role="list">
+        @for (link of navLinks(); track link.path) {
           <li class="item-fixed">
             <a
               [routerLink]="link.path"
@@ -57,10 +65,10 @@
       <app-theme-toggle />
 
       @if (!loggedIn()) {
-        <app-button variant="secondary" shape="pill" (click)="login()">Log in</app-button>
-        <app-button variant="accent" shape="pill" (click)="login()">Sign up</app-button>
+        <app-button variant="secondary" shape="pill" (pressed)="login()">Log in</app-button>
+        <app-button variant="primary" shape="pill" (pressed)="login()">Sign up</app-button>
       } @else {
-        <app-button variant="secondary" shape="pill" (click)="logout()">Log out</app-button>
+        <app-button variant="secondary" shape="pill" (pressed)="logout()">Log out</app-button>
       }
     </app-button-group>
   </div>

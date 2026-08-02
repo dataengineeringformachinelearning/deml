@@ -1,44 +1,49 @@
-/* Button group — flex shell for actions (mobile-first) */
+/* Button group — host is the flex shell (mobile-first) */
 
 :host {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-}
-
-.button-group {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
   align-items: stretch;
   justify-content: flex-start;
   gap: var(--space-2);
+  box-sizing: border-box;
   width: 100%;
   max-width: 100%;
 }
 
-:host(.place-end) .button-group {
+:host(.place-end) {
   justify-content: flex-end;
 }
 
-:host(.place-start) .button-group {
+:host(.place-start) {
   justify-content: flex-start;
 }
 
-:host(.place-center) .button-group {
+:host(.place-center) {
   justify-content: center;
 }
 
-.button-group > * {
+:host([data-layout='row']) {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+}
+
+:host([data-layout='column']) {
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
+:host > * {
   flex: 0 0 auto;
 }
 
 @media screen and (min-width: 800px) {
-  :host {
-    width: max-content;
-  }
-
-  .button-group {
+  :host([data-layout='responsive']) {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;

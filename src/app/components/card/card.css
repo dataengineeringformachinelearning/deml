@@ -1,0 +1,200 @@
+/* Card — feature (centered) or teaser (full-width); mobile-first */
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 22rem;
+  margin: 0;
+  padding: var(--space-6) var(--space-3) 0;
+  overflow: hidden;
+  text-align: center;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.card-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 36rem;
+}
+
+.card-meta {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.card-heading {
+  margin: 0 0 var(--space-2);
+  font-size: clamp(1.75rem, 4vw, var(--font-size-lg));
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--color-text);
+}
+
+.card-subtext {
+  margin: 0 0 var(--space-4);
+  max-width: 32ch;
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
+.card-actions {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: var(--space-5);
+}
+
+.card-actions:empty {
+  display: none;
+  margin: 0;
+}
+
+.card-media {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  min-height: 8rem;
+  margin-top: auto;
+}
+
+.card-media:empty:not(.has-visual) {
+  display: none;
+  min-height: 0;
+}
+
+.card-media.has-visual:empty,
+.card-media.has-visual {
+  min-height: 10rem;
+  background:
+    radial-gradient(
+      80% 70% at 50% 100%,
+      color-mix(in srgb, var(--card-visual, var(--color-primary)) 28%, transparent) 0%,
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      color-mix(in srgb, var(--color-bg) 35%, transparent) 100%
+    );
+}
+
+:host([data-visual='gold']) {
+  --card-visual: var(--color-primary);
+}
+
+:host([data-visual='red']) {
+  --card-visual: var(--color-accent);
+}
+
+:host([data-visual='olive']) {
+  --card-visual: var(--color-olive);
+}
+
+/* Full-width blog / list teaser */
+:host([data-layout='teaser']) {
+  height: auto;
+}
+
+:host([data-layout='teaser']) .card {
+  align-items: stretch;
+  min-height: 0;
+  padding: var(--space-4);
+  text-align: left;
+}
+
+:host([data-layout='teaser']) .card-copy {
+  align-items: flex-start;
+  max-width: none;
+  flex: 1 1 auto;
+}
+
+:host([data-layout='teaser']) .card-subtext {
+  max-width: 56ch;
+}
+
+:host([data-layout='teaser']) .card-actions {
+  justify-content: flex-start;
+  margin-bottom: 0;
+}
+
+:host([data-layout='teaser']) .card-media.has-visual:empty,
+:host([data-layout='teaser']) .card-media.has-visual {
+  min-height: 8rem;
+  margin-top: var(--space-4);
+}
+
+@media screen and (min-width: 800px) {
+  .card {
+    min-height: 26rem;
+    padding: var(--space-8) var(--space-4) 0;
+  }
+
+  .card-media.has-visual:empty,
+  .card-media.has-visual {
+    min-height: 12rem;
+  }
+
+  :host([data-layout='teaser']) .card {
+    flex-direction: row;
+    align-items: stretch;
+    min-height: 16rem;
+    padding: 0;
+  }
+
+  :host([data-layout='teaser']) .card-copy {
+    justify-content: center;
+    padding: var(--space-6) var(--space-6);
+  }
+
+  :host([data-layout='teaser']) .card-media {
+    flex: 0 0 min(40%, 22rem);
+    width: auto;
+    min-height: 100%;
+    margin-top: 0;
+  }
+
+  :host([data-layout='teaser']) .card-media.has-visual:empty,
+  :host([data-layout='teaser']) .card-media.has-visual {
+    min-height: 100%;
+    margin-top: 0;
+    background:
+      radial-gradient(
+        90% 80% at 70% 50%,
+        color-mix(in srgb, var(--card-visual, var(--color-primary)) 32%, transparent) 0%,
+        transparent 70%
+      ),
+      var(--color-olive);
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  :host([data-layout='teaser']) .card-copy {
+    padding: var(--space-8) var(--space-8);
+  }
+}

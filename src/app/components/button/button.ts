@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'accent';
@@ -10,6 +10,7 @@ export type ButtonShape = 'default' | 'pill';
   imports: [NgTemplateOutlet, RouterLink],
   templateUrl: './button.html',
   styleUrl: './button.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-variant]': 'variant()',
     '[attr.data-shape]': 'shape()',
@@ -52,7 +53,17 @@ export class Button {
     return typeof href === 'string' && href.length > 0;
   });
 
-  readonly isLink = computed(() => this.isRouterLink() || this.isHref());
+  /** Shared class list for the interactive control. */
+  readonly controlClass = computed(() => {
+    const classes = ['button', `button--${this.variant()}`];
+    if (this.shape() === 'pill') {
+      classes.push('button--pill');
+    }
+    if (this.disabled()) {
+      classes.push('is-disabled');
+    }
+    return classes.join(' ');
+  });
 
   onActivate(event: Event): void {
     if (this.disabled()) {

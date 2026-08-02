@@ -1,15 +1,11 @@
+<!-- ng-template keeps a single projection slot across @if branches -->
 <ng-template #content>
   <ng-content />
 </ng-template>
 
 @if (isRouterLink()) {
   <a
-    class="button"
-    [class.button--primary]="variant() === 'primary'"
-    [class.button--secondary]="variant() === 'secondary'"
-    [class.button--accent]="variant() === 'accent'"
-    [class.button--pill]="shape() === 'pill'"
-    [class.is-disabled]="disabled()"
+    [class]="controlClass()"
     [routerLink]="routerLink()!"
     [attr.aria-disabled]="disabled() ? true : null"
     [attr.tabindex]="disabled() ? -1 : null"
@@ -19,12 +15,7 @@
   </a>
 } @else if (isHref()) {
   <a
-    class="button"
-    [class.button--primary]="variant() === 'primary'"
-    [class.button--secondary]="variant() === 'secondary'"
-    [class.button--accent]="variant() === 'accent'"
-    [class.button--pill]="shape() === 'pill'"
-    [class.is-disabled]="disabled()"
+    [class]="controlClass()"
     [href]="href()"
     [attr.aria-disabled]="disabled() ? true : null"
     [attr.tabindex]="disabled() ? -1 : null"
@@ -34,11 +25,7 @@
   </a>
 } @else {
   <button
-    class="button"
-    [class.button--primary]="variant() === 'primary'"
-    [class.button--secondary]="variant() === 'secondary'"
-    [class.button--accent]="variant() === 'accent'"
-    [class.button--pill]="shape() === 'pill'"
+    [class]="controlClass()"
     [type]="type()"
     [disabled]="disabled()"
     (click)="onActivate($event)"

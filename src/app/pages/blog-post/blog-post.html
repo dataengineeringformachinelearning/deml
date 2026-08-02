@@ -1,0 +1,30 @@
+@if (post(); as entry) {
+  <article class="blog-post" [attr.aria-labelledby]="headingId()">
+    <app-banner
+      preheader="DEML"
+      [heading]="entry.title"
+      [lede]="entry.meta"
+      [headingId]="headingId()"
+    >
+      <app-button-group>
+        <app-button variant="secondary" shape="pill" routerLink="/blog">All posts</app-button>
+      </app-button-group>
+    </app-banner>
+
+    <div class="blog-post-body">
+      @for (paragraph of entry.body; track paragraph) {
+        <p>{{ paragraph }}</p>
+      }
+    </div>
+  </article>
+} @else {
+  <app-banner
+    preheader="DEML"
+    heading="Post not found"
+    lede="That note is not in the archive."
+  >
+    <app-button-group>
+      <app-button variant="primary" shape="pill" routerLink="/blog">Back to blog</app-button>
+    </app-button-group>
+  </app-banner>
+}

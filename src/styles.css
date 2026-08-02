@@ -1,15 +1,16 @@
-/* 8px grid + color system — dark-mode first studio palette */
+/* 8px grid + WCAG 2.1 AA / 508 crest palette (Porsche gold + red on olive-black) */
 
 :root {
   color-scheme: dark;
 
-  /* Core */
+  /* Core – crest gold primary, crest red accent, olive-black foundation */
   --color-bg: #0f110f;
   --color-surface: #1a1d1a;
-  --color-primary: #2a322a;
-  --color-primary-hover: #3a453a;
-  --color-accent: #c4a484;
-  --color-accent-hover: #d4b494;
+  --color-olive: #2a322a;
+  --color-primary: #c5a653;
+  --color-primary-hover: #d4b563;
+  --color-accent: #d5001c;
+  --color-accent-hover: #f01a33;
 
   /* Text */
   --color-text: #f5f5f0;
@@ -18,12 +19,12 @@
   /* UI */
   --color-border: #2e322e;
   --color-focus: #e8f4ff;
-  --color-error: #e05a5a;
+  --color-error: #d5001c;
   --color-success: #5a9e6a;
 
   /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.55);
 
   /* Aliases used across the codebase */
   --color-background: var(--color-bg);
@@ -31,14 +32,14 @@
   --color-accent-strong: var(--color-accent-hover);
   --color-dark: var(--color-bg);
   --color-sky-soft: var(--color-surface);
-  --color-on-primary: var(--color-text);
-  --color-on-accent: var(--color-bg);
+  /* Dark on gold; light on red (never small red body text on dark bg) */
+  --color-on-primary: #0f110f;
+  --color-on-accent: #f5f5f0;
   --color-on-dark: var(--color-text);
-  /* Solid secondary for WCAG AA body contrast (avoid transparent muted text) */
   --color-text-muted: var(--color-text-secondary);
-  --color-selection: color-mix(in srgb, var(--color-accent) 28%, transparent);
-  --shadow-color: rgba(0, 0, 0, 0.5);
-  --shadow-color-soft: rgba(0, 0, 0, 0.4);
+  --color-selection: color-mix(in srgb, var(--color-primary) 28%, transparent);
+  --shadow-color: rgba(0, 0, 0, 0.55);
+  --shadow-color-soft: rgba(0, 0, 0, 0.45);
 
   --grid: 8px;
   --space-1: calc(var(--grid) * 1); /* 8 */
@@ -85,20 +86,24 @@
 
   --color-bg: #0f110f;
   --color-surface: #1a1d1a;
-  --color-primary: #2a322a;
-  --color-primary-hover: #3a453a;
-  --color-accent: #c4a484;
-  --color-accent-hover: #d4b494;
+  --color-olive: #2a322a;
+  --color-primary: #c5a653;
+  --color-primary-hover: #d4b563;
+  --color-accent: #d5001c;
+  --color-accent-hover: #f01a33;
   --color-text: #f5f5f0;
   --color-text-secondary: #b8b8b0;
   --color-border: #2e322e;
   --color-focus: #e8f4ff;
-  --color-error: #e05a5a;
+  --color-error: #d5001c;
   --color-success: #5a9e6a;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --shadow-color: rgba(0, 0, 0, 0.5);
-  --shadow-color-soft: rgba(0, 0, 0, 0.4);
+  --color-on-primary: #0f110f;
+  --color-on-accent: #f5f5f0;
+  --color-selection: color-mix(in srgb, var(--color-primary) 28%, transparent);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.55);
+  --shadow-color: rgba(0, 0, 0, 0.55);
+  --shadow-color-soft: rgba(0, 0, 0, 0.45);
 }
 
 [data-theme="light"] {
@@ -106,18 +111,25 @@
 
   --color-bg: #f5f5f0;
   --color-surface: #ffffff;
-  --color-primary: #2a322a;
-  --color-primary-hover: #1a221a;
-  --color-accent: #8a6a4a;
-  --color-accent-hover: #6f5338;
+  --color-olive: #e8ebe6;
+  /* Darker gold for AA link/text contrast on light surfaces */
+  --color-primary: #8b7320;
+  /* Keep hover ≥ AA on light surfaces */
+  --color-primary-hover: #6f5c19;
+  --color-accent: #d5001c;
+  --color-accent-hover: #a80016;
   --color-text: #0f110f;
   --color-text-secondary: #4a4a45;
   --color-border: #d0d4d0;
-  --color-focus: #2a322a;
-  --color-error: #c04040;
+  --color-focus: #0f110f;
+  --color-error: #d5001c;
   --color-success: #3a7e4a;
+  /* Dark on gold fills; light on red fills (same crest pairing as dark) */
+  --color-on-primary: #0f110f;
+  --color-on-accent: #f5f5f0;
+  --color-selection: color-mix(in srgb, var(--color-primary) 22%, transparent);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.16);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.16);
   --shadow-color: rgba(0, 0, 0, 0.16);
   --shadow-color-soft: rgba(0, 0, 0, 0.1);
 }
@@ -170,8 +182,8 @@ body {
   padding: var(--space-1) var(--space-2);
   margin: var(--space-1);
   border-radius: 9999px;
-  background-color: var(--color-accent);
-  color: var(--color-on-accent);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
   font-weight: 700;
   text-decoration: none;
   transform: translateY(-200%);
@@ -187,14 +199,15 @@ body {
 
 main {
   display: block;
+  box-sizing: border-box;
   padding: 0;
-  margin: 0 auto;
+  margin: 0;
   height: auto;
   width: 100%;
-  max-width: var(--content-width-sm);
+  max-width: none;
 }
 
-main:focus {
+main:focus:not(:focus-visible) {
   outline: none;
 }
 
@@ -207,14 +220,19 @@ footer {
   position: relative;
   z-index: 1000;
   padding: 0;
-  margin: var(--space-4) var(--space-2) 0 var(--space-2);
+  margin: var(--space-4) 0 0;
+  width: 100%;
 }
 
+/* Page sections are full-bleed by default; components own their gutters */
 section,
 article {
   z-index: 13;
+  box-sizing: border-box;
   padding: 0;
-  margin: var(--space-4) var(--space-2);
+  margin: 0;
+  width: 100%;
+  max-width: none;
 }
 
 ol,
@@ -317,7 +335,7 @@ h6 {
   letter-spacing: 0.12em;
   line-height: 1;
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 .lede {
@@ -348,7 +366,7 @@ a {
 }
 
 a:hover {
-  color: var(--color-accent-hover);
+  color: var(--color-primary-hover);
   transition: color;
   transition-delay: 24ms;
   transition-duration: 96ms;
@@ -368,7 +386,7 @@ blockquote {
   margin: var(--space-8) auto;
   font-style: italic;
   background-color: transparent;
-  border-color: var(--color-accent);
+  border-color: var(--color-primary);
   border-style: solid;
   border-width: 0 0 0 var(--space-1);
   border-radius: 0;
@@ -475,7 +493,7 @@ code {
   letter-spacing: 0.12em;
   line-height: 1;
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 .alt-article-date {
@@ -488,98 +506,7 @@ code {
   color: var(--color-on-dark);
 }
 
-/* Buttons */
-
-.button,
-.button:visited {
-  position: relative;
-  display: inline-block;
-  height: auto;
-  width: auto;
-  padding: var(--space-1) var(--space-4) !important;
-  margin: 0;
-  color: var(--color-on-primary);
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 0;
-  font-size: var(--font-size-sm);
-  font-weight: 300;
-  text-decoration: none;
-  appearance: none;
-  cursor: pointer;
-}
-
-.button:hover {
-  color: var(--color-on-primary);
-  background-color: var(--color-primary-hover);
-  border-color: var(--color-primary-hover);
-  box-shadow: var(--shadow-md);
-}
-
-.button:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
-}
-
-.button-pill,
-.button-pill:visited {
-  flex: 0 0 auto;
-  width: auto;
-  max-width: none;
-  min-width: max-content;
-  min-height: 40px;
-  padding: 8px 32px !important;
-  border-radius: 9999px;
-  border-width: 0;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  line-height: 1;
-  white-space: nowrap;
-  box-shadow: none;
-  transition:
-    transform 120ms ease,
-    background-color 120ms ease,
-    color 120ms ease,
-    border-color 120ms ease;
-}
-
-.button-pill:hover {
-  box-shadow: none;
-  transform: scale(1.04);
-}
-
-.button-secondary,
-.button-secondary:visited {
-  background-color: transparent;
-  color: var(--color-text);
-  border-width: 1px;
-  border-style: solid;
-  border-color: var(--color-border);
-}
-
-.button-secondary:hover {
-  background-color: var(--color-surface);
-  border-color: var(--color-text-secondary);
-  color: var(--color-text);
-  box-shadow: none;
-}
-
-.button-accent,
-.button-accent:visited {
-  background-color: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--color-on-accent);
-}
-
-.button-accent:hover {
-  background-color: var(--color-accent-hover);
-  border-color: var(--color-accent-hover);
-  color: var(--color-on-accent);
-  box-shadow: none;
-}
+/* Buttons: use <app-button> — component owns crest variants (primary/secondary/accent) */
 
 /* Layout utilities — flex & grid */
 
@@ -925,7 +852,7 @@ code {
   transition-timing-function: ease-in-out;
   background: linear-gradient(
     360deg,
-    color-mix(in srgb, var(--color-accent) 12%, var(--color-surface)) 0%,
+    color-mix(in srgb, var(--color-primary) 14%, var(--color-surface)) 0%,
     var(--color-surface) 100%
   );
   box-shadow: var(--shadow-color) 0 var(--space-2) var(--space-4) 0,
@@ -953,7 +880,7 @@ code {
   padding: var(--space-4);
   margin: var(--space-2) auto var(--space-4) auto;
   text-align: center;
-  border-color: color-mix(in srgb, var(--color-accent) 24%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 28%, transparent);
   border-style: solid;
   border-width: 1px;
   border-radius: 0;
@@ -1147,11 +1074,6 @@ code {
 /* Media Queries */
 
 @media screen and (min-width: 800px) {
-  /* Structure */
-  main {
-    max-width: var(--content-width-md);
-  }
-
   .row-md {
     flex-direction: row;
     align-items: center;
@@ -1167,11 +1089,6 @@ code {
 }
 
 @media screen and (min-width: 1200px) {
-  /* Structure */
-  main {
-    max-width: var(--content-width-lg);
-  }
-
   .row-lg {
     flex-direction: row;
     align-items: center;
@@ -1218,19 +1135,8 @@ code {
 }
 
 @media screen and (min-width: 1400px) {
-  /* Structure */
-
-  main {
-    max-width: var(--content-width-xl);
-  }
-
   footer {
-    margin: 0 auto;
-  }
-
-  section,
-  article {
-    margin: var(--space-6) auto;
+    margin: 0;
   }
 
   /* Typography */
@@ -1254,14 +1160,6 @@ code {
 
   .alt-article-date {
     letter-spacing: var(--space-2);
-  }
-
-  /* Buttons — content buttons only; pills keep intrinsic width */
-
-  .button:not(.button-pill):not(.button--pill),
-  .button:not(.button-pill):not(.button--pill):visited {
-    max-width: 24%;
-    padding: var(--space-1) var(--space-4) !important;
   }
 
   /* Article */

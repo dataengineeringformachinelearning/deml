@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { LucideMoon, LucideSun } from '@lucide/angular';
 
 import { ThemeService } from '../../services/theme';
@@ -8,6 +8,7 @@ import { ThemeService } from '../../services/theme';
   imports: [LucideMoon, LucideSun],
   templateUrl: './theme-toggle.html',
   styleUrl: './theme-toggle.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ThemeToggle {
   private readonly themeService = inject(ThemeService);

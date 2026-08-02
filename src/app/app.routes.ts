@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 
+import { getBlogPost } from './data/blog-posts';
+
 export const routes: Routes = [
   {
     path: '',
@@ -15,6 +17,29 @@ export const routes: Routes = [
     path: 'blog',
     loadComponent: () => import('./pages/blog/blog').then((m) => m.Blog),
     title: 'Blog · DEML',
+  },
+  {
+    path: 'blog/:slug',
+    loadComponent: () => import('./pages/blog-post/blog-post').then((m) => m.BlogPostPage),
+    title: (route) => {
+      const post = getBlogPost(String(route.params['slug'] ?? ''));
+      return post ? `${post.title} · DEML` : 'Post not found · DEML';
+    },
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () => import('./pages/dashboard/dashboard').then((m) => m.Dashboard),
+    title: 'Dashboard · DEML',
+  },
+  {
+    path: 'sites',
+    loadComponent: () => import('./pages/sites/sites').then((m) => m.Sites),
+    title: 'Sites · DEML',
+  },
+  {
+    path: 'account',
+    loadComponent: () => import('./pages/account/account').then((m) => m.Account),
+    title: 'Account · DEML',
   },
   {
     path: '**',

@@ -46,9 +46,9 @@ describe('Banner', () => {
     const host = fixture.nativeElement as HTMLElement;
 
     expect(host.querySelector('.preheader')?.textContent?.trim()).toBe('DEML');
-    expect(host.querySelector('h1#banner-heading')?.textContent?.trim()).toBe(
-      'Build with clarity.',
-    );
+    const heading = host.querySelector('h1.banner-heading');
+    expect(heading?.textContent?.trim()).toBe('Build with clarity.');
+    expect(heading?.id).toMatch(/^banner-heading-/);
     expect(host.querySelector('.lede')?.textContent?.trim()).toBe('Supporting copy.');
     expect(host.querySelector('#projected')?.textContent?.trim()).toBe('Action');
   });

@@ -3,10 +3,10 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Banner } from '../../components/banner/banner';
 
 @Component({
-  selector: 'app-about',
+  selector: 'app-account',
   imports: [Banner],
-  templateUrl: './about.html',
-  styleUrl: './about.css',
+  templateUrl: './account.html',
+  styleUrl: './account.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class About {}
+export class Account {}

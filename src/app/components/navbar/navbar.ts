@@ -1,7 +1,12 @@
+import { DOCUMENT } from '@angular/common';
 import {
+  ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
-  HostListener,
+  Injector,
+  afterNextRender,
+  computed,
   inject,
   input,
   signal,
@@ -12,20 +17,12 @@ import { LucideBoxes, LucideMenu, LucideX } from '@lucide/angular';
 
 import { AuthService } from '../../services/auth';
 import { BREAKPOINT_MD_MQ } from '../../shared/breakpoints';
+import { AUTH_NAV_LINKS, GUEST_NAV_LINKS, type NavLink } from '../../shared/nav-links';
 import { Button } from '../button/button';
 import { ButtonGroup } from '../button-group/button-group';
 import { ThemeToggle } from '../theme-toggle/theme-toggle';
 
-export interface NavLink {
-  label: string;
-  path: string;
-}
-
-const DEFAULT_LINKS: NavLink[] = [
-  { label: 'Home', path: '/' },
-  { label: 'About', path: '/about' },
-  { label: 'Blog', path: '/blog' },
-];
+export type { NavLink };
 
 @Component({
   selector: 'app-navbar',
@@ -41,16 +38,22 @@ const DEFAULT_LINKS: NavLink[] = [
   ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[style.--navbar-icon-color]': 'iconColor() || null',
+    '(document:keydown.escape)': 'onEscape()',
+    '(keydown)': 'onKeydown($event)',
   },
 })
 export class Navbar {
   private readonly auth = inject(AuthService);
+  private readonly document = inject(DOCUMENT);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly injector = inject(Injector);
   private readonly host = inject(ElementRef<HTMLElement>);
 
-  private readonly menuToggle = viewChild<ElementRef<HTMLButtonElement>>('menuToggle');
-  private readonly menuPanel = viewChild<ElementRef<HTMLElement>>('menuPanel');
+  private readonly menuToggle = viewChild.required<ElementRef<HTMLButtonElement>>('menuToggle');
+  private readonly menuPanel = viewChild.required<ElementRef<HTMLElement>>('menuPanel');
 
   /** Override the navbar logo stroke color (any CSS color). */
   readonly iconColor = input<string>();
@@ -61,11 +64,40 @@ export class Navbar {
   /** Brand destination (router path). */
   readonly brandHref = input('/');
 
-  /** Primary navigation links. */
-  readonly links = input<NavLink[]>(DEFAULT_LINKS);
+  /** Optional full override of primary navigation links. */
+  readonly links = input<NavLink[]>();
 
   readonly loggedIn = this.auth.loggedIn;
+
+  /** Guest vs auth link set, unless `links` is provided. */
+  readonly navLinks = computed(() => {
+    const override = this.links();
+    if (override) {
+      return override;
+    }
+    return this.loggedIn() ? AUTH_NAV_LINKS : GUEST_NAV_LINKS;
+  });
+
   readonly menuOpen = signal(false);
+
+  constructor() {
+    afterNextRender(() => {
+      const win = this.document.defaultView;
+      if (!win?.matchMedia) {
+        return;
+      }
+
+      const media = win.matchMedia(BREAKPOINT_MD_MQ);
+      const onBreakpoint = () => {
+        if (media.matches) {
+          this.closeMenu();
+        }
+      };
+
+      media.addEventListener('change', onBreakpoint);
+      this.destroyRef.onDestroy(() => media.removeEventListener('change', onBreakpoint));
+    });
+  }
 
   login(): void {
     this.auth.login();
@@ -88,7 +120,7 @@ export class Navbar {
   openMenu(): void {
     this.menuOpen.set(true);
     this.setMainInert(true);
-    queueMicrotask(() => this.focusFirstInMenu());
+    this.afterView(() => this.focusFirstInMenu());
   }
 
   closeMenu(returnFocus = false): void {
@@ -98,23 +130,14 @@ export class Navbar {
     this.menuOpen.set(false);
     this.setMainInert(false);
     if (returnFocus) {
-      queueMicrotask(() => this.menuToggle()?.nativeElement.focus());
+      this.afterView(() => this.menuToggle().nativeElement.focus());
     }
   }
 
-  @HostListener('document:keydown.escape')
   onEscape(): void {
     this.closeMenu(true);
   }
 
-  @HostListener('window:resize')
-  onResize(): void {
-    if (typeof window !== 'undefined' && window.matchMedia(BREAKPOINT_MD_MQ).matches) {
-      this.closeMenu();
-    }
-  }
-
-  @HostListener('keydown', ['$event'])
   onKeydown(event: KeyboardEvent): void {
     if (!this.menuOpen() || event.key !== 'Tab') {
       return;
@@ -127,7 +150,7 @@ export class Navbar {
 
     const first = focusables[0];
     const last = focusables[focusables.length - 1];
-    const active = document.activeElement as HTMLElement | null;
+    const active = this.document.activeElement as HTMLElement | null;
 
     if (event.shiftKey && active === first) {
       event.preventDefault();
@@ -141,16 +164,20 @@ export class Navbar {
     }
   }
 
+  private afterView(fn: () => void): void {
+    afterNextRender(fn, { injector: this.injector });
+  }
+
   private focusFirstInMenu(): void {
-    const panel = this.menuPanel()?.nativeElement as HTMLElement | undefined;
-    const first = panel?.querySelector(
+    const panel = this.menuPanel().nativeElement;
+    const first = panel.querySelector(
       'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
     ) as HTMLElement | null;
     first?.focus();
   }
 
   private focusableInNavbar(): HTMLElement[] {
-    const root = this.host.nativeElement as HTMLElement;
+    const root = this.host.nativeElement;
     const nodes = Array.from(
       root.querySelectorAll(
         'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
@@ -170,10 +197,7 @@ export class Navbar {
   }
 
   private setMainInert(inert: boolean): void {
-    if (typeof document === 'undefined') {
-      return;
-    }
-    const main = document.getElementById('main-content');
+    const main = this.document.getElementById('main-content');
     if (!main) {
       return;
     }

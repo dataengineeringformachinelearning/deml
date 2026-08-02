@@ -1,20 +1,19 @@
-/* Container — host is the padded shell (mobile-first) */
+/* Card grid — host is the grid; 1 col mobile, 50/50 from 800px */
 
 :host {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
   box-sizing: border-box;
   width: 100%;
   max-width: none;
   margin: 0;
   padding: 0 var(--space-2);
-  gap: 0;
 }
 
 @media screen and (min-width: 800px) {
   :host {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     padding: 0 var(--space-4);
   }
 }

@@ -40,4 +40,9 @@ describe('ButtonGroup', () => {
     const group = fixture.nativeElement.querySelector('app-button-group') as HTMLElement;
     expect(group.classList.contains('place-end')).toBe(true);
   });
+
+  it('should default to responsive layout', () => {
+    const group = fixture.nativeElement.querySelector('app-button-group') as HTMLElement;
+    expect(group.getAttribute('data-layout')).toBe('responsive');
+  });
 });

@@ -1,15 +1,18 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
 import { Banner } from '../../components/banner/banner';
 import { Button } from '../../components/button/button';
 import { ButtonGroup } from '../../components/button-group/button-group';
+import { Card } from '../../components/card/card';
+import { CardGrid } from '../../components/card-grid/card-grid';
 import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-home',
-  imports: [Banner, Button, ButtonGroup],
+  imports: [Banner, Button, ButtonGroup, Card, CardGrid],
   templateUrl: './home.html',
   styleUrl: './home.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home {
   private readonly auth = inject(AuthService);

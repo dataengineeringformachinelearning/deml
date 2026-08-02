@@ -1,5 +1,12 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
+import {
+  Injectable,
+  PLATFORM_ID,
+  afterNextRender,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -12,13 +19,12 @@ export class ThemeService {
   private readonly isBrowser = isPlatformBrowser(this.platformId);
 
   readonly theme = signal<ThemeMode>(this.readInitialTheme());
+  readonly isDark = computed(() => this.theme() === 'dark');
 
   constructor() {
-    this.applyTheme(this.theme());
-  }
-
-  isDark(): boolean {
-    return this.theme() === 'dark';
+    afterNextRender(() => {
+      this.applyTheme(this.theme());
+    });
   }
 
   toggle(): void {
@@ -49,7 +55,9 @@ export class ThemeService {
       /* ignore storage access errors */
     }
 
-    const prefersLight = window.matchMedia?.('(prefers-color-scheme: light)')?.matches;
+    const prefersLight = this.document.defaultView?.matchMedia?.(
+      '(prefers-color-scheme: light)',
+    )?.matches;
     return prefersLight ? 'light' : 'dark';
   }
 

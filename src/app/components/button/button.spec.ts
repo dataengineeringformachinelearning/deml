@@ -8,7 +8,7 @@ import { Button } from './button';
   selector: 'app-host',
   imports: [Button],
   template: `
-    <app-button variant="accent" shape="pill">Sign up</app-button>
+    <app-button variant="primary" shape="pill">Sign up</app-button>
     <app-button variant="secondary" shape="pill" href="/blog/">Read</app-button>
     <app-button variant="accent" shape="pill" routerLink="/blog">Router</app-button>
   `,
@@ -32,7 +32,7 @@ describe('Button', () => {
   it('should render projected label on a button', () => {
     const button = fixture.nativeElement.querySelector('button.button') as HTMLButtonElement;
     expect(button.textContent?.trim()).toBe('Sign up');
-    expect(button.classList.contains('button--accent')).toBe(true);
+    expect(button.classList.contains('button--primary')).toBe(true);
     expect(button.classList.contains('button--pill')).toBe(true);
   });
 

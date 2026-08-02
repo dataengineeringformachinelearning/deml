@@ -1,14 +1,18 @@
-import { Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 export type BannerHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
+let bannerIdSeq = 0;
+
 @Component({
   selector: 'app-banner',
-  imports: [],
   templateUrl: './banner.html',
   styleUrl: './banner.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Banner {
+  private readonly autoId = `banner-heading-${++bannerIdSeq}`;
+
   /** Optional uppercase label above the heading. */
   readonly preheader = input<string>();
 
@@ -22,7 +26,9 @@ export class Banner {
   readonly headingLevel = input<BannerHeadingLevel>(1);
 
   /** Accessible id for the heading element. */
-  readonly headingId = input('banner-heading');
+  readonly headingId = input<string>();
 
-  readonly labelledBy = computed(() => (this.heading() ? this.headingId() : null));
+  readonly resolvedHeadingId = computed(() => this.headingId() || this.autoId);
+
+  readonly labelledBy = computed(() => (this.heading() ? this.resolvedHeadingId() : null));
 }

@@ -28,15 +28,15 @@ describe('Navbar', () => {
   });
 
   it('should apply iconColor to the navbar icon CSS variable', async () => {
-    fixture.componentRef.setInput('iconColor', '#c4a484');
+    fixture.componentRef.setInput('iconColor', '#c5a653');
     fixture.detectChanges();
     await fixture.whenStable();
 
     const host = fixture.nativeElement as HTMLElement;
-    expect(host.style.getPropertyValue('--navbar-icon-color').trim()).toBe('#c4a484');
+    expect(host.style.getPropertyValue('--navbar-icon-color').trim()).toBe('#c5a653');
   });
 
-  it('should render dynamic nav links without redundant aria-labels', () => {
+  it('should render guest nav links when logged out', () => {
     const host = fixture.nativeElement as HTMLElement;
     const links = Array.from(host.querySelectorAll('#site-navbar-menu a'));
 
@@ -44,6 +44,24 @@ describe('Navbar', () => {
     for (const link of links) {
       expect(link.hasAttribute('aria-label')).toBe(false);
     }
+  });
+
+  it('should render auth nav links when logged in', async () => {
+    auth.login();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const host = fixture.nativeElement as HTMLElement;
+    const links = Array.from(host.querySelectorAll('#site-navbar-menu a'));
+
+    expect(links.map((el) => el.textContent?.trim())).toEqual([
+      'Home',
+      'About',
+      'Blog',
+      'Dashboard',
+      'Sites',
+      'Account',
+    ]);
   });
 
   it('should show Log in and Sign up when logged out', () => {

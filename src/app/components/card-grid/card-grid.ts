@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-container',
-  templateUrl: './container.html',
-  styleUrl: './container.css',
+  selector: 'app-card-grid',
+  templateUrl: './card-grid.html',
+  styleUrl: './card-grid.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Container {}
+export class CardGrid {}
