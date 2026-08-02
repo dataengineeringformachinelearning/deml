@@ -1,0 +1,8 @@
+{
+  "name": "deml-frontend-shim",
+  "private": true,
+  "description": "Vercel rootDirectory shim — app lives at repo root on deml-ui.",
+  "scripts": {
+    "build": "node ../scripts/vercel-frontend-build.mjs"
+  }
+}
