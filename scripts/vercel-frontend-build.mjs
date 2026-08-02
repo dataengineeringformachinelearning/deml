@@ -13,8 +13,12 @@ const scriptsDir = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(scriptsDir, '..');
 const frontendDir = path.join(root, 'frontend');
 
-function run(command, args, cwd) {
-  const result = spawnSync(command, args, { cwd, stdio: 'inherit', env: process.env });
+function run(command, args, cwd, envExtra = {}) {
+  const result = spawnSync(command, args, {
+    cwd,
+    stdio: 'inherit',
+    env: { ...process.env, ...envExtra },
+  });
   if (result.status !== 0) {
     process.exit(result.status ?? 1);
   }
@@ -28,7 +32,10 @@ if (!fs.existsSync(path.join(root, 'node_modules', 'deml-ui'))) {
 
 run('node', ['set-env.js'], root);
 run('npm', ['run', 'build:contracts'], root);
-run('npx', ['ng', 'build', '--configuration', 'production'], root);
+// Static browser build — avoids SSR/prerender OOM on Vercel 8GB builders.
+run('npx', ['ng', 'build', '--configuration', 'vercel'], root, {
+  NODE_OPTIONS: '--max-old-space-size=6144',
+});
 
 const from = path.join(root, 'dist', 'deml', 'browser');
 const to = path.join(frontendDir, 'dist', 'deml', 'browser');
