@@ -1,0 +1,14 @@
+<app-banner
+  preheader="DEML"
+  heading="Build with clarity."
+  lede="A focused space for ideas, writing, and work that stays out of the way."
+>
+  <app-button-group>
+    @if (!loggedIn()) {
+      <app-button variant="accent" shape="pill" (click)="login()">Sign up</app-button>
+      <app-button variant="secondary" shape="pill" (click)="login()">Log in</app-button>
+    } @else {
+      <app-button variant="accent" shape="pill" routerLink="/blog">Read the blog</app-button>
+    }
+  </app-button-group>
+</app-banner>

@@ -1,21 +1,16 @@
-/* Navbar — Spotify-inspired fixed top bar; mobile-first */
+/* Navbar — fixed top bar; mobile-first */
 
 :host {
   display: block;
   --navbar-inset: var(--space-2);
   --navbar-icon-size: 32px;
-  /* Theme tokens — Spotify-like shapes, site colors */
-  --navbar-bg: var(--color-background);
-  --navbar-fg: var(--color-text-primary);
+  --navbar-bg: var(--color-bg);
+  --navbar-fg: var(--color-text);
   --navbar-muted: var(--color-text-secondary);
   --navbar-accent: var(--color-accent);
   --navbar-accent-hover: var(--color-accent-hover);
-  --navbar-pill: var(--color-accent);
-  --navbar-pill-hover: var(--color-accent-hover);
-  --navbar-on-pill: var(--color-on-accent);
   --navbar-surface: var(--color-surface);
   --navbar-focus: var(--color-focus);
-  /* Keep document flow clear of the fixed bar (closed height). */
   --navbar-bar-height: calc(var(--navbar-inset) * 2 + var(--navbar-icon-size));
   min-height: var(--navbar-bar-height);
 }
@@ -26,21 +21,18 @@
   left: 0;
   right: 0;
   z-index: 1000;
+  display: grid;
   box-sizing: border-box;
   width: 100%;
   max-width: none;
   margin: 0;
-  padding-top: var(--navbar-inset);
-  padding-right: var(--navbar-inset);
-  padding-bottom: var(--navbar-inset);
-  padding-left: var(--navbar-inset);
+  padding: var(--navbar-inset);
   color: var(--navbar-fg);
   background-color: var(--navbar-bg);
   grid-template-columns: 1fr auto;
   grid-template-areas:
     "brand toggle"
-    "nav nav"
-    "actions actions";
+    "panel panel";
   gap: var(--navbar-inset);
   align-items: center;
 }
@@ -73,8 +65,8 @@
 }
 
 .site-navbar-icon:focus-visible {
-  outline: 2px solid var(--navbar-focus);
-  outline-offset: 3px;
+  outline: 3px solid var(--navbar-focus);
+  outline-offset: 2px;
   border-radius: 50%;
 }
 
@@ -105,13 +97,19 @@
 }
 
 .site-navbar-menu-toggle:focus-visible {
-  outline: 2px solid var(--navbar-focus);
-  outline-offset: 3px;
+  outline: 3px solid var(--navbar-focus);
+  outline-offset: 2px;
+}
+
+.site-navbar-panel {
+  display: none;
+  grid-area: panel;
+  flex-direction: column;
+  gap: var(--navbar-inset);
+  width: 100%;
 }
 
 .main-navigation {
-  display: none;
-  grid-area: nav;
   justify-self: stretch;
 }
 
@@ -139,62 +137,21 @@
   transition: color 120ms ease, background-color 120ms ease;
 }
 
-.main-navigation ul li a:hover {
+.main-navigation ul li a:hover,
+.main-navigation ul li a.is-active {
   color: var(--navbar-accent-hover);
   background-color: transparent;
 }
 
 .main-navigation ul li a:focus-visible {
-  outline: 2px solid var(--navbar-focus);
+  outline: 3px solid var(--navbar-focus);
   outline-offset: 2px;
   color: var(--navbar-accent);
 }
 
-.site-button-group {
-  display: none;
-  grid-area: actions;
-  justify-content: flex-start;
-  gap: var(--space-1);
-}
-
-.site-button-group .button {
-  max-width: none;
-  width: auto;
-  min-height: 40px;
-  padding: 8px 32px !important;
-  border-radius: 9999px;
-  border-width: 0;
-  border-color: transparent;
-  background-color: var(--navbar-pill);
-  color: var(--navbar-on-pill);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  line-height: 1;
-  text-transform: none;
-  box-shadow: none;
-  transition:
-    transform 120ms ease,
-    background-color 120ms ease,
-    color 120ms ease;
-}
-
-.site-button-group .button:hover {
-  background-color: var(--navbar-pill-hover);
-  border-color: transparent;
-  color: var(--navbar-on-pill);
-  box-shadow: none;
-  transform: scale(1.04);
-}
-
-.site-button-group .button:focus-visible {
-  outline: 2px solid var(--navbar-focus);
-  outline-offset: 3px;
-}
-
-.site-navbar.is-menu-open .main-navigation,
-.site-navbar.is-menu-open .site-button-group {
-  display: flex;
+app-button-group {
+  justify-self: stretch;
+  width: 100%;
 }
 
 .site-navbar.is-menu-open {
@@ -203,25 +160,41 @@
   background-color: var(--navbar-bg);
 }
 
+.site-navbar.is-menu-open .site-navbar-panel {
+  display: flex;
+}
+
+/* Full-width actions when stacked in the mobile menu */
+.site-navbar.is-menu-open app-button-group app-button,
+.site-navbar.is-menu-open app-button-group app-theme-toggle {
+  display: block;
+  width: 100%;
+}
+
+.site-navbar.is-menu-open app-button-group .button--pill,
+.site-navbar.is-menu-open app-button-group .theme-toggle {
+  width: 100%;
+  min-height: 40px;
+}
+
 @media screen and (min-width: 800px) {
   .site-navbar {
     grid-template-columns: 1fr auto 1fr;
-    grid-template-areas: none;
-    gap: var(--navbar-inset);
-  }
-
-  .site-navbar-branding,
-  .main-navigation,
-  .site-button-group {
-    grid-area: auto;
+    grid-template-areas: "brand nav actions";
+    align-items: center;
   }
 
   .site-navbar-menu-toggle {
     display: none;
   }
 
+  .site-navbar-panel {
+    display: contents;
+  }
+
   .main-navigation {
     display: block;
+    grid-area: nav;
     justify-self: center;
   }
 
@@ -232,17 +205,26 @@
     gap: var(--space-1);
   }
 
-  .site-button-group {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
+  app-button-group {
+    grid-area: actions;
+    justify-self: end;
+    width: max-content;
   }
 
-  .site-navbar.is-menu-open .main-navigation {
-    display: block;
+  .site-navbar.is-menu-open app-button-group app-button,
+  .site-navbar.is-menu-open app-button-group app-theme-toggle {
+    display: inline-flex;
+    width: auto;
   }
 
-  .site-navbar.is-menu-open .site-button-group {
-    display: flex;
+  .site-navbar.is-menu-open app-button-group .button--pill,
+  .site-navbar.is-menu-open app-button-group .theme-toggle {
+    width: auto;
+  }
+
+  .site-navbar.is-menu-open app-button-group .theme-toggle {
+    width: 40px;
+    min-height: 40px;
+    padding: 0;
   }
 }

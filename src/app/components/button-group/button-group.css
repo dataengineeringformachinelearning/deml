@@ -1,0 +1,47 @@
+/* Button group — flex shell for actions (mobile-first) */
+
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 100%;
+}
+
+:host(.place-end) .button-group {
+  justify-content: flex-end;
+}
+
+:host(.place-start) .button-group {
+  justify-content: flex-start;
+}
+
+:host(.place-center) .button-group {
+  justify-content: center;
+}
+
+.button-group > * {
+  flex: 0 0 auto;
+}
+
+@media screen and (min-width: 800px) {
+  :host {
+    width: max-content;
+  }
+
+  .button-group {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    width: max-content;
+  }
+}

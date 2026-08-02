@@ -1,0 +1,113 @@
+/* Host must not generate its own box — avoids empty primary “ghost” rectangles */
+:host {
+  display: contents;
+}
+
+.button,
+.button:visited {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+  padding: var(--space-1) var(--space-4);
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: 300;
+  line-height: 1;
+  text-decoration: none;
+  appearance: none;
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    background-color 120ms ease,
+    color 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.button:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.button.is-disabled,
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Variants */
+
+.button--primary {
+  color: var(--color-on-primary);
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.button--primary:hover {
+  color: var(--color-on-primary);
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.button--secondary {
+  color: var(--color-text);
+  background-color: transparent;
+  border-color: var(--color-border);
+}
+
+.button--secondary:hover {
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border-color: var(--color-text-secondary);
+  box-shadow: none;
+}
+
+.button--accent {
+  color: var(--color-on-accent);
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.button--accent:hover {
+  color: var(--color-on-accent);
+  background-color: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+  box-shadow: none;
+}
+
+/* Shapes */
+
+.button--pill {
+  flex: 0 0 auto;
+  min-width: max-content;
+  max-width: none;
+  min-height: 40px;
+  padding: 8px 32px;
+  border-radius: 9999px;
+  border-width: 0;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  box-shadow: none;
+}
+
+.button--pill.button--secondary {
+  border-width: 1px;
+}
+
+.button--pill:hover {
+  box-shadow: none;
+  transform: scale(1.04);
+}

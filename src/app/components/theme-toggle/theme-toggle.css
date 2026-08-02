@@ -1,0 +1,44 @@
+:host {
+  display: inline-flex;
+  width: auto;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  background-color: var(--color-surface);
+  color: var(--color-accent);
+  cursor: pointer;
+  appearance: none;
+  transition:
+    transform 120ms ease,
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.theme-toggle:hover {
+  color: var(--color-accent-hover);
+  background-color: var(--color-primary);
+  border-color: var(--color-primary-hover);
+  transform: scale(1.04);
+}
+
+.theme-toggle:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.theme-toggle svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
