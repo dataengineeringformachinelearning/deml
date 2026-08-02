@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+}
+
+/* Equal outer rhythm between stacked section hosts inside a page body */
+:host ::ng-deep > app-section-header:not(:first-child) {
+  margin-top: var(--space-6);
+}
+
+@media screen and (min-width: 800px) {
+  :host ::ng-deep > app-section-header:not(:first-child) {
+    margin-top: var(--space-8);
+  }
+}
+
+:host([data-variant='auth']) {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100%;
+}
+
+:host([data-variant='auth']) .page-body--auth {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: calc(100dvh - var(--space-16));
+  padding-block: var(--space-6);
+}

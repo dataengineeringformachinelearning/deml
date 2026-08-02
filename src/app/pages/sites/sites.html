@@ -9,7 +9,7 @@
   </app-button-group>
 </app-banner>
 
-<section class="page-body page-body--catalog sites" aria-labelledby="sites-heading">
+<app-page-section variant="catalog" labelledBy="sites-heading">
   <app-section-header
     eyebrow="Connected"
     heading="Your sites"
@@ -18,58 +18,49 @@
   />
 
   <app-dashboard-grid>
-    <app-stat-card
-      size="sm"
-      accent="primary"
-      label="Live sites"
-      value="2"
-      delta="+1"
-      meta="Connected environments"
-    />
-
-    <app-stat-card
-      size="sm"
-      accent="gold"
-      label="Uptime"
-      value="99.8%"
-      delta="+0.2%"
-      meta="Rolling 30 days"
-      [sparkline]="uptimeSpark"
-    />
-
-    <app-stat-card
-      size="sm"
-      accent="red"
-      label="Open previews"
-      value="1"
-      meta="Pull request environments"
-    />
-
-    <app-chart-card
-      size="lg"
-      accent="primary"
-      heading="Traffic by site"
-      meta="Sessions · last 7 days"
-    >
-      <app-bar-chart
-        [items]="traffic"
-        accent="primary"
-        ariaLabel="Sessions by site"
-      />
-    </app-chart-card>
-
-    <app-chart-card
-      size="lg"
-      accent="gold"
-      heading="Recent deployments"
-      meta="Latest releases"
-    >
-      <app-metric-list
-        [items]="deployments"
-        accent="gold"
-        ariaLabel="Recent site deployments"
-      />
-    </app-chart-card>
+    @for (tile of tiles; track tile.id) {
+      @switch (tile.kind) {
+        @case ('stat') {
+          <app-stat-card
+            [size]="tile.size"
+            [accent]="tile.accent"
+            [label]="tile.label"
+            [value]="tile.value"
+            [delta]="tile.delta"
+            [meta]="tile.meta"
+            [sparkline]="tile.sparkline"
+          />
+        }
+        @case ('bar') {
+          <app-chart-card
+            [size]="tile.size"
+            [accent]="tile.accent"
+            [heading]="tile.heading"
+            [meta]="tile.meta"
+          >
+            <app-bar-chart
+              [items]="tile.items"
+              [accent]="tile.accent"
+              [ariaLabel]="tile.ariaLabel"
+            />
+          </app-chart-card>
+        }
+        @case ('metrics') {
+          <app-chart-card
+            [size]="tile.size"
+            [accent]="tile.accent"
+            [heading]="tile.heading"
+            [meta]="tile.meta"
+          >
+            <app-metric-list
+              [items]="tile.items"
+              [accent]="tile.accent"
+              [ariaLabel]="tile.ariaLabel"
+            />
+          </app-chart-card>
+        }
+      }
+    }
   </app-dashboard-grid>
 
   <app-section-header
@@ -97,4 +88,4 @@
       </app-card>
     }
   </app-card-grid>
-</section>
+</app-page-section>

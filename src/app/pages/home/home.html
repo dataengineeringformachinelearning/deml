@@ -13,7 +13,7 @@
   </app-button-group>
 </app-banner>
 
-<section class="page-body page-body--catalog home-cards" aria-labelledby="home-cards-heading">
+<app-page-section variant="catalog" labelledBy="home-cards-heading">
   <app-section-header
     heading="Explore"
     lede="Jump into writing, sites, metrics, and account controls."
@@ -21,60 +21,24 @@
   />
 
   <app-card-grid>
-    <app-card
-      heading="Write"
-      subtext="Capture ideas with a calm, focused editor."
-      visual="gold"
-    >
-      <app-button-group align="center" layout="row">
-        <app-button variant="primary" shape="pill" routerLink="/blog">Learn more</app-button>
-        <app-button variant="secondary" shape="pill" routerLink="/learn">Learn</app-button>
-      </app-button-group>
-    </app-card>
-
-    <app-card
-      heading="Sites"
-      subtext="Ship a clean presence without the clutter."
-      visual="olive"
-    >
-      <app-button-group align="center" layout="row">
-        @if (loggedIn()) {
-          <app-button variant="primary" shape="pill" routerLink="/sites">Open Sites</app-button>
-        } @else {
-          <app-button variant="primary" shape="pill" routerLink="/signup">Get started</app-button>
-        }
-        <app-button variant="secondary" shape="pill" routerLink="/learn">Learn more</app-button>
-      </app-button-group>
-    </app-card>
-
-    <app-card
-      heading="Dashboard"
-      subtext="See what matters across your workspace."
-      visual="red"
-    >
-      <app-button-group align="center" layout="row">
-        @if (loggedIn()) {
-          <app-button variant="primary" shape="pill" routerLink="/dashboard">Open</app-button>
-        } @else {
-          <app-button variant="primary" shape="pill" routerLink="/login">Sign in</app-button>
-        }
-        <app-button variant="secondary" shape="pill" routerLink="/blog">Read</app-button>
-      </app-button-group>
-    </app-card>
-
-    <app-card
-      heading="Account"
-      subtext="Preferences that stay out of the way."
-      visual="gold"
-    >
-      <app-button-group align="center" layout="row">
-        @if (loggedIn()) {
-          <app-button variant="primary" shape="pill" routerLink="/account">Manage</app-button>
-        } @else {
-          <app-button variant="primary" shape="pill" routerLink="/signup">Sign up</app-button>
-        }
-        <app-button variant="secondary" shape="pill" routerLink="/learn">Learn more</app-button>
-      </app-button-group>
-    </app-card>
+    @for (card of cards(); track card.id) {
+      <app-card
+        [heading]="card.heading"
+        [subtext]="card.subtext"
+        [visual]="card.visual"
+      >
+        <app-button-group align="center" layout="row">
+          @for (action of card.actions; track action.label) {
+            <app-button
+              [variant]="action.variant"
+              shape="pill"
+              [routerLink]="action.routerLink"
+            >
+              {{ action.label }}
+            </app-button>
+          }
+        </app-button-group>
+      </app-card>
+    }
   </app-card-grid>
-</section>
+</app-page-section>

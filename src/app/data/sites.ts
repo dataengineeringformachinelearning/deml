@@ -1,4 +1,11 @@
-import type { DashBarItem, DashMetricItem, DashPoint } from '../components/dashboard/dashboard.types';
+import type {
+  DashAccent,
+  DashBarItem,
+  DashMetricItem,
+  DashPoint,
+  DashSize,
+} from '../components/dashboard/dashboard.types';
+import type { DashTile } from './dashboard';
 
 export interface SiteCard {
   readonly id: string;
@@ -55,4 +62,58 @@ export const SITE_DEPLOYMENTS: readonly DashMetricItem[] = [
   { label: 'Studio · main', value: '2h ago', meta: 'Success' },
   { label: 'Docs · staging', value: '5h ago', meta: 'Success' },
   { label: 'Preview · pr-42', value: '1d ago', meta: 'Expired' },
+];
+
+/** Overview tiles for the sites page — same contract as the dashboard bento. */
+export const SITE_TILES: readonly DashTile[] = [
+  {
+    kind: 'stat',
+    id: 'live-sites',
+    size: 'sm' satisfies DashSize,
+    accent: 'primary' satisfies DashAccent,
+    label: 'Live sites',
+    value: '2',
+    delta: '+1',
+    meta: 'Connected environments',
+  },
+  {
+    kind: 'stat',
+    id: 'uptime',
+    size: 'sm',
+    accent: 'gold',
+    label: 'Uptime',
+    value: '99.8%',
+    delta: '+0.2%',
+    meta: 'Rolling 30 days',
+    sparkline: SITE_UPTIME_SPARK,
+  },
+  {
+    kind: 'stat',
+    id: 'previews',
+    size: 'sm',
+    accent: 'red',
+    label: 'Open previews',
+    value: '1',
+    meta: 'Pull request environments',
+  },
+  {
+    kind: 'bar',
+    id: 'traffic',
+    size: 'lg',
+    accent: 'primary',
+    heading: 'Traffic by site',
+    meta: 'Sessions · last 7 days',
+    items: SITE_TRAFFIC,
+    ariaLabel: 'Sessions by site',
+  },
+  {
+    kind: 'metrics',
+    id: 'deployments',
+    size: 'lg',
+    accent: 'gold',
+    heading: 'Recent deployments',
+    meta: 'Latest releases',
+    items: SITE_DEPLOYMENTS,
+    ariaLabel: 'Recent site deployments',
+  },
 ];

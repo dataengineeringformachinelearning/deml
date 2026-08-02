@@ -4,7 +4,7 @@
   lede="Live pulse of your workspace — listeners, sessions, and what people open."
 />
 
-<section class="page-body page-body--catalog dashboard" aria-labelledby="dashboard-heading">
+<app-page-section variant="catalog" labelledBy="dashboard-heading">
   <app-section-header
     eyebrow="Pulse"
     heading="Overview"
@@ -13,116 +13,62 @@
   />
 
   <app-dashboard-grid>
-    <app-stat-card
-      size="sm"
-      accent="primary"
-      label="Active listeners"
-      value="12.4k"
-      delta="+18%"
-      meta="vs prior period"
-    />
-
-    <app-stat-card
-      size="sm"
-      accent="gold"
-      label="Avg. session"
-      value="4m 12s"
-      delta="+6%"
-      meta="Time on site"
-    />
-
-    <app-stat-card
-      size="sm"
-      accent="red"
-      label="Bounce rate"
-      value="31%"
-      delta="-4%"
-      meta="Lower is better"
-    />
-
-    <app-stat-card
-      size="md"
-      accent="primary"
-      label="Engagement score"
-      value="78"
-      delta="+9%"
-      meta="Composite of reads, stars, and return visits"
-      [sparkline]="engagementSpark"
-    />
-
-    <app-stat-card
-      size="md"
-      accent="gold"
-      label="Retention"
-      value="64%"
-      delta="+2%"
-      meta="Users who returned within 7 days"
-      [sparkline]="retentionSpark"
-    />
-
-    <app-chart-card
-      size="hero"
-      accent="primary"
-      heading="Weekly activity"
-      meta="Sessions · last 8 weeks"
-    >
-      <app-area-chart
-        [points]="sessionsMonth"
-        accent="primary"
-        ariaLabel="Weekly sessions over the last eight weeks"
-      />
-    </app-chart-card>
-
-    <app-chart-card
-      size="lg"
-      accent="gold"
-      heading="Top channels"
-      meta="Traffic sources"
-    >
-      <app-bar-chart
-        [items]="topChannels"
-        accent="gold"
-        ariaLabel="Traffic by channel"
-      />
-    </app-chart-card>
-
-    <app-chart-card
-      size="lg"
-      accent="red"
-      heading="Top content"
-      meta="Most opened"
-    >
-      <app-metric-list
-        [items]="topContent"
-        accent="red"
-        ariaLabel="Top content by opens"
-      />
-    </app-chart-card>
-
-    <app-chart-card
-      size="wide"
-      accent="primary"
-      heading="This week"
-      meta="Daily listeners"
-    >
-      <app-area-chart
-        [points]="listenersWeek"
-        accent="primary"
-        ariaLabel="Daily listeners this week"
-      />
-    </app-chart-card>
-
-    <app-chart-card
-      size="tall"
-      accent="gold"
-      heading="Devices"
-      meta="Share of sessions"
-    >
-      <app-bar-chart
-        [items]="deviceMix"
-        accent="gold"
-        ariaLabel="Sessions by device type"
-      />
-    </app-chart-card>
+    @for (tile of tiles; track tile.id) {
+      @switch (tile.kind) {
+        @case ('stat') {
+          <app-stat-card
+            [size]="tile.size"
+            [accent]="tile.accent"
+            [label]="tile.label"
+            [value]="tile.value"
+            [delta]="tile.delta"
+            [meta]="tile.meta"
+            [sparkline]="tile.sparkline"
+          />
+        }
+        @case ('area') {
+          <app-chart-card
+            [size]="tile.size"
+            [accent]="tile.accent"
+            [heading]="tile.heading"
+            [meta]="tile.meta"
+          >
+            <app-area-chart
+              [points]="tile.points"
+              [accent]="tile.accent"
+              [ariaLabel]="tile.ariaLabel"
+            />
+          </app-chart-card>
+        }
+        @case ('bar') {
+          <app-chart-card
+            [size]="tile.size"
+            [accent]="tile.accent"
+            [heading]="tile.heading"
+            [meta]="tile.meta"
+          >
+            <app-bar-chart
+              [items]="tile.items"
+              [accent]="tile.accent"
+              [ariaLabel]="tile.ariaLabel"
+            />
+          </app-chart-card>
+        }
+        @case ('metrics') {
+          <app-chart-card
+            [size]="tile.size"
+            [accent]="tile.accent"
+            [heading]="tile.heading"
+            [meta]="tile.meta"
+          >
+            <app-metric-list
+              [items]="tile.items"
+              [accent]="tile.accent"
+              [ariaLabel]="tile.ariaLabel"
+            />
+          </app-chart-card>
+        }
+      }
+    }
   </app-dashboard-grid>
-</section>
+</app-page-section>

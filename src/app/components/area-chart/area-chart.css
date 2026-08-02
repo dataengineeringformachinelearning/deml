@@ -43,12 +43,17 @@
   border: var(--border-width) solid var(--color-plot-border);
 }
 
-/* Full plot — fill card width; height from aspect (soft floor only) */
+/*
+ * Full plot — fill card width; height from aspect.
+ * Soft floor/ceiling on the 8px grid; never squash the viewBox.
+ */
 :host(:not([data-variant='spark'])) .area-chart-frame {
   aspect-ratio: var(--chart-aspect);
-  width: 100%;
+  width: min(100%, calc(var(--chart-max-block) * var(--chart-aspect)));
   height: auto;
   min-height: var(--chart-min-block);
+  max-height: var(--chart-max-block);
+  margin-inline: auto;
 }
 
 .area-chart {
@@ -126,10 +131,12 @@
 }
 
 :host([data-variant='spark']) .area-chart-frame {
-  width: 100%;
+  width: min(100%, calc(var(--chart-spark-max-block) * var(--chart-spark-aspect)));
   aspect-ratio: var(--chart-spark-aspect);
   height: auto;
   min-height: var(--chart-spark-min-block);
+  max-height: var(--chart-spark-max-block);
+  margin-inline: auto;
   padding: 0;
   border: 0;
   background-color: transparent;

@@ -5,12 +5,13 @@ import { Button } from '../../components/button/button';
 import { ButtonGroup } from '../../components/button-group/button-group';
 import { CheckboxField } from '../../components/checkbox-field/checkbox-field';
 import { FormPanel } from '../../components/form-panel/form-panel';
+import { PageSection } from '../../components/page-section/page-section';
 import { TextField } from '../../components/text-field/text-field';
 import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-signup',
-  imports: [FormPanel, TextField, CheckboxField, Button, ButtonGroup, RouterLink],
+  imports: [PageSection, FormPanel, TextField, CheckboxField, Button, ButtonGroup, RouterLink],
   templateUrl: './signup.html',
   styleUrl: './signup.css',
   host: { class: 'page page--auth' },

@@ -11,7 +11,7 @@
   </app-button-group>
 </app-banner>
 
-<section class="page-body page-body--catalog account" aria-labelledby="account-heading">
+<app-page-section variant="catalog" labelledBy="account-heading">
   <app-section-header
     eyebrow="Settings"
     heading="Your account"
@@ -20,42 +20,35 @@
   />
 
   <app-dashboard-grid>
-    <app-stat-card
-      size="sm"
-      accent="primary"
-      label="Plan"
-      value="Pro"
-      meta="Workspace seat"
-    />
-
-    <app-stat-card
-      size="sm"
-      accent="gold"
-      label="Sites linked"
-      value="3"
-      meta="Live, staging, preview"
-    />
-
-    <app-stat-card
-      size="sm"
-      accent="red"
-      label="Theme"
-      [value]="isDark() ? 'Dark' : 'Light'"
-      meta="Applies across the app"
-    />
-
-    <app-chart-card
-      size="wide"
-      accent="primary"
-      heading="Recent activity"
-      meta="Account timeline"
-    >
-      <app-metric-list
-        [items]="activity"
-        accent="primary"
-        ariaLabel="Recent account activity"
-      />
-    </app-chart-card>
+    @for (tile of tiles(); track tile.id) {
+      @switch (tile.kind) {
+        @case ('stat') {
+          <app-stat-card
+            [size]="tile.size"
+            [accent]="tile.accent"
+            [label]="tile.label"
+            [value]="tile.value"
+            [delta]="tile.delta"
+            [meta]="tile.meta"
+            [sparkline]="tile.sparkline"
+          />
+        }
+        @case ('metrics') {
+          <app-chart-card
+            [size]="tile.size"
+            [accent]="tile.accent"
+            [heading]="tile.heading"
+            [meta]="tile.meta"
+          >
+            <app-metric-list
+              [items]="tile.items"
+              [accent]="tile.accent"
+              [ariaLabel]="tile.ariaLabel"
+            />
+          </app-chart-card>
+        }
+      }
+    }
   </app-dashboard-grid>
 
   <app-section-header
@@ -79,4 +72,4 @@
       </app-card>
     }
   </app-card-grid>
-</section>
+</app-page-section>

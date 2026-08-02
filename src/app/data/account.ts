@@ -1,4 +1,5 @@
 import type { DashMetricItem } from '../components/dashboard/dashboard.types';
+import type { DashTile } from './dashboard';
 
 export interface AccountPrefCard {
   readonly id: string;
@@ -40,4 +41,36 @@ export const ACCOUNT_ACTIVITY: readonly DashMetricItem[] = [
   { label: 'Signed in from Chrome', value: 'Now', meta: 'This device' },
   { label: 'Theme preference saved', value: 'Today', meta: 'Appearance' },
   { label: 'Connected Studio site', value: '2d ago', meta: 'Sites' },
+];
+
+/** Static account overview tiles; theme value is resolved on the page. */
+export const ACCOUNT_BASE_TILES: readonly DashTile[] = [
+  {
+    kind: 'stat',
+    id: 'plan',
+    size: 'sm',
+    accent: 'primary',
+    label: 'Plan',
+    value: 'Pro',
+    meta: 'Workspace seat',
+  },
+  {
+    kind: 'stat',
+    id: 'sites-linked',
+    size: 'sm',
+    accent: 'gold',
+    label: 'Sites linked',
+    value: '3',
+    meta: 'Live, staging, preview',
+  },
+  {
+    kind: 'metrics',
+    id: 'activity',
+    size: 'wide',
+    accent: 'primary',
+    heading: 'Recent activity',
+    meta: 'Account timeline',
+    items: ACCOUNT_ACTIVITY,
+    ariaLabel: 'Recent account activity',
+  },
 ];

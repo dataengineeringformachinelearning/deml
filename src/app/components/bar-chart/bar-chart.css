@@ -34,11 +34,12 @@
   justify-content: center;
   gap: var(--space-2);
   box-sizing: border-box;
-  width: 100%;
+  width: min(100%, calc(var(--chart-max-block) * var(--chart-aspect)));
   aspect-ratio: var(--chart-aspect);
   height: auto;
   min-height: var(--chart-min-block);
-  margin: 0;
+  max-height: var(--chart-max-block);
+  margin: 0 auto;
   padding: var(--space-3);
   list-style: none;
   background-color: var(--chart-plot);

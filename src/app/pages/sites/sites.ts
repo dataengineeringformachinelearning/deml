@@ -9,14 +9,10 @@ import { CardGrid } from '../../components/card-grid/card-grid';
 import { ChartCard } from '../../components/chart-card/chart-card';
 import { DashboardGrid } from '../../components/dashboard-grid/dashboard-grid';
 import { MetricList } from '../../components/metric-list/metric-list';
+import { PageSection } from '../../components/page-section/page-section';
 import { SectionHeader } from '../../components/section-header/section-header';
 import { StatCard } from '../../components/stat-card/stat-card';
-import {
-  SITE_CARDS,
-  SITE_DEPLOYMENTS,
-  SITE_TRAFFIC,
-  SITE_UPTIME_SPARK,
-} from '../../data/sites';
+import { SITE_CARDS, SITE_TILES } from '../../data/sites';
 
 @Component({
   selector: 'app-sites',
@@ -24,6 +20,7 @@ import {
     Banner,
     Button,
     ButtonGroup,
+    PageSection,
     SectionHeader,
     DashboardGrid,
     StatCard,
@@ -39,7 +36,5 @@ import {
 })
 export class Sites {
   readonly sites = SITE_CARDS;
-  readonly uptimeSpark = SITE_UPTIME_SPARK;
-  readonly traffic = SITE_TRAFFIC;
-  readonly deployments = SITE_DEPLOYMENTS;
+  readonly tiles = SITE_TILES;
 }

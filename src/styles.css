@@ -1,10 +1,10 @@
 /* DEML design system — 8px grid, WCAG 2.0 AA / 508
-   Wide-tracked eyebrows, bold display type, warm limestone surfaces */
+   Wide-tracked eyebrows, bold display type, warm ash surfaces */
 
 :root {
   color-scheme: dark;
 
-  /* Surfaces — warm ash ground, plaster modules */
+  /* Surfaces — warm ash ground, light elevated modules */
   --color-bg: #35312d;
   --color-surface: #1c1916;
   --color-card: #f3f0ea;
@@ -335,10 +335,22 @@ main {
   min-height: 0;
   background-color: var(--color-bg);
   background-image:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-surface) 18%, transparent) 0,
+      transparent var(--space-2),
+      transparent calc(100% - var(--space-2)),
+      color-mix(in srgb, var(--color-surface) 18%, transparent) 100%
+    ),
     radial-gradient(
       90% 40% at 50% 0%,
-      color-mix(in srgb, var(--color-primary) 10%, transparent) 0%,
+      color-mix(in srgb, var(--color-primary) 12%, transparent) 0%,
       transparent 70%
+    ),
+    radial-gradient(
+      55% 30% at 85% 8%,
+      color-mix(in srgb, var(--color-accent-gold) 8%, transparent) 0%,
+      transparent 68%
     ),
     linear-gradient(
       180deg,

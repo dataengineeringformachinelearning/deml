@@ -3,6 +3,7 @@
     {{ label() }}
     @if (required()) {
       <span class="text-field__required" aria-hidden="true">*</span>
+      <span class="visually-hidden"> (required)</span>
     }
   </span>
 
@@ -14,6 +15,7 @@
     [attr.autocomplete]="autocomplete() || null"
     [placeholder]="placeholder()"
     [required]="required()"
+    [attr.aria-required]="required() ? true : null"
     [disabled]="disabled()"
     [value]="value()"
     [attr.aria-invalid]="invalid() ? true : null"

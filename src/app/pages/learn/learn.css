@@ -6,11 +6,19 @@
   margin: 0 0 var(--tile-gap);
   padding: var(--space-4);
   background-color: var(--color-card);
-  background-image: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
-    var(--color-card) var(--space-8)
-  );
+  background-image:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-primary) 6%, transparent) 0,
+      transparent var(--space-2),
+      transparent calc(100% - var(--space-2)),
+      color-mix(in srgb, var(--color-primary) 6%, transparent) 100%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+      var(--color-card) var(--space-8)
+    );
   border: var(--border-width) solid var(--color-card-border);
   border-top: calc(var(--border-width) * 4) solid var(--color-primary);
   box-shadow: var(--shadow-card);
