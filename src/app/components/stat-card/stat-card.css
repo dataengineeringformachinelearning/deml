@@ -1,0 +1,130 @@
+/* Stat card — Spotify-like KPI tile on planter surface */
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  --stat-accent: var(--color-primary);
+  background-color: transparent;
+}
+
+:host([data-accent='gold']) {
+  --stat-accent: var(--color-accent-gold);
+}
+
+:host([data-accent='red']) {
+  --stat-accent: var(--color-accent-red);
+}
+
+:host([data-accent='primary']) {
+  --stat-accent: var(--color-primary);
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: var(--space-16);
+  margin: 0;
+  padding: var(--space-3);
+  overflow: hidden;
+  color: var(--color-card-text);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--stat-accent) 18%, var(--color-card)) 0%,
+    var(--color-card) 55%
+  );
+  border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--stat-accent);
+  box-shadow: var(--shadow-card);
+}
+
+.stat-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+}
+
+.stat-card-label {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--stat-accent);
+}
+
+.stat-card-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--grid) / 2);
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--color-card-text-secondary);
+  white-space: nowrap;
+}
+
+:host([data-trend='up']) .stat-card-delta {
+  color: var(--color-accent-gold);
+}
+
+:host([data-trend='down']) .stat-card-delta {
+  color: var(--color-accent-red);
+}
+
+.stat-card-value {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  color: var(--color-card-text);
+}
+
+.stat-card-meta {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--color-card-text-secondary);
+}
+
+.stat-card-spark {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+  width: 100%;
+  min-height: var(--space-10);
+  margin-top: var(--space-2);
+}
+
+:host([data-size='sm']) .stat-card-spark {
+  display: none;
+}
+
+:host([data-size='md']) .stat-card-value,
+:host([data-size='wide']) .stat-card-value,
+:host([data-size='lg']) .stat-card-value,
+:host([data-size='hero']) .stat-card-value {
+  font-size: clamp(2.25rem, 5vw, 3.25rem);
+}
+
+@media screen and (min-width: 800px) {
+  .stat-card {
+    padding: var(--space-4);
+  }
+}

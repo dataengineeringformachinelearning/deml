@@ -1,0 +1,78 @@
+<div class="area-chart-frame">
+  <svg
+    class="area-chart"
+    [attr.viewBox]="viewBox"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <defs>
+      <linearGradient [attr.id]="gradientId" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" class="area-chart-stop area-chart-stop--top" />
+        <stop offset="55%" class="area-chart-stop area-chart-stop--mid" />
+        <stop offset="100%" class="area-chart-stop area-chart-stop--bottom" />
+      </linearGradient>
+      <filter [attr.id]="glowId" x="-20%" y="-40%" width="140%" height="180%">
+        <feGaussianBlur stdDeviation="2.5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
+
+    @for (x of plot().gridXs; track x) {
+      <line
+        class="area-chart-grid-v"
+        [attr.x1]="x"
+        [attr.x2]="x"
+        [attr.y1]="plot().padL > 8 ? 16 : 8"
+        [attr.y2]="plot().floorY"
+      />
+    }
+
+    <line
+      class="area-chart-baseline"
+      [attr.x1]="plot().padL"
+      [attr.x2]="viewRight"
+      [attr.y1]="plot().baselineY"
+      [attr.y2]="plot().baselineY"
+    />
+
+    <path
+      class="area-chart-fill"
+      [attr.d]="plot().area"
+      [attr.fill]="'url(#' + gradientId + ')'"
+    />
+
+    <path
+      class="area-chart-line"
+      [attr.d]="plot().line"
+      fill="none"
+      [attr.filter]="'url(#' + glowId + ')'"
+    />
+
+    @for (node of plot().nodes; track node.x) {
+      <circle
+        class="area-chart-node"
+        [attr.cx]="node.x"
+        [attr.cy]="node.y"
+        [attr.r]="plot().nodeRadius"
+      />
+    }
+
+    @if (plot().showAxes) {
+      <text class="area-chart-y" [attr.x]="4" [attr.y]="22">{{ plot().yTop }}</text>
+      <text class="area-chart-y" [attr.x]="4" [attr.y]="plot().floorY">{{ plot().yBottom }}</text>
+
+      @for (node of plot().nodes; track node.x) {
+        <text
+          class="area-chart-x"
+          [attr.x]="node.x"
+          [attr.y]="152"
+          text-anchor="middle"
+        >{{ node.label }}</text>
+      }
+    }
+  </svg>
+</div>
