@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "node set-env.js && npm run build:contracts && NG_BUILD_MAX_WORKERS=1 NODE_OPTIONS=--max-old-space-size=3072 npx ng build --configuration vercel",
+  "buildCommand": "node set-env.js && npm run build:contracts && NG_BUILD_MAX_WORKERS=1 GOMAXPROCS=1 NODE_OPTIONS=--max-old-space-size=1536 npx ng build --configuration vercel",
   "outputDirectory": "dist/deml/browser",
   "framework": null,
   "installCommand": "npm install --include=dev",
