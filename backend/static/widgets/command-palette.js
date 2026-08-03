@@ -1,5 +1,5 @@
 /**
- * Viking-UI unified command palette — mounts viking-suite-command-palette on every surface.
+ * DEML-UI unified command palette — mounts deml-suite-command-palette on every surface.
  * Live Algolia multi-index results merge into the palette as you type (see suite-search-palette-wc).
  * Trigger: navbar search button or ⌘K / Ctrl+K.
  */
@@ -42,12 +42,12 @@
 
   const ensureElements = () => {
     if (
-      customElements.get('viking-suite-command-palette') ||
-      customElements.get('viking-suite-search-palette-wc')
+      customElements.get('deml-suite-command-palette') ||
+      customElements.get('deml-suite-search-palette-wc')
     ) {
       return;
     }
-    window.VikingUI?.registerVikingElements?.();
+    window.DEMLUI?.registerDEMLElements?.();
   };
 
   const ensurePalette = () => {
@@ -56,7 +56,7 @@
     let palette = document.getElementById(PALETTE_ID);
 
     if (!palette) {
-      palette = document.createElement('viking-suite-command-palette');
+      palette = document.createElement('deml-suite-command-palette');
       palette.id = PALETTE_ID;
       // Suite palette owns ⌘K when this widget is the search host.
       palette.setAttribute('global-shortcut', '');
@@ -83,7 +83,7 @@
       return;
     }
     // Custom element may still be upgrading.
-    customElements.whenDefined('viking-suite-command-palette').then(() => {
+    customElements.whenDefined('deml-suite-command-palette').then(() => {
       ensurePalette().openPalette?.();
     });
   };
@@ -153,7 +153,7 @@
       event.preventDefault();
       const palette = document.getElementById(PALETTE_ID);
       const isOpen =
-        palette?.hasAttribute('open') || palette?.querySelector?.('viking-command-palette[open]');
+        palette?.hasAttribute('open') || palette?.querySelector?.('deml-command-palette[open]');
       if (isOpen) {
         closeSearch();
       } else {

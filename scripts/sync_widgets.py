@@ -42,7 +42,7 @@ def sync_widgets() -> None:
   )
   marketing_widgets = os.path.join(root, "marketing", "public", "assets", "widgets")
   backend_widgets = os.path.join(root, "backend", "static", "widgets")
-  docs_widgets = os.path.join(root, "viking-ui-docs", "public", "assets", "widgets")
+  docs_widgets = os.path.join(root, "deml-ui-docs", "public", "assets", "widgets")
   frontend_public_widgets = os.path.join(root, "frontend", "public", "assets", "widgets")
 
   widget_dirs = [backend_widgets, docs_widgets, frontend_public_widgets]

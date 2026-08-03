@@ -1,7 +1,7 @@
 /*!
  * SUITE APIDOCS — owned Swagger UI + ReDoc chrome (DEML + FORJD)
  * ----------------------------------------------------------------------------
- * Load after suite-tokens + suite-components + suite-backend (or viking-ui.css).
+ * Load after deml-ui.css (+ optional suite-backend.css for splash/docs chrome).
  * Vendor assets are self-hosted (no jsDelivr). Tokens only — no raw product hex.
  * Docs: SUITE_APIDOCS.md · Law: docs/SUITE_UI_UNIFICATION.md
  *

@@ -39,4 +39,4 @@ cd backend && uv run python manage.py runserver 127.0.0.1:8000
 | `/settings` `/account` | Account / billing / consent |
 | `/status` `/explore` | Public status |
 
-Design system dependency: `deml-ui` (`file:../deml-ui` locally). App behavioral components live under `src/app/components` and consume deml-ui CSS (no parallel local DS stylesheets).
+Design system dependency: `deml-ui` (`github:…/deml-ui#main`; use `file:../deml-ui` for local DS work). App behavioral components live under `src/app/components` and consume deml-ui CSS (no parallel local DS stylesheets). See [THEME.md](THEME.md) and [docs/DEML_UI.md](docs/DEML_UI.md). **Viking-UI is retired.**

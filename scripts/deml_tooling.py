@@ -49,10 +49,14 @@ def cmd_sync(args: argparse.Namespace) -> None:
     _run([sys.executable, "scripts/sync_content.py"])
 
   if "design-system" in targets:
-    _run([sys.executable, "scripts/sync_design_system.py"])
+    _run(["bash", "scripts/sync_deml_ui_static.sh"])
 
   if "widgets" in targets:
-    _run([sys.executable, "scripts/sync_widgets.py"])
+    widgets = ROOT / "scripts" / "sync_widgets.py"
+    if widgets.is_file():
+      _run([sys.executable, str(widgets)])
+    else:
+      print("→ sync_widgets.py not present — skip")
 
 
 def cmd_hygiene(args: argparse.Namespace) -> None:
@@ -60,11 +64,10 @@ def cmd_hygiene(args: argparse.Namespace) -> None:
     _run(["bash", "scripts/deml-cleanup.sh"])
 
   if args.theme:
-    theme_args = ["node", "scripts/enforce-theme.js"]
-    theme_args.append("--apply" if args.apply else "--dry-run")
-    if args.verbose:
-      theme_args.append("--verbose")
-    _run(theme_args)
+    print(
+      "→ theme audit retired with Viking-UI. "
+      "Visual SoT is deml-ui (THEME.md). Sync with: bash scripts/sync_deml_ui_static.sh",
+    )
 
 
 def cmd_quality(args: argparse.Namespace) -> None:
@@ -140,8 +143,12 @@ def cmd_verify(args: argparse.Namespace) -> None:
     [py, "-m", "pytest", "utils/test_env.py", "config/test_ready_contract.py", "-q", "--tb=line"],
     cwd=ROOT / "backend",
   )
-  _run(["npm", "run", "typecheck", "--workspace", "frontend"])
-  print("\n✓ verify passed (config + contracts + usecase registry + backend smoke + frontend tsc)")
+  package_json = (ROOT / "package.json").read_text(encoding="utf-8")
+  if '"typecheck"' in package_json:
+    _run(["npm", "run", "typecheck"])
+  else:
+    print("→ npm run typecheck not defined — skip")
+  print("\n✓ verify passed (config + contracts + usecase registry + backend smoke)")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -161,15 +168,19 @@ def build_parser() -> argparse.ArgumentParser:
   sync.add_argument(
     "--design-system",
     action="store_true",
-    help="Build static CSS via viking-ui-docs and sync to all surfaces",
+    help="Sync deml-ui CSS/elements into backend/static",
   )
   sync.add_argument("--widgets", action="store_true", help="Sync navbar/widget assets")
   sync.set_defaults(func=cmd_sync, all=False, content=False, design_system=False, widgets=False)
 
-  hygiene = sub.add_parser("hygiene", help="Cache purge and theme cleanup")
+  hygiene = sub.add_parser("hygiene", help="Cache purge and theme notes")
   hygiene.add_argument("--cache", action="store_true", help="Purge build caches (deml-cleanup.sh)")
-  hygiene.add_argument("--theme", action="store_true", help="Run enforce-theme.js audit")
-  hygiene.add_argument("--apply", action="store_true", help="Apply safe theme fixes")
+  hygiene.add_argument(
+    "--theme",
+    action="store_true",
+    help="Print deml-ui theme sync guidance (enforce-theme.js retired)",
+  )
+  hygiene.add_argument("--apply", action="store_true", help="Unused (kept for CLI compatibility)")
   hygiene.add_argument("-v", "--verbose", action="store_true")
   hygiene.set_defaults(func=cmd_hygiene, cache=True, theme=False, apply=False, verbose=False)
 

@@ -280,7 +280,7 @@
     },
     "UC-ONBOARD-001": {
       "unit": ["frontend/src/app/services/onboarding.service.spec.ts"],
-      "integration": ["packages/viking-ui/src/lib/onboarding-checklist/onboarding-checklist.spec.ts"],
+      "integration": ["src/app/services/onboarding.service.spec.ts"],
       "observability": {
         "deferred_observability": "Client-only checklist; no server boundary"
       }

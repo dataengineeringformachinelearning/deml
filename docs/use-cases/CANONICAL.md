@@ -9,9 +9,9 @@ Flow diagrams: [`DIAGRAMS.md`](DIAGRAMS.md) (linked from each UC **How it works*
 
 | Code | Package / surface |
 |------|-------------------|
-| `frontend` | `frontend/` Angular SPA (deml.app) |
+| `frontend` | `src/` Angular SPA (deml.app) |
 | `backend` | `backend/` Django/Ninja BFF (backend.deml.app) |
-| `viking-ui` | `packages/viking-ui` |
+| `deml-ui` | sibling repo `deml-ui` (design system) |
 | `deml-crypto` | `packages/deml-crypto` |
 | `deml-rate-limit` | `packages/deml-rate-limit` |
 | `deml-contracts` | `packages/deml-contracts` (**contract SoT** — import from here) |
@@ -232,12 +232,12 @@ Flow diagrams: [`DIAGRAMS.md`](DIAGRAMS.md) (linked from each UC **How it works*
 | **Name** | Authenticated dashboard overview |
 | **Actors** | Viewer+ user |
 | **Trigger** | Navigate `/dashboard` (authGuard) |
-| **Happy path** | Angular loads → `GET /api/v1/analytics/overview` (+ tenants) via BFF → FORJD analytics → Viking metric/HUD/chart panels; optional onboarding checklist + stream status; SSE/poll refresh via UC-ANALYTICS-001 |
-| **Errors / edges** | Unmapped tenant / FORJD down → `503` `forjd_degraded` + Viking callout; Viewer ok for reads |
-| **Data contracts** | Analytics overview DTO (FORJD-shaped, BFF-adapted); `SuiteActivityEntry` / onboarding types from viking-ui |
+| **Happy path** | Angular loads → `GET /api/v1/analytics/overview` (+ tenants) via BFF → FORJD analytics → deml-ui metric/HUD/chart panels; optional onboarding checklist + stream status; SSE/poll refresh via UC-ANALYTICS-001 |
+| **Errors / edges** | Unmapped tenant / FORJD down → `503` `forjd_degraded` + deml-ui callout; Viewer ok for reads |
+| **Data contracts** | Analytics overview DTO (FORJD-shaped, BFF-adapted); `SuiteActivityEntry` / onboarding types from deml-ui |
 | **Observability** | `X-Request-ID`; dashboard load latency; degraded flag |
 | **How it works** | Dashboard loads CES/KPI via BFF; FORJD-backed metrics resolve through tenant-bound proxy. Diagram: [`DIAGRAMS.md#analytics`](DIAGRAMS.md#analytics) |
-| **Ownership** | UI: `frontend` + `viking-ui`. Adapter: `backend/forjd`. Aggregates: `forjd` |
+| **Ownership** | UI: `frontend` + `deml-ui`. Adapter: `backend/forjd`. Aggregates: `forjd` |
 
 ---
 
@@ -320,7 +320,7 @@ Flow diagrams: [`DIAGRAMS.md`](DIAGRAMS.md) (linked from each UC **How it works*
 | **Happy path** | BFF proxy → virtual list UI |
 | **Errors / edges** | Degraded ≠ empty; Pro on writes |
 | **Data contracts** | FORJD vulnerability schema |
-| **Observability** | Request correlation; UI loading/empty Viking states |
+| **Observability** | Request correlation; UI loading/empty deml-ui states |
 | **How it works** | Vulnerability views proxy FORJD scanners; same degrade / Pro invariants as other threat UCs. Diagram: [`DIAGRAMS.md#analytics`](DIAGRAMS.md#analytics) |
 | **Ownership** | `forjd` + `backend` + `frontend` |
 
@@ -419,12 +419,12 @@ Flow diagrams: [`DIAGRAMS.md`](DIAGRAMS.md) (linked from each UC **How it works*
 | **Name** | Pipeline Studio (YAML compose, no persist) |
 | **Actors** | Authenticated user |
 | **Trigger** | `/pipeline` or Account → studio; `GET /api/v1/workflows` |
-| **Happy path** | Load FORJD workflow catalog via BFF → Viking pipeline-flow edit → client validate → copy/download YAML → human deploys under FORJD `backend/workflows/` + `npm run validate:workflows` |
+| **Happy path** | Load FORJD workflow catalog via BFF → deml-ui pipeline-flow edit → client validate → copy/download YAML → human deploys under FORJD `backend/workflows/` + `npm run validate:workflows` |
 | **Errors / edges** | DEML **never** persists workflow YAML; no partner workflow write API; catalog empty if FORJD degraded |
 | **Data contracts** | Workflow catalog + `pipeline_steps` cards; export YAML string (client) |
 | **Observability** | Catalog fetch correlation only |
 | **How it works** | Pipeline Studio composes FORJD YAML in-browser for export/validate; no partner workflow write API. Diagram: [`DIAGRAMS.md#pipeline`](DIAGRAMS.md#pipeline) |
-| **Ownership** | Compose UI: `frontend` + `viking-ui`. Catalog: `forjd`. Deploy SoT: FORJD git YAML |
+| **Ownership** | Compose UI: `frontend` + `deml-ui`. Catalog: `forjd`. Deploy SoT: FORJD git YAML |
 
 ---
 
@@ -593,7 +593,7 @@ Flow diagrams: [`DIAGRAMS.md`](DIAGRAMS.md) (linked from each UC **How it works*
 | **Errors / edges** | Partial section failures isolated in UI |
 | **Data contracts** | Union of child UCs |
 | **Observability** | Per-section |
-| **How it works** | Settings shell composes billing, consent, sessions, and credentials under Viking-UI. Diagram: [`DIAGRAMS.md#settings`](DIAGRAMS.md#settings) |
+| **How it works** | Settings shell composes billing, consent, sessions, and credentials under deml-ui. Diagram: [`DIAGRAMS.md#settings`](DIAGRAMS.md#settings) |
 | **Ownership** | `frontend` page shell; APIs `backend` |
 
 ---
@@ -606,12 +606,12 @@ Flow diagrams: [`DIAGRAMS.md`](DIAGRAMS.md) (linked from each UC **How it works*
 | **Name** | Account page (preferences, pipeline deep link) |
 | **Actors** | Authenticated user |
 | **Trigger** | `/account` |
-| **Happy path** | Viking preferences panel; disclosure; link to UC-PIPE-001 |
+| **Happy path** | deml-ui preferences panel; disclosure; link to UC-PIPE-001 |
 | **Errors / edges** | Preferences local/browser; no server workflow persist |
-| **Data contracts** | Viking preference types |
+| **Data contracts** | deml-ui preference types |
 | **Observability** | Minimal |
 | **How it works** | Account prefs stay DEML-local; pipeline entry deep-links to Pipeline Studio. Diagram: [`DIAGRAMS.md#settings`](DIAGRAMS.md#settings) |
-| **Ownership** | `frontend` + `viking-ui` |
+| **Ownership** | `frontend` + `deml-ui` |
 
 ---
 
@@ -623,12 +623,12 @@ Flow diagrams: [`DIAGRAMS.md`](DIAGRAMS.md) (linked from each UC **How it works*
 | **Name** | Onboarding checklist |
 | **Actors** | Authenticated new user |
 | **Trigger** | Dashboard mount; local/suite activity store |
-| **Happy path** | Viking onboarding checklist steps; record suite activity |
+| **Happy path** | deml-ui onboarding checklist steps; record suite activity |
 | **Errors / edges** | Local storage absence → defaults |
-| **Data contracts** | `OnboardingStore`, `VikingOnboardingStep` (viking-ui) |
+| **Data contracts** | `OnboardingStore`, `deml-uiOnboardingStep` (deml-ui) |
 | **Observability** | None required beyond client |
 | **How it works** | Onboarding checklist tracks suite activity in DEML until first sealed ingest succeeds. Diagram: [`DIAGRAMS.md#settings`](DIAGRAMS.md#settings) |
-| **Ownership** | `viking-ui` + `frontend` onboarding.service |
+| **Ownership** | `deml-ui` + `frontend` onboarding.service |
 
 ---
 

@@ -56,9 +56,6 @@ jobs:
           pip install -r backend/requirements.txt
           python scripts/check_usecase_coverage.py
 
-      - name: Viking-UI version contract
-        run: npm run check:viking-ui:version
-
   quality:
     name: Quality gates
     needs: [shared]
@@ -160,6 +157,3 @@ jobs:
 
       - name: Vitest (app)
         run: npm test
-
-      - name: Vitest (viking-ui library)
-        run: npm run test:viking-ui

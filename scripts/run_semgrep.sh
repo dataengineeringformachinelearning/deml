@@ -8,7 +8,7 @@ cd "$ROOT"
 CMD=(uvx semgrep scan --error)
 
 # Exclude generated CSS, swagger CDN templates, and lockfiles from SAST noise.
-CMD+=(--exclude '**/viking-ui.css')
+CMD+=(--exclude '**/deml-ui.css')
 CMD+=(--exclude '**/design-tokens.css')
 CMD+=(--exclude '**/deml-components.css')
 CMD+=(--exclude '**/package-lock.json')

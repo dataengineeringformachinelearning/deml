@@ -11,7 +11,8 @@ Scale guidance: [docs/SCALE.md](docs/SCALE.md).
 
 | Repo | Role |
 |------|------|
-| **This repo (`deml`)** | Control plane — Angular product + Django BFF + Viking-UI |
+| **This repo (`deml`)** | Control plane — Angular product (`src/`) + Django BFF + **deml-ui** |
+| [`deml-ui`](https://github.com/dataengineeringformachinelearning/deml-ui) | Design system — tokens, HTML/CSS components, WC + Angular, Storybook (`ui.deml.app`) |
 | [`forjd`](https://github.com/dataengineeringformachinelearning/forjd) | Data plane — sealed streaming engine |
 | [`dataengineeringformachinelearning`](https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning) | Community / marketing site + public BOOK |
 
@@ -35,18 +36,14 @@ Scale guidance: [docs/SCALE.md](docs/SCALE.md).
 - Missing FORJD capabilities are explicit dependencies — never filled with DEML
   stream workers or direct FORJD database access.
 
-**Operations:** [docs/FORJD_INTEGRATION.md](docs/FORJD_INTEGRATION.md) (includes
-Pipeline Studio → FORJD deploy loop),
+**Operations:** [docs/FORJD_INTEGRATION.md](docs/FORJD_INTEGRATION.md),
 [docs/CONNECTION_MAP.md](docs/CONNECTION_MAP.md),
 [docs/PRODUCTION_DEPLOY.md](docs/PRODUCTION_DEPLOY.md),
 [docs/PRODUCTION_CHECKLIST.md](docs/PRODUCTION_CHECKLIST.md).
-FORJD extension map (validate CLI, detectors): FORJD
-[`docs/EXTENDING.md`](https://github.com/dataengineeringformachinelearning/forjd/blob/main/docs/EXTENDING.md).
 
 **Steady-state flags (`deml-backend`):** `FORJD_WRITE_MODE=forjd` and
 `FORJD_READ_MODE=forjd` are the production defaults (`FORJD_CUTOVER_PHASE=2`
-is an equivalent legacy alias). These flags must remain set in all production
-and staging deployments.
+is an equivalent legacy alias).
 
 ## Core Philosophy
 
@@ -63,58 +60,49 @@ and staging deployments.
   sealed telemetry and analytics live in FORJD.
 - **Automation Over Vigilance:** Pre-commit hooks, CI enforcement, doc sync.
 - **Pragmatic & Sovereign:** Own identity, billing, consent, and learning content
-  locally. Decouple content (Sanity) and edge (Cloudflare) where needed.
-- **Inclusive & Accessible:** WCAG 2.1 AA enforced automatically.
+  locally.
+- **Inclusive & Accessible:** WCAG 2.0 Level AA (or greater) / Section 508.
 - **Future-Proof:** Plan for PQC and FORJD-backed ML. Use `state_dict` only
   (no pickle) if any local model artifacts remain.
 
 ## Quality gates
 
-| Layer        | Command                                                                                            |
-| ------------ | -------------------------------------------------------------------------------------------------- |
-| Theme / a11y | `node scripts/enforce-theme.js` · `node scripts/run_axe.js` · `node scripts/check_mobile_first.js` |
-| Frontend     | `cd frontend && npm run lint && npm test && npm run test:viking-ui`                                |
-| Backend      | `cd backend && pytest` (touched modules) · Ruff via pre-commit                                     |
-| Full         | `uvx pre-commit run --all-files` · root `npm run quality`                                          |
-| CI           | `.github/workflows/ci.yml`, `viking-ui.yml`, `production-smoke.yml`, `publish-*.yml`               |
+| Layer | Command |
+|-------|---------|
+| Frontend | Root `npm test` · `npx ng build` · axe / a11y via deml-ui Storybook |
+| Design system | In deml-ui: `npm run build` · `npm run storybook` · a11y addon |
+| Backend | `cd backend && pytest` (touched modules) · Ruff via pre-commit |
+| Full | `uvx pre-commit run --all-files` |
+| CI | `.github/workflows/ci.yml`, `production-smoke.yml`, `publish-*.yml` |
 
-- **Frontend:** Prettier + ESLint; WCAG 2.1 AA; Viking-UI only
-  ([THEME.md](THEME.md), [.cursorrules](.cursorrules)).
+- **Frontend:** Prettier + ESLint; WCAG AA; **deml-ui only**
+  ([THEME.md](THEME.md), [.cursorrules](.cursorrules), [docs/DEML_UI.md](docs/DEML_UI.md)).
 - **Backend (Python/Django):** Ruff; `uv` / `uvx pre-commit`; Postgres UUID PKs;
   AES-256-GCM + GCP KMS for secrets; no pickle for models.
 - **Security:** Semgrep/Trivy/gitleaks in pre-push; Firebase Auth at DEML edge;
-  sealed E2EE + tenant-bound `fjsvc_` to FORJD; Postgres headless rate limits.
-- Partner engine quality gates: see FORJD `AGENTS.md` (backend / engine / frontend CI).
+  sealed E2EE + tenant-bound `fjsvc_` to FORJD.
 
 ## Architecture & Data Principles
 
 - **Decoupling:** Client (Angular) ↔ Server (Django) via REST + CORS.
   Streaming/processing ↔ FORJD via sealed envelopes + `fjsvc_` tokens.
 - **Storage (DEML-owned):** Postgres (accounts, billing, consent, credentials,
-  FORJD tenant mapping, learning progress); sessions in Postgres
-  (`browser_sessions`, `auth_handoff_tokens`). Firebase is Auth-only — no
-  Firestore, Storage, or Cloud Functions.
-- **Storage (FORJD-owned):** Sealed events, `stream_results`, report documents,
-  replay/DLQ, analytics, threat/ML tables.
+  FORJD tenant mapping, learning progress); sessions in Postgres.
+  Firebase is Auth-only — no Firestore, Storage, or Cloud Functions.
+- **Storage (FORJD-owned):** Sealed events, projections, replay/DLQ, analytics, ML.
 - **Multi-Tenancy:** Absolute isolation. Explicit
   `company_account → forjd_tenant_id` mapping. UUIDs everywhere.
-- **ML/Intelligence:** Executed in FORJD.
-- **UI/Frontend:** Full Angular 22+ surface; Signals; Viking-UI (not FORJD
-  `forjd-ui`); Django SSE live updates (`LiveUpdatesService.latestEvent` /
-  `degraded` → `/api/v1/analytics/live`, ticks `{count, cursor}` only);
-  Headless Sanity for learning content. No Firestore product path. Browser
-  never holds `fjsvc_`.
-- **Security:** Firebase Auth + Django middleware for end users; never forward
-  Firebase tokens to FORJD; FORJD token secret refs only; UUID PKs; ABAC + RBAC
-  on DEML surfaces; FORJD enforces tenant binding + RLS.
+- **UI/Frontend:** Angular 22+ at repo-root `src/`; Signals; **deml-ui** design
+  system (not FORJD `forjd-ui`, not retired Viking-UI); Django SSE live updates;
+  Headless Sanity for learning content. Browser never holds `fjsvc_`.
 - **Deployment:** Django on Fly (`deml-backend`, `docs/FLY.md`); Angular on
-  Vercel (`deml`, `docs/VERCEL.md`).
+  Vercel (`deml`, `docs/VERCEL.md`); deml-ui Storybook on Vercel (`ui.deml.app`).
 
 ## Workflows & Automation
 
 - Pre-commit: `uvx pre-commit run --all-files`
 - Docs start in BOOK.md/README; `scripts/sync_content.py` propagates
-- Run `node scripts/run_axe.js` and lint before commits
+- Design changes land in **deml-ui** first, then bump deml’s `deml-ui` dependency
 
 ## What Agents Must Do
 
@@ -123,34 +111,16 @@ and staging deployments.
   DEML control plane / FORJD data plane boundary.
 - Update BOOK.md first if architectural.
 - Never introduce: hardcoded tenants, sequential IDs, pickle for models,
-  inaccessible UI, or DEML-local stream processing.
+  inaccessible UI, DEML-local stream processing, or **Viking-UI / `packages/viking-ui`**.
 
 ## Key Tools & Scripts
 
 - `scripts/git_flow.py` — versioning, PR automation
-- `scripts/run_axe.js` — a11y enforcement
+- `scripts/run_axe.js` — a11y enforcement (when present)
 - `scripts/sync_content.py` — doc sync
-- `scripts/dump_openapi.py` — regenerate `frontend/openapi.json`
-- `.cursorrules` — Viking-UI + THEME.md enforcement
-- Pre-commit, ruff, eslint, prettier, uv, tsx, Docker (unprivileged)
-
-## Official Integrations (Customer-Facing)
-
-DEML documents first-class integration paths for enterprise ML infrastructure.
-Each platform has a dedicated guide in
-[BOOK.md § Appendix Z](BOOK.md#appendix-z-integration-guides) and a health-check
-endpoint at `/api/v1/integrations/{platform}`:
-
-| Platform     | Primary endpoints                   |
-| ------------ | ----------------------------------- |
-| Kubernetes   | `/api/v1/predict`, `/api/v1/ingest` |
-| TensorFlow   | `/api/v1/ingest`, `/api/v1/predict` |
-| PyTorch      | `/api/v1/ingest`, `/api/v1/predict` |
-| Apache Spark | `/api/v1/ingest`                    |
-| Databricks   | `/api/v1/ingest`, `/api/v1/predict` |
-| AWS Redshift | `/api/v1/ingest`, `/api/v1/predict` |
-
-Streaming and warehouse-style analytics exports are FORJD responsibilities.
+- `scripts/sync_deml_ui_static.sh` — copy deml-ui CSS into Django static
+- `.cursorrules` — deml-ui + THEME.md enforcement
+- Pre-commit, ruff, eslint, prettier, uv, Docker (unprivileged)
 
 ## Project-Specific Agent Rules
 
@@ -158,60 +128,51 @@ Streaming and warehouse-style analytics exports are FORJD responsibilities.
 
 - **NEVER** hardcode customer or tenant domains into `CORS_ALLOWED_ORIGINS`.
 - Origin validation uses `monitor.cors_utils.is_domain_registered` against Postgres.
-- Domains must be registered in the database, not configuration files.
 
 ### Core Architectural Invariants
 
 - **FORJD Exclusive Data Plane:** All sealed ingest, projections, analytics, and
   ML execute in FORJD. Contract: [docs/FORJD_INTEGRATION.md](docs/FORJD_INTEGRATION.md).
 - **Tenant UUID Normalization:** Never use string literals like `"platform"` as
-  foreign keys. Map platform scope to the native Tenant0 UUID
-  (`is_platform_tenant=True`) before any persistence or FORJD call.
+  foreign keys.
 - **Account → FORJD Tenant Binding:** Every authenticated FORJD call resolves
   `deml_account_id → forjd_tenant_id → secret_ref` and fails closed on mismatch.
 - **Angular Surface Intact:** Django adapters keep established Angular paths stable.
 
-### Antigravity Rules & Persona
+### deml-ui Uniformity Law
 
-- **CTO:** Antigravity (Architecture, Frontend, Backend, Data Engineering, ML)
-- Collaboration, clean code, Section 508, Semgrep, Viking-UI / THEME.md
-- Zero-dependency & IP ownership — minimize third-party UI kits
+All DEML product chrome uses **deml-ui** — the design system that carries the
+**new-from-the-start** look (atelier tokens, 8px grid, dual `data-theme`).
 
-### Viking-UI Uniformity Law
+Canonical docs: [.cursorrules](.cursorrules), [THEME.md](THEME.md),
+[docs/DEML_UI.md](docs/DEML_UI.md), deml-ui [README](https://github.com/dataengineeringformachinelearning/deml-ui).
 
-All DEML **and FORJD** product chrome share one suite design system — see
-**[docs/SUITE_UI_UNIFICATION.md](docs/SUITE_UI_UNIFICATION.md)**. Aesthetic:
-void-black austerity + electric command `#2176ff` + institutional gold; Viking-UI
-is the canonical SoT; FORJD `forjd-ui` is a `--fj-*` adapter only.
-**[.cursorrules](.cursorrules)** is the Cursor agent entry point;
-**[THEME.md](THEME.md)** is the canonical token matrix;
-**[BOOK.md § Chapter 32](BOOK.md#chapter-32-viking-ui--the-zero-dependency-ui-kit)**
-documents the kit. Package:
-`@dataengineeringformachinelearning/viking-ui`.
-
-- `packages/viking-ui/` owns all CSS/SCSS, tokens, Web Components, Angular
-  wrappers, icons, and visual utilities. No other surface owns styling.
-  Suite `--fj-*` aliases ship via `_suite-bridge.scss`.
-- Always import from `@dataengineeringformachinelearning/viking-ui` — never
-  Material, Bootstrap, or other third-party UI kits.
-- Compose pages with `viking-page-shell` → `viking-section` and semantic layout
-  recipes (`viking-panel-grid`, `viking-form-grid`, `viking-stack`,
-  `viking-section-template`).
-- Charts: `viking-chart` / `viking-chart-panel` only; series via
-  `VIKING_SERIES_PRESETS` / `--viking-series-*`.
-- Tokens only: every visual value resolves to a `--viking-*` token.
-- Breakpoints: `--viking-bp-*` only.
-- After Viking-UI changes: `npm run build:viking-ui:package` +
-  `python scripts/sync_design_system.py`.
-- Pre-ship: `node scripts/enforce-theme.js` (zero violations),
-  `node scripts/run_axe.js`, `npm run test:viking-ui`.
+- **SoT:** sibling / GitHub package `deml-ui` owns tokens (`styles/tokens.css`),
+  component HTML/CSS (`components/<name>/`), Web Components, and Angular markup.
+- **App shape:** Product UI lives at repo-root `src/`. Depend on
+  `deml-ui` (`github:…/deml-ui#main`). Load
+  `node_modules/deml-ui/dist/styles/deml-ui.css` via `angular.json`.
+- **Behavioral wrappers:** `src/app/components/*` use `ViewEncapsulation.None`
+  and deml-ui class contracts — **no local component CSS** for product chrome.
+- **Compose pages** with `app-banner` → `app-page-section` → `app-section-header`
+  → `app-tile-board` / `app-dashboard-grid` / `app-card-grid`.
+- **Charts:** `app-area-chart` / `app-bar-chart` inside `app-chart-card` only.
+  Keep the chart aspect contract (never squash or stretch plots).
+- **Theme:** `data-theme="light"|"dark"` on `<html>`; prefer deml-ui tokens
+  (`--color-*`, `--space-*`, `--tile-*`, `--chart-*`).
+- **Spacing:** 8px grid; NFTS dashboard row rhythm (`--tile-row-unit` / dash-row).
+- **Retired — do not use:** `packages/viking-ui`,
+  `@dataengineeringformachinelearning/viking-ui`, `viking-*` components,
+  `--viking-*` tokens, void-black / electric `#2176ff` suite chrome,
+  `viking-ui-docs/`, root `frontend/` product tree (Vercel shim only).
+- After deml-ui changes: build deml-ui, bump deml’s dependency, run
+  `scripts/sync_deml_ui_static.sh` for Django static mirrors.
 
 ### Critical Code Styling & Theming Law
 
-Before editing HTML/CSS/SCSS/Tailwind/Viking-UI styles, conform to **THEME.md**
-and **.cursorrules**. No hardcoded hex outside `_variables.scss` /
-`_series-colors.scss`. Angular components must not contain `styleUrl`,
-`styleUrls`, or inline `styles`.
+Before editing HTML/CSS, conform to **THEME.md** and **.cursorrules**.
+No hardcoded hex for product chrome — use deml-ui tokens. Angular product
+components must not add `styleUrl` / `styleUrls` / inline `styles` for DS chrome.
 
 ### Code Style & Modernization
 
@@ -223,15 +184,7 @@ and **.cursorrules**. No hardcoded hex outside `_variables.scss` /
 
 - **BOOK.md** — authoritative architecture and operations narrative.
 - **WHITEPAPER.md** — concise value proposition and diagrams.
-- New dependencies → Acknowledgements in README.md.
 - Architectural changes start in BOOK.md; sync via `scripts/sync_content.py`.
+- Design-system contribution docs live primarily in the **deml-ui** repo.
 
 Update this file whenever BOOK.md evolves core principles.
-
-**Note on file location:** Canonical AGENTS.md lives at the repository root
-(https://agents.md/). Nested AGENTS.md files are supported for subprojects.
-
-For Astro-specific (marketing site): See `marketing/AGENTS.md` and `marketing/CLAUDE.md`.
-
-
-> **Note (new-from-the-start):** Product UI lives at repo-root `src/` and consumes sibling `deml-ui`. `frontend/` and `packages/viking-ui` are retired.

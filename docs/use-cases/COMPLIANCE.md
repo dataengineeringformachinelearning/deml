@@ -15,7 +15,7 @@ Test/obs gate: [`coverage.json`](coverage.json) + `npm run validate:usecase-cove
 | `packages/deml-contracts` | `validate:contracts` **pass** | Auth, consent, billing, ingest, ready, live, playbooks, ErrorCode, factories |
 | `backend` (auth/ingest/openapi/live/billing/consent/proxies) | new UC suites **pass** | Session fixtures + `log_usecase` boundaries |
 | `frontend` | `typecheck` **pass**; live-updates vitest **5/5** | `ERROR_CODES` on dashboard/analytics/SSE |
-| `packages/viking-ui` | na | Visual SoT — no UC wire DTOs |
+| `deml-ui` | na | Visual SoT — no UC wire DTOs |
 | `packages/deml-crypto` | na | Crypto envelopes only |
 | `packages/deml-rate-limit` | na | Codes via middleware + `ErrorCode` |
 | Sibling `forjd` | out of scope here | Data-plane SoT for proxied resources |

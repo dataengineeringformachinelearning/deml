@@ -36,7 +36,7 @@ the `forjd` repository; this package owns DEML wire aliases and control-plane en
 ## Build order
 
 1. `npm run build:contracts` (TypeScript typecheck)
-2. `npm run build:viking-ui:package` (UI kit)
+2. `npm run build:deml-ui:package` (UI kit)
 3. Frontend / backend app builds
 
 ```bash

@@ -43,7 +43,7 @@ Keep:
 
 - Standalone + lazy routes
 - Pages orchestrate; services hold HTTP/signals
-- Viking-UI composition
+- deml-ui composition
 
 Avoid:
 

@@ -5,15 +5,15 @@
   margin: var(--space-2, 16px) auto;
 }
 
-/* Requires the built viking-ui.css bundle on the host page (THEME.md). */
+/* Requires the built deml-ui.css bundle on the host page (THEME.md). */
 
 .widget-container {
   display: inline-flex;
   align-items: center;
   padding: var(--space-1) var(--space-2);
-  background: var(--viking-charcoal-900);
+  background: var(--deml-widget-charcoal-900);
   border: 1px solid var(--border);
-  border-radius: var(--viking-radius-pill, 999px);
+  border-radius: var(--deml-widget-radius-pill, 999px);
   font-family: var(--font-family);
   font-size: var(--base-font-size);
   font-weight: 500;
@@ -26,7 +26,7 @@
 
 .widget-container:hover {
   background: var(--card-bg);
-  border-color: var(--viking-teal-400);
+  border-color: var(--deml-widget-teal-400);
   box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }
@@ -68,7 +68,7 @@
 .report-trigger:hover {
   background-color: color-mix(
     in srgb,
-    var(--viking-crimson-500) 15%,
+    var(--deml-widget-crimson-500) 15%,
     transparent
   );
 }
@@ -84,7 +84,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: color-mix(in srgb, var(--viking-black) 60%, transparent);
+  background-color: color-mix(in srgb, var(--deml-widget-black) 60%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -182,7 +182,7 @@
   border-radius: var(--space-1);
   font-size: var(--base-font-size);
   outline: none;
-  background-color: var(--viking-charcoal-900);
+  background-color: var(--deml-widget-charcoal-900);
   color: var(--text-color);
   font-family: inherit;
   transition: var(--transition-smooth);
@@ -192,7 +192,7 @@
 .form-field textarea:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px
-    color-mix(in srgb, var(--viking-teal-600) 25%, transparent);
+    color-mix(in srgb, var(--deml-widget-teal-600) 25%, transparent);
 }
 
 .form-row {
@@ -210,7 +210,7 @@
   display: flex;
   justify-content: flex-end;
   gap: var(--space-2);
-  background-color: var(--viking-charcoal-900);
+  background-color: var(--deml-widget-charcoal-900);
   border-bottom-left-radius: var(--space-2);
   border-bottom-right-radius: var(--space-2);
 }
@@ -219,7 +219,7 @@
   padding: var(--space-1) var(--space-2);
   font-size: var(--base-font-size);
   font-weight: 600;
-  border-radius: var(--viking-radius-pill, 999px);
+  border-radius: var(--deml-widget-radius-pill, 999px);
   cursor: pointer;
   border: none;
   font-family: inherit;
@@ -235,19 +235,19 @@
 .btn-cancel:hover {
   background-color: color-mix(
     in srgb,
-    var(--viking-white-pure) 5%,
+    var(--deml-widget-white-pure) 5%,
     transparent
   );
   color: var(--text-color);
 }
 
 .btn-submit {
-  background-color: var(--viking-teal-600);
-  color: var(--viking-white-pure);
+  background-color: var(--deml-widget-teal-600);
+  color: var(--deml-widget-white-pure);
 }
 
 .btn-submit:hover:not(:disabled) {
-  background-color: var(--viking-teal-400);
+  background-color: var(--deml-widget-teal-400);
 }
 
 .btn-submit:disabled {
@@ -264,26 +264,26 @@
 }
 
 .status-msg.success {
-  background-color: color-mix(in srgb, var(--viking-teal-400) 15%, transparent);
-  border: 1px solid color-mix(in srgb, var(--viking-teal-400) 30%, transparent);
-  color: var(--viking-teal-400);
+  background-color: color-mix(in srgb, var(--deml-widget-teal-400) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--deml-widget-teal-400) 30%, transparent);
+  color: var(--deml-widget-teal-400);
 }
 
 .status-msg.error {
   background-color: color-mix(
     in srgb,
-    var(--viking-crimson-500) 15%,
+    var(--deml-widget-crimson-500) 15%,
     transparent
   );
   border: 1px solid
-    color-mix(in srgb, var(--viking-crimson-500) 30%, transparent);
-  color: var(--viking-crimson-500);
+    color-mix(in srgb, var(--deml-widget-crimson-500) 30%, transparent);
+  color: var(--deml-widget-crimson-500);
 }
 
 .status-msg.warning {
-  background-color: color-mix(in srgb, var(--viking-gold-500) 15%, transparent);
-  border: 1px solid color-mix(in srgb, var(--viking-gold-500) 30%, transparent);
-  color: var(--viking-gold-500);
+  background-color: color-mix(in srgb, var(--deml-widget-gold-500) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--deml-widget-gold-500) 30%, transparent);
+  color: var(--deml-widget-gold-500);
 }
 
 .is-hidden {
@@ -301,9 +301,9 @@
 .security-banner {
   display: flex;
   gap: var(--space-1);
-  background-color: color-mix(in srgb, var(--viking-gold-500) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--viking-gold-500) 35%, transparent);
-  color: var(--viking-gold-500);
+  background-color: color-mix(in srgb, var(--deml-widget-gold-500) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--deml-widget-gold-500) 35%, transparent);
+  color: var(--deml-widget-gold-500);
   padding: var(--space-2);
   border-radius: var(--space-1);
   font-size: var(--base-font-size);
@@ -314,5 +314,5 @@
 .security-banner svg {
   flex-shrink: 0;
   margin-top: 0;
-  color: var(--viking-gold-500);
+  color: var(--deml-widget-gold-500);
 }

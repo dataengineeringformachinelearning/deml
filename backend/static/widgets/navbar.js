@@ -1,6 +1,6 @@
 /**
  * Shared navbar behavior for marketing + backend static pages.
- * Requires window.__DEML = { FRONTEND_URL, BACKEND_URL, MARKETING_URL } and viking-ui.css.
+ * Requires window.__DEML = { FRONTEND_URL, BACKEND_URL, MARKETING_URL } and deml-ui.css.
  */
 (() => {
   if (window.__DEML_AUTH_BRIDGE_READY__ === true) {
@@ -11,8 +11,8 @@
   const AUTH_CACHE_TTL_MS = 60 * 60 * 1000;
   const AUTH_BRIDGE_ID = 'deml-auth-status-bridge';
 
-  const iconPaths = () => window.__VIKING_ICON_PATHS ?? {};
-  const filledIconPaths = () => window.__VIKING_ICON_FILLED_PATHS ?? {};
+  const iconPaths = () => window.__DEML_ICON_PATHS ?? {};
+  const filledIconPaths = () => window.__DEML_ICON_FILLED_PATHS ?? {};
 
   const normalizeIconName = name => {
     const outlinePaths = iconPaths();
@@ -25,23 +25,23 @@
 
   const closeStaticMobileMenu = () => {
     const menuBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
+    const navbar = document.getElementById('navbar');
+    const mobileMenu = document.getElementById('mobile-menu') || document.getElementById('site-navbar-panel');
     if (!menuBtn || !mobileMenu) return;
     mobileMenu.classList.remove('open');
-    mobileMenu.setAttribute('hidden', 'true');
-    mobileMenu.style.setProperty('display', 'none', 'important');
+    navbar?.classList.remove('is-menu-open');
     menuBtn.setAttribute('aria-expanded', 'false');
     menuBtn.setAttribute('aria-label', 'Toggle navigation menu');
-    const menuIcon = menuBtn.querySelector('[data-viking-icon]');
+    const menuIcon = menuBtn.querySelector('[data-deml-icon]');
     if (menuIcon) {
-      menuIcon.setAttribute('data-viking-icon', 'menu');
+      menuIcon.setAttribute('data-deml-icon', 'menu');
       setIcon(menuIcon, 'menu', 24);
     }
   };
 
   const resolveIconColorClass = color => {
-    if (color === 'accent') return 'viking-icon-color-accent';
-    if (color === 'muted') return 'viking-icon-color-muted';
+    if (color === 'accent') return 'deml-icon-color-accent';
+    if (color === 'muted') return 'deml-icon-color-muted';
     return '';
   };
 
@@ -61,17 +61,17 @@
     if (!el) return false;
     el.innerHTML = svgIcon(name, size, options);
     const rendered = el.querySelector('svg path, svg circle, svg rect, svg line, svg polyline');
-    el.toggleAttribute('data-viking-icon-pending', !rendered);
+    el.toggleAttribute('data-deml-icon-pending', !rendered);
     return Boolean(rendered);
   };
 
   const initNavIcons = () => {
     let missing = 0;
-    document.querySelectorAll('[data-viking-icon]').forEach(el => {
-      const name = el.getAttribute('data-viking-icon');
-      const size = Number(el.getAttribute('data-viking-icon-size') || 16);
-      const variant = el.getAttribute('data-viking-icon-variant') || 'outline';
-      const color = el.getAttribute('data-viking-icon-color') || undefined;
+    document.querySelectorAll('[data-deml-icon]').forEach(el => {
+      const name = el.getAttribute('data-deml-icon');
+      const size = Number(el.getAttribute('data-deml-icon-size') || 16);
+      const variant = el.getAttribute('data-deml-icon-variant') || 'outline';
+      const color = el.getAttribute('data-deml-icon-color') || undefined;
       if (name) {
         const rendered = setIcon(el, name, size, { variant, color });
         if (!rendered) missing += 1;
@@ -81,7 +81,7 @@
   };
 
   const initThemeToggle = () => {
-    if (document.querySelector('viking-theme-toggle-wc')) {
+    if (document.querySelector('deml-theme-toggle')) {
       return;
     }
 
@@ -98,27 +98,30 @@
       const currentTheme = document.documentElement.getAttribute('data-theme');
       const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
+      localStorage.setItem('deml-theme', newTheme);
       document.documentElement.classList.toggle('dark', newTheme === 'dark');
+      themeBtn.setAttribute('aria-pressed', newTheme === 'dark' ? 'true' : 'false');
       updateThemeIcon();
     });
   };
 
   const initMobileMenu = () => {
     const menuBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
+    const navbar = document.getElementById('navbar');
+    const mobileMenu = document.getElementById('mobile-menu') || document.getElementById('site-navbar-panel');
     if (!menuBtn || !mobileMenu) return;
 
-    menuBtn.setAttribute('aria-controls', 'mobile-menu');
+    menuBtn.setAttribute('aria-controls', mobileMenu.id || 'site-navbar-panel');
     if (menuBtn.dataset.mobileMenuBound === 'true') {
       closeStaticMobileMenu();
       return;
     }
     menuBtn.dataset.mobileMenuBound = 'true';
 
-    const menuIcon = menuBtn.querySelector('[data-viking-icon]');
+    const menuIcon = menuBtn.querySelector('[data-deml-icon]');
     const setMobileMenuOpen = isOpen => {
       mobileMenu.classList.remove('open');
+      navbar?.classList.toggle('is-menu-open', isOpen);
       if (isOpen) {
         mobileMenu.classList.add('open');
         mobileMenu.removeAttribute('hidden');
@@ -136,7 +139,7 @@
         isOpen ? 'Close navigation menu' : 'Toggle navigation menu',
       );
       if (menuIcon) {
-        menuIcon.setAttribute('data-viking-icon', isOpen ? 'x' : 'menu');
+        menuIcon.setAttribute('data-deml-icon', isOpen ? 'x' : 'menu');
         setIcon(menuIcon, isOpen ? 'x' : 'menu', 24);
       } else {
         menuBtn.innerHTML = svgIcon(isOpen ? 'x' : 'menu', 24);
@@ -144,7 +147,7 @@
     };
 
     const interactiveMenuTarget = target => {
-      return target?.closest?.('a,button,viking-button-wc,viking-button,[role="button"]');
+      return target?.closest?.('a,button,deml-button,deml-button,[role="button"]');
     };
 
     const closeMobileMenu = closeStaticMobileMenu;
@@ -349,7 +352,7 @@
     const setAuthButtonHref = (id, href) => {
       const el = document.getElementById(id);
       if (!el) return;
-      if (el.tagName.toLowerCase() === 'viking-button-wc') {
+      if (el.tagName.toLowerCase() === 'deml-button') {
         el.setAttribute('href', href);
       } else {
         el.href = href;
@@ -360,7 +363,7 @@
       const textEl = document.getElementById(textId);
       const iconEl = document.getElementById(iconId);
       if (textEl) textEl.textContent = label;
-      const iconTarget = iconEl?.querySelector?.('[data-viking-icon]') ?? iconEl;
+      const iconTarget = iconEl?.querySelector?.('[data-deml-icon]') ?? iconEl;
       if (iconTarget) setIcon(iconTarget, iconName, 16);
     };
 
@@ -377,7 +380,7 @@
 
     const setAuthAwareHref = (el, href) => {
       if (!href) return;
-      if (el.tagName.toLowerCase() === 'viking-button-wc') {
+      if (el.tagName.toLowerCase() === 'deml-button') {
         el.setAttribute('href', href);
         return;
       }
@@ -471,7 +474,7 @@
           signOut();
         };
         btn.addEventListener('viking-press', handler);
-        if (btn.tagName.toLowerCase() !== 'viking-button-wc') {
+        if (btn.tagName.toLowerCase() !== 'deml-button') {
           btn.addEventListener('click', handler);
         }
       }
@@ -623,14 +626,14 @@
     if (!force && Object.keys(iconPaths()).length > 0) return;
     try {
       const [pathsRes, filledRes] = await Promise.all([
-        fetch('/assets/viking-icon-paths.json', { cache: 'no-store' }),
-        fetch('/assets/viking-icon-filled-paths.json', { cache: 'no-store' }),
+        fetch('/static/deml-icon-paths.json', { cache: 'no-store' }),
+        fetch('/static/deml-icon-filled-paths.json', { cache: 'no-store' }),
       ]);
       if (pathsRes.ok) {
-        window.__VIKING_ICON_PATHS = await pathsRes.json();
+        window.__DEML_ICON_PATHS = await pathsRes.json();
       }
       if (filledRes.ok) {
-        window.__VIKING_ICON_FILLED_PATHS = await filledRes.json();
+        window.__DEML_ICON_FILLED_PATHS = await filledRes.json();
       }
     } catch {
       /* icons optional */
@@ -641,7 +644,7 @@
     const retryDelays = [100, 350, 900, 1800];
     retryDelays.forEach(delay => {
       window.setTimeout(async () => {
-        if (!document.querySelector('[data-viking-icon-pending]')) return;
+        if (!document.querySelector('[data-deml-icon-pending]')) return;
         await loadIconPaths(true);
         initNavIcons();
       }, delay);

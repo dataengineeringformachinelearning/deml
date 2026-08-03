@@ -93,7 +93,7 @@
       }
     </script>
 
-    <!-- Fonts — self-hosted Inter via viking-ui.css -->
+    <!-- Fonts — fonts via deml-ui.css (Geist / Syne / Fraunces) -->
     <link
       rel="preload"
       href="{% static 'fonts/inter/InterVariable.woff2' %}"
@@ -102,16 +102,16 @@
       crossorigin
     />
 
-    <!-- Vendor styles load first so Viking-UI remains the visual authority. -->
+    <!-- Vendor styles load first; deml-ui remains the visual authority. -->
     {% block vendor_styles %}{% endblock %}
 
-    <!-- Viking-UI design system (synced from packages/viking-ui/dist) -->
-    <link rel="stylesheet" href="{% static 'viking-ui.css' %}" />
+    <!-- deml-ui design system (synced from deml-ui) -->
+    <link rel="stylesheet" href="{% static 'deml-ui.css' %}" />
     {% block extra_styles %}{% endblock %}
 
     <script>
       (function () {
-        const savedTheme = localStorage.getItem("theme");
+        const savedTheme = localStorage.getItem("deml-theme");
         const prefersDark = window.matchMedia(
           "(prefers-color-scheme: dark)",
         ).matches;

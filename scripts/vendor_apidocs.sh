@@ -25,4 +25,4 @@ curl -fsSL "$BASE_REDOC/bundles/redoc.standalone.js" -o "$REDOC_DIR/redoc.standa
 printf '%s\n' "$REDOC_VER" >"$REDOC_DIR/VERSION"
 
 echo "✓ Vendored under backend/static/vendor/ (commit these files)."
-echo "  Also copy packages/viking-ui/src/tokens/suite-apidocs.css → backend/static/suite-apidocs.css"
+echo "  Also copy Keep suite-apidocs.css in backend/static (Swagger/ReDoc skin; product SoT is deml-ui)"

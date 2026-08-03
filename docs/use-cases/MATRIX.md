@@ -42,7 +42,7 @@ are imported at runtime. FORJD resource bodies stay FORJD-owned (proxied).
 | UC-HEALTH-001 | full | full product-home probe | full health/ready/capabilities | full | full ReadyResponse | full | FORJD_* |
 | UC-SETTINGS-001 | full | full `/settings` | full composed | na | na | partial | na |
 | UC-ACCOUNT-001 | partial | full `/account` | na | na | na | partial | na |
-| UC-ONBOARD-001 | partial | full dashboard | na | na | na (viking-ui) | partial | na |
+| UC-ONBOARD-001 | partial | full dashboard | na | na | na (deml-ui) | partial | na |
 | UC-CORS-001 | full | na | full cors_utils | na | na | full | DB domains |
 | UC-LEARN-001 | deferred | missing | missing | missing | reserved only | missing | na |
 
@@ -58,11 +58,11 @@ schema ownership on FORJD or deml-contracts fragments.
 |------|---------|---------|----------------|
 | `frontend/` | npm workspace | Angular 22 / Node >=22.22.3 | Product SPA (deml.app) |
 | `backend/` | uv | Django + Ninja / Python 3.12 | BFF, identity, billing, FORJD adapters |
-| `packages/viking-ui` | npm workspace | TS / Angular lib | Suite UI SoT |
+| `deml-ui` (sibling) | GitHub package | Design system | Product UI SoT |
 | `packages/deml-crypto` | hatch/uv | Python | AES-GCM + GCP KMS envelopes |
 | `packages/deml-rate-limit` | hatch/uv | Python | Redis/Dragonfly rate-limit helpers |
 | `packages/deml-contracts` | npm + hatch | TS + Python | Use-case contract SoT |
-| `viking-ui-docs/` | npm workspace | Storybook | Kit docs |
+| `deml-ui-docs/` | npm workspace | Storybook | Kit docs |
 | `infrastructure/studio` | npm workspace | tooling | Studio infra |
 | `native/` | Xcode | Swift/macOS | Security workbench |
 | `tests/` | Playwright | Node | Visual checks |

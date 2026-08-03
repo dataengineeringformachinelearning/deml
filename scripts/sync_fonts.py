@@ -15,13 +15,13 @@ FONT_TARGETS: Final = (
   # Absolute /fonts/inter/ (suite-fonts.css / forjd.co parity)
   "frontend/public/fonts/inter",
   "marketing/public/fonts/inter",
-  "viking-ui-docs/public/fonts/inter",
+  "deml-ui-docs/public/fonts/inter",
   # Relative fonts/inter/ next to viking-*.css asset bundles
   "frontend/src/assets/fonts/inter",
   "frontend/public/assets/fonts/inter",
   "backend/static/fonts/inter",
   "marketing/public/assets/fonts/inter",
-  "viking-ui-docs/public/assets/fonts/inter",
+  "deml-ui-docs/public/assets/fonts/inter",
 )
 
 
@@ -35,7 +35,7 @@ def validate_woff2(path: str) -> None:
 
 def sync_fonts() -> None:
   root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-  src_dir = os.path.join(root, "packages", "viking-ui", "src", "assets", "fonts", "inter")
+  src_dir = os.path.join(root, "packages", "deml-ui", "src", "assets", "fonts", "inter")
 
   if not os.path.isdir(src_dir):
     print(f"Font source directory missing: {src_dir}", file=sys.stderr)

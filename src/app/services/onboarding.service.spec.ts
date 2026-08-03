@@ -1,27 +1,23 @@
 import { TestBed } from '@angular/core/testing';
 import { PLATFORM_ID } from '@angular/core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  getDefaultActivityLog,
-  getDefaultOnboardingStore,
-  resetDefaultActivityLog,
-  resetDefaultOnboardingStore,
-  VikingDialogService,
-} from '@dataengineeringformachinelearning/viking-ui';
+
+import { DialogService } from './dialog.service';
 import { OnboardingService } from './onboarding.service';
 
 describe('OnboardingService', () => {
+  const storageKey = 'deml-onboarding';
+
   beforeEach(() => {
-    resetDefaultOnboardingStore();
-    resetDefaultActivityLog();
+    localStorage.removeItem(storageKey);
     TestBed.configureTestingModule({
       providers: [
         OnboardingService,
         { provide: PLATFORM_ID, useValue: 'browser' },
         {
-          provide: VikingDialogService,
+          provide: DialogService,
           useValue: {
-            openOnboarding: vi.fn(() => Promise.resolve(true)),
+            confirm: vi.fn(() => Promise.resolve(true)),
           },
         },
       ],
@@ -29,43 +25,29 @@ describe('OnboardingService', () => {
   });
 
   afterEach(() => {
-    resetDefaultOnboardingStore();
-    resetDefaultActivityLog();
+    localStorage.removeItem(storageKey);
   });
 
-  it('shouldAutoOpen when guide is active and user has no pages', () => {
+  it('tracks completed steps in localStorage', () => {
     const svc = TestBed.inject(OnboardingService);
-    expect(svc.shouldAutoOpen(false)).toBe(true);
-    expect(svc.shouldAutoOpen(true)).toBe(false);
+    expect(svc.getCompletedSteps()).toEqual([]);
+    svc.completeStep('welcome');
+    expect(svc.getCompletedSteps()).toContain('welcome');
   });
 
-  it('markComplete writes store and activity', () => {
+  it('reset clears completed steps', () => {
     const svc = TestBed.inject(OnboardingService);
-    svc.markComplete();
-    expect(getDefaultOnboardingStore().get().completed).toBe(true);
-    expect(
-      getDefaultActivityLog()
-        .list()
-        .some(e => e.kind === 'onboarding.complete'),
-    ).toBe(true);
+    svc.completeStep('welcome');
+    svc.reset();
+    expect(svc.getCompletedSteps()).toEqual([]);
   });
 
-  it('markSkipped dismisses guide and records activity', () => {
+  it('confirmReset uses DialogService and clears on confirm', async () => {
+    const dialog = TestBed.inject(DialogService);
     const svc = TestBed.inject(OnboardingService);
-    svc.markSkipped();
-    expect(getDefaultOnboardingStore().get().dismissed).toBe(true);
-    expect(svc.shouldShowGuide()).toBe(false);
-    expect(
-      getDefaultActivityLog()
-        .list()
-        .some(e => e.kind === 'onboarding.dismiss'),
-    ).toBe(true);
-  });
-
-  it('openWizard delegates to VikingDialogService', async () => {
-    const dialog = TestBed.inject(VikingDialogService);
-    const svc = TestBed.inject(OnboardingService);
-    await svc.openWizard(true);
-    expect(dialog.openOnboarding).toHaveBeenCalledWith(true);
+    svc.completeStep('welcome');
+    await expect(svc.confirmReset()).resolves.toBe(true);
+    expect(dialog.confirm).toHaveBeenCalled();
+    expect(svc.getCompletedSteps()).toEqual([]);
   });
 });
