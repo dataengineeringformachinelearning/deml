@@ -11,7 +11,7 @@
     headingId="blog-list-heading"
   />
 
-  <app-microcard-grid ariaLabel="Blog posts" [columns]="3">
+  <app-microcard-grid ariaLabel="Blog posts" [columns]="1">
     @for (post of posts; track post.slug) {
       <li>
         <app-microcard
