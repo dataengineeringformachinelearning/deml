@@ -34,7 +34,7 @@
     "@sentry/angular": "^10.69.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
-    "deml-ui": "github:dataengineeringformachinelearning/deml-ui#main",
+    "deml-ui": "github:dataengineeringformachinelearning/deml-ui#eee4bcee24023aae642a705eb5ecfd16384990a9",
     "express": "^5.1.0",
     "firebase": "^12.17.0",
     "leaflet": "^1.9.4",
@@ -54,6 +54,6 @@
     "vitest": "^4.0.8"
   },
   "allowScripts": {
-    "github:dataengineeringformachinelearning/deml-ui#b7937d327bf21c9b8e4317ff9fd4d4ed7633f171": true
+    "github:dataengineeringformachinelearning/deml-ui#eee4bcee24023aae642a705eb5ecfd16384990a9": true
   }
 }

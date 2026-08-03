@@ -4,7 +4,7 @@
     title="Log in"
     description="Welcome back. Enter your email and password to continue."
   >
-    <form class="auth-form" (submit)="submit($event)" novalidate>
+    <form class="form-panel__form" (submit)="submit($event)" novalidate>
       <app-text-field
         label="Email"
         type="email"
@@ -37,7 +37,7 @@
       />
 
       @if (formError()) {
-        <p class="auth-form__error" role="alert">{{ formError() }}</p>
+        <p class="form-panel__error" role="alert">{{ formError() }}</p>
       }
 
       <app-button-group align="start" layout="column">

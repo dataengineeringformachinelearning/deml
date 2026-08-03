@@ -28,7 +28,7 @@ describe('Login', () => {
     const host = fixture.nativeElement as HTMLElement;
     expect(fixture.componentInstance).toBeTruthy();
     expect(host.querySelector('app-form-panel')).toBeTruthy();
-    expect(host.querySelector('form.auth-form')).toBeTruthy();
+    expect(host.querySelector('form.form-panel__form')).toBeTruthy();
     expect(host.querySelector('h1')?.textContent).toContain('Log in');
   });
 

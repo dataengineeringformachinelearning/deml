@@ -11,7 +11,6 @@ import { PACKAGE_GROUPS, topicsForGroup } from '../../data/packages';
   selector: 'app-learn',
   imports: [Banner, Microcard, MicrocardGrid, PageSection, SectionHeader],
   templateUrl: './learn.html',
-  styleUrl: './learn.css',
   host: { class: 'page page--catalog' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

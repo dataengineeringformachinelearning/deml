@@ -1,10 +1,14 @@
-# DEML Design System — deml-ui (new-from-the-start)
+# DEML Design System — deml-ui (LOCKED)
 
+**Status:** Locked for all future work.  
+**Look:** **new-from-the-start** / **atelier**  
 **Canonical package:** [`deml-ui`](https://github.com/dataengineeringformachinelearning/deml-ui)  
 **Storybook:** [ui.deml.app](https://ui.deml.app)  
 **App integration:** [docs/DEML_UI.md](docs/DEML_UI.md) · [.cursorrules](.cursorrules) · [AGENTS.md](AGENTS.md)
 
-Viking-UI (`packages/viking-ui`, `@dataengineeringformachinelearning/viking-ui`, `--viking-*`) is **retired**. Do not add or restore it.
+`deml-ui` is the **single source of truth** for product visuals. Viking-UI
+(`packages/viking-ui`, `@dataengineeringformachinelearning/viking-ui`,
+`viking-*`, `--viking-*`) is **fully retired**. Do not add or restore it.
 
 ---
 
@@ -16,26 +20,40 @@ Viking-UI (`packages/viking-ui`, `@dataengineeringformachinelearning/viking-ui`,
 | [ui.deml.app](https://ui.deml.app) | deml-ui Storybook on Vercel | deml-ui tokens + components |
 | [backend.deml.app](https://backend.deml.app) | Django templates | `backend/static/deml-ui.css` (synced from deml-ui) |
 
+Every surface above must share the same locked rules: equal spacing, identical
+tile/card heights via `--tile-row-unit`, fixed chart aspect, WCAG 2.0 AA, and
+dual `data-theme`.
+
 ---
 
-## Design philosophy (new-from-the-start)
+## Locked design rules (mandatory)
 
-The product look is the **new-from-the-start** composition carried by deml-ui’s
-**atelier** tokens:
+These rules are non-negotiable for agents, PRs, and product UI:
 
-- **8px grid** — all spacing resolves to `--grid` / `--space-*`
-- **Equal distribution** — dashboard tiles use `--tile-row-unit` (dash-row)
-  with `minmax(..., auto)` and shared `--tile-gap`; cards and microcards share
-  the same gutter language
-- **Letterspaced marks** — eyebrows / meta use wide tracking (`--tracking-eyebrow`)
-- **Bold display** — large headings use `--font-display` (Syne) with tight tracking
-- **Readable intros** — ledes use `--font-serif` (Fraunces) with intro tracking
-- **Dual theme** — `data-theme="light"` / `data-theme="dark"` on `<html>`
-- **Light modules on ink ground (dark)** / limestone ground (light)
-- **Charts never squash** — fixed `--chart-aspect` (2.4); area plots lock aspect;
-  chart cards fill the plot band without distorting the viewBox
-- **WCAG 2.0 AA** — contrast, `:focus-visible`, ≥44px hit targets (`--hit-target`),
-  `prefers-reduced-motion`
+1. **Tokens only** — product chrome uses deml-ui CSS variables
+   (`--color-*`, `--space-*`, `--tile-*`, `--chart-*`, `--font-*`, `--tracking-*`).
+   No arbitrary hex/rgb in app or component chrome outside deml-ui `tokens.css`.
+2. **8px grid** — all spacing resolves to `--grid` / `--space-*` (8px multiples).
+   Outer gutters and board gaps stay equal; do not invent one-off margins.
+3. **Identical heights** — dashboard tiles / bento rows use `--tile-row-unit`
+   (dash-row) with shared `--tile-gap`; cards and microcards share the same
+   gutter language (`minmax(..., auto)` where grids apply).
+4. **Fixed charts** — `--chart-aspect` is **2.4**. Area/bar plots lock aspect;
+   never squash, stretch, or freely resize plots outside
+   `--chart-aspect` / `--chart-min-block` / `--chart-max-block`.
+5. **Typography** — large bold display (`--font-display` / Syne, tight tracking);
+   letterspaced secondary / eyebrows (`--tracking-eyebrow`); readable intros
+   (`--font-serif` / Fraunces with intro tracking).
+6. **Dual theme** — `data-theme="light"` | `data-theme="dark"` on `<html>`.
+   Dark: light modules on ink ground. Light: limestone ground.
+7. **WCAG 2.0 AA** — contrast, `:focus-visible`, ≥44px hit targets (`--hit-target`),
+   `prefers-reduced-motion`.
+8. **Compose deml-ui only** — pages use `app-*` wrappers that mirror deml-ui
+   class contracts. Zero app-level design-system CSS for product chrome.
+9. **Extend deml-ui first** — new primitives, tokens, or surfaces land in deml-ui,
+   then deml consumes them (bump dependency / sync Django static).
+10. **No Viking / parallel kits** — no Viking-UI, Material, Bootstrap, Tailwind
+    utilities, or a second local design system.
 
 Directional quality bars inform craft only. Do **not** import third-party UI kits
 or copy external visual systems into deml.
@@ -82,6 +100,11 @@ compatibility and must resolve to the families above.
 Pages pass **data**; shared components own markup and deml-ui classes.
 Prefer `@for` + `app-tile-board` over one-off grids.
 
+**Angular wrappers** under `src/app/components/*`:
+- `ViewEncapsulation.None`
+- **no** `styleUrl` / `styleUrls` / inline `styles` for design-system chrome
+- Thin auth/learn layout helpers may use deml-ui tokens only (not a parallel DS)
+
 ---
 
 ## Theme runtime
@@ -126,13 +149,18 @@ npx ng serve
 4. **Tokens only** — no arbitrary hex/rgb in product chrome.
 5. **Equal spacing** — gutters and tile gaps from `--tile-gap` / page-body rules;
    do not invent one-off margins between boards.
-6. **Chart golden rule** — never squash, stretch, or freely resize plots outside
+6. **Identical tile heights** — use `--tile-row-unit` / dash-row rhythm.
+7. **Chart golden rule** — never squash, stretch, or freely resize plots outside
    `--chart-aspect` / min-max block tokens.
+8. **WCAG 2.0 AA** — preserve focus, contrast, hit targets, reduced motion.
 
 ---
 
 ## Historical note
 
 Older suite docs that mention Viking-UI, `packages/viking-ui`, or void-black /
-electric-teal command chrome describe a **retired** system. Treat those sections
-as superseded by this file and deml-ui.
+electric `#2176ff` command chrome describe a **retired** system. Treat those
+sections as superseded by this file and deml-ui.
+
+**Confirmation:** The new-from-the-start / atelier / deml-ui style is locked for
+all future deml product work.

@@ -13,7 +13,6 @@ import { AuthService } from '../../services/auth.service';
   selector: 'app-signup',
   imports: [PageSection, FormPanel, TextField, CheckboxField, Button, ButtonGroup, RouterLink],
   templateUrl: './signup.html',
-  styleUrl: './signup.css',
   host: { class: 'page page--auth' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

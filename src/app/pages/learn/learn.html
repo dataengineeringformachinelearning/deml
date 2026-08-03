@@ -13,7 +13,7 @@
 
   @for (group of sections; track group.id) {
     <section
-      class="learn-group"
+      class="catalog-group"
       [attr.aria-labelledby]="'learn-' + group.id"
     >
       <app-section-header
@@ -21,7 +21,6 @@
         [lede]="group.summary"
         [headingId]="'learn-' + group.id"
         [headingLevel]="2"
-        tone="card"
       />
 
       <app-microcard-grid [ariaLabel]="group.title" [columns]="3">

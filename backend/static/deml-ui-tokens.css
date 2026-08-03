@@ -1,6 +1,10 @@
 /* =========================================================
    deml-ui design tokens — atelier system (8px grid, dual theme)
    Import via: deml-ui/tokens.css  or  deml-ui/styles.css (full kit)
+   Canonical rules: deml THEME.md (8px grid, data-theme dual mode,
+   WCAG 2.0 AA, chart aspect 2.4, theme-color #2A2622 / #E4DDD0).
+   Colors: atelier palette already owned by this file (THEME.md token
+   entry point); do not invent hexes outside this set.
    Contrast targets: WCAG 2.0 AA for text and UI chrome.
    ========================================================= */
 
@@ -127,9 +131,15 @@
   --module-pad: var(--space-3);
   --module-pad-lg: var(--space-4);
 
-  --hit-target: var(--space-6);
+  --hit-target: var(--space-6); /* 48px ≥ THEME.md 44px AA target */
   --icon-size: var(--space-4);
   --icon-size-sm: var(--space-3);
+
+  /*
+   * Hairline exceptions (not 8px lengths — chrome strokes only):
+   * --border-width 1px, --focus-ring-width/offset 2px.
+   * --radius-pill is pill geometry; sharp radii stay 0 (atelier).
+   */
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;
   --border-width: 1px;
@@ -139,8 +149,9 @@
   --radius-lg: 0;
 
   /*
-   * Chart contract — fixed aspect everywhere.
+   * Chart contract — fixed aspect everywhere (THEME.md).
    * Plots must never squash, stretch, or freely resize outside these bounds.
+   * --chart-aspect is a ratio (not a length).
    */
   --chart-aspect: 2.4;
   --chart-spark-aspect: 2.4;
@@ -159,13 +170,25 @@
   --tile-row-card: var(--space-52);
   --tile-cols: 6;
 
-  /* Type — bold display + letterspaced marks */
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 1rem;
-  --font-size-md: 1.5rem;
-  --font-size-lg: 2rem;
-  --font-size-xl: 3rem;
-  --font-size-2xl: 4rem;
+  /*
+   * Type — 8px grid (root 16px ⇒ rem steps of 0.5).
+   * Remapped former 0.75rem (12px) xs → 1rem (16px).
+   */
+  --font-size-xs: 1rem; /* 16px */
+  --font-size-sm: 1rem; /* 16px */
+  --font-size-md: 1.5rem; /* 24px */
+  --font-size-lg: 2rem; /* 32px */
+  --font-size-xl: 3rem; /* 48px */
+  --font-size-2xl: 4rem; /* 64px */
+
+  /* Line-height — absolute 8px multiples */
+  --line-height-tight: var(--space-2); /* 16px */
+  --line-height-snug: var(--space-3); /* 24px */
+  --line-height-normal: var(--space-4); /* 32px */
+  --line-height-relaxed: var(--space-5); /* 40px */
+  --line-height-loose: var(--space-6); /* 48px */
+  --line-height-display: var(--space-8); /* 64px */
+
   --font-family: "Geist Variable", "Geist", system-ui, -apple-system, sans-serif;
   --font-display: "Syne", var(--font-family);
   --font-sans: var(--font-family);
@@ -181,6 +204,7 @@
   --tracking-display: -0.03em;
   --tracking-tight: -0.02em;
 
+  /* Layout widths — 8px multiples; --reading-width is ch-based measure */
   --content-width: 1200px;
   --content-width-sm: 600px;
   --content-width-md: 800px;
@@ -269,6 +293,7 @@
 .light {
   color-scheme: light;
 
+  /* Limestone ground — THEME.md theme-color #E4DDD0 */
   --color-bg: #e4ddd0;
   --color-surface: #f4f0e6;
   --color-card: #fbf8f1;

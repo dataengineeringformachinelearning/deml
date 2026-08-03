@@ -25,7 +25,7 @@ describe('Learn', () => {
   it('should render microcards for each package topic', () => {
     const host = fixture.nativeElement as HTMLElement;
     const groupTitles = Array.from(
-      host.querySelectorAll('.learn-group .section-header-heading'),
+      host.querySelectorAll('.catalog-group .section-header-heading'),
     ).map((el) => el.textContent?.trim());
     const cards = host.querySelectorAll('app-microcard');
 
