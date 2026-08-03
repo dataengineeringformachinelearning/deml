@@ -1,16 +1,16 @@
-<div class="page-body page-body--catalog">
-  <app-banner preheader="DEML" heading="Success" [lede]="note()" />
-  <app-page-section variant="catalog" labelledBy="success-heading">
-    <app-section-header
-      eyebrow="Checkout"
-      heading="Success"
-      [lede]="note()"
-      headingId="success-heading"
-    />
-    <app-dashboard-grid>
-      @for (metric of metrics(); track metric.label) {
-        <app-stat-card [label]="metric.label" [value]="metric.value" />
-      }
-    </app-dashboard-grid>
-  </app-page-section>
-</div>
+<app-banner
+  preheader="DEML"
+  heading="Success"
+  lede="Your action completed successfully."
+/>
+
+<app-page-section variant="catalog" labelledBy="success-heading">
+  <app-section-header
+    eyebrow="Checkout"
+    heading="Success"
+    lede="Your action completed successfully."
+    headingId="success-heading"
+  />
+
+  <app-tile-board [tiles]="tiles" />
+</app-page-section>
