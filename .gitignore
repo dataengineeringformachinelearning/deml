@@ -51,3 +51,4 @@ Thumbs.db
 .env.*
 !.env.example
 !.env.frontend.example
+.vercel

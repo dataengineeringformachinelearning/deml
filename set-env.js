@@ -226,7 +226,11 @@ fs.writeFileSync(targetPathDev, envBody(false), 'utf8');
 console.log(`Angular environment.development.ts dynamically generated at ${targetPathDev}`);
 
 // Ensure src/assets/firebase-config.js placeholder exists to prevent 404 errors
-const firebaseConfigPath = path.join(__dirname, 'src', 'assets', 'firebase-config.js');
+const assetsDir = path.join(__dirname, 'src', 'assets');
+if (!fs.existsSync(assetsDir)) {
+  fs.mkdirSync(assetsDir, { recursive: true });
+}
+const firebaseConfigPath = path.join(assetsDir, 'firebase-config.js');
 if (!fs.existsSync(firebaseConfigPath)) {
   fs.writeFileSync(
     firebaseConfigPath,

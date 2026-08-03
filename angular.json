@@ -56,6 +56,9 @@
             },
             "vercel": {
               "outputMode": "static",
+              "optimization": true,
+              "sourceMap": false,
+              "extractLicenses": false,
               "budgets": [
                 {
                   "type": "initial",
