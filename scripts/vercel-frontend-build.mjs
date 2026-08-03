@@ -44,9 +44,11 @@ if (!fs.existsSync(demlUiCss)) {
 run('node', ['set-env.js'], root);
 run('npm', ['run', 'build:contracts'], root);
 // Static browser build — single worker + modest heap leave room for esbuild.
+// Keep the Node heap modest so native esbuild has room on 8GB builders.
 run('npx', ['ng', 'build', '--configuration', 'vercel'], root, {
-  NODE_OPTIONS: '--max-old-space-size=3072',
+  NODE_OPTIONS: '--max-old-space-size=1536',
   NG_BUILD_MAX_WORKERS: '1',
+  GOMAXPROCS: '1',
 });
 
 const from = path.join(root, 'dist', 'deml', 'browser');
