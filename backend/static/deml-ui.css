@@ -2290,53 +2290,52 @@ deml-card-grid > *,
 }
 
 /* inlined: components/microcard-grid/microcard-grid.css */
-/* Component: microcard-grid — NFTS minmax equal tiles */
+/* Component: microcard-grid — NFTS equal tiles
+ *
+ * Angular wraps a UL: host must be block (not a multi-col grid), or the UL
+ * collapses into the first track and cards look razor-thin.
+ */
 
 .component--microcard-grid .demo {
   display: grid;
   gap: var(--tile-gap);
 }
 
-.microcard-grid,
+/* Host wrapper — full width, not a column track container */
 app-microcard-grid,
 deml-microcard-grid,
 :host {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+}
+
+/* Actual board — class on UL, or bare .microcard-grid usage */
+.microcard-grid,
+app-microcard-grid > .microcard-grid,
+deml-microcard-grid > .microcard-grid,
+:host > .microcard-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-auto-rows: minmax(var(--tile-row-micro), auto);
-  grid-auto-flow: dense;
-  gap: var(--tile-gap);
-  align-items: stretch;
   box-sizing: border-box;
   width: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
+  gap: var(--tile-gap);
+  align-items: stretch;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: minmax(var(--tile-row-micro), auto);
+  grid-auto-flow: dense;
   background-color: transparent;
 }
 
-/*
- * When the host is the Angular wrapper, the UL inside is the grid.
- * Keep both host + list as grids so either markup shape works.
- */
-app-microcard-grid > .microcard-grid,
-deml-microcard-grid > .microcard-grid,
-:host > .microcard-grid {
-  display: grid;
-  grid-template-columns: inherit;
-  grid-auto-rows: inherit;
-  grid-auto-flow: inherit;
-  gap: inherit;
-  align-items: stretch;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
+.microcard-grid > li,
 app-microcard-grid .microcard-grid > li,
 deml-microcard-grid .microcard-grid > li,
-.microcard-grid > li {
+:host .microcard-grid > li {
   width: 100%;
   height: 100%;
   min-width: 0;
@@ -2347,29 +2346,37 @@ deml-microcard-grid .microcard-grid > li,
   background-color: transparent;
 }
 
+.microcard-grid > li > *,
 app-microcard-grid .microcard-grid > li > *,
 deml-microcard-grid .microcard-grid > li > *,
-.microcard-grid > li > * {
+:host .microcard-grid > li > * {
   height: 100%;
 }
 
 @media screen and (min-width: 800px) {
   .microcard-grid,
-  app-microcard-grid,
-  deml-microcard-grid,
-  :host {
+  app-microcard-grid > .microcard-grid,
+  deml-microcard-grid > .microcard-grid,
+  :host > .microcard-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-auto-rows: minmax(var(--tile-row-micro), 1fr);
   }
 }
 
 @media screen and (min-width: 1200px) {
-  app-microcard-grid[data-columns='3'],
-  deml-microcard-grid[data-columns='3'],
-  :host([data-columns='3']),
   app-microcard-grid[data-columns='3'] > .microcard-grid,
-  deml-microcard-grid[data-columns='3'] > .microcard-grid {
+  deml-microcard-grid[data-columns='3'] > .microcard-grid,
+  :host([data-columns='3']) > .microcard-grid,
+  .microcard-grid[data-columns='3'] {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* 25/100 — four equal catalog columns */
+  app-microcard-grid[data-columns='4'] > .microcard-grid,
+  deml-microcard-grid[data-columns='4'] > .microcard-grid,
+  :host([data-columns='4']) > .microcard-grid,
+  .microcard-grid[data-columns='4'] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 

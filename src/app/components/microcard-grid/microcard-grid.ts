@@ -5,7 +5,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 
-export type MicrocardGridColumns = 2 | 3;
+export type MicrocardGridColumns = 2 | 3 | 4;
 
 /**
  * Equal-height microcard bento on the 8px grid.
@@ -21,8 +21,8 @@ export type MicrocardGridColumns = 2 | 3;
   },
 })
 export class MicrocardGrid {
-  /** Column count from the medium breakpoint up (3 from large when set). */
-  readonly columns = input<MicrocardGridColumns>(3);
+  /** Column count from the large breakpoint (2 from medium). */
+  readonly columns = input<MicrocardGridColumns>(4);
 
   readonly ariaLabel = input<string>();
 }

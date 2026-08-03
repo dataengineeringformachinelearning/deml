@@ -23,7 +23,7 @@
         [headingLevel]="2"
       />
 
-      <app-microcard-grid [ariaLabel]="group.title" [columns]="3">
+      <app-microcard-grid [ariaLabel]="group.title" [columns]="4">
         @for (topic of group.topics; track topic.slug) {
           <li>
             <app-microcard
