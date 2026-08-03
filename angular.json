@@ -59,6 +59,12 @@
               "optimization": true,
               "sourceMap": false,
               "extractLicenses": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/app/app.routes.server.ts",
+                  "with": "src/app/app.routes.server.vercel.ts"
+                }
+              ],
               "budgets": [
                 {
                   "type": "initial",
