@@ -1,9 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "node set-env.js && npm run build:contracts && NG_BUILD_MAX_WORKERS=1 GOMAXPROCS=1 NODE_OPTIONS=--max-old-space-size=1536 npx ng build --configuration vercel",
+  "buildCommand": "node set-env.js && npm run build:contracts && NG_BUILD_MAX_WORKERS=1 GOMAXPROCS=1 NODE_OPTIONS=--max-old-space-size=1536 npx ng build --configuration vercel && cp dist/deml/browser/index.csr.html dist/deml/browser/index.html",
   "outputDirectory": "dist/deml/browser",
   "framework": null,
   "installCommand": "rm -rf node_modules/deml-ui && npm install --include=dev --prefer-online --no-audit --no-fund",
+  "cleanUrls": true,
   "redirects": [
     {
       "source": "/docs",

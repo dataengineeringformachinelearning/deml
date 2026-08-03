@@ -52,6 +52,12 @@ run('npx', ['ng', 'build', '--configuration', 'vercel'], root, {
 });
 
 const from = path.join(root, 'dist', 'deml', 'browser');
+// CSR-only vercel config emits index.csr.html; SPA rewrites need index.html.
+const csrIndex = path.join(from, 'index.csr.html');
+const htmlIndex = path.join(from, 'index.html');
+if (fs.existsSync(csrIndex) && !fs.existsSync(htmlIndex)) {
+  fs.copyFileSync(csrIndex, htmlIndex);
+}
 const to = path.join(frontendDir, 'dist', 'deml', 'browser');
 fs.rmSync(to, { recursive: true, force: true });
 fs.mkdirSync(path.dirname(to), { recursive: true });
