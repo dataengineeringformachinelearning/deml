@@ -2273,16 +2273,18 @@ deml-card-grid > *,
   deml-card-grid,
   .card-grid,
   :host {
+    /* Default: 50/50 — four home cards read as a 2×2 board */
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-auto-rows: minmax(var(--tile-row-card), 1fr);
   }
 }
 
 @media screen and (min-width: 1200px) {
-  app-card-grid,
-  deml-card-grid,
-  .card-grid,
-  :host {
+  /* Opt-in 3-up only — never force a ragged 3+1 on four-card boards */
+  app-card-grid[data-columns='3'],
+  deml-card-grid[data-columns='3'],
+  .card-grid[data-columns='3'],
+  :host([data-columns='3']) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

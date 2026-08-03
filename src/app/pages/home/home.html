@@ -20,7 +20,7 @@
     headingId="home-cards-heading"
   />
 
-  <app-card-grid>
+  <app-card-grid [columns]="2">
     @for (card of cards(); track card.id) {
       <app-card
         [heading]="card.heading"
