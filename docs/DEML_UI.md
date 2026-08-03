@@ -1,7 +1,9 @@
 # deml-ui integration
 
 Design system SoT: [`deml-ui`](https://github.com/dataengineeringformachinelearning/deml-ui)
-(main). Visual language: **new-from-the-start** / atelier tokens.
+(main). Visual language: **new-from-the-start (NFTS) / heritage** — seven-color
+palette only (`#0066B2` `#3D3D3D` `#BDBDBD` `#121212` `#FFFFFF` `#3C7A4A`
+`#C41E3A`). See [THEME.md](../THEME.md).
 
 ## App consumption
 

@@ -143,12 +143,17 @@ is an equivalent legacy alias).
 ### deml-ui Uniformity Law (LOCKED)
 
 All DEML product chrome uses **deml-ui** — the design system that carries the
-**new-from-the-start** look (atelier tokens, 8px grid, dual `data-theme`).
-**deml-ui is the single visual source of truth. Viking-UI is fully retired.**
-**This style is locked for all future work.**
+**new-from-the-start (NFTS) / heritage** look (**seven-color palette only**,
+8px grid, dual `data-theme`).
+**deml-ui is the single visual source of truth. Viking-UI and atelier-cream are
+fully retired. This style is locked for all future work — agents must not drift.**
 
 Canonical docs: [.cursorrules](.cursorrules), [THEME.md](THEME.md),
 [docs/DEML_UI.md](docs/DEML_UI.md), deml-ui [AGENTS.md](https://github.com/dataengineeringformachinelearning/deml-ui/blob/main/AGENTS.md).
+
+**Locked palette (exact):** `#0066B2` `#3D3D3D` `#BDBDBD` `#121212` `#FFFFFF`
+`#3C7A4A` `#C41E3A`. Dark/light role swaps only; no cream (`#E4DDD0` / `#F4F1EA`),
+void (`#2A2622`), or electric (`#2176ff`).
 
 - **SoT:** sibling / GitHub package `deml-ui` owns tokens (`styles/tokens.css`),
   component HTML/CSS (`components/<name>/`), Web Components, and Angular markup.
@@ -156,23 +161,30 @@ Canonical docs: [.cursorrules](.cursorrules), [THEME.md](THEME.md),
   `deml-ui` (`github:…/deml-ui#main`). Load
   `node_modules/deml-ui/dist/styles/deml-ui.css` via `angular.json`.
 - **Behavioral wrappers:** `src/app/components/*` use `ViewEncapsulation.None`
-  and deml-ui class contracts — **no local component CSS** for product chrome
-  (`styleUrl` / `styleUrls` / inline `styles` forbidden on DS wrappers).
+  and deml-ui class contracts — **zero app-level DS chrome CSS**
+  (`styleUrl` / `styleUrls` / inline `styles` forbidden on DS wrappers and
+  product pages).
 - **Compose pages** with `app-banner` → `app-page-section` → `app-section-header`
   → `app-tile-board` / `app-dashboard-grid` / `app-card-grid`.
 - **Charts:** `app-area-chart` / `app-bar-chart` inside `app-chart-card` only.
-  Keep the chart aspect contract (`--chart-aspect: 2.4` — never squash or stretch).
-- **Theme:** `data-theme="light"|"dark"` on `<html>`; prefer deml-ui tokens
-  (`--color-*`, `--space-*`, `--tile-*`, `--chart-*`).
-- **Spacing:** 8px grid; equal outer gutters; identical tile/card heights via
-  `--tile-row-unit` / dash-row and shared `--tile-gap`.
-- **Typography:** bold display (`--font-display`) + letterspaced secondary
-  (`--tracking-eyebrow`); intros via `--font-serif`.
+  Keep `--chart-aspect: 2.4` — never squash or stretch; series colors from the
+  seven-color palette only; charts sit in equal-height chart-cards.
+- **Theme:** `data-theme="light"|"dark"` on `<html>`; deml-ui tokens only
+  (`--palette-*`, `--color-*`, `--space-*`, `--tile-*`, `--chart-*`);
+  `theme-color` meta `#121212` / `#FFFFFF`.
+- **Spacing:** 8px grid; **equal outer spacing on all four sides**; identical
+  tile/card/bento heights via `--tile-row-unit` / dash-row, `--tile-gap`,
+  `--module-pad`.
+- **Typography:** primary headings bold condensed tight (`--font-display` +
+  `--tracking-display`); secondary/intro generous letter-spacing
+  (`--tracking-eyebrow` / `--tracking-intro`); body highly readable
+  (`--font-sans`).
 - **A11y:** WCAG 2.0 AA — focus-visible, contrast, ≥44px `--hit-target`,
   reduced motion.
 - **Retired — do not use:** `packages/viking-ui`,
   `@dataengineeringformachinelearning/viking-ui`, `viking-*` components,
   `--viking-*` tokens, void-black / electric `#2176ff` suite chrome,
+  atelier-cream / limestone hexes (`#2A2622`, `#E4DDD0`, `#F4F1EA`),
   `viking-ui-docs/`, root `frontend/` product tree (Vercel shim only).
 - After deml-ui changes: build deml-ui, bump deml’s dependency, run
   `scripts/sync_deml_ui_static.sh` for Django static mirrors.
@@ -180,9 +192,10 @@ Canonical docs: [.cursorrules](.cursorrules), [THEME.md](THEME.md),
 ### Critical Code Styling & Theming Law
 
 Before editing HTML/CSS, conform to **THEME.md** and **.cursorrules**.
-No hardcoded hex for product chrome — use deml-ui tokens. Angular product
-components must not add `styleUrl` / `styleUrls` / inline `styles` for DS chrome.
-Thin auth/learn layout helpers may use deml-ui tokens only (not a parallel DS).
+No hardcoded hex for product chrome outside the seven locked colors — use
+deml-ui tokens. Angular product components must not add `styleUrl` /
+`styleUrls` / inline `styles` for DS chrome. Thin auth/learn layout helpers may
+use deml-ui tokens only (not a parallel DS).
 
 ### Code Style & Modernization
 

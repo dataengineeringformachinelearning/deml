@@ -72,7 +72,8 @@ export class ThemeService {
 
     const themeColor = this.document.querySelector('meta[name="theme-color"]');
     if (themeColor) {
-      themeColor.setAttribute('content', mode === 'dark' ? '#2A2622' : '#E4DDD0');
+      /* Locked palette only: ink #121212 / white #FFFFFF */
+      themeColor.setAttribute('content', mode === 'dark' ? '#121212' : '#FFFFFF');
     }
 
     try {

@@ -1,10 +1,11 @@
 /** Shared dashboard layout + accent tokens for reusable analytics cards. */
 export type DashSize = 'sm' | 'md' | 'lg' | 'wide' | 'tall' | 'hero';
 
+/** Maps to `--chart-series-1` | `3` | `4` via deml-ui `data-accent`. */
 export type DashAccent = 'primary' | 'gold' | 'red';
 
 /** Re-export chart scale so consumers can import from one dashboard module. */
-export { CHART_SCALE } from './chart-scale';
+export { CHART_SCALE, CHART_SERIES, DASH_ACCENT_SERIES } from './chart-scale';
 export type { ChartScale } from './chart-scale';
 
 export interface DashPoint {

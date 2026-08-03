@@ -2,15 +2,20 @@
   preheader="DEML"
   heading="Status detail"
   [lede]="note()"
-/>
+>
+  <app-button-group>
+    <app-button variant="primary" shape="pill" routerLink="/status">All systems</app-button>
+    <app-button variant="secondary" shape="pill" routerLink="/">Home</app-button>
+  </app-button-group>
+</app-banner>
 
 <app-page-section variant="catalog" labelledBy="isolated-status-heading">
   <app-section-header
     eyebrow="Public"
-    heading="Status detail"
-    [lede]="note()"
+    heading="Surface health"
+    lede="Detail tiles for a single monitored surface."
     headingId="isolated-status-heading"
   />
 
-  <app-tile-board [tiles]="tiles" />
+  <app-tile-board [tiles]="tiles()" />
 </app-page-section>

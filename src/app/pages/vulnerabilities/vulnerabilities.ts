@@ -4,7 +4,7 @@ import { Banner } from '../../components/banner/banner';
 import { PageSection } from '../../components/page-section/page-section';
 import { SectionHeader } from '../../components/section-header/section-header';
 import { TileBoard } from '../../components/tile-board/tile-board';
-import { catalogStatTiles } from '../../data/catalog-tiles';
+import { VULN_TILES } from '../../data/vulnerabilities';
 
 @Component({
   selector: 'app-vulnerabilities',
@@ -14,9 +14,5 @@ import { catalogStatTiles } from '../../data/catalog-tiles';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Vulnerabilities {
-  readonly tiles = catalogStatTiles([
-    { id: 'critical', label: 'Critical', value: '2' },
-    { id: 'high', label: 'High', value: '9' },
-    { id: 'resolved', label: 'Resolved', value: '128' },
-  ]);
+  readonly tiles = VULN_TILES;
 }

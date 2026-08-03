@@ -8,9 +8,23 @@
   <app-section-header
     eyebrow="Account"
     heading="Controls"
-    lede="Shared modules keep every preference surface aligned."
+    lede="Preference modules keep every settings surface aligned."
     headingId="settings-heading"
   />
 
-  <app-tile-board [tiles]="tiles" />
+  <app-card-grid>
+    @for (card of cards; track card.id) {
+      <app-card
+        [heading]="card.heading"
+        [subtext]="card.subtext"
+        [visual]="card.visual"
+      >
+        <app-button-group align="center" layout="row">
+          <app-button variant="primary" shape="pill" [routerLink]="card.href">
+            {{ card.cta }}
+          </app-button>
+        </app-button-group>
+      </app-card>
+    }
+  </app-card-grid>
 </app-page-section>
