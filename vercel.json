@@ -4,7 +4,6 @@
   "outputDirectory": "dist/deml/browser",
   "framework": null,
   "installCommand": "rm -rf node_modules/deml-ui && npm install --include=dev --prefer-online --no-audit --no-fund",
-  "cleanUrls": true,
   "redirects": [
     {
       "source": "/docs",
@@ -42,7 +41,7 @@
       "destination": "https://backend.deml.app/static/widgets/widget.css"
     },
     {
-      "source": "/((?!.*\\.(?:js|mjs|css|map|png|jpe?g|gif|ico|svg|webp|woff2?|json|webmanifest|txt|xml)$).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
