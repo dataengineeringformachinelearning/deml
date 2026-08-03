@@ -22,6 +22,7 @@ printf '%s\n' "$SWAGGER_VER" >"$SWAGGER_DIR/VERSION"
 
 echo "→ redoc@${REDOC_VER}"
 curl -fsSL "$BASE_REDOC/bundles/redoc.standalone.js" -o "$REDOC_DIR/redoc.standalone.js"
+curl -fsSL "$BASE_REDOC/bundles/redoc.standalone.js.map" -o "$REDOC_DIR/redoc.standalone.js.map" || true
 printf '%s\n' "$REDOC_VER" >"$REDOC_DIR/VERSION"
 
 echo "✓ Vendored under backend/static/vendor/ (commit these files)."
