@@ -61,10 +61,28 @@ def custom_404(request: HttpRequest, exception: Exception) -> HttpResponse:
 
 
 def serve_asset(request: HttpRequest, path: str) -> FileResponse:
-  """Serve shared JSON/CSS assets at /assets/* (marketing + widget parity)."""
-  assets_root = (settings.BASE_DIR / "static" / "assets").resolve()
-  file_path = (assets_root / path).resolve()
-  if not str(file_path).startswith(str(assets_root)) or not file_path.is_file():
+  """Serve shared JSON/CSS/JS assets at /assets/* (marketing + widget parity).
+
+  Embed contract: external sites load https://deml.app/assets/widget.js.
+  Backend mirrors that path so /assets/widget.js also resolves on
+  backend.deml.app (from static/widgets/) for CDN fallbacks.
+  """
+  static_root = (settings.BASE_DIR / "static").resolve()
+  candidates = [(static_root / "assets" / path).resolve()]
+  # Legacy / canonical embed filenames live under static/widgets/.
+  if path in {"widget.js", "widget.css"} or path.startswith("widgets/"):
+    widget_rel = path.removeprefix("widgets/")
+    candidates.append((static_root / "widgets" / widget_rel).resolve())
+
+  file_path = next(
+    (
+      candidate
+      for candidate in candidates
+      if str(candidate).startswith(str(static_root)) and candidate.is_file()
+    ),
+    None,
+  )
+  if file_path is None:
     raise Http404
   content_type = mimetypes.guess_type(file_path.name)[0] or "application/octet-stream"
   return FileResponse(file_path.open("rb"), content_type=content_type)

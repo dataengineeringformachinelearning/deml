@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """
-Sync embeddable widget assets from frontend to marketing public/.
+Sync embeddable widget assets.
 
-Cookie consent and Algolia search bridge are marketing-only surfaces.
-Navbar widget is shared with backend static templates.
+Source of truth: backend/static/widgets/
+Publish targets:
+  - public/assets/          → deml.app/assets/widget.js (Vercel / Angular)
+  - backend/static/assets/  → backend.deml.app/assets/widget.js (Django serve_asset)
+  - marketing public assets when that surface is present in-repo
 """
 
 from __future__ import annotations
@@ -13,81 +16,91 @@ import shutil
 import subprocess
 import sys
 
-WIDGET_FILES = (
+# Canonical embed filenames published at /assets/<name>
+EMBED_FILES = (
   "widget.js",
   "widget.css",
-  "cookie-consent.js",
+)
+
+# Shared chrome widgets (backend templates + optional marketing)
+SHARED_WIDGET_FILES = (
   "algolia-search.js",
   "command-palette.js",
   "navbar.js",
 )
 
+MARKETING_ONLY = ("cookie-consent.js",)
+
 ALGOLIA_CONFIG = "algolia-config.js"
 PRETTIER_VERSION = "prettier@3.8.2"
 
 
-def resolve_widget_src(root: str, name: str) -> str:
-  src_widgets = os.path.join(root, "frontend", "src", "assets", "widgets")
-  src_assets = os.path.join(root, "frontend", "src", "assets")
-  src = os.path.join(src_widgets, name)
-  if not os.path.isfile(src) and name in ("widget.js", "widget.css"):
-    src = os.path.join(src_assets, name)
-  return src
-
-
 def sync_widgets() -> None:
   root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+  backend_widgets = os.path.join(root, "backend", "static", "widgets")
+  public_assets = os.path.join(root, "public", "assets")
+  backend_assets = os.path.join(root, "backend", "static", "assets")
   marketing_alive = os.path.isfile(
     os.path.join(root, "marketing", "src", "layouts", "Layout.astro")
   )
   marketing_widgets = os.path.join(root, "marketing", "public", "assets", "widgets")
-  backend_widgets = os.path.join(root, "backend", "static", "widgets")
-  docs_widgets = os.path.join(root, "deml-ui-docs", "public", "assets", "widgets")
-  frontend_public_widgets = os.path.join(root, "frontend", "public", "assets", "widgets")
+  marketing_assets = os.path.join(root, "marketing", "public", "assets")
 
-  widget_dirs = [backend_widgets, docs_widgets, frontend_public_widgets]
+  if not os.path.isdir(backend_widgets):
+    print(f"Missing widget SoT: {backend_widgets}", file=sys.stderr)
+    sys.exit(1)
+
+  os.makedirs(public_assets, exist_ok=True)
+  os.makedirs(backend_assets, exist_ok=True)
   if marketing_alive:
-    widget_dirs.insert(0, marketing_widgets)
-
-  for widgets_dir in widget_dirs:
-    os.makedirs(widgets_dir, exist_ok=True)
-
-  shared_widget_targets = tuple(widget_dirs)
+    os.makedirs(marketing_widgets, exist_ok=True)
+    os.makedirs(marketing_assets, exist_ok=True)
 
   copied_paths: list[str] = []
 
-  for name in WIDGET_FILES:
-    src = resolve_widget_src(root, name)
+  for name in EMBED_FILES:
+    src = os.path.join(backend_widgets, name)
     if not os.path.isfile(src):
-      print(f"Skip missing widget asset: {name}", file=sys.stderr)
+      print(f"Skip missing embed asset: {name}", file=sys.stderr)
       continue
-
-    if name == "cookie-consent.js":
-      if not marketing_alive:
-        print(f"Skip {name}: marketing surface not in this repo", file=sys.stderr)
-        continue
-      dst = os.path.join(marketing_widgets, name)
-      shutil.copy2(src, dst)
-      copied_paths.append(dst)
-      print(f"Synced {name} -> marketing")
-      continue
-
-    if name in ("command-palette.js", "navbar.js"):
-      for dst_dir in shared_widget_targets:
-        dst = os.path.join(dst_dir, name)
-        shutil.copy2(src, dst)
-        copied_paths.append(dst)
-        print(f"Synced {name} -> {dst_dir}")
-      continue
-
-    embed_targets = [backend_widgets]
-    if marketing_alive:
-      embed_targets.insert(0, marketing_widgets)
-    for dst_dir in embed_targets:
+    for dst_dir in (public_assets, backend_assets):
       dst = os.path.join(dst_dir, name)
       shutil.copy2(src, dst)
       copied_paths.append(dst)
       print(f"Synced {name} -> {dst_dir}")
+    if marketing_alive:
+      dst = os.path.join(marketing_widgets, name)
+      shutil.copy2(src, dst)
+      copied_paths.append(dst)
+      print(f"Synced {name} -> {marketing_widgets}")
+
+  for name in SHARED_WIDGET_FILES:
+    src = os.path.join(backend_widgets, name)
+    if not os.path.isfile(src):
+      print(f"Skip missing shared widget: {name}", file=sys.stderr)
+      continue
+    # Keep SoT in place; mirror to marketing when present.
+    if marketing_alive:
+      dst = os.path.join(marketing_widgets, name)
+      shutil.copy2(src, dst)
+      copied_paths.append(dst)
+      print(f"Synced {name} -> {marketing_widgets}")
+
+  for name in MARKETING_ONLY:
+    src = os.path.join(backend_widgets, name)
+    if not marketing_alive:
+      continue
+    if not os.path.isfile(src):
+      # Optional legacy path under frontend (shim may be absent).
+      alt = os.path.join(root, "frontend", "src", "assets", "widgets", name)
+      src = alt if os.path.isfile(alt) else src
+    if not os.path.isfile(src):
+      print(f"Skip missing marketing widget: {name}", file=sys.stderr)
+      continue
+    dst = os.path.join(marketing_widgets, name)
+    shutil.copy2(src, dst)
+    copied_paths.append(dst)
+    print(f"Synced {name} -> marketing")
 
   format_synced_assets(copied_paths)
 
@@ -106,10 +119,13 @@ def format_synced_assets(paths: list[str]) -> None:
 
 def sync_algolia_config() -> None:
   root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-  src = os.path.join(root, "frontend", "public", "assets", ALGOLIA_CONFIG)
-  if not os.path.isfile(src):
-    src = os.path.join(root, "frontend", "src", "assets", ALGOLIA_CONFIG)
-  if not os.path.isfile(src):
+  candidates = [
+    os.path.join(root, "backend", "static", ALGOLIA_CONFIG),
+    os.path.join(root, "frontend", "public", "assets", ALGOLIA_CONFIG),
+    os.path.join(root, "frontend", "src", "assets", ALGOLIA_CONFIG),
+  ]
+  src = next((path for path in candidates if os.path.isfile(path)), None)
+  if src is None:
     print(f"Skip missing Algolia config: {ALGOLIA_CONFIG}", file=sys.stderr)
     return
 
@@ -118,10 +134,10 @@ def sync_algolia_config() -> None:
   )
   targets = [
     os.path.join(root, "backend", "static"),
-    os.path.join(root, "frontend", "public", "assets"),
+    os.path.join(root, "public", "assets"),
   ]
   if marketing_alive:
-    targets.insert(1, os.path.join(root, "marketing", "public", "assets"))
+    targets.append(os.path.join(root, "marketing", "public", "assets"))
 
   for dst_dir in targets:
     os.makedirs(dst_dir, exist_ok=True)
@@ -131,15 +147,6 @@ def sync_algolia_config() -> None:
     shutil.copy2(src, dst)
     format_synced_assets([dst])
     print(f"Synced {ALGOLIA_CONFIG} -> {dst_dir}")
-
-  # Verify cross-surface presence. Prettier config is surface-sensitive, so
-  # byte-size parity would oscillate between frontend and static mirrors.
-  canonical = os.path.join(root, "frontend", "public", "assets", ALGOLIA_CONFIG)
-  for dst_dir in targets:
-    dst = os.path.join(dst_dir, ALGOLIA_CONFIG)
-    if not os.path.isfile(canonical) or not os.path.isfile(dst):
-      print(f"Algolia config missing: {dst}", file=sys.stderr)
-      sys.exit(1)
 
 
 if __name__ == "__main__":
