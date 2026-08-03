@@ -158,6 +158,18 @@
   --module-pad: var(--space-3);
   --module-pad-lg: var(--space-4);
 
+  /* Navbar — equal inset on all four sides (8px grid) */
+  --navbar-inset: var(--space-2);
+  --navbar-hit: var(--hit-target);
+  --navbar-icon-size: var(--space-3);
+  --navbar-bg: var(--color-bg);
+  --navbar-fg: var(--color-text);
+  --navbar-muted: var(--color-text-secondary);
+  --navbar-accent: var(--color-highlight);
+  --navbar-accent-hover: var(--color-highlight-hover);
+  --navbar-surface: var(--color-surface);
+  --navbar-focus: var(--color-focus);
+
   --font-size-xs: 0.875rem;
   --font-size-sm: var(--space-2);
   --font-size-md: var(--space-3);
@@ -7922,9 +7934,9 @@ deml-chart-empty-state,
 
 /* Navbar — full-bleed fixed top bar; mobile-first */
 
-/* Offset document flow under the fixed bar */
+/* Offset document flow under the fixed bar (inset + hit + inset) */
 body:has(.site-navbar) {
-  padding-top: calc(var(--space-2) * 2 + var(--hit-target));
+  padding-top: calc(var(--navbar-inset) * 2 + var(--navbar-hit));
 }
 
 .site-navbar {
@@ -7938,7 +7950,9 @@ body:has(.site-navbar) {
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: var(--navbar-inset);
+  /* Equal inner padding on all four sides */
+  padding-block: var(--navbar-inset);
+  padding-inline: var(--navbar-inset);
   color: var(--navbar-fg);
   background-color: var(--navbar-bg);
   background-image: linear-gradient(

@@ -156,6 +156,18 @@
   --module-pad: var(--space-3);
   --module-pad-lg: var(--space-4);
 
+  /* Navbar — equal inset on all four sides (8px grid) */
+  --navbar-inset: var(--space-2);
+  --navbar-hit: var(--hit-target);
+  --navbar-icon-size: var(--space-3);
+  --navbar-bg: var(--color-bg);
+  --navbar-fg: var(--color-text);
+  --navbar-muted: var(--color-text-secondary);
+  --navbar-accent: var(--color-highlight);
+  --navbar-accent-hover: var(--color-highlight-hover);
+  --navbar-surface: var(--color-surface);
+  --navbar-focus: var(--color-focus);
+
   --font-size-xs: 0.875rem;
   --font-size-sm: var(--space-2);
   --font-size-md: var(--space-3);
