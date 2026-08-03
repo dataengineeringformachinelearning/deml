@@ -1,22 +1,22 @@
 # deml-ui integration
 
 Design system SoT: [`deml-ui`](https://github.com/dataengineeringformachinelearning/deml-ui)
-(main). Visual language: **new-from-the-start (NFTS) / heritage** — seven-color
-palette only (`#0066B2` `#3D3D3D` `#BDBDBD` `#121212` `#FFFFFF` `#3C7A4A`
-`#C41E3A`). See [THEME.md](../THEME.md).
+(main). Visual language: **new-from-the-start (warm ash)** — expand from that
+system only. See [THEME.md](../THEME.md).
 
 ## App consumption
 
 - Dependency: `"deml-ui": "github:dataengineeringformachinelearning/deml-ui#main"`
   (local iteration may use `file:../deml-ui`).
 - Global styles: `node_modules/deml-ui/dist/styles/deml-ui.css` in `angular.json`
-  (plus Geist / Syne / Fraunces via `index.html` or fontsource).
+  (Geist only via `index.html`).
 - Behavioral Angular components live in `src/app/components` with
   `ViewEncapsulation.None` and **no local CSS** for DS chrome — class contracts
   come from deml-ui.
 - Pages compose `app-banner` → `app-page-section` → `app-section-header` →
   `app-tile-board` / grids / cards.
-- Theme: `data-theme` on `<html>`; `ThemeService` + `app-theme-toggle`.
+- Theme: `data-theme` on `<html>`; `ThemeService` + `app-theme-toggle`
+  (`theme-color` `#35312D` / `#D4CEC5`).
 
 ## Django
 
@@ -29,6 +29,7 @@ palette only (`#0066B2` `#3D3D3D` `#BDBDBD` `#121212` `#FFFFFF` `#3C7A4A`
 - `@dataengineeringformachinelearning/viking-ui`
 - Product tree under `frontend/` (only a Vercel `rootDirectory` shim remains)
 - `--viking-*` tokens and `viking-*` components
+- Cold seven-color / Syne–Fraunces frankenstein overlays on NFTS
 
 ## Related
 

@@ -1,93 +1,53 @@
 /* =========================================================
-   deml-ui design tokens — LOCKED palette (THEME.md)
-   Exact colors only:
-     #0066B2  primary / focus / chart accent
-     #3D3D3D  charcoal surface / secondary text (light)
-     #BDBDBD  muted / border / secondary text (dark)
-     #121212  ink / dark ground / card text on light modules
-     #FFFFFF  white / light ground / on-primary
-     #3C7A4A  success / accent-gold (positive)
-     #C41E3A  danger / accent-red
-   Dark-mode equivalents reuse the same seven hexes (roles swap).
-   Mixes are only between these hexes (hover / translucent chrome).
-   8px grid · chart aspect 2.4 · WCAG 2.0 AA · dual data-theme
+   deml-ui design tokens — new-from-the-start warm ash system
+   Import via: deml-ui/tokens.css  or  deml-ui/styles.css (full kit)
    ========================================================= */
 
 :root {
   color-scheme: dark;
 
-  /* —— Locked palette (do not add hexes outside this set) —— */
-  --palette-blue: #0066b2;
-  --palette-charcoal: #3d3d3d;
-  --palette-gray: #bdbdbd;
-  --palette-ink: #121212;
-  --palette-white: #ffffff;
-  --palette-green: #3c7a4a;
-  --palette-red: #c41e3a;
+  /* Surfaces — warm ash ground, light elevated modules */
+  --color-bg: #35312d;
+  --color-surface: #1c1916;
+  --color-card: #f3f0ea;
+  --color-card-text: #1c1916;
+  --color-card-text-secondary: #4a453f;
+  --color-card-border: color-mix(in srgb, #8a847c 38%, #f3f0ea);
 
-  /* Surfaces — light modules on ink ground (dark default) */
-  --color-bg: var(--palette-ink);
-  --color-surface: var(--palette-charcoal);
-  --color-card: var(--palette-white);
-  --color-card-text: var(--palette-ink);
-  --color-card-text-secondary: var(--palette-charcoal);
-  --color-card-border: color-mix(in srgb, var(--palette-gray) 40%, var(--palette-white));
-
-  /* Fills */
-  --color-primary: var(--palette-blue);
-  --color-primary-hover: color-mix(in srgb, var(--palette-blue) 82%, var(--palette-white));
-  --color-accent-gold: var(--palette-green);
-  --color-accent-gold-hover: color-mix(in srgb, var(--palette-green) 82%, var(--palette-white));
-  --color-accent-red: var(--palette-red);
-  --color-accent-red-hover: color-mix(in srgb, var(--palette-red) 82%, var(--palette-white));
-  --color-brass: var(--palette-blue);
-  --color-brass-hover: color-mix(in srgb, var(--palette-blue) 78%, var(--palette-white));
+  /* Fills — AA with white text on solid CTAs */
+  --color-primary: #2f5f8f;
+  --color-primary-hover: color-mix(in srgb, #2f5f8f 78%, #ffffff);
+  --color-accent-gold: #3f6b54;
+  --color-accent-gold-hover: color-mix(in srgb, #3f6b54 78%, #ffffff);
+  --color-accent-red: #9e3d47;
+  --color-accent-red-hover: color-mix(in srgb, #9e3d47 78%, #ffffff);
 
   /* Text on page ground */
-  --color-text: var(--palette-white);
-  --color-text-secondary: var(--palette-gray);
-  --color-highlight: var(--palette-blue);
-  --color-highlight-hover: color-mix(in srgb, var(--palette-blue) 70%, var(--palette-white));
+  --color-text: #f3f0ea;
+  --color-text-secondary: #c6c0b7;
+  --color-highlight: #9bb8d4;
+  --color-highlight-hover: #c2d4e6;
 
-  /* Chart plot — series colors never theme-invert */
-  --color-plot: var(--palette-ink);
-  --color-plot-ink: var(--palette-white);
-  --color-plot-muted: var(--palette-gray);
-  --color-plot-grid: color-mix(in srgb, var(--palette-gray) 28%, transparent);
-  --color-plot-baseline: color-mix(in srgb, var(--palette-gray) 40%, transparent);
-  --color-plot-border: color-mix(in srgb, var(--palette-gray) 32%, var(--palette-ink));
-
-  --chart-plot: var(--color-plot);
-  --chart-grid: var(--color-plot-grid);
-  --chart-baseline: var(--color-plot-baseline);
-  --chart-node: var(--color-plot-ink);
-  --chart-label: var(--color-plot-muted);
-  --chart-value: var(--color-plot-ink);
-
-  /*
-   * Series — palette roles only (never arbitrary chart hex).
-   * 1 primary blue · 2 secondary gray · 3 success green · 4 danger red
-   */
-  --chart-series-1: var(--palette-blue);
-  --chart-series-2: var(--palette-gray);
-  --chart-series-3: var(--palette-green);
-  --chart-series-4: var(--palette-red);
-  --chart-series-ink: var(--palette-ink);
-  --chart-series-paper: var(--palette-white);
-  --chart-accent: var(--chart-series-1);
+  /* Chart plot — never theme-invert the series */
+  --color-plot: #1c1916;
+  --color-plot-ink: #f3f0ea;
+  --color-plot-muted: #c6c0b7;
+  --color-plot-grid: color-mix(in srgb, #c6c0b7 22%, transparent);
+  --color-plot-baseline: color-mix(in srgb, #c6c0b7 35%, transparent);
+  --color-plot-border: color-mix(in srgb, #c6c0b7 24%, #1c1916);
 
   /* UI */
-  --color-border: color-mix(in srgb, var(--palette-gray) 36%, var(--palette-ink));
-  --color-focus: var(--palette-blue);
-  --color-error: var(--palette-red);
-  --color-success: var(--palette-green);
+  --color-border: color-mix(in srgb, #c6c0b7 30%, #35312d);
+  --color-focus: #f3f0ea;
+  --color-error: #9e3d47;
+  --color-success: #3f6b54;
 
-  --shadow-sm: 0 0 0 1px color-mix(in srgb, var(--palette-ink) 40%, transparent);
-  --shadow-md: 0 8px 32px color-mix(in srgb, var(--palette-ink) 56%, transparent);
-  --shadow-card: 0 8px 32px color-mix(in srgb, var(--palette-ink) 40%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--palette-ink) 16%, transparent);
+  --shadow-sm: 0 0 0 1px color-mix(in srgb, #1c1916 30%, transparent);
+  --shadow-md: 0 8px 32px color-mix(in srgb, #1c1916 36%, transparent);
+  --shadow-card: 0 8px 32px color-mix(in srgb, #1c1916 26%, transparent),
+    0 0 0 1px color-mix(in srgb, #1c1916 12%, transparent);
 
-  /* Semantic aliases */
+  /* Semantic aliases (deml app + legacy deml-ui) */
   --color-background: var(--color-bg);
   --color-text-primary: var(--color-text);
   --color-text-muted: var(--color-text-secondary);
@@ -97,14 +57,14 @@
   --color-dark: var(--color-surface);
   --color-sky-soft: var(--color-bg);
   --color-olive: var(--color-plot);
-  --color-on-primary: var(--palette-white);
-  --color-on-accent: var(--palette-white);
+  --color-on-primary: #ffffff;
+  --color-on-accent: #ffffff;
   --color-on-dark: var(--color-text);
   --color-selection: color-mix(in srgb, var(--color-primary) 28%, transparent);
-  --shadow-color: color-mix(in srgb, var(--palette-ink) 48%, transparent);
-  --shadow-color-soft: color-mix(in srgb, var(--palette-ink) 28%, transparent);
+  --shadow-color: color-mix(in srgb, #1c1916 36%, transparent);
+  --shadow-color-soft: color-mix(in srgb, #1c1916 20%, transparent);
 
-  /* Public deml-ui aliases */
+  /* Public deml-ui aliases used by existing component CSS */
   --bg-primary: var(--color-bg);
   --bg-secondary: var(--color-surface);
   --text-primary: var(--color-text);
@@ -131,7 +91,6 @@
   --space-9: calc(var(--grid) * 9);
   --space-10: calc(var(--grid) * 10);
   --space-12: calc(var(--grid) * 12);
-  --space-14: calc(var(--grid) * 14);
   --space-16: calc(var(--grid) * 16);
   --space-18: calc(var(--grid) * 18);
   --space-22: calc(var(--grid) * 22);
@@ -147,119 +106,92 @@
   --space-90: calc(var(--grid) * 90);
   --space-160: calc(var(--grid) * 160);
 
+  /* Legacy spacing aliases */
   --space-sm: var(--space-2);
   --space-md: var(--space-3);
   --space-lg: var(--space-6);
   --space-xl: var(--space-8);
   --gutter: var(--space-2);
   --demo-padding: var(--space-3);
-  --module-pad: var(--space-3);
-  --module-pad-lg: var(--space-4);
 
-  --hit-target: var(--space-6); /* 48px ≥ 44px AA */
+  --hit-target: var(--space-6);
   --icon-size: var(--space-4);
   --icon-size-sm: var(--space-3);
-
-  /*
-   * Hairline exceptions (stroke chrome only, not layout lengths):
-   * --border-width 1px, --focus-ring-width/offset 2px.
-   * Radii are 0 or 8px multiples (--radius-sm = 8px).
-   */
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;
   --border-width: 1px;
   --radius-pill: 9999px;
-  --radius-sm: var(--space-1); /* 8px */
-  --radius-md: var(--space-1);
-  --radius-lg: var(--space-2); /* 16px */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
 
-  /*
-   * Chart contract — fixed aspect; never squash/stretch.
-   * Width may fluid-fill the card; height comes ONLY from aspect-ratio.
-   * Cap size with max-width (not max-height) so proportions stay locked.
-   */
   --chart-aspect: 2.4;
   --chart-spark-aspect: 2.4;
-  --chart-min-block: calc(var(--grid) * 20); /* 160px — docs/compat */
-  --chart-max-block: calc(var(--grid) * 40); /* 320px — soft ceiling */
+  --chart-min-block: calc(var(--grid) * 20);
+  --chart-max-block: calc(var(--grid) * 40);
   --chart-spark-min-block: calc(var(--grid) * 12);
-  --chart-spark-max-block: calc(var(--grid) * 24);
-  --chart-stage-max-inline: calc(var(--chart-max-block) * var(--chart-aspect));
-  --chart-spark-stage-max-inline: calc(
-    var(--chart-spark-max-block) * var(--chart-spark-aspect)
-  );
+  --chart-spark-max-block: calc(var(--grid) * 25);
   --chart-panel-block: var(--chart-min-block);
   --chart-plot-block: var(--chart-min-block);
   --chart-inset: var(--space-2);
+  --chart-plot: var(--color-plot);
+  --chart-grid: var(--color-plot-grid);
+  --chart-baseline: var(--color-plot-baseline);
+  --chart-accent: var(--color-primary);
+  --chart-node: var(--color-plot-ink);
+  --chart-label: var(--color-plot-muted);
+  --chart-value: var(--color-plot-ink);
+  --chart-series-1: var(--color-primary);
+  --chart-series-2: var(--color-text-secondary);
+  --chart-series-3: var(--color-accent-gold);
+  --chart-series-4: var(--color-accent-red);
 
-  /* Equal tile rhythm */
+  /* Equal tile rhythm — NFTS dash-row; minmax grids grow, never squash */
   --tile-gap: var(--space-2);
-  --tile-row-unit: var(--space-16); /* 128px */
+  --tile-row-unit: var(--space-16);
   --tile-row-micro: var(--space-22);
   --tile-row-card: var(--space-52);
-  --dash-row: var(--tile-row-unit);
   --tile-cols: 6;
+  --dash-row: var(--tile-row-unit);
+  --module-pad: var(--space-3);
+  --module-pad-lg: var(--space-4);
 
-  /*
-   * Type roles (Pass 3):
-   *   display  — Syne: large primary headings, bold, condensed, tight tracking
-   *   secondary — Fraunces: secondary headers + intro, generous letter-spacing
-   *   sans/body — Geist: readable UI + body copy
-   */
+  --font-size-xs: 0.875rem;
+  --font-size-sm: var(--space-2);
+  --font-size-md: var(--space-3);
+  --font-size-lg: var(--space-4);
+  --font-size-xl: var(--space-6);
+  --font-size-2xl: var(--space-8);
+  --font-size-body: var(--font-size-sm);
+  --font-size-display: var(--font-size-xl);
+  --font-size-display-lg: var(--font-size-2xl);
+  --font-size-title: var(--font-size-lg);
+  --font-size-title-sm: var(--font-size-md);
+  /* Geist only — new-from-the-start (no Syne / Fraunces mix) */
   --font-family: "Geist Variable", "Geist", system-ui, -apple-system, sans-serif;
-  --font-display: "Syne", var(--font-family);
   --font-sans: var(--font-family);
-  --font-serif: "Fraunces", "Iowan Old Style", "Palatino Linotype", serif;
-  --font-secondary: var(--font-serif);
+  --font-serif: var(--font-family);
+  --font-display: var(--font-sans);
+  --font-secondary: var(--font-sans);
   --font-body: var(--font-sans);
-
-  --font-weight-display: 800;
+  --font-stretch-display: normal;
+  --font-weight-display: 700;
   --font-weight-bold: 700;
   --font-weight-semibold: 600;
   --font-weight-medium: 600;
   --font-weight-regular: 400;
-
-  /* Stepped sizes — 8px rhythm at 16px root */
-  --font-size-xs: 1rem; /* 16px — letterspaced UI minimum */
-  --font-size-sm: 1rem; /* 16px body floor */
-  --font-size-body: 1.125rem; /* 18px — readable body */
-  --font-size-md: 1.5rem; /* 24px */
-  --font-size-lg: 2rem; /* 32px */
-  --font-size-xl: 3rem; /* 48px */
-  --font-size-2xl: 4rem; /* 64px */
-  --font-size-3xl: 5rem; /* 80px */
-
-  /* Fluid display / title sizes */
-  --font-size-display: clamp(2.5rem, 6.5vw, var(--font-size-2xl));
-  --font-size-display-lg: clamp(3rem, 8vw, var(--font-size-3xl));
-  --font-size-title: clamp(1.5rem, 3vw, var(--font-size-lg));
-  --font-size-title-sm: clamp(1.25rem, 2.2vw, var(--font-size-md));
-
-  /* Unitless leading (prefer over absolute line boxes for text) */
-  --leading-display: 0.98;
-  --leading-tight: 1.1;
-  --leading-snug: 1.25;
-  --leading-body: 1.65;
-  --leading-relaxed: 1.75;
+  --leading-display: 1.1;
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-body: 1.5;
+  --leading-relaxed: 1.6;
   --leading-ui: 1.3;
 
-  /* Absolute line boxes retained for legacy layout math */
-  --line-height-tight: var(--space-2);
-  --line-height-snug: var(--space-3);
-  --line-height-normal: var(--space-4);
-  --line-height-relaxed: var(--space-5);
-  --line-height-loose: var(--space-6);
-  --line-height-display: var(--space-8);
-
-  /* Tracking — display tight; secondary / intro generous */
-  --tracking-display: -0.045em;
-  --tracking-tight: -0.03em;
-  --tracking-body: 0.01em;
-  --tracking-intro: 0.16em;
+  --tracking-eyebrow: 0.22em;
+  --tracking-intro: 0.06em;
   --tracking-mark: 0.22em;
-  --tracking-eyebrow: 0.3em;
-
-  --font-stretch-display: condensed;
+  --tracking-display: -0.04em;
+  --tracking-tight: -0.025em;
 
   --content-width: 1200px;
   --content-width-sm: 600px;
@@ -271,8 +203,8 @@
   --bp-md: 800px;
 
   --focus-ring: 0 0 0 var(--focus-ring-width) var(--color-focus);
-  --white: var(--palette-white);
-  --black: var(--palette-ink);
+  --white: #f3f0ea;
+  --black: #1c1916;
   --violet: var(--color-primary);
   --violet-soft: var(--color-primary-hover);
   --twilight: var(--color-highlight);
@@ -285,59 +217,44 @@
 .dark {
   color-scheme: dark;
 
-  --color-bg: var(--palette-ink);
-  --color-surface: var(--palette-charcoal);
-  --color-card: var(--palette-white);
-  --color-card-text: var(--palette-ink);
-  --color-card-text-secondary: var(--palette-charcoal);
-  --color-card-border: color-mix(in srgb, var(--palette-gray) 40%, var(--palette-white));
-  --color-primary: var(--palette-blue);
-  --color-primary-hover: color-mix(in srgb, var(--palette-blue) 82%, var(--palette-white));
-  --color-accent-gold: var(--palette-green);
-  --color-accent-gold-hover: color-mix(in srgb, var(--palette-green) 82%, var(--palette-white));
-  --color-accent-red: var(--palette-red);
-  --color-accent-red-hover: color-mix(in srgb, var(--palette-red) 82%, var(--palette-white));
-  --color-brass: var(--palette-blue);
-  --color-brass-hover: color-mix(in srgb, var(--palette-blue) 78%, var(--palette-white));
+  --color-bg: #35312d;
+  --color-surface: #1c1916;
+  --color-card: #f3f0ea;
+  --color-card-text: #1c1916;
+  --color-card-text-secondary: #4a453f;
+  --color-card-border: color-mix(in srgb, #8a847c 38%, #f3f0ea);
+  --color-primary: #2f5f8f;
+  --color-primary-hover: color-mix(in srgb, #2f5f8f 78%, #ffffff);
+  --color-accent-gold: #3f6b54;
+  --color-accent-gold-hover: color-mix(in srgb, #3f6b54 78%, #ffffff);
+  --color-accent-red: #9e3d47;
+  --color-accent-red-hover: color-mix(in srgb, #9e3d47 78%, #ffffff);
   --color-accent: var(--color-accent-red);
   --color-accent-hover: var(--color-accent-red-hover);
-  --color-text: var(--palette-white);
-  --color-text-secondary: var(--palette-gray);
-  --color-plot: var(--palette-ink);
-  --color-plot-ink: var(--palette-white);
-  --color-plot-muted: var(--palette-gray);
-  --color-plot-grid: color-mix(in srgb, var(--palette-gray) 28%, transparent);
-  --color-plot-baseline: color-mix(in srgb, var(--palette-gray) 40%, transparent);
-  --color-plot-border: color-mix(in srgb, var(--palette-gray) 32%, var(--palette-ink));
-  --chart-plot: var(--color-plot);
-  --chart-grid: var(--color-plot-grid);
-  --chart-baseline: var(--color-plot-baseline);
-  --chart-series-1: var(--palette-blue);
-  --chart-series-2: var(--palette-gray);
-  --chart-series-3: var(--palette-green);
-  --chart-series-4: var(--palette-red);
-  --chart-series-ink: var(--palette-ink);
-  --chart-series-paper: var(--palette-white);
-  --chart-accent: var(--chart-series-1);
-  --chart-node: var(--color-plot-ink);
-  --chart-label: var(--color-plot-muted);
-  --chart-value: var(--color-plot-ink);
-  --color-border: color-mix(in srgb, var(--palette-gray) 36%, var(--palette-ink));
-  --color-focus: var(--palette-blue);
-  --color-error: var(--palette-red);
-  --color-success: var(--palette-green);
+  --color-text: #f3f0ea;
+  --color-text-secondary: #c6c0b7;
+  --color-plot: #1c1916;
+  --color-plot-ink: #f3f0ea;
+  --color-plot-muted: #c6c0b7;
+  --color-plot-grid: color-mix(in srgb, #c6c0b7 22%, transparent);
+  --color-plot-baseline: color-mix(in srgb, #c6c0b7 35%, transparent);
+  --color-plot-border: color-mix(in srgb, #c6c0b7 24%, #1c1916);
+  --color-border: color-mix(in srgb, #c6c0b7 30%, #35312d);
+  --color-focus: #f3f0ea;
+  --color-error: #9e3d47;
+  --color-success: #3f6b54;
   --color-olive: var(--color-plot);
-  --color-highlight: var(--palette-blue);
-  --color-highlight-hover: color-mix(in srgb, var(--palette-blue) 70%, var(--palette-white));
-  --color-on-primary: var(--palette-white);
-  --color-on-accent: var(--palette-white);
+  --color-highlight: #9bb8d4;
+  --color-highlight-hover: #c2d4e6;
+  --color-on-primary: #ffffff;
+  --color-on-accent: #ffffff;
   --color-selection: color-mix(in srgb, var(--color-primary) 28%, transparent);
-  --shadow-sm: 0 0 0 1px color-mix(in srgb, var(--palette-ink) 40%, transparent);
-  --shadow-md: 0 8px 32px color-mix(in srgb, var(--palette-ink) 56%, transparent);
-  --shadow-card: 0 8px 32px color-mix(in srgb, var(--palette-ink) 40%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--palette-ink) 16%, transparent);
-  --shadow-color: color-mix(in srgb, var(--palette-ink) 48%, transparent);
-  --shadow-color-soft: color-mix(in srgb, var(--palette-ink) 28%, transparent);
+  --shadow-sm: 0 0 0 1px color-mix(in srgb, #1c1916 30%, transparent);
+  --shadow-md: 0 8px 32px color-mix(in srgb, #1c1916 36%, transparent);
+  --shadow-card: 0 8px 32px color-mix(in srgb, #1c1916 26%, transparent),
+    0 0 0 1px color-mix(in srgb, #1c1916 12%, transparent);
+  --shadow-color: color-mix(in srgb, #1c1916 36%, transparent);
+  --shadow-color-soft: color-mix(in srgb, #1c1916 20%, transparent);
 
   --bg-primary: var(--color-bg);
   --bg-secondary: var(--color-surface);
@@ -357,60 +274,44 @@
 .light {
   color-scheme: light;
 
-  /* Light — white ground; charcoal ink; same seven hexes */
-  --color-bg: var(--palette-white);
-  --color-surface: var(--palette-gray);
-  --color-card: var(--palette-white);
-  --color-card-text: var(--palette-ink);
-  --color-card-text-secondary: var(--palette-charcoal);
-  --color-card-border: color-mix(in srgb, var(--palette-charcoal) 24%, var(--palette-white));
-  --color-primary: var(--palette-blue);
-  --color-primary-hover: color-mix(in srgb, var(--palette-blue) 82%, var(--palette-ink));
-  --color-accent-gold: var(--palette-green);
-  --color-accent-gold-hover: color-mix(in srgb, var(--palette-green) 82%, var(--palette-ink));
-  --color-accent-red: var(--palette-red);
-  --color-accent-red-hover: color-mix(in srgb, var(--palette-red) 82%, var(--palette-ink));
-  --color-brass: var(--palette-blue);
-  --color-brass-hover: color-mix(in srgb, var(--palette-blue) 82%, var(--palette-ink));
+  --color-bg: #d4cec5;
+  --color-surface: #f3f0ea;
+  --color-card: #faf8f4;
+  --color-card-text: #1c1916;
+  --color-card-text-secondary: #4a453f;
+  --color-card-border: color-mix(in srgb, #4a453f 20%, #d4cec5);
+  --color-primary: #2f5f8f;
+  --color-primary-hover: color-mix(in srgb, #2f5f8f 78%, #1c1916);
+  --color-accent-gold: #3f6b54;
+  --color-accent-gold-hover: color-mix(in srgb, #3f6b54 78%, #1c1916);
+  --color-accent-red: #9e3d47;
+  --color-accent-red-hover: color-mix(in srgb, #9e3d47 78%, #1c1916);
   --color-accent: var(--color-accent-red);
   --color-accent-hover: var(--color-accent-red-hover);
-  --color-text: var(--palette-ink);
-  --color-text-secondary: var(--palette-charcoal);
-  --color-plot: var(--palette-ink);
-  --color-plot-ink: var(--palette-white);
-  --color-plot-muted: var(--palette-gray);
-  --color-plot-grid: color-mix(in srgb, var(--palette-gray) 36%, transparent);
-  --color-plot-baseline: color-mix(in srgb, var(--palette-charcoal) 28%, transparent);
-  --color-plot-border: color-mix(in srgb, var(--palette-gray) 40%, var(--palette-ink));
-  --chart-plot: var(--color-plot);
-  --chart-grid: var(--color-plot-grid);
-  --chart-baseline: var(--color-plot-baseline);
-  --chart-series-1: var(--palette-blue);
-  --chart-series-2: var(--palette-gray);
-  --chart-series-3: var(--palette-green);
-  --chart-series-4: var(--palette-red);
-  --chart-series-ink: var(--palette-ink);
-  --chart-series-paper: var(--palette-white);
-  --chart-accent: var(--chart-series-1);
-  --chart-node: var(--color-plot-ink);
-  --chart-label: var(--color-plot-muted);
-  --chart-value: var(--color-plot-ink);
-  --color-border: color-mix(in srgb, var(--palette-charcoal) 28%, var(--palette-white));
-  --color-focus: var(--palette-blue);
-  --color-error: var(--palette-red);
-  --color-success: var(--palette-green);
+  --color-text: #1c1916;
+  --color-text-secondary: #4a453f;
+  --color-plot: #1c1916;
+  --color-plot-ink: #f3f0ea;
+  --color-plot-muted: #c6c0b7;
+  --color-plot-grid: color-mix(in srgb, #c6c0b7 22%, transparent);
+  --color-plot-baseline: color-mix(in srgb, #c6c0b7 35%, transparent);
+  --color-plot-border: color-mix(in srgb, #c6c0b7 24%, #1c1916);
+  --color-border: color-mix(in srgb, #4a453f 26%, #d4cec5);
+  --color-focus: #2f5f8f;
+  --color-error: #9e3d47;
+  --color-success: #3f6b54;
   --color-olive: var(--color-plot);
-  --color-highlight: var(--palette-blue);
-  --color-highlight-hover: color-mix(in srgb, var(--palette-blue) 82%, var(--palette-ink));
-  --color-on-primary: var(--palette-white);
-  --color-on-accent: var(--palette-white);
-  --color-selection: color-mix(in srgb, var(--color-primary) 16%, transparent);
-  --shadow-sm: 0 0 0 1px color-mix(in srgb, var(--palette-charcoal) 16%, transparent);
-  --shadow-md: 0 8px 32px color-mix(in srgb, var(--palette-ink) 12%, transparent);
-  --shadow-card: 0 8px 32px color-mix(in srgb, var(--palette-ink) 10%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--palette-charcoal) 14%, transparent);
-  --shadow-color: color-mix(in srgb, var(--palette-ink) 12%, transparent);
-  --shadow-color-soft: color-mix(in srgb, var(--palette-ink) 8%, transparent);
+  --color-highlight: #2f5f8f;
+  --color-highlight-hover: color-mix(in srgb, #2f5f8f 78%, #1c1916);
+  --color-on-primary: #ffffff;
+  --color-on-accent: #ffffff;
+  --color-selection: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  --shadow-sm: 0 0 0 1px color-mix(in srgb, #4a453f 14%, transparent);
+  --shadow-md: 0 8px 32px color-mix(in srgb, #1c1916 12%, transparent);
+  --shadow-card: 0 8px 32px color-mix(in srgb, #1c1916 10%, transparent),
+    0 0 0 1px color-mix(in srgb, #4a453f 12%, transparent);
+  --shadow-color: color-mix(in srgb, #1c1916 12%, transparent);
+  --shadow-color-soft: color-mix(in srgb, #1c1916 7%, transparent);
 
   --bg-primary: var(--color-bg);
   --bg-secondary: var(--color-surface);
@@ -424,15 +325,4 @@
   --muted: var(--text-secondary);
   --line: var(--border);
   --surface: var(--bg-secondary);
-}
-
-@media (max-width: 800px) {
-  :root,
-  [data-theme="dark"],
-  [data-theme="light"],
-  .dark,
-  .light {
-    --tile-row-unit: var(--space-14); /* 112px */
-    --dash-row: var(--tile-row-unit);
-  }
 }

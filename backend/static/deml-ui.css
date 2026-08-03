@@ -1,95 +1,55 @@
 /* Full library stylesheet for package consumers (tokens + base + components) */
 /* inlined: styles/tokens.css */
 /* =========================================================
-   deml-ui design tokens — LOCKED palette (THEME.md)
-   Exact colors only:
-     #0066B2  primary / focus / chart accent
-     #3D3D3D  charcoal surface / secondary text (light)
-     #BDBDBD  muted / border / secondary text (dark)
-     #121212  ink / dark ground / card text on light modules
-     #FFFFFF  white / light ground / on-primary
-     #3C7A4A  success / accent-gold (positive)
-     #C41E3A  danger / accent-red
-   Dark-mode equivalents reuse the same seven hexes (roles swap).
-   Mixes are only between these hexes (hover / translucent chrome).
-   8px grid · chart aspect 2.4 · WCAG 2.0 AA · dual data-theme
+   deml-ui design tokens — new-from-the-start warm ash system
+   Import via: deml-ui/tokens.css  or  deml-ui/styles.css (full kit)
    ========================================================= */
 
 :root {
   color-scheme: dark;
 
-  /* —— Locked palette (do not add hexes outside this set) —— */
-  --palette-blue: #0066b2;
-  --palette-charcoal: #3d3d3d;
-  --palette-gray: #bdbdbd;
-  --palette-ink: #121212;
-  --palette-white: #ffffff;
-  --palette-green: #3c7a4a;
-  --palette-red: #c41e3a;
+  /* Surfaces — warm ash ground, light elevated modules */
+  --color-bg: #35312d;
+  --color-surface: #1c1916;
+  --color-card: #f3f0ea;
+  --color-card-text: #1c1916;
+  --color-card-text-secondary: #4a453f;
+  --color-card-border: color-mix(in srgb, #8a847c 38%, #f3f0ea);
 
-  /* Surfaces — light modules on ink ground (dark default) */
-  --color-bg: var(--palette-ink);
-  --color-surface: var(--palette-charcoal);
-  --color-card: var(--palette-white);
-  --color-card-text: var(--palette-ink);
-  --color-card-text-secondary: var(--palette-charcoal);
-  --color-card-border: color-mix(in srgb, var(--palette-gray) 40%, var(--palette-white));
-
-  /* Fills */
-  --color-primary: var(--palette-blue);
-  --color-primary-hover: color-mix(in srgb, var(--palette-blue) 82%, var(--palette-white));
-  --color-accent-gold: var(--palette-green);
-  --color-accent-gold-hover: color-mix(in srgb, var(--palette-green) 82%, var(--palette-white));
-  --color-accent-red: var(--palette-red);
-  --color-accent-red-hover: color-mix(in srgb, var(--palette-red) 82%, var(--palette-white));
-  --color-brass: var(--palette-blue);
-  --color-brass-hover: color-mix(in srgb, var(--palette-blue) 78%, var(--palette-white));
+  /* Fills — AA with white text on solid CTAs */
+  --color-primary: #2f5f8f;
+  --color-primary-hover: color-mix(in srgb, #2f5f8f 78%, #ffffff);
+  --color-accent-gold: #3f6b54;
+  --color-accent-gold-hover: color-mix(in srgb, #3f6b54 78%, #ffffff);
+  --color-accent-red: #9e3d47;
+  --color-accent-red-hover: color-mix(in srgb, #9e3d47 78%, #ffffff);
 
   /* Text on page ground */
-  --color-text: var(--palette-white);
-  --color-text-secondary: var(--palette-gray);
-  --color-highlight: var(--palette-blue);
-  --color-highlight-hover: color-mix(in srgb, var(--palette-blue) 70%, var(--palette-white));
+  --color-text: #f3f0ea;
+  --color-text-secondary: #c6c0b7;
+  --color-highlight: #9bb8d4;
+  --color-highlight-hover: #c2d4e6;
 
-  /* Chart plot — series colors never theme-invert */
-  --color-plot: var(--palette-ink);
-  --color-plot-ink: var(--palette-white);
-  --color-plot-muted: var(--palette-gray);
-  --color-plot-grid: color-mix(in srgb, var(--palette-gray) 28%, transparent);
-  --color-plot-baseline: color-mix(in srgb, var(--palette-gray) 40%, transparent);
-  --color-plot-border: color-mix(in srgb, var(--palette-gray) 32%, var(--palette-ink));
-
-  --chart-plot: var(--color-plot);
-  --chart-grid: var(--color-plot-grid);
-  --chart-baseline: var(--color-plot-baseline);
-  --chart-node: var(--color-plot-ink);
-  --chart-label: var(--color-plot-muted);
-  --chart-value: var(--color-plot-ink);
-
-  /*
-   * Series — palette roles only (never arbitrary chart hex).
-   * 1 primary blue · 2 secondary gray · 3 success green · 4 danger red
-   */
-  --chart-series-1: var(--palette-blue);
-  --chart-series-2: var(--palette-gray);
-  --chart-series-3: var(--palette-green);
-  --chart-series-4: var(--palette-red);
-  --chart-series-ink: var(--palette-ink);
-  --chart-series-paper: var(--palette-white);
-  --chart-accent: var(--chart-series-1);
+  /* Chart plot — never theme-invert the series */
+  --color-plot: #1c1916;
+  --color-plot-ink: #f3f0ea;
+  --color-plot-muted: #c6c0b7;
+  --color-plot-grid: color-mix(in srgb, #c6c0b7 22%, transparent);
+  --color-plot-baseline: color-mix(in srgb, #c6c0b7 35%, transparent);
+  --color-plot-border: color-mix(in srgb, #c6c0b7 24%, #1c1916);
 
   /* UI */
-  --color-border: color-mix(in srgb, var(--palette-gray) 36%, var(--palette-ink));
-  --color-focus: var(--palette-blue);
-  --color-error: var(--palette-red);
-  --color-success: var(--palette-green);
+  --color-border: color-mix(in srgb, #c6c0b7 30%, #35312d);
+  --color-focus: #f3f0ea;
+  --color-error: #9e3d47;
+  --color-success: #3f6b54;
 
-  --shadow-sm: 0 0 0 1px color-mix(in srgb, var(--palette-ink) 40%, transparent);
-  --shadow-md: 0 8px 32px color-mix(in srgb, var(--palette-ink) 56%, transparent);
-  --shadow-card: 0 8px 32px color-mix(in srgb, var(--palette-ink) 40%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--palette-ink) 16%, transparent);
+  --shadow-sm: 0 0 0 1px color-mix(in srgb, #1c1916 30%, transparent);
+  --shadow-md: 0 8px 32px color-mix(in srgb, #1c1916 36%, transparent);
+  --shadow-card: 0 8px 32px color-mix(in srgb, #1c1916 26%, transparent),
+    0 0 0 1px color-mix(in srgb, #1c1916 12%, transparent);
 
-  /* Semantic aliases */
+  /* Semantic aliases (deml app + legacy deml-ui) */
   --color-background: var(--color-bg);
   --color-text-primary: var(--color-text);
   --color-text-muted: var(--color-text-secondary);
@@ -99,14 +59,14 @@
   --color-dark: var(--color-surface);
   --color-sky-soft: var(--color-bg);
   --color-olive: var(--color-plot);
-  --color-on-primary: var(--palette-white);
-  --color-on-accent: var(--palette-white);
+  --color-on-primary: #ffffff;
+  --color-on-accent: #ffffff;
   --color-on-dark: var(--color-text);
   --color-selection: color-mix(in srgb, var(--color-primary) 28%, transparent);
-  --shadow-color: color-mix(in srgb, var(--palette-ink) 48%, transparent);
-  --shadow-color-soft: color-mix(in srgb, var(--palette-ink) 28%, transparent);
+  --shadow-color: color-mix(in srgb, #1c1916 36%, transparent);
+  --shadow-color-soft: color-mix(in srgb, #1c1916 20%, transparent);
 
-  /* Public deml-ui aliases */
+  /* Public deml-ui aliases used by existing component CSS */
   --bg-primary: var(--color-bg);
   --bg-secondary: var(--color-surface);
   --text-primary: var(--color-text);
@@ -133,7 +93,6 @@
   --space-9: calc(var(--grid) * 9);
   --space-10: calc(var(--grid) * 10);
   --space-12: calc(var(--grid) * 12);
-  --space-14: calc(var(--grid) * 14);
   --space-16: calc(var(--grid) * 16);
   --space-18: calc(var(--grid) * 18);
   --space-22: calc(var(--grid) * 22);
@@ -149,119 +108,92 @@
   --space-90: calc(var(--grid) * 90);
   --space-160: calc(var(--grid) * 160);
 
+  /* Legacy spacing aliases */
   --space-sm: var(--space-2);
   --space-md: var(--space-3);
   --space-lg: var(--space-6);
   --space-xl: var(--space-8);
   --gutter: var(--space-2);
   --demo-padding: var(--space-3);
-  --module-pad: var(--space-3);
-  --module-pad-lg: var(--space-4);
 
-  --hit-target: var(--space-6); /* 48px ≥ 44px AA */
+  --hit-target: var(--space-6);
   --icon-size: var(--space-4);
   --icon-size-sm: var(--space-3);
-
-  /*
-   * Hairline exceptions (stroke chrome only, not layout lengths):
-   * --border-width 1px, --focus-ring-width/offset 2px.
-   * Radii are 0 or 8px multiples (--radius-sm = 8px).
-   */
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;
   --border-width: 1px;
   --radius-pill: 9999px;
-  --radius-sm: var(--space-1); /* 8px */
-  --radius-md: var(--space-1);
-  --radius-lg: var(--space-2); /* 16px */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
 
-  /*
-   * Chart contract — fixed aspect; never squash/stretch.
-   * Width may fluid-fill the card; height comes ONLY from aspect-ratio.
-   * Cap size with max-width (not max-height) so proportions stay locked.
-   */
   --chart-aspect: 2.4;
   --chart-spark-aspect: 2.4;
-  --chart-min-block: calc(var(--grid) * 20); /* 160px — docs/compat */
-  --chart-max-block: calc(var(--grid) * 40); /* 320px — soft ceiling */
+  --chart-min-block: calc(var(--grid) * 20);
+  --chart-max-block: calc(var(--grid) * 40);
   --chart-spark-min-block: calc(var(--grid) * 12);
-  --chart-spark-max-block: calc(var(--grid) * 24);
-  --chart-stage-max-inline: calc(var(--chart-max-block) * var(--chart-aspect));
-  --chart-spark-stage-max-inline: calc(
-    var(--chart-spark-max-block) * var(--chart-spark-aspect)
-  );
+  --chart-spark-max-block: calc(var(--grid) * 25);
   --chart-panel-block: var(--chart-min-block);
   --chart-plot-block: var(--chart-min-block);
   --chart-inset: var(--space-2);
+  --chart-plot: var(--color-plot);
+  --chart-grid: var(--color-plot-grid);
+  --chart-baseline: var(--color-plot-baseline);
+  --chart-accent: var(--color-primary);
+  --chart-node: var(--color-plot-ink);
+  --chart-label: var(--color-plot-muted);
+  --chart-value: var(--color-plot-ink);
+  --chart-series-1: var(--color-primary);
+  --chart-series-2: var(--color-text-secondary);
+  --chart-series-3: var(--color-accent-gold);
+  --chart-series-4: var(--color-accent-red);
 
-  /* Equal tile rhythm */
+  /* Equal tile rhythm — NFTS dash-row; minmax grids grow, never squash */
   --tile-gap: var(--space-2);
-  --tile-row-unit: var(--space-16); /* 128px */
+  --tile-row-unit: var(--space-16);
   --tile-row-micro: var(--space-22);
   --tile-row-card: var(--space-52);
-  --dash-row: var(--tile-row-unit);
   --tile-cols: 6;
+  --dash-row: var(--tile-row-unit);
+  --module-pad: var(--space-3);
+  --module-pad-lg: var(--space-4);
 
-  /*
-   * Type roles (Pass 3):
-   *   display  — Syne: large primary headings, bold, condensed, tight tracking
-   *   secondary — Fraunces: secondary headers + intro, generous letter-spacing
-   *   sans/body — Geist: readable UI + body copy
-   */
+  --font-size-xs: 0.875rem;
+  --font-size-sm: var(--space-2);
+  --font-size-md: var(--space-3);
+  --font-size-lg: var(--space-4);
+  --font-size-xl: var(--space-6);
+  --font-size-2xl: var(--space-8);
+  --font-size-body: var(--font-size-sm);
+  --font-size-display: var(--font-size-xl);
+  --font-size-display-lg: var(--font-size-2xl);
+  --font-size-title: var(--font-size-lg);
+  --font-size-title-sm: var(--font-size-md);
+  /* Geist only — new-from-the-start (no Syne / Fraunces mix) */
   --font-family: "Geist Variable", "Geist", system-ui, -apple-system, sans-serif;
-  --font-display: "Syne", var(--font-family);
   --font-sans: var(--font-family);
-  --font-serif: "Fraunces", "Iowan Old Style", "Palatino Linotype", serif;
-  --font-secondary: var(--font-serif);
+  --font-serif: var(--font-family);
+  --font-display: var(--font-sans);
+  --font-secondary: var(--font-sans);
   --font-body: var(--font-sans);
-
-  --font-weight-display: 800;
+  --font-stretch-display: normal;
+  --font-weight-display: 700;
   --font-weight-bold: 700;
   --font-weight-semibold: 600;
   --font-weight-medium: 600;
   --font-weight-regular: 400;
-
-  /* Stepped sizes — 8px rhythm at 16px root */
-  --font-size-xs: 1rem; /* 16px — letterspaced UI minimum */
-  --font-size-sm: 1rem; /* 16px body floor */
-  --font-size-body: 1.125rem; /* 18px — readable body */
-  --font-size-md: 1.5rem; /* 24px */
-  --font-size-lg: 2rem; /* 32px */
-  --font-size-xl: 3rem; /* 48px */
-  --font-size-2xl: 4rem; /* 64px */
-  --font-size-3xl: 5rem; /* 80px */
-
-  /* Fluid display / title sizes */
-  --font-size-display: clamp(2.5rem, 6.5vw, var(--font-size-2xl));
-  --font-size-display-lg: clamp(3rem, 8vw, var(--font-size-3xl));
-  --font-size-title: clamp(1.5rem, 3vw, var(--font-size-lg));
-  --font-size-title-sm: clamp(1.25rem, 2.2vw, var(--font-size-md));
-
-  /* Unitless leading (prefer over absolute line boxes for text) */
-  --leading-display: 0.98;
-  --leading-tight: 1.1;
-  --leading-snug: 1.25;
-  --leading-body: 1.65;
-  --leading-relaxed: 1.75;
+  --leading-display: 1.1;
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-body: 1.5;
+  --leading-relaxed: 1.6;
   --leading-ui: 1.3;
 
-  /* Absolute line boxes retained for legacy layout math */
-  --line-height-tight: var(--space-2);
-  --line-height-snug: var(--space-3);
-  --line-height-normal: var(--space-4);
-  --line-height-relaxed: var(--space-5);
-  --line-height-loose: var(--space-6);
-  --line-height-display: var(--space-8);
-
-  /* Tracking — display tight; secondary / intro generous */
-  --tracking-display: -0.045em;
-  --tracking-tight: -0.03em;
-  --tracking-body: 0.01em;
-  --tracking-intro: 0.16em;
+  --tracking-eyebrow: 0.22em;
+  --tracking-intro: 0.06em;
   --tracking-mark: 0.22em;
-  --tracking-eyebrow: 0.3em;
-
-  --font-stretch-display: condensed;
+  --tracking-display: -0.04em;
+  --tracking-tight: -0.025em;
 
   --content-width: 1200px;
   --content-width-sm: 600px;
@@ -273,8 +205,8 @@
   --bp-md: 800px;
 
   --focus-ring: 0 0 0 var(--focus-ring-width) var(--color-focus);
-  --white: var(--palette-white);
-  --black: var(--palette-ink);
+  --white: #f3f0ea;
+  --black: #1c1916;
   --violet: var(--color-primary);
   --violet-soft: var(--color-primary-hover);
   --twilight: var(--color-highlight);
@@ -287,59 +219,44 @@
 .dark {
   color-scheme: dark;
 
-  --color-bg: var(--palette-ink);
-  --color-surface: var(--palette-charcoal);
-  --color-card: var(--palette-white);
-  --color-card-text: var(--palette-ink);
-  --color-card-text-secondary: var(--palette-charcoal);
-  --color-card-border: color-mix(in srgb, var(--palette-gray) 40%, var(--palette-white));
-  --color-primary: var(--palette-blue);
-  --color-primary-hover: color-mix(in srgb, var(--palette-blue) 82%, var(--palette-white));
-  --color-accent-gold: var(--palette-green);
-  --color-accent-gold-hover: color-mix(in srgb, var(--palette-green) 82%, var(--palette-white));
-  --color-accent-red: var(--palette-red);
-  --color-accent-red-hover: color-mix(in srgb, var(--palette-red) 82%, var(--palette-white));
-  --color-brass: var(--palette-blue);
-  --color-brass-hover: color-mix(in srgb, var(--palette-blue) 78%, var(--palette-white));
+  --color-bg: #35312d;
+  --color-surface: #1c1916;
+  --color-card: #f3f0ea;
+  --color-card-text: #1c1916;
+  --color-card-text-secondary: #4a453f;
+  --color-card-border: color-mix(in srgb, #8a847c 38%, #f3f0ea);
+  --color-primary: #2f5f8f;
+  --color-primary-hover: color-mix(in srgb, #2f5f8f 78%, #ffffff);
+  --color-accent-gold: #3f6b54;
+  --color-accent-gold-hover: color-mix(in srgb, #3f6b54 78%, #ffffff);
+  --color-accent-red: #9e3d47;
+  --color-accent-red-hover: color-mix(in srgb, #9e3d47 78%, #ffffff);
   --color-accent: var(--color-accent-red);
   --color-accent-hover: var(--color-accent-red-hover);
-  --color-text: var(--palette-white);
-  --color-text-secondary: var(--palette-gray);
-  --color-plot: var(--palette-ink);
-  --color-plot-ink: var(--palette-white);
-  --color-plot-muted: var(--palette-gray);
-  --color-plot-grid: color-mix(in srgb, var(--palette-gray) 28%, transparent);
-  --color-plot-baseline: color-mix(in srgb, var(--palette-gray) 40%, transparent);
-  --color-plot-border: color-mix(in srgb, var(--palette-gray) 32%, var(--palette-ink));
-  --chart-plot: var(--color-plot);
-  --chart-grid: var(--color-plot-grid);
-  --chart-baseline: var(--color-plot-baseline);
-  --chart-series-1: var(--palette-blue);
-  --chart-series-2: var(--palette-gray);
-  --chart-series-3: var(--palette-green);
-  --chart-series-4: var(--palette-red);
-  --chart-series-ink: var(--palette-ink);
-  --chart-series-paper: var(--palette-white);
-  --chart-accent: var(--chart-series-1);
-  --chart-node: var(--color-plot-ink);
-  --chart-label: var(--color-plot-muted);
-  --chart-value: var(--color-plot-ink);
-  --color-border: color-mix(in srgb, var(--palette-gray) 36%, var(--palette-ink));
-  --color-focus: var(--palette-blue);
-  --color-error: var(--palette-red);
-  --color-success: var(--palette-green);
+  --color-text: #f3f0ea;
+  --color-text-secondary: #c6c0b7;
+  --color-plot: #1c1916;
+  --color-plot-ink: #f3f0ea;
+  --color-plot-muted: #c6c0b7;
+  --color-plot-grid: color-mix(in srgb, #c6c0b7 22%, transparent);
+  --color-plot-baseline: color-mix(in srgb, #c6c0b7 35%, transparent);
+  --color-plot-border: color-mix(in srgb, #c6c0b7 24%, #1c1916);
+  --color-border: color-mix(in srgb, #c6c0b7 30%, #35312d);
+  --color-focus: #f3f0ea;
+  --color-error: #9e3d47;
+  --color-success: #3f6b54;
   --color-olive: var(--color-plot);
-  --color-highlight: var(--palette-blue);
-  --color-highlight-hover: color-mix(in srgb, var(--palette-blue) 70%, var(--palette-white));
-  --color-on-primary: var(--palette-white);
-  --color-on-accent: var(--palette-white);
+  --color-highlight: #9bb8d4;
+  --color-highlight-hover: #c2d4e6;
+  --color-on-primary: #ffffff;
+  --color-on-accent: #ffffff;
   --color-selection: color-mix(in srgb, var(--color-primary) 28%, transparent);
-  --shadow-sm: 0 0 0 1px color-mix(in srgb, var(--palette-ink) 40%, transparent);
-  --shadow-md: 0 8px 32px color-mix(in srgb, var(--palette-ink) 56%, transparent);
-  --shadow-card: 0 8px 32px color-mix(in srgb, var(--palette-ink) 40%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--palette-ink) 16%, transparent);
-  --shadow-color: color-mix(in srgb, var(--palette-ink) 48%, transparent);
-  --shadow-color-soft: color-mix(in srgb, var(--palette-ink) 28%, transparent);
+  --shadow-sm: 0 0 0 1px color-mix(in srgb, #1c1916 30%, transparent);
+  --shadow-md: 0 8px 32px color-mix(in srgb, #1c1916 36%, transparent);
+  --shadow-card: 0 8px 32px color-mix(in srgb, #1c1916 26%, transparent),
+    0 0 0 1px color-mix(in srgb, #1c1916 12%, transparent);
+  --shadow-color: color-mix(in srgb, #1c1916 36%, transparent);
+  --shadow-color-soft: color-mix(in srgb, #1c1916 20%, transparent);
 
   --bg-primary: var(--color-bg);
   --bg-secondary: var(--color-surface);
@@ -359,60 +276,44 @@
 .light {
   color-scheme: light;
 
-  /* Light — white ground; charcoal ink; same seven hexes */
-  --color-bg: var(--palette-white);
-  --color-surface: var(--palette-gray);
-  --color-card: var(--palette-white);
-  --color-card-text: var(--palette-ink);
-  --color-card-text-secondary: var(--palette-charcoal);
-  --color-card-border: color-mix(in srgb, var(--palette-charcoal) 24%, var(--palette-white));
-  --color-primary: var(--palette-blue);
-  --color-primary-hover: color-mix(in srgb, var(--palette-blue) 82%, var(--palette-ink));
-  --color-accent-gold: var(--palette-green);
-  --color-accent-gold-hover: color-mix(in srgb, var(--palette-green) 82%, var(--palette-ink));
-  --color-accent-red: var(--palette-red);
-  --color-accent-red-hover: color-mix(in srgb, var(--palette-red) 82%, var(--palette-ink));
-  --color-brass: var(--palette-blue);
-  --color-brass-hover: color-mix(in srgb, var(--palette-blue) 82%, var(--palette-ink));
+  --color-bg: #d4cec5;
+  --color-surface: #f3f0ea;
+  --color-card: #faf8f4;
+  --color-card-text: #1c1916;
+  --color-card-text-secondary: #4a453f;
+  --color-card-border: color-mix(in srgb, #4a453f 20%, #d4cec5);
+  --color-primary: #2f5f8f;
+  --color-primary-hover: color-mix(in srgb, #2f5f8f 78%, #1c1916);
+  --color-accent-gold: #3f6b54;
+  --color-accent-gold-hover: color-mix(in srgb, #3f6b54 78%, #1c1916);
+  --color-accent-red: #9e3d47;
+  --color-accent-red-hover: color-mix(in srgb, #9e3d47 78%, #1c1916);
   --color-accent: var(--color-accent-red);
   --color-accent-hover: var(--color-accent-red-hover);
-  --color-text: var(--palette-ink);
-  --color-text-secondary: var(--palette-charcoal);
-  --color-plot: var(--palette-ink);
-  --color-plot-ink: var(--palette-white);
-  --color-plot-muted: var(--palette-gray);
-  --color-plot-grid: color-mix(in srgb, var(--palette-gray) 36%, transparent);
-  --color-plot-baseline: color-mix(in srgb, var(--palette-charcoal) 28%, transparent);
-  --color-plot-border: color-mix(in srgb, var(--palette-gray) 40%, var(--palette-ink));
-  --chart-plot: var(--color-plot);
-  --chart-grid: var(--color-plot-grid);
-  --chart-baseline: var(--color-plot-baseline);
-  --chart-series-1: var(--palette-blue);
-  --chart-series-2: var(--palette-gray);
-  --chart-series-3: var(--palette-green);
-  --chart-series-4: var(--palette-red);
-  --chart-series-ink: var(--palette-ink);
-  --chart-series-paper: var(--palette-white);
-  --chart-accent: var(--chart-series-1);
-  --chart-node: var(--color-plot-ink);
-  --chart-label: var(--color-plot-muted);
-  --chart-value: var(--color-plot-ink);
-  --color-border: color-mix(in srgb, var(--palette-charcoal) 28%, var(--palette-white));
-  --color-focus: var(--palette-blue);
-  --color-error: var(--palette-red);
-  --color-success: var(--palette-green);
+  --color-text: #1c1916;
+  --color-text-secondary: #4a453f;
+  --color-plot: #1c1916;
+  --color-plot-ink: #f3f0ea;
+  --color-plot-muted: #c6c0b7;
+  --color-plot-grid: color-mix(in srgb, #c6c0b7 22%, transparent);
+  --color-plot-baseline: color-mix(in srgb, #c6c0b7 35%, transparent);
+  --color-plot-border: color-mix(in srgb, #c6c0b7 24%, #1c1916);
+  --color-border: color-mix(in srgb, #4a453f 26%, #d4cec5);
+  --color-focus: #2f5f8f;
+  --color-error: #9e3d47;
+  --color-success: #3f6b54;
   --color-olive: var(--color-plot);
-  --color-highlight: var(--palette-blue);
-  --color-highlight-hover: color-mix(in srgb, var(--palette-blue) 82%, var(--palette-ink));
-  --color-on-primary: var(--palette-white);
-  --color-on-accent: var(--palette-white);
-  --color-selection: color-mix(in srgb, var(--color-primary) 16%, transparent);
-  --shadow-sm: 0 0 0 1px color-mix(in srgb, var(--palette-charcoal) 16%, transparent);
-  --shadow-md: 0 8px 32px color-mix(in srgb, var(--palette-ink) 12%, transparent);
-  --shadow-card: 0 8px 32px color-mix(in srgb, var(--palette-ink) 10%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--palette-charcoal) 14%, transparent);
-  --shadow-color: color-mix(in srgb, var(--palette-ink) 12%, transparent);
-  --shadow-color-soft: color-mix(in srgb, var(--palette-ink) 8%, transparent);
+  --color-highlight: #2f5f8f;
+  --color-highlight-hover: color-mix(in srgb, #2f5f8f 78%, #1c1916);
+  --color-on-primary: #ffffff;
+  --color-on-accent: #ffffff;
+  --color-selection: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  --shadow-sm: 0 0 0 1px color-mix(in srgb, #4a453f 14%, transparent);
+  --shadow-md: 0 8px 32px color-mix(in srgb, #1c1916 12%, transparent);
+  --shadow-card: 0 8px 32px color-mix(in srgb, #1c1916 10%, transparent),
+    0 0 0 1px color-mix(in srgb, #4a453f 12%, transparent);
+  --shadow-color: color-mix(in srgb, #1c1916 12%, transparent);
+  --shadow-color-soft: color-mix(in srgb, #1c1916 7%, transparent);
 
   --bg-primary: var(--color-bg);
   --bg-secondary: var(--color-surface);
@@ -428,19 +329,8 @@
   --surface: var(--bg-secondary);
 }
 
-@media (max-width: 800px) {
-  :root,
-  [data-theme="dark"],
-  [data-theme="light"],
-  .dark,
-  .light {
-    --tile-row-unit: var(--space-14); /* 112px */
-    --dash-row: var(--tile-row-unit);
-  }
-}
-
 /* inlined: styles/base.css */
-/* Global base — NFTS / heritage chrome (7-color palette, 8px grid, dual theme) */
+/* Global base — mirrors deml new-from-the-start app chrome */
 
 *,
 *::before,
@@ -451,14 +341,11 @@
 html {
   font-style: normal;
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1;
   min-height: 100%;
   background-color: var(--color-bg);
   overflow-y: auto;
   scrollbar-gutter: stable;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
 }
 
 body {
@@ -470,20 +357,7 @@ body {
   overflow-x: clip;
   appearance: none;
   color: var(--color-text-primary);
-  font-family: var(--font-body);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
-  letter-spacing: var(--tracking-body);
-  line-height: var(--leading-body);
-}
-
-:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
-  outline-offset: var(--focus-ring-offset);
-}
-
-:focus:not(:focus-visible) {
-  outline: none;
+  font-family: var(--font-sans);
 }
 
 .visually-hidden {
@@ -498,186 +372,37 @@ body {
   border: 0;
 }
 
-/* —— Type recipes —— */
-
-/* Element defaults */
-p {
-  font-family: var(--font-body);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
-  letter-spacing: var(--tracking-body);
-  line-height: var(--leading-body);
-}
-
-h1,
-h2,
-h3,
-h4 {
+.type-eyebrow,
+.preheader {
   margin: 0;
-  font-family: var(--font-display);
-  font-stretch: var(--font-stretch-display);
-  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-eyebrow);
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--color-highlight);
 }
 
-h1 {
-  font-size: var(--font-size-display-lg);
-  font-weight: var(--font-weight-display);
-  letter-spacing: var(--tracking-display);
-  line-height: var(--leading-display);
-}
-
-h2 {
-  font-size: var(--font-size-display);
-  font-weight: var(--font-weight-display);
-  letter-spacing: var(--tracking-display);
-  line-height: var(--leading-display);
-}
-
-h3 {
-  font-size: var(--font-size-title);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
-}
-
-h4 {
-  font-size: var(--font-size-title-sm);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
-}
-
-h5,
-h6 {
-  margin: 0;
-  font-family: var(--font-secondary);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-snug);
-  color: var(--color-text);
-}
-
-h5 {
-  font-size: var(--font-size-md);
-}
-
-h6 {
-  font-size: var(--font-size-body);
-}
-
-/* Utility roles — always win over bare element defaults */
-.type-body {
-  margin: 0;
-  font-family: var(--font-body);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
-  letter-spacing: var(--tracking-body);
-  line-height: var(--leading-body);
-  color: var(--color-text);
-}
-
-/* Primary — Syne, big, bold, condensed, tight tracking */
 .type-display {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: var(--font-size-display);
-  font-stretch: var(--font-stretch-display);
-  font-weight: var(--font-weight-display);
-  letter-spacing: var(--tracking-display);
-  line-height: var(--leading-display);
-  color: var(--color-text);
-}
-
-.type-title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: var(--font-size-title);
-  font-stretch: var(--font-stretch-display);
-  font-weight: var(--font-weight-bold);
+  font-family: var(--font-sans);
+  font-size: clamp(1.5rem, 3vw, var(--font-size-lg));
+  font-weight: 700;
   letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
-  color: var(--color-text);
-}
-
-/* Secondary headers + intro — Fraunces, generous letter-spacing */
-.type-secondary {
-  margin: 0;
-  font-family: var(--font-secondary);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-snug);
+  line-height: 1.15;
   color: var(--color-text);
 }
 
 .type-intro,
 .lede {
   margin: 0;
-  font-family: var(--font-secondary);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
   letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-relaxed);
+  line-height: 1.5;
   color: var(--color-text-secondary);
-}
-
-/* UI marks / eyebrows — sans, letterspaced */
-.type-eyebrow,
-.preheader {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-ui);
-  text-transform: uppercase;
-  color: var(--color-highlight);
-}
-
-.type-mark,
-.type-label {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  letter-spacing: var(--tracking-mark);
-  line-height: var(--leading-ui);
-  text-transform: uppercase;
-  color: var(--color-text-secondary);
-}
-
-/* App root + main — product shell consumed by deml Angular */
-app-root {
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: none;
-  min-height: 100dvh;
-  margin: 0;
-  padding: 0;
-  color: var(--color-text);
-  background-color: var(--color-bg);
-}
-
-.main {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: none;
-  min-height: 0;
-  margin: 0;
-  padding: 0;
-  color: var(--color-text);
-  background-color: var(--color-bg);
-}
-
-/* Routed page hosts are siblings of router-outlet */
-.main > .page {
-  flex: 1 1 auto;
-  min-height: 100%;
 }
 
 .page {
@@ -692,21 +417,17 @@ app-root {
 
 .page-body {
   display: block;
-  box-sizing: border-box;
   width: 100%;
-  max-width: none;
   margin: 0;
-  /* Identical outer spacing on all four sides */
-  padding: var(--space-4);
+  padding: var(--space-4) var(--space-2) var(--space-8);
   flex: 1 1 auto;
-  min-height: 0;
   background-color: var(--color-bg);
   background-image:
     linear-gradient(
       90deg,
       color-mix(in srgb, var(--color-surface) 18%, transparent) 0,
-      transparent var(--space-4),
-      transparent calc(100% - var(--space-4)),
+      transparent var(--space-2),
+      transparent calc(100% - var(--space-2)),
       color-mix(in srgb, var(--color-surface) 18%, transparent) 100%
     ),
     radial-gradient(
@@ -726,50 +447,18 @@ app-root {
     );
 }
 
-/* Stacked catalog sections share equal outer rhythm */
-.page-body app-section-header:not(:first-child),
-.page-body deml-section-header:not(:first-child) {
-  margin-top: var(--space-6);
-  margin-bottom: var(--tile-gap);
-}
-
 @media screen and (min-width: 800px) {
   .page-body {
-    padding: var(--space-4);
-    --tile-gap: var(--space-2);
+    padding: var(--space-6) var(--space-4) var(--space-10);
+    --tile-gap: var(--space-3);
   }
 
   .page-body--catalog {
-    /* Equal block inset; equal inline inset (centered) */
-    padding-block: var(--space-4);
     padding-inline: max(var(--space-4), calc((100% - var(--content-width-lg)) / 2));
   }
 
   .page-body--prose {
-    padding-block: var(--space-4);
     padding-inline: max(var(--space-4), calc((100% - var(--reading-width)) / 2));
-  }
-
-  .page-body app-section-header:not(:first-child),
-  .page-body deml-section-header:not(:first-child) {
-    margin-top: var(--space-8);
-    margin-bottom: var(--tile-gap);
-  }
-}
-
-@media screen and (min-width: 1200px) {
-  .page-body {
-    padding: var(--space-6);
-  }
-
-  .page-body--catalog {
-    padding-block: var(--space-6);
-    padding-inline: max(var(--space-6), calc((100% - var(--content-width-lg)) / 2));
-  }
-
-  .page-body--prose {
-    padding-block: var(--space-6);
-    padding-inline: max(var(--space-6), calc((100% - var(--reading-width)) / 2));
   }
 }
 
@@ -1060,7 +749,7 @@ app-root {
 }
 
 /* inlined: components/brand/brand.css */
-/* Component: brand — NFTS wordmark */
+/* Component: brand — atelier wordmark */
 
 .component--brand .demo {
   display: grid;
@@ -1086,11 +775,9 @@ app-root {
 
 .brand__name {
   font-family: var(--font-display);
-  font-size: var(--font-size-title-sm);
-  font-stretch: var(--font-stretch-display);
-  font-weight: var(--font-weight-display);
-  letter-spacing: var(--tracking-display);
-  line-height: var(--leading-tight);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-tight);
 }
 
 .brand:focus-visible {
@@ -1190,11 +877,8 @@ app-root {
   align-items: center;
   min-height: var(--hit-target);
   padding: 0 var(--space-2);
-  font-family: var(--font-sans);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-ui);
   text-transform: uppercase;
   text-decoration: none;
   color: var(--color-highlight);
@@ -1213,11 +897,9 @@ app-root {
   min-height: var(--hit-target);
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-sans);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  font-weight: 600;
   letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-ui);
   text-decoration: none;
   color: var(--color-text);
 }
@@ -1352,7 +1034,7 @@ app-root {
 }
 
 /* inlined: components/page-header/page-header.css */
-/* Component: page-header — NFTS page title */
+/* Component: page-header — atelier page title */
 
 .component--page-header .demo {
   display: grid;
@@ -1363,7 +1045,7 @@ app-root {
   display: grid;
   gap: var(--space-2);
   width: 100%;
-  margin: 0 0 var(--tile-gap);
+  margin: 0 0 var(--space-4);
   padding: 0;
 }
 
@@ -1373,7 +1055,6 @@ app-root {
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-ui);
   text-transform: uppercase;
   color: var(--color-highlight);
 }
@@ -1382,11 +1063,10 @@ app-root {
 .page-header__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: var(--font-size-display);
-  font-stretch: var(--font-stretch-display);
+  font-size: clamp(var(--font-size-lg), 4vw, var(--font-size-xl));
   font-weight: var(--font-weight-display);
   letter-spacing: var(--tracking-display);
-  line-height: var(--leading-display);
+  line-height: 1.05;
   color: var(--color-text);
 }
 
@@ -1394,11 +1074,9 @@ app-root {
 .page-header__lede {
   margin: 0;
   max-width: var(--reading-width);
-  font-family: var(--font-secondary);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-relaxed);
   color: var(--color-text-secondary);
 }
 
@@ -1968,7 +1646,7 @@ app-button-group {
 
 /* Layout */
 /* inlined: components/section/section.css */
-/* Component: section — NFTS content section */
+/* Component: section — atelier content section */
 
 .component--section .demo {
   display: grid;
@@ -1979,8 +1657,7 @@ app-button-group {
   display: grid;
   gap: var(--space-md);
   width: 100%;
-  /* Identical outer spacing on all four sides */
-  padding: var(--module-pad);
+  padding: var(--module-pad) 0;
 }
 
 .section__header {
@@ -2000,7 +1677,7 @@ app-button-group {
 .section__description {
   margin: 0;
   max-width: var(--reading-width);
-  font-family: var(--font-secondary);
+  font-family: var(--font-serif);
   font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
   color: var(--color-text-secondary);
@@ -2012,7 +1689,7 @@ app-button-group {
 }
 
 /* inlined: components/section-template/section-template.css */
-/* Component: section-template — NFTS section chrome */
+/* Component: section-template — atelier section chrome */
 
 .component--section-template .demo {
   display: grid;
@@ -2023,8 +1700,7 @@ app-button-group {
   display: grid;
   gap: var(--space-3);
   width: 100%;
-  /* Identical outer spacing on all four sides */
-  padding: var(--module-pad);
+  padding: var(--module-pad) 0;
 }
 
 .section-template__title {
@@ -2039,7 +1715,7 @@ app-button-group {
 .section-template__description {
   margin: 0;
   max-width: var(--reading-width);
-  font-family: var(--font-secondary);
+  font-family: var(--font-serif);
   font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
   color: var(--color-text-secondary);
@@ -2052,7 +1728,7 @@ app-button-group {
 }
 
 /* inlined: components/section-header/section-header.css */
-/* Component: section-header — NFTS outer margin + type hierarchy */
+/* Component: section-header — NFTS outer margin + atelier type */
 
 .component--section-header .demo {
   display: grid;
@@ -2063,9 +1739,8 @@ app-section-header,
 deml-section-header,
 :host {
   display: block;
-  box-sizing: border-box;
   width: 100%;
-  margin: 0 0 var(--tile-gap);
+  margin: 0 0 var(--space-4);
   padding: 0;
   background-color: transparent;
 }
@@ -2117,41 +1792,29 @@ deml-section-header[data-tone='card'] .section-header-eyebrow,
 }
 
 /* inlined: components/page-section/page-section.css */
-/* Component: page-section — equal section rhythm from Pass 1 tokens */
+/* Component: page-section — NFTS stacked section rhythm */
 
 .component--page-section .demo {
   display: grid;
-  gap: var(--tile-gap);
-  margin: 0;
-  padding: var(--tile-gap);
+  gap: var(--space-md);
 }
 
 app-page-section,
 deml-page-section,
 :host {
   display: block;
-  box-sizing: border-box;
   width: 100%;
   margin: 0;
   padding: 0;
   background-color: transparent;
 }
 
-/* Equal gap between header and board inside a section body */
-.page-body > app-section-header,
-.page-body > deml-section-header,
-app-page-section .page-body > app-section-header,
-deml-page-section .page-body > deml-section-header {
-  margin: 0 0 var(--tile-gap);
-  padding: 0;
-}
-
+/* Equal outer rhythm between stacked section headers inside a page body */
 .page-body > app-section-header:not(:first-child),
 .page-body > deml-section-header:not(:first-child),
 app-page-section .page-body > app-section-header:not(:first-child),
 deml-page-section .page-body > deml-section-header:not(:first-child) {
   margin-top: var(--space-6);
-  margin-bottom: var(--tile-gap);
 }
 
 @media screen and (min-width: 800px) {
@@ -2160,7 +1823,6 @@ deml-page-section .page-body > deml-section-header:not(:first-child) {
   app-page-section .page-body > app-section-header:not(:first-child),
   deml-page-section .page-body > deml-section-header:not(:first-child) {
     margin-top: var(--space-8);
-    margin-bottom: var(--tile-gap);
   }
 }
 
@@ -2171,13 +1833,15 @@ deml-page-section[data-variant='auth'] .page-body--auth,
   flex: 1 1 auto;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
   width: 100%;
   min-height: calc(100dvh - var(--space-16));
-  margin: 0;
-  padding: var(--space-6);
+  padding-block: var(--space-6);
 }
 
+/*
+ * Catalog group — transparent NFTS board grouping (not a cream module shell).
+ * Cream lives on tiles/microcards; groups only own equal vertical rhythm.
+ */
 .catalog-group {
   box-sizing: border-box;
   display: block;
@@ -2196,8 +1860,7 @@ deml-page-section[data-variant='auth'] .page-body--auth,
 .catalog-group > app-section-header,
 .catalog-group > deml-section-header,
 .catalog-group > .section-header {
-  margin: 0 0 var(--tile-gap);
-  padding: 0;
+  margin-bottom: var(--space-4);
 }
 
 @media screen and (min-width: 800px) {
@@ -2333,14 +1996,17 @@ deml-grid > *,
 }
 
 /* inlined: components/tile-board/tile-board.css */
-/* Component: tile-board — board shell; rhythm owned by dashboard-grid */
+/* Component: tile-board — NFTS board shell over dashboard-grid */
 
 .component--tile-board .demo {
   display: grid;
   gap: var(--tile-gap);
-  margin: 0;
-  padding: var(--tile-gap);
 }
+
+/*
+ * Tile board — equal outer rhythm; children stretch into dash-row cells.
+ * Compose: tile-board → dashboard-grid → typed tiles (stat / chart-card).
+ */
 
 app-tile-board,
 deml-tile-board,
@@ -2371,6 +2037,7 @@ deml-tile-board > deml-dashboard-grid,
   padding: 0;
 }
 
+/* Demo / static cells — match peer tile stretch contract */
 .tile-board__cell {
   display: flex;
   flex-direction: column;
@@ -2384,21 +2051,18 @@ deml-tile-board > deml-dashboard-grid,
   color: var(--color-card-text);
   background-color: var(--color-card);
   border: var(--border-width) solid var(--color-card-border);
-  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-card);
 }
 
 /* inlined: components/dashboard-grid/dashboard-grid.css */
-/* Component: dashboard-grid — equal cells, equal gaps (Pass 1 tokens) */
+/* Component: dashboard-grid — NFTS equal-cell rhythm */
 
 .component--dashboard-grid .demo {
   display: grid;
   gap: var(--tile-gap);
-  margin: 0;
-  padding: var(--tile-gap);
 }
 
-/* Thin Angular wrapper must not collapse the board */
+/* Angular tile-board is a thin data wrapper — must not collapse the grid */
 app-tile-board,
 deml-tile-board {
   display: block;
@@ -2410,8 +2074,10 @@ deml-tile-board {
 }
 
 /*
- * Fixed dash-row tracks + equal --tile-gap on every axis.
- * Identical peer heights: row size is exact (not minmax/auto).
+ * Equal-cell dashboard grid.
+ * Row unit matches new-from-the-start (--dash-row / --tile-row-unit).
+ * minmax(..., auto) lets fluid chart tiles grow without ragged gaps.
+ * Gap is always --tile-gap (8px scale); never invent one-off gutters.
  */
 
 app-dashboard-grid,
@@ -2427,7 +2093,7 @@ deml-dashboard-grid,
   padding: 0;
   gap: var(--dash-gap);
   grid-template-columns: minmax(0, 1fr);
-  grid-auto-rows: var(--dash-row);
+  grid-auto-rows: minmax(var(--dash-row), auto);
   grid-auto-flow: dense;
   align-items: stretch;
   justify-items: stretch;
@@ -2438,17 +2104,14 @@ app-dashboard-grid > *,
 deml-dashboard-grid > *,
 .dashboard-grid > *,
 :host > * {
-  box-sizing: border-box;
   min-width: 0;
   min-height: 0;
   width: 100%;
   height: 100%;
-  margin: 0;
   align-self: stretch;
   justify-self: stretch;
 }
 
-/* Mobile: full-bleed columns; span rows for size tiers */
 app-dashboard-grid > [data-size='sm'],
 deml-dashboard-grid > [data-size='sm'],
 .dashboard-grid > [data-size='sm'],
@@ -2493,7 +2156,6 @@ deml-dashboard-grid > [data-size='hero'],
   color: var(--color-card-text);
   background-color: var(--color-card);
   border: var(--border-width) solid var(--color-card-border);
-  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-card);
 }
 
@@ -2502,10 +2164,10 @@ deml-dashboard-grid > [data-size='hero'],
   deml-dashboard-grid,
   .dashboard-grid,
   :host {
-    --dash-row: var(--space-14);
-    --tile-row-unit: var(--space-14);
+    /* 14 × 8px — mid breakpoint dash-row (THEME NFTS rhythm) */
+    --dash-row: calc(var(--grid) * 14);
+    --tile-row-unit: calc(var(--grid) * 14);
     grid-template-columns: repeat(var(--tile-cols), minmax(0, 1fr));
-    grid-auto-rows: var(--dash-row);
   }
 
   app-dashboard-grid > [data-size='sm'],
@@ -2519,7 +2181,11 @@ deml-dashboard-grid > [data-size='hero'],
   app-dashboard-grid > [data-size='md'],
   deml-dashboard-grid > [data-size='md'],
   .dashboard-grid > [data-size='md'],
-  :host > [data-size='md'],
+  :host > [data-size='md'] {
+    grid-column: span 3;
+    grid-row: span 3;
+  }
+
   app-dashboard-grid > [data-size='lg'],
   deml-dashboard-grid > [data-size='lg'],
   .dashboard-grid > [data-size='lg'],
@@ -2560,18 +2226,15 @@ deml-dashboard-grid > [data-size='hero'],
   :host {
     --dash-row: var(--space-16);
     --tile-row-unit: var(--space-16);
-    grid-auto-rows: var(--dash-row);
   }
 }
 
 /* inlined: components/card-grid/card-grid.css */
-/* Component: card-grid — identical card heights, equal --tile-gap */
+/* Component: card-grid — equal-height modules, NFTS minmax rows */
 
 .component--card-grid .demo {
   display: grid;
   gap: var(--tile-gap);
-  margin: 0;
-  padding: var(--tile-gap);
 }
 
 app-card-grid,
@@ -2586,7 +2249,7 @@ deml-card-grid,
   padding: 0;
   gap: var(--tile-gap);
   grid-template-columns: minmax(0, 1fr);
-  grid-auto-rows: var(--tile-row-card);
+  grid-auto-rows: minmax(var(--tile-row-card), auto);
   grid-auto-flow: dense;
   align-items: stretch;
   justify-items: stretch;
@@ -2597,12 +2260,10 @@ app-card-grid > *,
 deml-card-grid > *,
 .card-grid > *,
 :host > * {
-  box-sizing: border-box;
   min-width: 0;
   min-height: 0;
   width: 100%;
   height: 100%;
-  margin: 0;
   align-self: stretch;
   justify-self: stretch;
 }
@@ -2613,7 +2274,7 @@ deml-card-grid > *,
   .card-grid,
   :host {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: var(--tile-row-card);
+    grid-auto-rows: minmax(var(--tile-row-card), 1fr);
   }
 }
 
@@ -2623,18 +2284,15 @@ deml-card-grid > *,
   .card-grid,
   :host {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-auto-rows: var(--tile-row-card);
   }
 }
 
 /* inlined: components/microcard-grid/microcard-grid.css */
-/* Component: microcard-grid — identical micro heights, equal gaps */
+/* Component: microcard-grid — NFTS minmax equal tiles */
 
 .component--microcard-grid .demo {
   display: grid;
   gap: var(--tile-gap);
-  margin: 0;
-  padding: var(--tile-gap);
 }
 
 .microcard-grid,
@@ -2642,20 +2300,23 @@ app-microcard-grid,
 deml-microcard-grid,
 :host {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: minmax(var(--tile-row-micro), auto);
+  grid-auto-flow: dense;
+  gap: var(--tile-gap);
+  align-items: stretch;
   box-sizing: border-box;
   width: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
-  gap: var(--tile-gap);
-  grid-template-columns: minmax(0, 1fr);
-  grid-auto-rows: var(--tile-row-micro);
-  grid-auto-flow: dense;
-  align-items: stretch;
-  justify-items: stretch;
   background-color: transparent;
 }
 
+/*
+ * When the host is the Angular wrapper, the UL inside is the grid.
+ * Keep both host + list as grids so either markup shape works.
+ */
 app-microcard-grid > .microcard-grid,
 deml-microcard-grid > .microcard-grid,
 :host > .microcard-grid {
@@ -2674,7 +2335,6 @@ deml-microcard-grid > .microcard-grid,
 app-microcard-grid .microcard-grid > li,
 deml-microcard-grid .microcard-grid > li,
 .microcard-grid > li {
-  box-sizing: border-box;
   width: 100%;
   height: 100%;
   min-width: 0;
@@ -2689,7 +2349,6 @@ app-microcard-grid .microcard-grid > li > *,
 deml-microcard-grid .microcard-grid > li > *,
 .microcard-grid > li > * {
   height: 100%;
-  margin: 0;
 }
 
 @media screen and (min-width: 800px) {
@@ -2698,7 +2357,7 @@ deml-microcard-grid .microcard-grid > li > *,
   deml-microcard-grid,
   :host {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: var(--tile-row-micro);
+    grid-auto-rows: minmax(var(--tile-row-micro), 1fr);
   }
 }
 
@@ -2709,18 +2368,15 @@ deml-microcard-grid .microcard-grid > li > *,
   app-microcard-grid[data-columns='3'] > .microcard-grid,
   deml-microcard-grid[data-columns='3'] > .microcard-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-auto-rows: var(--tile-row-micro);
   }
 }
 
 /* inlined: components/panel-grid/panel-grid.css */
-/* Component: panel-grid — identical panel heights, equal gaps */
+/* Component: panel-grid — equal-height panels, NFTS tile rhythm */
 
 .component--panel-grid .demo {
   display: grid;
   gap: var(--tile-gap);
-  margin: 0;
-  padding: var(--tile-gap);
 }
 
 app-panel-grid,
@@ -2734,7 +2390,7 @@ deml-panel-grid,
   padding: 0;
   gap: var(--tile-gap);
   grid-template-columns: minmax(0, 1fr);
-  grid-auto-rows: var(--tile-row-unit);
+  grid-auto-rows: minmax(var(--tile-row-unit), auto);
   grid-auto-flow: dense;
   align-items: stretch;
   justify-items: stretch;
@@ -2745,12 +2401,10 @@ app-panel-grid > *,
 deml-panel-grid > *,
 .panel-grid > *,
 :host > * {
-  box-sizing: border-box;
   min-width: 0;
   min-height: 0;
   width: 100%;
   height: 100%;
-  margin: 0;
   align-self: stretch;
   justify-self: stretch;
 }
@@ -2761,7 +2415,7 @@ deml-panel-grid > *,
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  min-height: 0;
+  min-height: var(--tile-row-unit);
   margin: 0;
   padding: var(--module-pad);
   color: var(--color-card-text);
@@ -2776,7 +2430,7 @@ deml-panel-grid > *,
   .panel-grid,
   :host {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: var(--tile-row-unit);
+    grid-auto-rows: minmax(var(--tile-row-unit), 1fr);
   }
 }
 
@@ -2786,7 +2440,6 @@ deml-panel-grid > *,
   .panel-grid,
   :host {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-auto-rows: var(--tile-row-unit);
   }
 }
 
@@ -3094,7 +2747,7 @@ deml-panel-grid > *,
 }
 
 /* inlined: components/form-section/form-section.css */
-/* Component: form-section — NFTS form region */
+/* Component: form-section — atelier form region */
 
 .component--form-section .demo {
   display: grid;
@@ -3106,28 +2759,22 @@ deml-panel-grid > *,
   gap: var(--space-3);
   width: 100%;
   max-width: var(--content-width-md);
-  /* Identical outer spacing on all four sides */
-  padding: var(--module-pad);
+  padding: var(--module-pad) 0;
 }
 
 .form-section__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: var(--font-size-title-sm);
-  font-stretch: var(--font-stretch-display);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
   color: var(--color-text);
 }
 
 .form-section__description {
   margin: 0;
-  font-family: var(--font-secondary);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-relaxed);
   color: var(--color-text-secondary);
 }
 
@@ -3161,12 +2808,12 @@ deml-panel-grid > *,
   padding: var(--space-1) var(--space-4);
   border-style: solid;
   border-width: var(--border-width);
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-ui);
+  line-height: 1;
   text-decoration: none;
   appearance: none;
   cursor: pointer;
@@ -3282,7 +2929,7 @@ deml-panel-grid > *,
   border-radius: var(--radius-pill);
   border-width: 0;
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   letter-spacing: var(--tracking-intro);
   white-space: nowrap;
   box-shadow: none;
@@ -3404,9 +3051,9 @@ deml-button-group > *,
   margin: 0;
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-weight: 600;
   letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-ui);
+  line-height: 1.2;
   text-transform: uppercase;
   color: var(--color-card-text-secondary);
 }
@@ -3423,12 +3070,12 @@ deml-button-group > *,
   margin: 0;
   padding: var(--space-1) var(--space-2);
   border: var(--border-width) solid var(--color-card-border);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-body);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
-  letter-spacing: var(--tracking-body);
-  line-height: var(--leading-ui);
+  border-radius: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  letter-spacing: var(--tracking-intro);
+  line-height: 1.3;
   color: var(--color-card-text);
   background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
   appearance: none;
@@ -3475,9 +3122,9 @@ deml-button-group > *,
   margin: 0;
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-regular);
+  font-weight: 400;
   letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-snug);
+  line-height: 1.35;
 }
 
 .text-field__hint {
@@ -3485,7 +3132,7 @@ deml-button-group > *,
 }
 
 .text-field__error {
-  font-weight: var(--font-weight-medium);
+  font-weight: 600;
   color: var(--color-error);
 }
 
@@ -4752,7 +4399,7 @@ progress::-moz-progress-bar {
 
 /* Feedback */
 /* inlined: components/badge/badge.css */
-/* Component: badge — NFTS mark */
+/* Component: badge — atelier mark */
 
 .component--badge .demo {
   display: grid;
@@ -4764,14 +4411,13 @@ progress::-moz-progress-bar {
   align-items: center;
   gap: var(--space-1);
   min-height: var(--space-3);
-  padding: var(--space-1) var(--space-2);
+  padding: 0 var(--space-1);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-pill);
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   letter-spacing: var(--tracking-mark);
-  line-height: var(--leading-ui);
   text-transform: uppercase;
   color: var(--color-text);
   background-color: var(--color-surface);
@@ -4879,7 +4525,7 @@ progress::-moz-progress-bar {
 }
 
 /* inlined: components/callout/callout.css */
-/* Component: callout — NFTS inline notice */
+/* Component: callout — atelier inline notice */
 
 .component--callout .demo {
   display: grid;
@@ -4923,20 +4569,15 @@ progress::-moz-progress-bar {
 .callout__heading {
   margin: 0;
   font-family: var(--font-display);
-  font-size: var(--font-size-title-sm);
-  font-stretch: var(--font-stretch-display);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
 }
 
 .callout__text {
   margin: 0;
-  font-family: var(--font-secondary);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-relaxed);
   color: var(--color-text-secondary);
 }
 
@@ -5080,7 +4721,7 @@ progress::-moz-progress-bar {
 }
 
 /* inlined: components/empty-state/empty-state.css */
-/* Component: empty-state — NFTS empty module */
+/* Component: empty-state — atelier empty module */
 
 .component--empty-state .demo {
   display: grid;
@@ -5124,7 +4765,7 @@ progress::-moz-progress-bar {
 .empty-state__description {
   margin: 0;
   max-width: var(--content-width-sm);
-  font-family: var(--font-secondary);
+  font-family: var(--font-serif);
   font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
   color: var(--color-text-secondary);
@@ -5139,7 +4780,7 @@ progress::-moz-progress-bar {
 }
 
 /* inlined: components/error-state/error-state.css */
-/* Component: error-state — NFTS error module */
+/* Component: error-state — atelier error module */
 
 .component--error-state .demo {
   display: grid;
@@ -5164,22 +4805,18 @@ progress::-moz-progress-bar {
 .error-state__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: var(--font-size-title-sm);
-  font-stretch: var(--font-stretch-display);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
   color: var(--color-text);
 }
 
 .error-state__description {
   margin: 0;
   max-width: var(--content-width-sm);
-  font-family: var(--font-secondary);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-relaxed);
   color: var(--color-text-secondary);
 }
 
@@ -5459,8 +5096,7 @@ deml-card[data-visual='none'],
   height: 100%;
   min-height: 100%;
   margin: 0;
-  /* Identical outer inset on all four sides */
-  padding: var(--module-pad);
+  padding: var(--space-6) var(--module-pad) 0;
   overflow: hidden;
   text-align: center;
   color: var(--color-card-text);
@@ -5472,7 +5108,6 @@ deml-card[data-visual='none'],
   );
   border: var(--border-width) solid var(--color-card-border);
   border-top: calc(var(--border-width) * 4) solid var(--card-visual, var(--color-primary));
-  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-card);
 }
 
@@ -5489,9 +5124,9 @@ deml-card[data-visual='none'],
   margin: 0 0 var(--space-2);
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-weight: 600;
   letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-ui);
+  line-height: 1.2;
   text-transform: uppercase;
   color: var(--card-visual, var(--color-primary));
 }
@@ -5499,22 +5134,21 @@ deml-card[data-visual='none'],
 .card-heading {
   margin: 0 0 var(--space-2);
   font-family: var(--font-display);
-  font-size: var(--font-size-title);
-  font-stretch: var(--font-stretch-display);
+  font-size: clamp(calc(var(--grid) * 3.5), 4vw, var(--font-size-lg));
   font-weight: var(--font-weight-display);
   letter-spacing: var(--tracking-display);
-  line-height: var(--leading-display);
+  line-height: 1.05;
   color: var(--color-card-text);
 }
 
 .card-subtext {
   margin: 0 0 var(--space-4);
   max-width: 32ch;
-  font-family: var(--font-secondary);
-  font-size: var(--font-size-body);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-relaxed);
+  line-height: 1.5;
   color: var(--color-card-text-secondary);
 }
 
@@ -5619,7 +5253,7 @@ deml-card[data-layout='teaser'] .card-media.has-visual,
 @media screen and (min-width: 800px) {
   .card {
     min-height: 100%;
-    padding: var(--module-pad-lg);
+    padding: var(--space-8) var(--space-4) 0;
   }
 
   .card-media.has-visual:empty,
@@ -5642,7 +5276,7 @@ deml-card[data-layout='teaser'] .card-media.has-visual,
   deml-card[data-layout='teaser'] .card-copy,
   :host([data-layout='teaser']) .card-copy {
     justify-content: center;
-    padding: var(--space-6);
+    padding: var(--space-6) var(--space-6);
     background-color: var(--color-card);
   }
 
@@ -5682,7 +5316,7 @@ deml-card[data-layout='teaser'] .card-media.has-visual,
   app-card[data-layout='teaser'] .card-copy,
   deml-card[data-layout='teaser'] .card-copy,
   :host([data-layout='teaser']) .card-copy {
-    padding: var(--space-8);
+    padding: var(--space-8) var(--space-8);
   }
 }
 
@@ -5743,7 +5377,7 @@ deml-metric-card[data-accent='primary'],
   height: 100%;
   min-height: 100%;
   margin: 0;
-  padding: var(--module-pad);
+  padding: var(--space-3);
   overflow: hidden;
   color: var(--color-card-text);
   background-color: var(--color-card);
@@ -5754,7 +5388,6 @@ deml-metric-card[data-accent='primary'],
   );
   border: var(--border-width) solid var(--color-card-border);
   border-top: calc(var(--border-width) * 4) solid var(--stat-accent);
-  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-card);
 }
 
@@ -5771,9 +5404,9 @@ deml-metric-card[data-accent='primary'],
   margin: 0;
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-weight: 600;
   letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-ui);
+  line-height: 1.2;
   text-transform: uppercase;
   color: var(--stat-accent);
 }
@@ -5785,7 +5418,7 @@ deml-metric-card[data-accent='primary'],
   margin: 0;
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   letter-spacing: var(--tracking-intro);
   line-height: 1;
   color: var(--color-card-text-secondary);
@@ -5812,37 +5445,35 @@ deml-stat-card[data-trend='down'] .stat-card-delta,
   margin: 0;
   flex: 0 0 auto;
   font-family: var(--font-display);
-  font-size: var(--font-size-title);
-  font-stretch: var(--font-stretch-display);
+  font-size: clamp(var(--font-size-lg), 4vw, calc(var(--grid) * 5.5));
   font-weight: var(--font-weight-display);
   letter-spacing: var(--tracking-display);
-  line-height: var(--leading-display);
+  line-height: 0.95;
   color: var(--color-card-text);
 }
 
 .stat-card-meta {
   margin: var(--space-1) 0 0;
   flex: 0 0 auto;
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-regular);
-  letter-spacing: var(--tracking-body);
-  line-height: var(--leading-snug);
+  font-weight: 400;
+  line-height: 1.35;
   color: var(--color-card-text-secondary);
 }
 
 .stat-card-spark {
   display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
+  flex: 1 1 auto;
+  align-items: stretch;
   width: 100%;
+  min-height: var(--chart-spark-min-block);
   margin-top: var(--space-3);
 }
 
 .stat-card-spark > :first-child {
   width: 100%;
-  min-height: 0;
+  min-height: 100%;
 }
 
 app-stat-card[data-size='sm'] .stat-card-spark,
@@ -5863,12 +5494,12 @@ deml-stat-card[data-size='hero'] .stat-card-value,
 :host([data-size='wide']) .stat-card-value,
 :host([data-size='lg']) .stat-card-value,
 :host([data-size='hero']) .stat-card-value {
-  font-size: var(--font-size-display);
+  font-size: clamp(calc(var(--grid) * 4.5), 5vw, calc(var(--grid) * 6.5));
 }
 
 @media screen and (min-width: 800px) {
   .stat-card {
-    padding: var(--module-pad-lg);
+    padding: var(--space-4);
   }
 }
 
@@ -5954,7 +5585,6 @@ app-stat-card[data-trend='down'] .stat-card-delta,
   );
   border: var(--border-width) solid var(--color-card-border);
   border-top: calc(var(--border-width) * 4) solid var(--stat-accent);
-  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-card);
 }
 
@@ -5985,7 +5615,7 @@ app-stat-card[data-trend='down'] .stat-card-delta,
   margin: 0;
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   letter-spacing: var(--tracking-intro);
   line-height: 1;
   color: var(--color-card-text-secondary);
@@ -6008,37 +5638,35 @@ app-stat-card[data-trend='down'] .stat-card-delta,
   margin: 0;
   flex: 0 0 auto;
   font-family: var(--font-display);
-  font-size: var(--font-size-title);
-  font-stretch: var(--font-stretch-display);
+  font-size: clamp(var(--font-size-lg), 4vw, calc(var(--grid) * 5.5));
   font-weight: var(--font-weight-display);
   letter-spacing: var(--tracking-display);
-  line-height: var(--leading-display);
+  line-height: 0.95;
   color: var(--color-card-text);
 }
 
 .stat-card-meta {
   margin: var(--space-1) 0 0;
   flex: 0 0 auto;
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-regular);
-  letter-spacing: var(--tracking-body);
-  line-height: var(--leading-snug);
+  font-weight: 400;
+  line-height: 1.35;
   color: var(--color-card-text-secondary);
 }
 
 .stat-card-spark {
   display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
+  flex: 1 1 auto;
+  align-items: stretch;
   width: 100%;
+  min-height: var(--chart-spark-min-block);
   margin-top: var(--space-3);
 }
 
 .stat-card-spark > :first-child {
   width: 100%;
-  min-height: 0;
+  min-height: 100%;
 }
 
 :host([data-size='sm']) .stat-card-spark {
@@ -6120,7 +5748,6 @@ deml-microcard[data-visual='olive'],
     var(--color-card) 50%
   );
   border: var(--border-width) solid var(--color-card-border);
-  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-card);
   transition:
     border-color 160ms ease,
@@ -6165,9 +5792,9 @@ deml-microcard[data-visual='olive'],
   margin: 0;
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-weight: 600;
   letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-ui);
+  line-height: 1.2;
   text-transform: uppercase;
   color: var(--microcard-visual, var(--color-primary));
 }
@@ -6175,11 +5802,10 @@ deml-microcard[data-visual='olive'],
 .microcard-heading {
   margin: 0;
   font-family: var(--font-display);
-  font-size: var(--font-size-title-sm);
-  font-stretch: var(--font-stretch-display);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
+  line-height: 1.25;
   color: var(--color-card-text);
   word-break: break-word;
 }
@@ -6187,19 +5813,17 @@ deml-microcard[data-visual='olive'],
 .microcard-subtext {
   margin: 0;
   flex: 1 1 auto;
-  font-family: var(--font-secondary);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-regular);
+  font-weight: 400;
   letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-relaxed);
+  line-height: 1.4;
   color: var(--color-card-text-secondary);
 }
 
 .microcard-cta {
   margin-top: var(--space-2);
-  font-family: var(--font-sans);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
   color: var(--microcard-visual, var(--color-primary));
@@ -6674,12 +6298,14 @@ app-metric-list[data-accent='primary'],
 }
 
 /* inlined: components/chart-card/chart-card.css */
-/* Component: chart-card — equal-height shell + aspect-safe plot band */
+/* Component: chart-card — NFTS fill + aspect-safe plot band */
 
 .component--chart-card .demo {
   display: grid;
   gap: var(--tile-gap);
 }
+
+/* Chart card — titled shell; plot band hosts aspect-locked charts */
 
 app-chart-card,
 deml-chart-card,
@@ -6688,23 +6314,23 @@ deml-chart-card,
   width: 100%;
   height: 100%;
   min-width: 0;
-  --chart-accent: var(--chart-series-1);
+  --chart-accent: var(--color-primary);
   background-color: transparent;
 }
 
 app-chart-card[data-accent='gold'],
 :host([data-accent='gold']) {
-  --chart-accent: var(--chart-series-3);
+  --chart-accent: var(--color-accent-gold);
 }
 
 app-chart-card[data-accent='red'],
 :host([data-accent='red']) {
-  --chart-accent: var(--chart-series-4);
+  --chart-accent: var(--color-accent-red);
 }
 
 app-chart-card[data-accent='primary'],
 :host([data-accent='primary']) {
-  --chart-accent: var(--chart-series-1);
+  --chart-accent: var(--color-primary);
 }
 
 .chart-card {
@@ -6715,7 +6341,6 @@ app-chart-card[data-accent='primary'],
   height: 100%;
   min-height: 100%;
   margin: 0;
-  /* Identical outer inset on all four sides */
   padding: var(--module-pad);
   overflow: clip;
   color: var(--color-card-text);
@@ -6727,7 +6352,6 @@ app-chart-card[data-accent='primary'],
   );
   border: var(--border-width) solid var(--color-card-border);
   border-top: calc(var(--border-width) * 4) solid var(--chart-accent);
-  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-card);
 }
 
@@ -6742,11 +6366,10 @@ app-chart-card[data-accent='primary'],
 .chart-card-heading {
   margin: 0;
   font-family: var(--font-display);
-  font-size: var(--font-size-title-sm);
-  font-stretch: var(--font-stretch-display);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
+  line-height: 1.2;
   color: var(--color-card-text);
 }
 
@@ -6756,14 +6379,13 @@ app-chart-card[data-accent='primary'],
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-ui);
   text-transform: uppercase;
   color: var(--chart-accent);
 }
 
 /*
- * Plot band — charts size via --chart-aspect on their own stage.
- * Never force height:100% on children (squashes viewBox plots).
+ * Plot band — hosts fill width; charts size themselves via --chart-aspect.
+ * Do not force height:100% on children (that squashes viewBox plots).
  */
 .chart-card-body {
   display: flex;
@@ -6783,7 +6405,7 @@ deml-chart-card .chart-card-body > * {
   width: 100%;
   min-width: 0;
   min-height: 0;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
 }
 
 :host([data-size='hero']) .chart-card-heading,
@@ -6792,7 +6414,7 @@ deml-chart-card .chart-card-body > * {
 app-chart-card[data-size='hero'] .chart-card-heading,
 app-chart-card[data-size='lg'] .chart-card-heading,
 app-chart-card[data-size='wide'] .chart-card-heading {
-  font-size: var(--font-size-title);
+  font-size: clamp(1.25rem, 2.5vw, var(--font-size-md));
   letter-spacing: var(--tracking-display);
 }
 
@@ -6803,7 +6425,7 @@ app-chart-card[data-size='wide'] .chart-card-heading {
 }
 
 /* inlined: components/area-chart/area-chart.css */
-/* Component: area-chart — aspect-locked plot; series from palette tokens */
+/* Component: area-chart — aspect-locked plot; never squash viewBox */
 
 .component--area-chart .demo {
   display: grid;
@@ -6820,54 +6442,67 @@ deml-area-chart,
   min-width: 0;
   min-height: 0;
   flex: 0 1 auto;
-  --chart-accent: var(--chart-series-1);
+  --chart-accent: var(--color-primary);
   --chart-plot: var(--color-plot);
   --chart-grid: var(--color-plot-grid);
   --chart-baseline: var(--color-plot-baseline);
   --chart-label: var(--color-plot-muted);
-  --chart-node: var(--chart-series-paper);
+  --chart-node: var(--color-plot-ink);
   background-color: transparent;
 }
 
 app-area-chart[data-accent='gold'],
 deml-area-chart[data-accent='gold'],
 :host([data-accent='gold']) {
-  --chart-accent: var(--chart-series-3);
+  --chart-accent: var(--color-accent-gold);
 }
 
 app-area-chart[data-accent='red'],
 deml-area-chart[data-accent='red'],
 :host([data-accent='red']) {
-  --chart-accent: var(--chart-series-4);
+  --chart-accent: var(--color-accent-red);
 }
 
 app-area-chart[data-accent='primary'],
 deml-area-chart[data-accent='primary'],
 :host([data-accent='primary']) {
-  --chart-accent: var(--chart-series-1);
+  --chart-accent: var(--color-primary);
 }
 
 .area-chart-frame {
   display: flex;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   align-items: stretch;
   justify-content: center;
   box-sizing: border-box;
   width: 100%;
-  max-width: var(--chart-stage-max-inline);
-  aspect-ratio: var(--chart-aspect);
-  height: auto;
-  margin: 0 auto;
+  margin: 0;
   padding: var(--chart-inset);
   background-color: var(--chart-plot);
   border: var(--border-width) solid var(--color-plot-border);
+}
+
+/*
+ * Full plot — width fills card; height from --chart-aspect only.
+ * Soft ceiling via max-width derived from --chart-max-block.
+ * Never set height:100% or conflicting min-height that breaks aspect.
+ */
+app-area-chart:not([data-variant='spark']) .area-chart-frame,
+deml-area-chart:not([data-variant='spark']) .area-chart-frame,
+:host(:not([data-variant='spark'])) .area-chart-frame,
+.component--area-chart .area-chart-frame,
+.component--chart-card .area-chart-frame {
+  aspect-ratio: var(--chart-aspect);
+  width: min(100%, calc(var(--chart-max-block) * var(--chart-aspect)));
+  height: auto;
+  max-height: var(--chart-max-block);
+  margin-inline: auto;
 }
 
 .area-chart {
   display: block;
   width: 100%;
   height: 100%;
-  min-width: 0;
   min-height: 0;
   overflow: visible;
 }
@@ -6926,16 +6561,23 @@ deml-area-chart[data-accent='primary'],
   letter-spacing: var(--tracking-mark);
 }
 
-/* Spark — same aspect; smaller max-inline only */
+/* Spark — same aspect contract as full plots */
 app-area-chart[data-variant='spark'] .area-chart-frame,
 deml-area-chart[data-variant='spark'] .area-chart-frame,
 :host([data-variant='spark']) .area-chart-frame {
-  max-width: var(--chart-spark-stage-max-inline);
+  width: min(100%, calc(var(--chart-spark-max-block) * var(--chart-spark-aspect)));
   aspect-ratio: var(--chart-spark-aspect);
   height: auto;
+  max-height: var(--chart-spark-max-block);
+  margin-inline: auto;
   padding: 0;
   border: 0;
   background-color: transparent;
+}
+
+app-area-chart[data-variant='spark'] .area-chart,
+:host([data-variant='spark']) .area-chart {
+  min-height: 0;
 }
 
 app-area-chart[data-variant='spark'] .area-chart-line,
@@ -6960,7 +6602,7 @@ app-area-chart[data-variant='spark'] .area-chart-node,
 }
 
 /* inlined: components/bar-chart/bar-chart.css */
-/* Component: bar-chart — aspect-locked plot band (same stage as area) */
+/* Component: bar-chart — aspect-locked plot band (same size as area) */
 
 .component--bar-chart .demo {
   display: grid;
@@ -6977,7 +6619,7 @@ deml-bar-chart,
   min-width: 0;
   min-height: 0;
   flex: 0 1 auto;
-  --chart-accent: var(--chart-series-1);
+  --chart-accent: var(--color-primary);
   --chart-plot: var(--color-plot);
   --chart-label: var(--color-plot-muted);
   --chart-value: var(--color-plot-ink);
@@ -6986,34 +6628,34 @@ deml-bar-chart,
 
 app-bar-chart[data-accent='gold'],
 :host([data-accent='gold']) {
-  --chart-accent: var(--chart-series-3);
+  --chart-accent: var(--color-accent-gold);
 }
 
 app-bar-chart[data-accent='red'],
 :host([data-accent='red']) {
-  --chart-accent: var(--chart-series-4);
+  --chart-accent: var(--color-accent-red);
 }
 
 app-bar-chart[data-accent='primary'],
 :host([data-accent='primary']) {
-  --chart-accent: var(--chart-series-1);
+  --chart-accent: var(--color-primary);
 }
 
 /*
- * Same stage as area plots — width fluid, height from --chart-aspect only.
+ * Same proportions as area plots — --chart-aspect container.
  * Rows scroll inside the band; the band never stretches.
  */
 .bar-chart {
   display: flex;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   flex-direction: column;
   justify-content: space-between;
   gap: var(--space-2);
   box-sizing: border-box;
-  width: 100%;
-  max-width: var(--chart-stage-max-inline);
+  width: min(100%, calc(var(--chart-max-block) * var(--chart-aspect)));
   aspect-ratio: var(--chart-aspect);
   height: auto;
+  max-height: var(--chart-max-block);
   margin: 0 auto;
   padding: var(--chart-inset) var(--space-3);
   overflow: auto;
@@ -7065,7 +6707,7 @@ app-bar-chart[data-accent='primary'],
 .bar-chart-track {
   width: 100%;
   height: var(--space-1);
-  background-color: color-mix(in srgb, var(--chart-series-2) 16%, var(--chart-plot));
+  background-color: color-mix(in srgb, var(--color-plot-muted) 16%, var(--chart-plot));
   overflow: hidden;
 }
 
@@ -7075,7 +6717,7 @@ app-bar-chart[data-accent='primary'],
   background-image: linear-gradient(
     90deg,
     var(--chart-accent) 0%,
-    color-mix(in srgb, var(--chart-accent) 55%, var(--chart-series-paper)) 100%
+    color-mix(in srgb, var(--chart-accent) 55%, var(--color-on-primary)) 100%
   );
 }
 
@@ -7103,10 +6745,10 @@ app-bar-chart[data-accent='primary'],
 .chart-figure__plot {
   display: block;
   box-sizing: border-box;
-  width: 100%;
-  max-width: var(--chart-stage-max-inline);
+  width: min(100%, calc(var(--chart-max-block) * var(--chart-aspect)));
   aspect-ratio: var(--chart-aspect);
   height: auto;
+  max-height: var(--chart-max-block);
   margin-inline: auto;
   padding: var(--chart-inset);
   background-color: var(--chart-plot);
@@ -7147,7 +6789,7 @@ deml-chart-panel,
   width: 100%;
   height: 100%;
   min-width: 0;
-  --chart-accent: var(--chart-series-1);
+  --chart-accent: var(--color-primary);
   background-color: transparent;
 }
 
@@ -7204,15 +6846,14 @@ deml-chart-panel,
 
 .chart-panel__body {
   display: flex;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: var(--chart-stage-max-inline);
+  width: min(100%, calc(var(--chart-max-block) * var(--chart-aspect)));
   aspect-ratio: var(--chart-aspect);
   height: auto;
+  max-height: var(--chart-max-block);
   margin: 0 auto;
   padding: var(--chart-inset);
   overflow: hidden;
@@ -7900,7 +7541,7 @@ deml-chart-empty-state,
   max-height: calc(var(--grid) * 56);
   margin: 0;
   overflow: hidden;
-  padding: var(--space-6);
+  padding: var(--space-6) var(--space-2);
   color: var(--color-text);
   background-color: var(--color-bg);
   background-image:
@@ -7945,11 +7586,9 @@ deml-chart-empty-state,
 
 .banner .preheader {
   margin: 0 0 var(--space-3);
-  font-family: var(--font-sans);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-ui);
   color: var(--color-highlight);
 }
 
@@ -7957,22 +7596,18 @@ deml-chart-empty-state,
   max-width: 14ch;
   margin-bottom: var(--space-3);
   font-family: var(--font-display);
-  font-size: var(--font-size-display-lg);
-  font-stretch: var(--font-stretch-display);
+  font-size: clamp(calc(var(--grid) * 4.5), 6vw, var(--font-size-2xl));
   font-weight: var(--font-weight-display);
   letter-spacing: var(--tracking-display);
-  line-height: var(--leading-display);
+  line-height: 0.98;
   color: var(--color-text);
 }
 
 .banner .lede {
   max-width: 42ch;
   margin: 0 0 var(--space-5);
-  font-family: var(--font-secondary);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
+  font-family: var(--font-serif);
   letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-relaxed);
   color: var(--color-text-secondary);
 }
 
@@ -7990,8 +7625,7 @@ deml-chart-empty-state,
     min-height: calc(var(--grid) * 36);
     height: 38dvh;
     max-height: calc(var(--grid) * 52);
-    padding-block: var(--space-8);
-    padding-inline: max(var(--space-4), calc((100% - var(--content-width-lg)) / 2));
+    padding: var(--space-8) var(--space-4);
   }
 
   .banner-actions {
@@ -7999,38 +7633,34 @@ deml-chart-empty-state,
     max-width: none;
   }
 
+  /* Align hero copy with page content measures (global, not :host-context) */
   .page--prose .banner,
   .page--prose app-banner .banner,
   .page--prose deml-banner .banner {
-    padding-block: var(--space-8);
     padding-inline: max(var(--space-4), calc((100% - var(--reading-width)) / 2));
   }
 
   .page--catalog .banner,
   .page--catalog app-banner .banner,
   .page--catalog deml-banner .banner {
-    padding-block: var(--space-8);
     padding-inline: max(var(--space-4), calc((100% - var(--content-width-lg)) / 2));
   }
 }
 
 @media screen and (min-width: 1200px) {
   .banner {
-    padding-block: var(--space-8);
-    padding-inline: max(var(--space-6), calc((100% - var(--content-width-lg)) / 2));
+    padding: var(--space-8) var(--space-6);
   }
 
   .page--prose .banner,
   .page--prose app-banner .banner,
   .page--prose deml-banner .banner {
-    padding-block: var(--space-8);
     padding-inline: max(var(--space-6), calc((100% - var(--reading-width)) / 2));
   }
 
   .page--catalog .banner,
   .page--catalog app-banner .banner,
   .page--catalog deml-banner .banner {
-    padding-block: var(--space-8);
     padding-inline: max(var(--space-6), calc((100% - var(--content-width-lg)) / 2));
   }
 }
@@ -8130,8 +7760,7 @@ deml-chart-empty-state,
   gap: var(--space-4);
   width: 100%;
   margin: 0;
-  /* Identical outer spacing on all four sides */
-  padding: var(--module-pad-lg);
+  padding: var(--space-5) var(--space-4);
   color: var(--color-card-text);
   background-color: var(--color-card);
   background-image: linear-gradient(
@@ -8141,7 +7770,6 @@ deml-chart-empty-state,
   );
   border: var(--border-width) solid var(--color-card-border);
   border-top: calc(var(--border-width) * 4) solid var(--color-primary);
-  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-card);
 }
 
@@ -8158,32 +7786,31 @@ deml-chart-empty-state,
   margin: 0;
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-weight: 600;
   letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-ui);
+  line-height: 1.2;
   text-transform: uppercase;
   color: var(--color-primary);
 }
 
 .form-panel__title {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: var(--font-size-title);
-  font-stretch: var(--font-stretch-display);
-  font-weight: var(--font-weight-display);
+  font-family: var(--font-sans);
+  font-size: clamp(calc(var(--grid) * 3.5), 4vw, var(--font-size-lg));
+  font-weight: 700;
   letter-spacing: var(--tracking-display);
-  line-height: var(--leading-tight);
+  line-height: 1.1;
   color: var(--color-card-text);
 }
 
 .form-panel__description {
   margin: 0;
   max-width: 42ch;
-  font-family: var(--font-secondary);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
   letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-relaxed);
+  line-height: 1.45;
   color: var(--color-card-text-secondary);
 }
 
@@ -8210,9 +7837,9 @@ deml-chart-empty-state,
   margin: 0;
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-weight: 600;
   letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-snug);
+  line-height: 1.35;
   color: var(--color-error);
 }
 
@@ -8245,7 +7872,7 @@ deml-chart-empty-state,
 
 .form-panel__footer a {
   color: var(--color-primary);
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 0.18em;
 }
@@ -8256,7 +7883,7 @@ deml-chart-empty-state,
 
 @media screen and (min-width: 800px) {
   .form-panel {
-    padding: var(--space-6);
+    padding: var(--space-6) var(--space-5);
   }
 }
 
@@ -8406,9 +8033,9 @@ body:has(.site-navbar) {
   min-height: var(--navbar-hit);
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-ui);
+  line-height: 1.2;
   text-transform: none;
   text-decoration: none;
   white-space: nowrap;
@@ -8548,9 +8175,9 @@ app-button-group {
   margin: 0;
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-weight: 600;
   letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-ui);
+  line-height: 1.2;
   text-transform: uppercase;
   color: var(--color-card-text-secondary);
 }
@@ -8567,12 +8194,12 @@ app-button-group {
   margin: 0;
   padding: var(--space-1) var(--space-2);
   border: var(--border-width) solid var(--color-card-border);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-body);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
-  letter-spacing: var(--tracking-body);
-  line-height: var(--leading-ui);
+  border-radius: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  letter-spacing: var(--tracking-intro);
+  line-height: 1.3;
   color: var(--color-card-text);
   background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
   appearance: none;
@@ -8619,9 +8246,9 @@ app-button-group {
   margin: 0;
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-regular);
+  font-weight: 400;
   letter-spacing: var(--tracking-intro);
-  line-height: var(--leading-snug);
+  line-height: 1.35;
 }
 
 .text-field__hint {
@@ -8629,7 +8256,7 @@ app-button-group {
 }
 
 .text-field__error {
-  font-weight: var(--font-weight-medium);
+  font-weight: 600;
   color: var(--color-error);
 }
 

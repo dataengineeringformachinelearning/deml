@@ -1,16 +1,13 @@
-# DEML Design System — deml-ui (LOCKED)
+# DEML Design System — deml-ui (new-from-the-start)
 
-**Status:** Locked for all future work.  
-**Look:** **new-from-the-start (NFTS) / heritage** — seven-color palette only  
+**Look:** **new-from-the-start (warm ash)** — expand from this system only.  
 **Canonical package:** [`deml-ui`](https://github.com/dataengineeringformachinelearning/deml-ui)  
 **Storybook:** [ui.deml.app](https://ui.deml.app)  
 **App integration:** [docs/DEML_UI.md](docs/DEML_UI.md) · [.cursorrules](.cursorrules) · [AGENTS.md](AGENTS.md)
 
-`deml-ui` is the **single source of truth** for product visuals. Viking-UI
-(`packages/viking-ui`, `@dataengineeringformachinelearning/viking-ui`,
-`viking-*`, `--viking-*`, void-black / electric `#2176ff`) is **fully retired**.
-Do **not** restore atelier-cream / limestone hexes (`#2A2622`, `#E4DDD0`,
-`#F4F1EA`) or any parallel kit.
+`deml-ui` is the **single source of truth** for product visuals. Viking-UI is **retired**.
+Do **not** layer cold seven-color locks, Syne/Fraunces display stacks, or void-black /
+electric `#2176ff` chrome on top of NFTS — that creates a frankenstein UI.
 
 ---
 
@@ -22,95 +19,48 @@ Do **not** restore atelier-cream / limestone hexes (`#2A2622`, `#E4DDD0`,
 | [ui.deml.app](https://ui.deml.app) | deml-ui Storybook on Vercel | deml-ui tokens + components |
 | [backend.deml.app](https://backend.deml.app) | Django templates | `backend/static/deml-ui.css` (synced from deml-ui) |
 
-Every surface must share the same locked rules: **7-color palette only**, equal
-outer spacing (8px multiples), identical tile/card/bento heights, fixed
-`--chart-aspect`, WCAG 2.0 AA, and dual `data-theme`.
-
 ---
 
-## Locked palette (exact — seven colors only)
+## Warm ash palette (NFTS)
 
 | Hex | Role |
 |-----|------|
-| `#0066B2` | Primary / focus / chart accent |
-| `#3D3D3D` | Charcoal surface / secondary text (light) |
-| `#BDBDBD` | Muted / border / secondary text (dark) |
-| `#121212` | Ink / dark ground / card text on light modules |
-| `#FFFFFF` | White / light ground / on-primary |
-| `#3C7A4A` | Success / positive accent (`--color-accent-gold`) |
-| `#C41E3A` | Danger / accent red |
+| `#35312D` | Dark page ground (`theme-color` dark) |
+| `#1C1916` | Deep surface / plot |
+| `#F3F0EA` | Cream elevated modules / card fill |
+| `#D4CEC5` | Light page ground (`theme-color` light) |
+| `#2F5F8F` | Primary / focus |
+| `#3F6B54` | Success / positive |
+| `#9E3D47` | Danger / accent |
+| `#C6C0B7` | Muted text on dark ground |
+| `#4A453F` | Secondary text on cream modules |
 
-Dark/light **role swaps** only — no new hexes. Hovers and translucent chrome may
-`color-mix` **only** among these seven. Chart series colors come from this
-palette only. `theme-color` meta: dark `#121212`, light `#FFFFFF`.
-
----
-
-## Locked design rules (mandatory)
-
-These rules are non-negotiable for agents, PRs, and product UI:
-
-1. **Seven colors only** — product chrome uses deml-ui tokens that resolve to the
-   palette above (`--color-*`, `--palette-*`). No arbitrary hex/rgb in app or
-   component chrome outside deml-ui `tokens.css`.
-2. **8px equal outer spacing** — all layout lengths resolve to `--grid` /
-   `--space-*` (8px multiples). Outer gutters identical on all four sides
-   (`.page-body` / `--module-pad` / `--tile-gap`). Do not invent asymmetric
-   one-off margins.
-3. **Identical card / bento heights** — dashboard tiles / bento rows use
-   `--tile-row-unit` (dash-row) with shared `--tile-gap`; cards and microcards
-   fill equal grid tracks. No free-height drift between siblings in a row.
-4. **Fixed charts** — `--chart-aspect` is **2.4**. Area/bar plots live inside
-   equal-height `app-chart-card` shells and size via aspect tokens only; never
-   squash, stretch, or override plot height outside
-   `--chart-aspect` / `--chart-min-block` / `--chart-max-block`.
-5. **Typography hierarchy** —
-   - Primary headings: `--font-display` (Syne), bold/800, **tight** tracking
-     (`--tracking-display` / `--tracking-tight`)
-   - Secondary / eyebrows / marks: same sans family, **generous** letter-spacing
-     (`--tracking-eyebrow` / `--tracking-mark`)
-   - Intro / lede: readable with **generous** tracking (`--tracking-intro`;
-     `--font-serif` / Fraunces)
-   - Body: highly readable `--font-sans` (Geist)
-6. **Dual theme** — `data-theme="light"` | `data-theme="dark"` on `<html>`.
-   Dark: light modules on ink ground. Light: white ground, charcoal ink.
-7. **WCAG 2.0 AA** — contrast, `:focus-visible`, ≥44px hit targets (`--hit-target`),
-   `prefers-reduced-motion`.
-8. **Compose deml-ui only** — pages use `app-*` wrappers that mirror deml-ui
-   class contracts. **Zero app-level design-system CSS** for product chrome
-   (`styleUrl` / `styleUrls` / inline `styles` forbidden on DS wrappers).
-9. **Extend deml-ui first** — new primitives, tokens, or surfaces land in deml-ui,
-   then deml consumes them (bump dependency / sync Django static).
-10. **No Viking / cream / parallel kits** — no Viking-UI, atelier-cream leftovers,
-    Material, Bootstrap, Tailwind utilities, or a second local design system.
-
-Directional quality bars inform craft only. Do **not** import third-party UI kits
-or copy external visual systems into deml.
+Dark default: light cream modules on warm ash ground. Light: cream cards on `#D4CEC5`.
 
 ---
 
-## Token entry points
+## Type
 
-| Artifact | Path |
-|----------|------|
-| Tokens | `deml-ui/styles/tokens.css` → package `deml-ui/tokens.css` |
-| Base + type | `deml-ui/styles/base.css` |
-| Full kit | `deml-ui/dist/styles/deml-ui.css` |
-| Components | `deml-ui/components/<name>/<name>.{html,css}` |
+**Geist only** for display, intro, eyebrows, and body (`--font-display` / `--font-secondary` /
+`--font-sans` all resolve to Geist). Do not ship Syne or Fraunces in the product UI.
 
-### Core token families
+| Role | Treatment |
+|------|-----------|
+| Primary headings | Geist bold, tight tracking (`--tracking-display` / `--tracking-tight`) |
+| Eyebrows / marks | Geist semibold, generous letter-spacing (`--tracking-eyebrow`) |
+| Intro / lede | Geist regular, slight tracking (`--tracking-intro`) |
+| Body | Geist regular, readable line-height |
 
-| Family | Examples |
-|--------|----------|
-| Palette | `--palette-blue`, `--palette-charcoal`, `--palette-gray`, `--palette-ink`, `--palette-white`, `--palette-green`, `--palette-red` |
-| Color | `--color-bg`, `--color-surface`, `--color-card`, `--color-primary`, `--color-accent-gold`, `--color-accent-red`, `--color-text` |
-| Chart paint | `--chart-plot`, `--chart-accent`, `--chart-grid`, `--chart-aspect`, `--chart-min-block`, `--chart-max-block` |
-| Space | `--grid`, `--space-1`…, `--tile-gap`, `--tile-row-unit`, `--tile-row-card`, `--module-pad` |
-| Type | `--font-sans`, `--font-display`, `--font-serif`, `--tracking-eyebrow`, `--tracking-display`, `--tracking-intro` |
-| Focus | `--color-focus`, `--focus-ring-width`, `--focus-ring-offset`, `--hit-target` |
+---
 
-Aliases such as `--bg`, `--ink`, `--surface`, `--accent` remain for component CSS
-compatibility and must resolve to the families above.
+## Layout & charts
+
+1. **8px grid** — `--grid` / `--space-*` / `--tile-gap` / `--module-pad`.
+2. **Fluid equal cells** — `grid-auto-rows: minmax(var(--tile-row-unit), auto)` so tiles and charts can grow; never squash with fixed-only row tracks.
+3. **Charts** — `--chart-aspect: 2.4` inside `app-chart-card`; series from NFTS tokens only.
+4. **Sharp modules** — `--radius-sm/md/lg: 0` (pill radius for chips only).
+5. **Dual theme** — `data-theme="light"|"dark"` on `<html>`.
+6. **WCAG 2.0 AA** — contrast, `:focus-visible`, ≥44px hit targets, reduced motion.
 
 ---
 
@@ -123,17 +73,13 @@ compatibility and must resolve to the families above.
 | Section title | `app-section-header` |
 | Dynamic boards | `app-tile-board` → `app-dashboard-grid` + typed tiles |
 | KPI | `app-stat-card` |
-| Charts | `app-chart-card` + `app-area-chart` / `app-bar-chart` / `app-metric-list` |
+| Charts | `app-chart-card` + `app-area-chart` / `app-bar-chart` |
 | Marketing cards | `app-card-grid` + `app-card` |
 | Shell | `app-navbar`, `app-theme-toggle` |
-
-Pages pass **data**; shared components own markup and deml-ui classes.
-Prefer `@for` + `app-tile-board` over one-off grids.
 
 **Angular wrappers** under `src/app/components/*`:
 - `ViewEncapsulation.None`
 - **no** `styleUrl` / `styleUrls` / inline `styles` for design-system chrome
-- Thin auth/learn layout helpers may use deml-ui tokens only (not a parallel DS)
 
 ---
 
@@ -141,11 +87,9 @@ Prefer `@for` + `app-tile-board` over one-off grids.
 
 - Boot: `src/index.html` sets `data-theme` from `localStorage['deml-theme']` or
   `prefers-color-scheme` (default dark).
-- Runtime: `ThemeService` (`src/app/services/theme.ts`) updates `data-theme`,
-  `color-scheme`, and `theme-color` meta (`#121212` / `#FFFFFF`).
-- Toggle: `app-theme-toggle` in the navbar; account page may also toggle.
-
-Storybook (deml-ui) uses the same `data-theme` attribute via the theme toolbar.
+- Runtime: `ThemeService` updates `data-theme`, `color-scheme`, and `theme-color`
+  (`#35312D` / `#D4CEC5`).
+- Toggle: `app-theme-toggle` in the navbar.
 
 ---
 
@@ -155,12 +99,12 @@ Storybook (deml-ui) uses the same `data-theme` attribute via the theme toolbar.
 # Design system
 cd ../deml-ui
 npm install
-npm run storybook          # http://localhost:6006
-npm run build              # refresh dist/ (committed for github: consumers)
+npm run storybook   # http://localhost:6006
+npm run build
 
 # Product app
 cd ../deml
-npm install                # pulls deml-ui#main (or file:../deml-ui locally)
+npm install
 npx ng serve
 
 # Django static mirror after deml-ui CSS changes
@@ -169,52 +113,20 @@ npx ng serve
 
 ---
 
-## Hard Do / Don't (anti-drift)
+## Hard Do / Don't
 
 ### Do
 
-- Use only the seven locked hexes (via tokens).
-- Keep equal outer spacing on all four sides (`--space-*` / `--tile-gap` /
-  `--module-pad`).
-- Keep identical card/bento/grid row heights (`--tile-row-unit` + stretch).
-- Host charts in aspect-locked containers inside equal-height chart-cards.
-- Preserve type hierarchy (display condensed tight / intro generous / readable body).
+- Expand from warm-ash NFTS only.
+- Keep Geist-only type.
+- Keep fluid `minmax` dash-rows and fixed chart aspect.
 - Compose product pages only from deml-ui `app-*` wrappers.
 
 ### Don't
 
-- Add hexes outside the seven-color set (including cream `#E4DDD0` / `#F4F1EA`,
-  void `#2A2622`, electric `#2176ff`).
-- Squash or stretch charts; override `--chart-aspect` with free heights.
-- Add app-level DS chrome CSS (`styleUrl` on product wrappers/pages).
-- Restore Viking-UI (`viking-*`, `--viking-*`, `packages/viking-ui`).
-- Invent one-off spacing, asymmetric module padding, or parallel tokens.
+- Mix seven-color cold palettes, Syne/Fraunces, or Viking on top of NFTS.
+- Squash charts/tiles with fixed-only grid rows.
+- Add app-level DS chrome CSS.
+- Restore Viking-UI.
 
----
-
-## Laws for agents and PRs
-
-1. **Extend deml-ui first** — new primitives, tokens, or surfaces land in deml-ui,
-   then deml consumes them.
-2. **No app-owned DS CSS** — do not add page-level design systems under `src/app`
-   except thin auth/learn layout helpers that only use deml-ui tokens.
-3. **No Viking / cream** — no `viking-*`, `--viking-*`, void-black / `#2176ff`,
-   or atelier-cream hexes.
-4. **Seven colors only** — no arbitrary hex/rgb in product chrome.
-5. **Equal spacing** — gutters and tile gaps from `--tile-gap` / page-body rules.
-6. **Identical tile heights** — use `--tile-row-unit` / dash-row rhythm.
-7. **Chart golden rule** — never squash, stretch, or freely resize plots outside
-   `--chart-aspect` / min-max block tokens.
-8. **WCAG 2.0 AA** — preserve focus, contrast, hit targets, reduced motion.
-
----
-
-## Historical note
-
-Older suite docs that mention Viking-UI, `packages/viking-ui`, void-black /
-electric `#2176ff`, or atelier-cream / limestone grounds describe a **retired**
-system. Treat those sections as superseded by this file and deml-ui `tokens.css`.
-
-**Confirmation:** The new-from-the-start / heritage seven-color deml-ui style is
-locked for all future deml product work. Agents must not drift back to Viking or
-cream atelier looks.
+**Confirmation:** Product UI must look like **new-from-the-start** — warm ash, Geist, fluid boards — not a hybrid of later experiments.

@@ -1,65 +1,37 @@
-# deml — Cursor rules (design system LOCKED)
+# deml — Cursor rules (design system)
 
 You are working in the DEML control-plane repo. Visual design is owned by **deml-ui**.
-The **new-from-the-start (NFTS) / heritage** look — **seven-color palette only** —
-is **mandatory** for all future product UI. Do not drift back to Viking or
-atelier-cream.
 
 ## Design system (required)
 
 - **SoT:** `deml-ui` (sibling repo / `github:dataengineeringformachinelearning/deml-ui#main`).
-- **Look:** NFTS / heritage — exact palette `#0066B2` `#3D3D3D` `#BDBDBD` `#121212`
-  `#FFFFFF` `#3C7A4A` `#C41E3A`; 8px equal outer spacing; identical card/bento
-  heights; fixed `--chart-aspect` (2.4); dual `data-theme`; WCAG 2.0 AA.
-- **Docs:** `THEME.md` (locked SoT), `docs/DEML_UI.md`, `AGENTS.md` (Uniformity Law).
+- **Look:** **new-from-the-start (warm ash)** — expand from that system only. Do not mix cold seven-color locks, Syne/Fraunces display stacks, or Viking chrome on top of NFTS.
+- **Palette:** dark ground `#35312D` / surface `#1C1916` / cream modules `#F3F0EA`; light ground `#D4CEC5`; primary `#2F5F8F`; accents `#3F6B54` / `#9E3D47`.
+- **Type:** **Geist only** (display, intro, body). No Syne / Fraunces.
+- **Layout:** 8px grid, dual `data-theme`, equal `--tile-gap`, fluid dash-rows `minmax(--tile-row-unit, auto)`, fixed `--chart-aspect: 2.4`.
+- **Docs:** `THEME.md`, `docs/DEML_UI.md`, `AGENTS.md` (deml-ui Uniformity Law).
 - **Storybook:** https://ui.deml.app
 
 ## Do
 
-- Compose product pages with `app-banner`, `app-page-section`, `app-section-header`,
-  `app-tile-board`, `app-dashboard-grid`, `app-card-grid`, `app-stat-card`,
-  `app-chart-card`, `app-area-chart`, `app-bar-chart`.
-- Keep Angular wrappers under `src/app/components` with `ViewEncapsulation.None`
-  and **no** component CSS for design-system chrome (`styleUrl` / `styleUrls` /
-  inline `styles` forbidden on DS wrappers and product pages).
-- Use deml-ui CSS variables only (`--color-*`, `--palette-*`, `--space-*`,
-  `--tile-*`, `--chart-*`, `--font-*`, `--tracking-*`).
-- Keep **equal outer spacing** (8px multiples on all four sides) via `--tile-gap`
-  / `--module-pad` / `.page-body` padding.
-- Keep **identical card/bento/grid row heights** via `--tile-row-unit` + shared
-  `--tile-gap` (siblings in a row stretch equally).
-- Preserve chart aspect (`--chart-aspect: 2.4`); never squash or stretch plots;
-  host series colors from the seven-color palette only, inside equal-height
-  chart-cards.
-- Preserve type hierarchy: display condensed tight (`--font-display` +
-  `--tracking-display`); secondary/intro generous letter-spacing
-  (`--tracking-eyebrow` / `--tracking-intro`); readable body (`--font-sans`).
-- Prefer WCAG 2.0 AA: focus-visible, contrast, ≥44px hit targets, reduced motion.
-- Dual theme via `data-theme="light"|"dark"` on `<html>` (`theme-color`:
-  `#121212` / `#FFFFFF`).
+- Compose product pages with `app-banner`, `app-page-section`, `app-section-header`, `app-tile-board`, `app-dashboard-grid`, `app-card-grid`, `app-stat-card`, `app-chart-card`, `app-area-chart`, `app-bar-chart`.
+- Keep Angular wrappers under `src/app/components` with `ViewEncapsulation.None` and **no** component CSS for design-system chrome.
+- Use deml-ui CSS variables (`--color-*`, `--space-*`, `--tile-*`, `--chart-*`).
+- Preserve chart aspect (`--chart-aspect`); never squash or stretch plots.
+- Prefer WCAG 2.0 AA: focus-visible, contrast, hit targets, reduced motion.
 
 ## Do not
 
-- Use or restore **Viking-UI** (`packages/viking-ui`,
-  `@dataengineeringformachinelearning/viking-ui`, `viking-*`, `--viking-*`,
-  void-black / electric `#2176ff` suite chrome).
-- Restore **atelier-cream / limestone** hexes (`#2A2622`, `#E4DDD0`, `#F4F1EA`)
-  or any hex outside the seven locked colors.
-- Add Material, Bootstrap, Tailwind utility styling, or a parallel local design
-  system / app-owned DS tokens.
-- Hand-edit `backend/static/deml-ui.css` — sync from deml-ui via
-  `scripts/sync_deml_ui_static.sh`.
-- Put product UI back under `frontend/` (that folder is a Vercel rootDirectory
-  shim only).
-- Invent one-off / asymmetric spacing, free-resize charts, or `styleUrl` chrome
-  on product pages.
+- Use or restore **Viking-UI** (`packages/viking-ui`, `@dataengineeringformachinelearning/viking-ui`, `viking-*`, `--viking-*`).
+- Replace warm ash with a parallel “locked seven-color” or atelier-cream frankenstein that fights NFTS.
+- Add Material, Bootstrap, Tailwind utility styling, or a parallel local design system.
+- Hand-edit `backend/static/deml-ui.css` — sync from deml-ui via `scripts/sync_deml_ui_static.sh`.
+- Put product UI back under `frontend/` (that folder is a Vercel rootDirectory shim only).
+- Fix layout squash with fixed-only `grid-auto-rows` — keep `minmax(..., auto)`.
 
 ## When changing visuals
 
-1. Edit deml-ui `components/` + `styles/tokens.css` / `styles/base.css`.
+1. Edit deml-ui `components/` + `styles/tokens.css` / `styles/base.css` (warm ash NFTS).
 2. `npm run build` in deml-ui (dist is consumed by github installs).
 3. Bump deml’s `deml-ui` dependency / lockfile.
 4. Sync Django static if templates need the new CSS.
-
-**Locked:** NFTS / heritage seven-color deml-ui is mandatory — see `THEME.md`.
-Agents must not regress to Viking or cream atelier looks.
