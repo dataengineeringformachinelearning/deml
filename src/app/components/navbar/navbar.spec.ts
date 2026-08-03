@@ -40,14 +40,20 @@ describe('Navbar', () => {
     const host = fixture.nativeElement as HTMLElement;
     const links = Array.from(host.querySelectorAll('#site-navbar-menu a'));
 
-    expect(links.map((el) => el.textContent?.trim())).toEqual(['Home', 'Learn', 'Blog']);
+    expect(links.map((el) => el.textContent?.trim())).toEqual([
+      'Home',
+      'Learn',
+      'Blog',
+      'Status',
+      'Explore',
+    ]);
     for (const link of links) {
       expect(link.hasAttribute('aria-label')).toBe(false);
     }
   });
 
   it('should render auth nav links when logged in', async () => {
-    auth.login();
+    auth.isAuthenticated.set(true);
     fixture.detectChanges();
     await fixture.whenStable();
 
@@ -55,11 +61,11 @@ describe('Navbar', () => {
     const links = Array.from(host.querySelectorAll('#site-navbar-menu a'));
 
     expect(links.map((el) => el.textContent?.trim())).toEqual([
-      'Home',
-      'Learn',
-      'Blog',
       'Dashboard',
+      'Analytics',
+      'Vulnerabilities',
       'Sites',
+      'Settings',
       'Account',
     ]);
   });
@@ -75,7 +81,7 @@ describe('Navbar', () => {
   });
 
   it('should show Log out when logged in', async () => {
-    auth.login();
+    auth.isAuthenticated.set(true);
     fixture.detectChanges();
     await fixture.whenStable();
 

@@ -1,3 +1,4 @@
+import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { vi } from 'vitest';
@@ -7,19 +8,39 @@ import { Login } from './login';
 
 describe('Login', () => {
   let fixture: ComponentFixture<Login>;
-  let auth: AuthService;
   let router: Router;
+  const isAuthenticated = signal(false);
+  const currentUserId = signal<number | null>(null);
+  const authMock = {
+    isAuthenticated,
+    currentUserId,
+    logout: vi.fn(async () => {
+      isAuthenticated.set(false);
+      currentUserId.set(null);
+    }),
+    login: vi.fn(async () => {
+      isAuthenticated.set(true);
+      currentUserId.set(1);
+      return { success: true };
+    }),
+  };
 
   beforeEach(async () => {
+    isAuthenticated.set(false);
+    currentUserId.set(null);
+    authMock.login.mockClear();
+    authMock.logout.mockClear();
+
     await TestBed.configureTestingModule({
       imports: [Login],
-      providers: [provideRouter([{ path: 'dashboard', children: [] }])],
+      providers: [
+        provideRouter([{ path: 'dashboard', children: [] }]),
+        { provide: AuthService, useValue: authMock },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Login);
-    auth = TestBed.inject(AuthService);
     router = TestBed.inject(Router);
-    auth.logout();
     fixture.detectChanges();
     await fixture.whenStable();
   });
@@ -40,7 +61,8 @@ describe('Login', () => {
 
     expect(fixture.componentInstance.emailError()).toContain('email');
     expect(fixture.componentInstance.passwordError()).toContain('password');
-    expect(auth.isAuthenticated()).toBe(false);
+    expect(authMock.isAuthenticated()).toBe(false);
+    expect(authMock.login).not.toHaveBeenCalled();
   });
 
   it('should log in and navigate when the form is valid', async () => {
@@ -49,12 +71,16 @@ describe('Login', () => {
 
     component.email.set('ada@example.com');
     component.password.set('secret123');
-    component.submit(new Event('submit'));
+    await component.submit(new Event('submit'));
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(auth.isAuthenticated()).toBe(true);
-    expect(auth.currentUser()?.name).toBe('ada');
+    expect(authMock.login).toHaveBeenCalledWith({
+      username: 'ada@example.com',
+      password: 'secret123',
+    });
+    expect(authMock.isAuthenticated()).toBe(true);
+    expect(authMock.currentUserId()).toBe(1);
     expect(navigateSpy).toHaveBeenCalledWith('/dashboard');
   });
 });

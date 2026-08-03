@@ -1,10 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { AuthService } from './auth.service';
 import { SessionApiService } from './session-api.service';
 import { environment } from '../../environments/environment';
-import { credentialsInterceptor } from '../interceptors/credentials.interceptor';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 const sessionApiMock = {
@@ -15,7 +14,7 @@ const sessionApiMock = {
 const authTestProviders = [
   AuthService,
   { provide: SessionApiService, useValue: sessionApiMock },
-  provideHttpClient(withInterceptors([credentialsInterceptor])),
+  provideHttpClient(),
   provideHttpClientTesting(),
 ];
 
@@ -78,7 +77,6 @@ describe('AuthService', () => {
   it('should check auth and set signals on success', async () => {
     const checkPromise = service.checkAuth();
 
-    // Wait for the async credentials interceptor token promise to resolve
     await new Promise(resolve => setTimeout(resolve, 10));
 
     const req = httpMock.expectOne(`${environment.backendUrl}/api/v1/auth/user`);
@@ -94,7 +92,6 @@ describe('AuthService', () => {
   it('should check auth and clear signals on failure', async () => {
     const checkPromise = service.checkAuth();
 
-    // Wait for the async credentials interceptor token promise to resolve
     await new Promise(resolve => setTimeout(resolve, 10));
 
     const req = httpMock.expectOne(`${environment.backendUrl}/api/v1/auth/user`);

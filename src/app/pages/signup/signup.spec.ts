@@ -1,3 +1,4 @@
+import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { vi } from 'vitest';
@@ -7,19 +8,39 @@ import { Signup } from './signup';
 
 describe('Signup', () => {
   let fixture: ComponentFixture<Signup>;
-  let auth: AuthService;
   let router: Router;
+  const isAuthenticated = signal(false);
+  const currentUserId = signal<number | null>(null);
+  const authMock = {
+    isAuthenticated,
+    currentUserId,
+    logout: vi.fn(async () => {
+      isAuthenticated.set(false);
+      currentUserId.set(null);
+    }),
+    register: vi.fn(async () => {
+      isAuthenticated.set(true);
+      currentUserId.set(1);
+      return { success: true };
+    }),
+  };
 
   beforeEach(async () => {
+    isAuthenticated.set(false);
+    currentUserId.set(null);
+    authMock.register.mockClear();
+    authMock.logout.mockClear();
+
     await TestBed.configureTestingModule({
       imports: [Signup],
-      providers: [provideRouter([{ path: 'dashboard', children: [] }])],
+      providers: [
+        provideRouter([{ path: 'dashboard', children: [] }]),
+        { provide: AuthService, useValue: authMock },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Signup);
-    auth = TestBed.inject(AuthService);
     router = TestBed.inject(Router);
-    auth.logout();
     fixture.detectChanges();
     await fixture.whenStable();
   });
@@ -39,12 +60,13 @@ describe('Signup', () => {
     component.password.set('secret123');
     component.confirmPassword.set('secret123');
     component.acceptTerms.set(false);
-    component.submit(new Event('submit'));
+    await component.submit(new Event('submit'));
     fixture.detectChanges();
     await fixture.whenStable();
 
     expect(component.formError()).toContain('terms');
-    expect(auth.isAuthenticated()).toBe(false);
+    expect(authMock.isAuthenticated()).toBe(false);
+    expect(authMock.register).not.toHaveBeenCalled();
   });
 
   it('should sign up and navigate when the form is valid', async () => {
@@ -56,12 +78,17 @@ describe('Signup', () => {
     component.password.set('secret123');
     component.confirmPassword.set('secret123');
     component.acceptTerms.set(true);
-    component.submit(new Event('submit'));
+    await component.submit(new Event('submit'));
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(auth.isAuthenticated()).toBe(true);
-    expect(auth.currentUser()?.name).toBe('Ada Lovelace');
+    expect(authMock.register).toHaveBeenCalledWith({
+      username: 'Ada Lovelace',
+      email: 'ada@example.com',
+      password: 'secret123',
+    });
+    expect(authMock.isAuthenticated()).toBe(true);
+    expect(authMock.currentUserId()).toBe(1);
     expect(navigateSpy).toHaveBeenCalledWith('/dashboard');
   });
 });
