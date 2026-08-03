@@ -24,6 +24,7 @@ export { SectionHeader } from './section-header/section-header';
 export { StatCard } from './stat-card/stat-card';
 export { TextField } from './text-field/text-field';
 export { ThemeToggle } from './theme-toggle/theme-toggle';
+export { TileBoard } from './tile-board/tile-board';
 
 /** deml-ui Angular markup + headless surface for composition / Storybook parity */
 export {

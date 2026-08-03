@@ -25,6 +25,7 @@ describe('Dashboard', () => {
     const host = fixture.nativeElement as HTMLElement;
     expect(host.querySelector('app-banner')).toBeTruthy();
     expect(host.querySelector('h1.banner-heading')?.textContent).toContain('Dashboard');
+    expect(host.querySelector('app-tile-board')).toBeTruthy();
     expect(host.querySelector('app-dashboard-grid')).toBeTruthy();
     expect(host.querySelectorAll('app-stat-card').length).toBeGreaterThanOrEqual(3);
     expect(host.querySelectorAll('app-chart-card').length).toBeGreaterThanOrEqual(3);

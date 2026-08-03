@@ -6,7 +6,10 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark light">
-  <meta name="theme-color" content="#35312D">
+  <meta name="theme-color" content="#2A2622">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Geist:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   <script>
     (function () {
       try {
@@ -20,7 +23,7 @@
         document.documentElement.style.colorScheme = theme;
         var meta = document.querySelector('meta[name="theme-color"]');
         if (meta) {
-          meta.setAttribute('content', theme === 'dark' ? '#35312D' : '#D4CEC5');
+          meta.setAttribute('content', theme === 'dark' ? '#2A2622' : '#E4DDD0');
         }
       } catch (e) {
         document.documentElement.setAttribute('data-theme', 'dark');
