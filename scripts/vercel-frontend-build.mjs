@@ -28,13 +28,16 @@ function run(command, args, cwd, envExtra = {}) {
 // installs inside frontend/. Prefer ignore-scripts: deml-ui ships dist, and
 // prepare rebuilds blow the 8GB builder before ng even starts.
 if (!fs.existsSync(path.join(root, 'node_modules', 'deml-ui'))) {
-  run('npm', ['install', '--include=dev', '--ignore-scripts'], root);
+  // Keep esbuild/native postinstalls; deml-ui prepare is a no-op when dist is shipped.
+  run('npm', ['install', '--include=dev'], root, {
+    NODE_OPTIONS: '--max-old-space-size=2048',
+  });
 }
 
 const demlUiCss = path.join(root, 'node_modules', 'deml-ui', 'dist', 'styles', 'deml-ui.css');
 if (!fs.existsSync(demlUiCss)) {
   run('npm', ['run', 'prepare', '--prefix', path.join(root, 'node_modules', 'deml-ui')], root, {
-    NODE_OPTIONS: '--max-old-space-size=3072',
+    NODE_OPTIONS: '--max-old-space-size=2048',
   });
 }
 
