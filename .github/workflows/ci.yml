@@ -89,17 +89,6 @@ jobs:
           uvx ruff@0.12.7 check backend packages/deml-contracts/src scripts
           uvx ruff@0.12.7 format --check backend packages/deml-contracts/src scripts
 
-      - uses: aquasecurity/setup-trivy@v0.3.1
-        with:
-          version: v0.68.2
-          cache: true
-
-      - name: Install backend deps
-        run: |
-          python -m venv backend/.venv
-          backend/.venv/bin/pip install -e packages/deml-contracts
-          backend/.venv/bin/pip install -r backend/requirements.txt
-
       - name: Semgrep SAST
         run: bash scripts/run_semgrep.sh
 
