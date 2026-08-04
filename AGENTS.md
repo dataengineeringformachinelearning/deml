@@ -112,7 +112,8 @@ is an equivalent legacy alias).
 - Update BOOK.md first if architectural.
 - Never introduce: hardcoded tenants, sequential IDs, pickle for models,
   inaccessible UI, DEML-local stream processing, or **Viking-UI / `packages/viking-ui`**.
-- Treat [THEME.md](THEME.md) as the locked visual contract for all product UI.
+- Treat [THEME.md](THEME.md) as the **locked, mandatory** visual contract for all
+  product UI — **any deviation is forbidden**.
 
 ## Key Tools & Scripts
 
@@ -140,7 +141,10 @@ is an equivalent legacy alias).
   `deml_account_id → forjd_tenant_id → secret_ref` and fails closed on mismatch.
 - **Angular Surface Intact:** Django adapters keep established Angular paths stable.
 
-### deml-ui Uniformity Law (new-from-the-start)
+### deml-ui Uniformity Law (new-from-the-start) — MANDATORY
+
+> **LOCKED:** The **new-from-the-start (warm ash)** look is the **only** allowed
+> style for all DEML product chrome. **Any deviation is forbidden.**
 
 All DEML product chrome uses **deml-ui** — the **new-from-the-start (warm ash)**
 look. Expand from that system only. Do **not** mix cold seven-color locks,
@@ -150,8 +154,8 @@ Canonical docs: [.cursorrules](.cursorrules), [THEME.md](THEME.md),
 [docs/DEML_UI.md](docs/DEML_UI.md), deml-ui [AGENTS.md](https://github.com/dataengineeringformachinelearning/deml-ui/blob/main/AGENTS.md).
 
 **Warm ash palette:** `#35312D` `#1C1916` `#F3F0EA` `#D4CEC5` `#2F5F8F`
-`#3F6B54` `#9E3D47` (+ muted `#C6C0B7` / `#4A453F`). `theme-color`:
-`#35312D` / `#D4CEC5`.
+`#3F6B54` `#9E3D47` (+ muted `#C6C0B7` / `#4A453F`; highlight `#9BB8D4`).
+`theme-color`: `#35312D` / `#D4CEC5`.
 
 - **SoT:** sibling / GitHub package `deml-ui` owns tokens (`styles/tokens.css`),
   component HTML/CSS (`components/<name>/`), Web Components, and Angular markup.
@@ -161,12 +165,16 @@ Canonical docs: [.cursorrules](.cursorrules), [THEME.md](THEME.md),
 - **Behavioral wrappers:** `src/app/components/*` use `ViewEncapsulation.None`
   and deml-ui class contracts — **zero app-level DS chrome CSS**.
 - **Compose pages** with `app-banner` → `app-page-section` → `app-section-header`
-  → `app-tile-board` / `app-dashboard-grid` / `app-card-grid`.
+  → `app-tile-board` / `app-dashboard-grid` / `app-card-grid` (+ `app-site-footer`,
+  `app-navbar`, `app-theme-toggle`).
 - **Charts:** `app-area-chart` / `app-bar-chart` inside `app-chart-card` only.
-  Keep `--chart-aspect: 2.4`; fluid `minmax(--tile-row-unit, auto)` rows — never
-  squash with fixed-only tracks.
+  Keep `--chart-aspect: 2.4` and equal `--chart-inset`; fluid
+  `minmax(--tile-row-unit, auto)` rows — never squash with fixed-only tracks;
+  never theme-invert plot series.
+- **Shell:** solid opaque navbar; no page horizontal overflow; dynamic boards
+  grow within scaffolding.
 - **Theme:** `data-theme="light"|"dark"`; deml-ui warm-ash tokens only.
-- **Typography:** **Geist only** for display, intro, and body.
+- **Typography:** **Geist only** for display, marks, intro, and body.
 - **A11y:** WCAG 2.0 AA — focus-visible, contrast, ≥44px `--hit-target`,
   reduced motion.
 - **Retired — do not use:** Viking-UI, void-black / `#2176ff`, cold seven-color
@@ -178,7 +186,7 @@ Canonical docs: [.cursorrules](.cursorrules), [THEME.md](THEME.md),
 
 Before editing HTML/CSS, conform to **THEME.md** and **.cursorrules**.
 Use deml-ui warm-ash tokens. Angular product components must not add `styleUrl` /
-`styleUrls` / inline `styles` for DS chrome.
+`styleUrls` / inline `styles` for DS chrome. **Deviating from NFTS is forbidden.**
 
 ### Code Style & Modernization
 

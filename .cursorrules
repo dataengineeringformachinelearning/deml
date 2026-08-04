@@ -2,32 +2,41 @@
 
 You are working in the DEML control-plane repo. Visual design is owned by **deml-ui**.
 
+## LOCKED STYLE — MANDATORY EVERYWHERE
+
+**new-from-the-start (warm ash)** is the **only** allowed visual style for all DEML
+product UI. **Any deviation is forbidden.** Do not invent parallel palettes, fonts,
+chart contracts, or app-local design-system chrome. Expand only inside deml-ui.
+
 ## Design system (required)
 
 - **SoT:** `deml-ui` (sibling repo / `github:dataengineeringformachinelearning/deml-ui#main`).
-- **Look:** **new-from-the-start (warm ash)** — expand from that system only. Do not mix cold seven-color locks, Syne/Fraunces display stacks, or Viking chrome on top of NFTS.
-- **Palette:** dark ground `#35312D` / surface `#1C1916` / cream modules `#F3F0EA`; light ground `#D4CEC5`; primary `#2F5F8F`; accents `#3F6B54` / `#9E3D47`.
-- **Type:** **Geist only** (display, intro, body). No Syne / Fraunces.
-- **Layout:** 8px grid, dual `data-theme`, equal `--tile-gap`, fluid dash-rows `minmax(--tile-row-unit, auto)`, fixed `--chart-aspect: 2.4`.
-- **Docs:** `THEME.md`, `docs/DEML_UI.md`, `AGENTS.md` (deml-ui Uniformity Law).
+- **Look:** **new-from-the-start (warm ash)** — mandatory; expand from that system only.
+- **Palette:** dark ground `#35312D` / surface `#1C1916` / cream modules `#F3F0EA`; light ground `#D4CEC5`; primary `#2F5F8F`; accents `#3F6B54` / `#9E3D47`; muted `#C6C0B7` / `#4A453F`.
+- **Type:** **Geist only** (display, marks, intro, body). No Syne / Fraunces / Inter product stacks.
+- **Layout:** 8px grid, dual `data-theme`, equal `--tile-gap`, fluid dash-rows `minmax(--tile-row-unit, auto)`, solid opaque navbar, no page overflow.
+- **Charts:** fixed `--chart-aspect: 2.4`, equal `--chart-inset`, width-driven height; never squash, stretch, or theme-invert series.
+- **Docs:** `THEME.md` (locked contract), `docs/DEML_UI.md`, `AGENTS.md` (deml-ui Uniformity Law).
 - **Storybook:** https://ui.deml.app
 
 ## Do
 
-- Compose product pages with `app-banner`, `app-page-section`, `app-section-header`, `app-tile-board`, `app-dashboard-grid`, `app-card-grid`, `app-stat-card`, `app-chart-card`, `app-area-chart`, `app-bar-chart`.
+- Compose product pages with `app-banner`, `app-page-section`, `app-section-header`, `app-tile-board`, `app-dashboard-grid`, `app-card-grid`, `app-stat-card`, `app-chart-card`, `app-area-chart`, `app-bar-chart`, `app-site-footer`, `app-navbar`, `app-theme-toggle`.
 - Keep Angular wrappers under `src/app/components` with `ViewEncapsulation.None` and **no** component CSS for design-system chrome.
-- Use deml-ui CSS variables (`--color-*`, `--space-*`, `--tile-*`, `--chart-*`).
+- Use deml-ui CSS variables (`--color-*`, `--space-*`, `--tile-*`, `--chart-*`, `--navbar-*`).
 - Preserve chart aspect (`--chart-aspect`); never squash or stretch plots.
 - Prefer WCAG 2.0 AA: focus-visible, contrast, hit targets, reduced motion.
 
-## Do not
+## Do not (forbidden)
 
+- Deviate from NFTS warm ash for experiments, “atelier,” cold seven-color locks, or hybrids.
 - Use or restore **Viking-UI** (`packages/viking-ui`, `@dataengineeringformachinelearning/viking-ui`, `viking-*`, `--viking-*`).
-- Replace warm ash with a parallel “locked seven-color” or atelier-cream frankenstein that fights NFTS.
+- Replace warm ash with void-black / electric `#2176ff` or a parallel frankenstein palette.
 - Add Material, Bootstrap, Tailwind utility styling, or a parallel local design system.
 - Hand-edit `backend/static/deml-ui.css` — sync from deml-ui via `scripts/sync_deml_ui_static.sh`.
 - Put product UI back under `frontend/` (that folder is a Vercel rootDirectory shim only).
 - Fix layout squash with fixed-only `grid-auto-rows` — keep `minmax(..., auto)`.
+- Use see-through / frosted navbar shells over content.
 
 ## When changing visuals
 
