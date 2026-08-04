@@ -8,7 +8,6 @@ export const GUEST_NAV_LINKS: NavLink[] = [
   { label: 'Home', path: '/' },
   { label: 'Learn', path: '/learn' },
   { label: 'Blog', path: '/blog' },
-  { label: 'Status', path: '/status' },
   { label: 'Explore', path: '/explore' },
 ];
 

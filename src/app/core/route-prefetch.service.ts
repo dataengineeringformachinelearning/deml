@@ -75,7 +75,6 @@ export class RoutePrefetchService {
         break;
       case 'settings':
       case 'explore':
-      case 'status':
         this.monitor.getStatusPages().subscribe({ next: ignore, error: ignore });
         break;
       case 'vulnerabilities':

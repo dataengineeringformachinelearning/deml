@@ -58,9 +58,8 @@ export const routes: Routes = [
   },
   {
     path: 'status',
-    loadComponent: () => import('./pages/status/status').then((m) => m.Status),
-    title: 'Status · DEML',
-    data: { preload: 'guest' },
+    pathMatch: 'full',
+    redirectTo: 'explore',
   },
   {
     path: 'status/:slug',

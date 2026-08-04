@@ -86,9 +86,9 @@ export const AUTH_STATUS_CARDS: readonly UtilityCard[] = [
   {
     id: 'status',
     heading: 'Platform status',
-    subtext: 'Check control-plane and data-plane health.',
+    subtext: 'Browse public status pages in the directory.',
     visual: 'red',
-    cta: 'View status',
-    href: '/status',
+    cta: 'Explore',
+    href: '/explore',
   },
 ];

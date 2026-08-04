@@ -44,7 +44,6 @@ describe('Navbar', () => {
       'Home',
       'Learn',
       'Blog',
-      'Status',
       'Explore',
     ]);
     for (const link of links) {
