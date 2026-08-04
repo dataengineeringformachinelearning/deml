@@ -170,6 +170,10 @@
   --navbar-surface: var(--color-surface);
   --navbar-focus: var(--color-focus);
 
+  /* Buttons — generous equal-feeling pad (8px grid) */
+  --button-pad-block: var(--space-2);
+  --button-pad-inline: var(--space-6);
+
   --font-size-xs: 0.875rem;
   --font-size-sm: var(--space-2);
   --font-size-md: var(--space-3);
@@ -2842,7 +2846,7 @@ deml-panel-grid > *,
   min-height: var(--hit-target);
   height: auto;
   margin: 0;
-  padding: var(--space-1) var(--space-4);
+  padding: var(--button-pad-block) var(--button-pad-inline);
   border-style: solid;
   border-width: var(--border-width);
   border-radius: 0;
@@ -2962,7 +2966,7 @@ deml-panel-grid > *,
   min-width: max-content;
   max-width: none;
   min-height: var(--hit-target);
-  padding: var(--space-1) var(--space-4);
+  padding: var(--button-pad-block) var(--button-pad-inline);
   border-radius: var(--radius-pill);
   border-width: 0;
   font-size: var(--font-size-sm);

@@ -168,6 +168,10 @@
   --navbar-surface: var(--color-surface);
   --navbar-focus: var(--color-focus);
 
+  /* Buttons — generous equal-feeling pad (8px grid) */
+  --button-pad-block: var(--space-2);
+  --button-pad-inline: var(--space-6);
+
   --font-size-xs: 0.875rem;
   --font-size-sm: var(--space-2);
   --font-size-md: var(--space-3);
