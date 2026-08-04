@@ -1,0 +1,37 @@
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <nav class="site-footer__directory" aria-label="Footer">
+      @for (column of columns; track column.title) {
+        <div class="site-footer__column">
+          <h2 class="site-footer__heading">{{ column.title }}</h2>
+          <ul class="site-footer__list">
+            @for (link of column.links; track link.label) {
+              <li>
+                @if (link.routerLink && !isExternal(link)) {
+                  <a [routerLink]="link.routerLink">{{ link.label }}</a>
+                } @else {
+                  <a
+                    [href]="link.href"
+                    [attr.target]="isExternal(link) ? '_blank' : null"
+                    [attr.rel]="isExternal(link) ? 'noopener noreferrer' : null"
+                  >
+                    {{ link.label }}
+                  </a>
+                }
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </nav>
+
+    <div class="site-footer__bottom">
+      <p class="site-footer__badge">Made in the U.S.A.</p>
+      <p class="site-footer__copy">
+        Copyright © {{ year }} Data Engineering for Machine Learning by
+        <a href="https://joealongi.dev/" target="_blank" rel="noopener noreferrer">Joe Alongi</a>.
+        All rights reserved.
+      </p>
+    </div>
+  </div>
+</footer>

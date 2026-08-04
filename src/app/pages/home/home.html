@@ -1,4 +1,5 @@
 <app-banner
+  variant="hero"
   [preheader]="hero.preheader"
   [heading]="hero.heading"
   [lede]="hero.lede"
@@ -7,10 +8,10 @@
     @if (!loggedIn()) {
       <app-button variant="primary" shape="pill" routerLink="/signup">Sign up</app-button>
       <app-button variant="secondary" shape="pill" routerLink="/login">Log in</app-button>
-      <app-button variant="secondary" shape="pill" routerLink="/explore">Status directory</app-button>
+      <app-button variant="secondary" shape="pill" routerLink="/explore">Explore</app-button>
     } @else {
-      <app-button variant="primary" shape="pill" routerLink="/dashboard">Open dashboard</app-button>
-      <app-button variant="secondary" shape="pill" routerLink="/explore">Status directory</app-button>
+      <app-button variant="primary" shape="pill" routerLink="/dashboard">Dashboard</app-button>
+      <app-button variant="secondary" shape="pill" routerLink="/explore">Explore</app-button>
       <app-button variant="secondary" shape="pill" routerLink="/learn">Learn</app-button>
     }
   </app-button-group>
@@ -78,9 +79,9 @@
         <app-button variant="secondary" shape="pill" routerLink="/explore">Browse status</app-button>
         <app-button variant="secondary" shape="pill" routerLink="/learn">Learn</app-button>
       } @else {
-        <app-button variant="primary" shape="pill" routerLink="/dashboard">Open dashboard</app-button>
+        <app-button variant="primary" shape="pill" routerLink="/dashboard">Dashboard</app-button>
         <app-button variant="secondary" shape="pill" routerLink="/analytics">Analytics</app-button>
-        <app-button variant="secondary" shape="pill" routerLink="/explore">Status directory</app-button>
+        <app-button variant="secondary" shape="pill" routerLink="/explore">Explore</app-button>
       }
     </app-button-group>
   </app-form-panel>

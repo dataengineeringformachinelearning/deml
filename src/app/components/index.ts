@@ -22,6 +22,7 @@ export { MicrocardGrid } from './microcard-grid/microcard-grid';
 export { Navbar } from './navbar/navbar';
 export { PageSection } from './page-section/page-section';
 export { SectionHeader } from './section-header/section-header';
+export { SiteFooter } from './site-footer/site-footer';
 export { StatCard } from './stat-card/stat-card';
 export { TextField } from './text-field/text-field';
 export { ThemeToggle } from './theme-toggle/theme-toggle';

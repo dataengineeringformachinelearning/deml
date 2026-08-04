@@ -25,10 +25,17 @@ class Host {}
 })
 class LevelHost {}
 
+@Component({
+  selector: 'app-hero-host',
+  imports: [Banner],
+  template: `<app-banner variant="hero" heading="Hero" />`,
+})
+class HeroHost {}
+
 describe('Banner', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Host, LevelHost],
+      imports: [Host, LevelHost, HeroHost],
     }).compileComponents();
   });
 
@@ -61,5 +68,15 @@ describe('Banner', () => {
 
     expect(host.querySelector('h2#section-heading')?.textContent?.trim()).toBe('Section');
     expect(host.querySelector('h1')).toBeNull();
+  });
+
+  it('should apply hero variant class and data attribute', async () => {
+    const fixture = TestBed.createComponent(HeroHost);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const host = fixture.nativeElement as HTMLElement;
+
+    expect(host.querySelector('app-banner')?.getAttribute('data-variant')).toBe('hero');
+    expect(host.querySelector('.banner.banner--hero')).toBeTruthy();
   });
 });

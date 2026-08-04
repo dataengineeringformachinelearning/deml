@@ -53,7 +53,7 @@ export const HOME_DESTINATIONS: readonly HomeCard[] = [
     subtext: 'Workspace pulse for sessions, traffic, and continuity signals across your accounts.',
     visual: 'red',
     guestPrimary: { label: 'Sign in', routerLink: '/login', variant: 'primary' },
-    signedInPrimary: { label: 'Open dashboard', routerLink: '/dashboard', variant: 'primary' },
+    signedInPrimary: { label: 'Dashboard', routerLink: '/dashboard', variant: 'primary' },
     actions: [{ label: 'Analytics', routerLink: '/analytics', variant: 'secondary' }],
   },
   {

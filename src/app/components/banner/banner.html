@@ -1,4 +1,9 @@
-<section class="banner" [attr.aria-labelledby]="labelledBy()">
+<section
+  class="banner"
+  [class.banner--hero]="variant() === 'hero'"
+  [attr.data-variant]="variant() === 'hero' ? 'hero' : null"
+  [attr.aria-labelledby]="labelledBy()"
+>
   @if (preheader()) {
     <p class="preheader">{{ preheader() }}</p>
   }

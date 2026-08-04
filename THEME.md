@@ -69,7 +69,8 @@ in the product UI.
 
 | Intent | Components |
 |--------|------------|
-| Page hero | `app-banner` |
+| Page hero | `app-banner` (`variant="hero"` on home; default elsewhere) |
+| Site footer | `app-site-footer` |
 | Catalog / prose region | `app-page-section` (`variant="catalog"|"prose"|"auth"`) |
 | Section title | `app-section-header` |
 | Dynamic boards | `app-tile-board` → `app-dashboard-grid` + typed tiles |

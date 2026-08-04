@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 
 export type BannerHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+export type BannerVariant = 'default' | 'hero';
 
 let bannerIdSeq = 0;
 
@@ -15,6 +16,9 @@ let bannerIdSeq = 0;
   selector: 'app-banner',
   templateUrl: './banner.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[attr.data-variant]': 'variant() === "default" ? null : variant()',
+  },
 })
 export class Banner {
   private readonly autoId = `banner-heading-${++bannerIdSeq}`;
@@ -27,6 +31,9 @@ export class Banner {
 
   /** Supporting lede copy under the heading. */
   readonly lede = input<string>();
+
+  /** `hero` — roomy landing treatment; default for compact page intros. */
+  readonly variant = input<BannerVariant>('default');
 
   /** Heading level for document outline (defaults to page-level h1). */
   readonly headingLevel = input<BannerHeadingLevel>(1);

@@ -17,7 +17,7 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render skip link, navbar, and main landmark', async () => {
+  it('should render skip link, navbar, main landmark, and site footer', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
@@ -26,5 +26,6 @@ describe('App', () => {
     expect(skip?.getAttribute('href')).toBe('#main-content');
     expect(compiled.querySelector('app-navbar')).toBeTruthy();
     expect(compiled.querySelector('#main-content')).toBeTruthy();
+    expect(compiled.querySelector('app-site-footer')).toBeTruthy();
   });
 });
