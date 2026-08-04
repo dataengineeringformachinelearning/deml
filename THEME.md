@@ -58,7 +58,7 @@ in the product UI.
 
 1. **8px grid** — `--grid` / `--space-*` / `--tile-gap` / `--module-pad`.
 2. **Fluid equal cells** — `grid-auto-rows: minmax(var(--tile-row-unit), auto)` so tiles in a row stretch equally; never squash with fixed-only row tracks.
-3. **Charts** — `--chart-aspect: 2.4` inside `app-chart-card`; plots size from aspect + `--chart-stage-max-inline`, never `height: 100%`. Extra row height letterboxes via the chart-card body spacer.
+3. **Charts** — `--chart-aspect: 2.4` with equal `--chart-inset` inside `app-chart-card`; plot wells fill card width (capped by `--chart-stage-max-inline`) so wider cards grow taller. Never `height: 100%` / max-height squash on stages — letterbox peer tiles, not the SVG.
 4. **Sharp modules** — `--radius-sm/md/lg: 0` (pill radius for chips only).
 5. **Dual theme** — `data-theme="light"|"dark"` on `<html>`.
 6. **WCAG 2.0 AA** — contrast, `:focus-visible`, ≥44px hit targets, reduced motion.
