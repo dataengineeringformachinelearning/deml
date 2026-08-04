@@ -709,6 +709,28 @@ body {
   color: var(--color-text-primary);
 }
 
+/* Shared interactive focus — components may refine, not omit */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible,
+[role="menuitem"]:focus-visible,
+[role="option"]:focus-visible,
+[tabindex]:not([tabindex="-1"]):focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
+}
+
+a {
+  color: var(--color-highlight);
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  color: var(--color-highlight-hover);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -1098,7 +1120,7 @@ body {
 .page-header__lede {
   margin: 0;
   max-width: var(--reading-width);
-  font-family: var(--font-serif);
+  font-family: var(--font-body);
   font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
   color: var(--color-text-secondary);
@@ -1695,7 +1717,7 @@ app-button-group {
 .section__description {
   margin: 0;
   max-width: var(--reading-width);
-  font-family: var(--font-serif);
+  font-family: var(--font-body);
   font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
   color: var(--color-text-secondary);
@@ -1733,7 +1755,7 @@ app-button-group {
 .section-template__description {
   margin: 0;
   max-width: var(--reading-width);
-  font-family: var(--font-serif);
+  font-family: var(--font-body);
   font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
   color: var(--color-text-secondary);
@@ -1904,7 +1926,13 @@ deml-page-section[data-variant='auth'] .page-body--auth,
   min-height: var(--tile-row-unit);
   padding: var(--module-pad);
   border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
   background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
   color: var(--color-card-text);
   box-shadow: var(--shadow-card);
 }
@@ -2068,7 +2096,13 @@ deml-tile-board > deml-dashboard-grid,
   padding: var(--module-pad);
   color: var(--color-card-text);
   background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
   border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
   box-shadow: var(--shadow-card);
 }
 
@@ -2173,7 +2207,13 @@ deml-dashboard-grid > [data-size='hero'],
   padding: var(--module-pad);
   color: var(--color-card-text);
   background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
   border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
   box-shadow: var(--shadow-card);
 }
 
@@ -2455,7 +2495,13 @@ deml-panel-grid > *,
   padding: var(--module-pad);
   color: var(--color-card-text);
   background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
   border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
   box-shadow: var(--shadow-card);
 }
 
@@ -4801,7 +4847,7 @@ progress::-moz-progress-bar {
 .empty-state__description {
   margin: 0;
   max-width: var(--content-width-sm);
-  font-family: var(--font-serif);
+  font-family: var(--font-body);
   font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
   color: var(--color-text-secondary);
@@ -4850,7 +4896,7 @@ progress::-moz-progress-bar {
 .error-state__description {
   margin: 0;
   max-width: var(--content-width-sm);
-  font-family: var(--font-serif);
+  font-family: var(--font-body);
   font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
   color: var(--color-text-secondary);
@@ -5180,7 +5226,7 @@ deml-card[data-visual='none'],
 .card-subtext {
   margin: 0 0 var(--space-4);
   max-width: 32ch;
-  font-family: var(--font-serif);
+  font-family: var(--font-body);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-intro);
@@ -5788,6 +5834,7 @@ deml-microcard[data-visual='olive'],
     var(--color-card) 50%
   );
   border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--microcard-visual, var(--color-primary));
   box-shadow: var(--shadow-card);
   transition:
     border-color 160ms ease,
@@ -5913,7 +5960,13 @@ deml-microcard[data-visual='olive'],
   min-height: var(--tile-row-unit);
   padding: var(--module-pad);
   border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
   background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
   color: var(--color-card-text);
   box-shadow: var(--shadow-card);
 }
@@ -5957,7 +6010,13 @@ deml-microcard[data-visual='olive'],
   gap: var(--space-1);
   color: var(--color-card-text);
   background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
   border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
   box-shadow: var(--shadow-card);
 }
 
@@ -7519,6 +7578,7 @@ deml-chart-empty-state,
   max-width: calc(var(--grid) * 44);
   padding: var(--module-pad);
   border: var(--border-width) solid var(--color-border);
+  border-inline-start: calc(var(--border-width) * 4) solid var(--color-primary);
   background-color: var(--color-surface);
   color: var(--color-text);
 }
@@ -7851,7 +7911,13 @@ deml-explore-card,
   padding: var(--module-pad-lg);
   color: var(--color-card-text);
   background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 40%
+  );
   border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-card);
 }
@@ -8056,7 +8122,13 @@ deml-explore-card,
   padding: var(--module-pad-lg);
   color: var(--color-card-text);
   background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 40%
+  );
   border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
   box-shadow: var(--shadow-card);
 }
 

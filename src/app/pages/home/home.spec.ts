@@ -43,15 +43,19 @@ describe('Home', () => {
     expect(labels).toContain('Status directory');
   });
 
-  it('should not render product-surface cards or settings hash sections', () => {
+  it('should render landing sections without settings hash surfaces', () => {
     const host = fixture.nativeElement as HTMLElement;
-    expect(host.querySelector('app-card-grid')).toBeNull();
-    expect(host.querySelector('app-card')).toBeNull();
+    expect(host.querySelector('app-page-section')).toBeTruthy();
+    expect(host.querySelector('app-section-header')).toBeTruthy();
+    expect(host.querySelector('app-form-panel')).toBeTruthy();
+    expect(host.querySelector('app-card-grid')).toBeTruthy();
+    expect(host.querySelector('app-card')).toBeTruthy();
     expect(host.querySelector('#account')).toBeNull();
     expect(host.querySelector('#sites')).toBeNull();
     expect(host.querySelector('#preferences')).toBeNull();
-    expect(host.querySelector('#explore')).toBeNull();
-    expect(host.textContent).not.toContain('Product surfaces');
+    expect(host.textContent).not.toContain('Manage sites');
+    expect(host.textContent).toContain('What the control plane owns');
+    expect(host.textContent).toContain('Jump into the product');
   });
 
   it('should show dashboard CTA when logged in', async () => {
@@ -64,7 +68,8 @@ describe('Home', () => {
     );
     expect(labels).toContain('Open dashboard');
     expect(labels).toContain('Status directory');
+    expect(labels).toContain('Learn');
     expect(labels).not.toContain('Sign up');
-    expect(fixture.nativeElement.querySelector('app-card-grid')).toBeNull();
+    expect(fixture.nativeElement.querySelector('#sites')).toBeNull();
   });
 });
