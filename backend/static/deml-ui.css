@@ -8278,12 +8278,29 @@ deml-explore-card,
   gap: var(--space-md);
 }
 
+app-form-panel,
+deml-form-panel,
+:host {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
 .form-panel {
   box-sizing: border-box;
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   gap: var(--space-4);
   width: 100%;
+  height: 100%;
+  min-height: 100%;
   margin: 0;
   padding: var(--space-5) var(--space-4);
   color: var(--color-card-text);
