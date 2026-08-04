@@ -156,9 +156,11 @@ def main() -> None:
     ],
   }
   # Commands are fixed argv lists (manage.py workers), not shell-interpolated user input.
-  server = subprocess.Popen(server_command)  # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-tainted-env-args.dangerous-subprocess-use-tainted-env-args
+  # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-tainted-env-args.dangerous-subprocess-use-tainted-env-args
+  server = subprocess.Popen(server_command)
   workers = {
-    name: subprocess.Popen(cmd)  # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-tainted-env-args.dangerous-subprocess-use-tainted-env-args
+    # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-tainted-env-args.dangerous-subprocess-use-tainted-env-args
+    name: subprocess.Popen(cmd)
     for name, cmd in worker_commands.items()
   }
   worker_restarts = dict.fromkeys(worker_commands, 0)
