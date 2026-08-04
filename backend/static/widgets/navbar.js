@@ -158,21 +158,11 @@
       }
     };
 
-    let lastPressToggle = 0;
     const toggleFromEvent = event => {
-      const now = Date.now();
-      if (event.type === 'click' && now - lastPressToggle < 250) {
-        return;
-      }
-      if (event.type === 'viking-press') {
-        lastPressToggle = now;
-      }
       event.preventDefault();
       const isOpen = mobileMenu.classList.contains('open');
       setMobileMenuOpen(!isOpen);
     };
-
-    menuBtn.addEventListener('viking-press', toggleFromEvent);
     menuBtn.addEventListener('click', event => {
       if (event.target === menuBtn || menuBtn.contains(event.target)) {
         toggleFromEvent(event);
@@ -214,7 +204,6 @@
     });
 
     mobileMenu.addEventListener('click', maybeCloseForEvent);
-    mobileMenu.addEventListener('viking-press', maybeCloseForEvent);
 
     closeMobileMenu();
   };
@@ -236,8 +225,6 @@
       }
       window.DemlWidgets?.openSearch?.();
     };
-
-    trigger.addEventListener('viking-press', openSearch);
     trigger.addEventListener('click', openSearch);
   };
 
@@ -473,10 +460,7 @@
           event.preventDefault();
           signOut();
         };
-        btn.addEventListener('viking-press', handler);
-        if (btn.tagName.toLowerCase() !== 'deml-button') {
-          btn.addEventListener('click', handler);
-        }
+        btn.addEventListener('click', handler);
       }
     };
 

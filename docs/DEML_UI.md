@@ -9,10 +9,12 @@ system only. See [THEME.md](../THEME.md).
 - Dependency: `"deml-ui": "github:dataengineeringformachinelearning/deml-ui#main"`
   (local iteration may use `file:../deml-ui`).
 - Global styles: `node_modules/deml-ui/dist/styles/deml-ui.css` in `angular.json`
-  (Geist only via `index.html`).
+  (Geist via `@fontsource-variable/geist` — not Google Fonts CDN).
 - Behavioral Angular components live in `src/app/components` with
   `ViewEncapsulation.None` and **no local CSS** for DS chrome — class contracts
   come from deml-ui.
+- Enforcement: `npm run check:nfts` (`scripts/check_nfts_style.mjs`) — CI +
+  pre-commit; **no escape hatches**.
 - Pages compose `app-banner` → `app-page-section` → `app-section-header` →
   `app-tile-board` / grids / cards.
 - Theme: `data-theme` on `<html>`; `ThemeService` + `app-theme-toggle`

@@ -84,6 +84,9 @@ jobs:
       - name: Validate config catalog
         run: npm run validate:config
 
+      - name: NFTS style gate (warm ash / deml-ui consumer)
+        run: npm run check:nfts
+
       - name: Ruff (backend + contracts + scripts)
         run: |
           uvx ruff@0.12.7 check backend packages/deml-contracts/src scripts
@@ -139,6 +142,9 @@ jobs:
 
       - name: Build shared contracts (first)
         run: npm run build:contracts
+
+      - name: NFTS style gate (warm ash / deml-ui consumer)
+        run: npm run check:nfts
 
       - name: Typecheck
         run: npm run typecheck

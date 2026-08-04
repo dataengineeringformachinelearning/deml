@@ -31,6 +31,13 @@ repos:
         pass_filenames: false
         files: ^(config/deml\.catalog\.json|\.env\.example|\.env\.frontend\.example|backend/\.env\.example|backend/fly\.toml|backend/Dockerfile|docker-compose\.yml)$
 
+      - id: check-nfts-style
+        name: NFTS warm ash style gate
+        entry: node scripts/check_nfts_style.mjs
+        language: system
+        pass_filenames: false
+        files: ^(src/|angular\.json|package\.json|backend/static/deml-ui\.css|THEME\.md|AGENTS\.md|\.cursorrules)
+
       - id: semgrep-sast
         name: Semgrep SAST Scan
         entry: bash scripts/run_semgrep.sh

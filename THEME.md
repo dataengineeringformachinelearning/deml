@@ -204,3 +204,14 @@ npx ng serve
 - Restore Viking-UI or put product UI under `frontend/`.
 
 **Confirmation:** Product UI must look like **new-from-the-start** — warm ash, Geist, fluid boards, locked charts — and nothing else.
+
+---
+
+## Automated enforcement
+
+| Gate | Command | Wired |
+|------|---------|-------|
+| deml consumer | `npm run check:nfts` → `scripts/check_nfts_style.mjs` | CI quality + frontend · pre-commit |
+| deml-ui library | In deml-ui: `npm run check:nfts` | deml-ui CI |
+
+There are **no escape hatches**. Drift from NFTS fails the gate.

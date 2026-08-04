@@ -69,14 +69,16 @@ is an equivalent legacy alias).
 
 | Layer | Command |
 |-------|---------|
+| NFTS style (mandatory) | Root `npm run check:nfts` — fails on DS chrome CSS, hex drift, Viking, missing deml-ui CSS, static sync skew |
 | Frontend | Root `npm test` · `npx ng build` · axe / a11y via deml-ui Storybook |
-| Design system | In deml-ui: `npm run build` · `npm run storybook` · a11y addon |
+| Design system | In deml-ui: `npm run check:nfts` · `npm run build` · `npm run storybook` · a11y addon |
 | Backend | `cd backend && pytest` (touched modules) · Ruff via pre-commit |
-| Full | `uvx pre-commit run --all-files` |
-| CI | `.github/workflows/ci.yml`, `production-smoke.yml`, `publish-*.yml` |
+| Full | `uvx pre-commit run --all-files` (includes NFTS gate) |
+| CI | `.github/workflows/ci.yml` (quality + frontend jobs run `check:nfts`), `production-smoke.yml`, `publish-*.yml` |
 
 - **Frontend:** Prettier + ESLint; WCAG AA; **deml-ui only**
   ([THEME.md](THEME.md), [.cursorrules](.cursorrules), [docs/DEML_UI.md](docs/DEML_UI.md)).
+  **No escape hatches:** `scripts/check_nfts_style.mjs` rejects app-level DS chrome.
 - **Backend (Python/Django):** Ruff; `uv` / `uvx pre-commit`; Postgres UUID PKs;
   AES-256-GCM + GCP KMS for secrets; no pickle for models.
 - **Security:** Semgrep/Trivy/gitleaks in pre-push; Firebase Auth at DEML edge;
@@ -121,6 +123,7 @@ is an equivalent legacy alias).
 - `scripts/run_axe.js` — a11y enforcement (when present)
 - `scripts/sync_content.py` — doc sync
 - `scripts/sync_deml_ui_static.sh` — copy deml-ui CSS into Django static
+- `scripts/check_nfts_style.mjs` — fail closed on NFTS drift (`npm run check:nfts`)
 - `.cursorrules` — deml-ui + THEME.md enforcement
 - Pre-commit, ruff, eslint, prettier, uv, Docker (unprivileged)
 

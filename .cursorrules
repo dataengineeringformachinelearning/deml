@@ -44,3 +44,18 @@ chart contracts, or app-local design-system chrome. Expand only inside deml-ui.
 2. `npm run build` in deml-ui (dist is consumed by github installs).
 3. Bump deml’s `deml-ui` dependency / lockfile.
 4. Sync Django static if templates need the new CSS.
+5. Run `npm run check:nfts` — must pass. CI and pre-commit enforce the same gate.
+
+## Automated enforcement (no escape hatches)
+
+`scripts/check_nfts_style.mjs` (`npm run check:nfts`) **fails** on:
+- `styleUrl` / `styleUrls` / component `styles` under `src/app`
+- Any `.css` under `src/app` or non-comment rules in `src/styles.css`
+- Hardcoded hex in product TS/HTML/CSS (theme bootstrap allowlist only: NFTS palette in `src/index.html` + `ThemeService`)
+- `viking-*` / `--viking-*` / Viking packages
+- Missing `deml-ui/dist/styles/deml-ui.css` in `angular.json`
+- `backend/static/deml-ui.css` out of sync with the installed package
+- Syne / Fraunces / Google Fonts CDN in product sources
+- Material / Bootstrap / Tailwind / Viking styling dependencies
+
+Reject any PR or commit that bypasses this gate.
