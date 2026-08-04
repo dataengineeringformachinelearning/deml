@@ -23,7 +23,6 @@ from config.csrf_header_auth import (
   authorization_header_required,
   csrf_exempt_require_header_auth,
 )
-
 from forjd.angular_compat import (
   deml_analytics_overview,
   deml_discovered_endpoints,

@@ -61,7 +61,7 @@ def test_redoc_shell_is_served(client: Client) -> None:
   body = response.content.decode()
   assert "redoc" in body.lower()
   assert "backend-docs-topbar" in body
-  assert 'spec-url="/api/v1/openapi.json"' in body
+  assert 'data-openapi-url="/api/v1/openapi.json"' in body
   assert "vendor/redoc/redoc.standalone.js" in body
   assert "suite-apidocs.css" in body
   assert "cdn.jsdelivr.net" not in body

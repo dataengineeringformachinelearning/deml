@@ -34,6 +34,9 @@ describe('SessionIdleService', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-07-10T12:00:00Z'));
     localStorage.clear();
+    // DialogService falls back to window.confirm when present; keep the
+    // signal-based confirm open so idle countdown tests can drive it.
+    vi.stubGlobal('confirm', undefined);
     authMock.isAuthenticated.mockReturnValue(true);
     authMock.logout.mockClear();
     routerMock.navigate.mockClear();
@@ -56,6 +59,7 @@ describe('SessionIdleService', () => {
     service.stop();
     TestBed.resetTestingModule();
     localStorage.clear();
+    vi.unstubAllGlobals();
     vi.useRealTimers();
   });
 

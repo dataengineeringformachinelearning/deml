@@ -12,9 +12,7 @@ class ReadyResponse(BaseModel):
 
   status: Literal["ok", "ready", "degraded"]
   # ``unreachable`` is the soft-probe miss from GET /api/v1/ready (UC-HEALTH-001).
-  forjd_health: (
-    Literal["ok", "degraded", "unknown", "unconfigured", "unreachable"] | None
-  ) = None
+  forjd_health: Literal["ok", "degraded", "unknown", "unconfigured", "unreachable"] | None = None
   mode: Literal["full", "degraded"] | None = None
   forjd_read_mode: Literal["off", "forjd", "dual"] | None = None
   forjd_write_mode: Literal["off", "forjd", "dual"] | None = None

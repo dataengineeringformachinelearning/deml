@@ -146,9 +146,7 @@ def create_checkout_session(request):
 
   if not _PRO_CHECKOUT_ENABLED:
     log_usecase(logger, "UC-BILL-001", "checkout_disabled")
-    return JsonResponse(
-      BillingErrorOut(error=_PRO_CHECKOUT_DISABLED_MSG).model_dump(), status=403
-    )
+    return JsonResponse(BillingErrorOut(error=_PRO_CHECKOUT_DISABLED_MSG).model_dump(), status=403)
 
   if not request.user.is_authenticated or not request.user.is_active:
     return JsonResponse({"error": "Authentication required"}, status=401)

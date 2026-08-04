@@ -44,7 +44,7 @@ def _prefer_backend_venv() -> None:
 
 def _use_case_ids() -> tuple[str, ...]:
   _prefer_backend_venv()
-  from deml_contracts import USE_CASE_IDS  # noqa: WPS433
+  from deml_contracts import USE_CASE_IDS
 
   return tuple(USE_CASE_IDS)
 
@@ -61,9 +61,7 @@ def _pytest_nodes() -> list[str]:
     check=False,
   )
   nodes = [
-    line.strip()
-    for line in proc.stdout.splitlines()
-    if "::" in line and not line.startswith("=")
+    line.strip() for line in proc.stdout.splitlines() if "::" in line and not line.startswith("=")
   ]
   _NODE_CACHE = nodes
   return nodes

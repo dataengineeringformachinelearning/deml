@@ -2,9 +2,10 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
+from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.test import Client, override_settings
+from django.test import AsyncClient, Client, override_settings
 
 User = get_user_model()
 
@@ -31,6 +32,27 @@ def enable_db_access_for_all_tests(db: Any) -> None:
   pass
 
 
+def _register_mock_token_session(auth: str) -> str:
+  """Create a live browser session for a DEBUG ``mock-token-*`` bearer."""
+  token = auth.split(" ", 1)[1]
+  parts = token.split("-")
+  uid = parts[2] if len(parts) > 2 else "mock_user"
+  email = parts[3] if len(parts) > 3 else f"{uid}@example.com"
+  from account.lifecycle import ensure_user_from_firebase
+  from utils.session_registry import register_session
+
+  user, _profile, _created = ensure_user_from_firebase(
+    {"uid": uid, "email": email, "name": uid.capitalize()}
+  )
+  session_id = f"test-sess-{uid}"
+  register_session(session_id, uid, int(user.id), user_agent="pytest", ip="127.0.0.1")
+  return session_id
+
+
+def _headers_have_session(headers: dict[str, Any]) -> bool:
+  return any(str(key).lower() == "x-deml-session-id" for key in headers)
+
+
 # --- UC-AUTH-002: mock Firebase tokens need a live browser session ---
 @pytest.fixture(autouse=True)
 def ensure_mock_firebase_browser_session() -> Any:
@@ -41,33 +63,37 @@ def ensure_mock_firebase_browser_session() -> Any:
   historically omitted the session header. This fixture keeps that public API
   surface while remaining compliant with UC-AUTH-002.
 
-  Opt out: pass ``HTTP_X_DEML_SESSION_ID`` explicitly (including empty string).
+  Covers both ``Client`` (HTTP_*) and ``AsyncClient`` (headers=).
+
+  Opt out: pass ``HTTP_X_DEML_SESSION_ID`` / ``X-DEML-Session-Id`` explicitly
+  (including empty string).
   """
   original_request = Client.request
+  original_async_generic = AsyncClient.generic
 
   def request_with_mock_session(self: Client, **kwargs: Any) -> Any:
     defaults = getattr(self, "defaults", {}) or {}
     auth = str(kwargs.get("HTTP_AUTHORIZATION") or defaults.get("HTTP_AUTHORIZATION") or "")
     session_explicit = "HTTP_X_DEML_SESSION_ID" in kwargs or "HTTP_X_DEML_SESSION_ID" in defaults
     if auth.startswith("Bearer mock-token-") and not session_explicit:
-      token = auth.split(" ", 1)[1]
-      parts = token.split("-")
-      uid = parts[2] if len(parts) > 2 else "mock_user"
-      email = parts[3] if len(parts) > 3 else f"{uid}@example.com"
-      from account.lifecycle import ensure_user_from_firebase
-      from utils.session_registry import register_session
-
-      user, _profile, _created = ensure_user_from_firebase(
-        {"uid": uid, "email": email, "name": uid.capitalize()}
-      )
-      session_id = f"test-sess-{uid}"
-      register_session(session_id, uid, int(user.id), user_agent="pytest", ip="127.0.0.1")
-      kwargs["HTTP_X_DEML_SESSION_ID"] = session_id
+      kwargs["HTTP_X_DEML_SESSION_ID"] = _register_mock_token_session(auth)
     return original_request(self, **kwargs)
 
+  async def async_generic_with_mock_session(
+    self: AsyncClient, method: str, path: str, *args: Any, **kwargs: Any
+  ) -> Any:
+    headers = dict(kwargs.get("headers") or {})
+    auth = str(headers.get("authorization") or headers.get("Authorization") or "")
+    if auth.startswith("Bearer mock-token-") and not _headers_have_session(headers):
+      headers["X-DEML-Session-Id"] = await sync_to_async(_register_mock_token_session)(auth)
+      kwargs["headers"] = headers
+    return await original_async_generic(self, method, path, *args, **kwargs)
+
   Client.request = request_with_mock_session  # type: ignore[method-assign]
+  AsyncClient.generic = async_generic_with_mock_session  # type: ignore[method-assign]
   yield
   Client.request = original_request  # type: ignore[method-assign]
+  AsyncClient.generic = original_async_generic  # type: ignore[method-assign]
 
 
 @pytest.fixture

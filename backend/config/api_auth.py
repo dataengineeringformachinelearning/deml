@@ -119,7 +119,6 @@ def generate_api_key(request, payload: APIKeyGenerateIn):
   return {"status": "success", "name": api_key.name, "key": raw_key, "prefix": api_key.prefix}
 
 
-
 @router.get("/api-keys", response=list[APIKeyOut], summary="List API Keys")
 def list_api_keys(request):
   if not request.user.is_authenticated:
@@ -161,9 +160,6 @@ def delete_api_key(request, key_id: str):
     raise HttpError(404, "API Key not found") from e
 
 
-
-
-
 _PKCE_PATTERN = re.compile(r"^[A-Za-z0-9_-]{43,128}$")
 _DESKTOP_SESSION_SALT = "deml.desktop-session.v1"
 _DESKTOP_SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30
@@ -201,8 +197,6 @@ def generate_handoff_token(request, payload: HandoffGenerateIn):
     has_pkce=bool(challenge),
   )
   return {"status": "success", "token": token}
-
-
 
 
 @router.post(
@@ -254,7 +248,6 @@ def verify_handoff_token(request, payload: HandoffVerifyIn):
     raise HttpError(404, "User not found") from None
 
 
-
 @router.post(
   "/desktop/session",
   response=DesktopAuthOut,
@@ -288,9 +281,6 @@ def validate_desktop_session(request, payload: DesktopSessionIn):
     "role": role,
     "desktop_token": None,
   }
-
-
-
 
 
 @router.post("/sessions", response=SessionRegisterOut, summary="Register browser session")
@@ -348,7 +338,6 @@ def revoke_session_endpoint(request, session_id: str):
     raise HttpError(404, "Session not found")
   notify_force_logout(firebase_uid, session_id=session_id, reason="revoked")
   return {"status": "success"}
-
 
 
 @router.post("/logout", response=SuccessSchema, summary="Sign out server session")

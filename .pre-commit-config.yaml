@@ -1,0 +1,39 @@
+# DEML quality gates — fast checks on commit, heavy scans on push.
+# Install: uvx pre-commit install --hook-type pre-commit --hook-type pre-push
+exclude: '^(?:\.venv|backend/\.venv|node_modules|backend/static/vendor)/'
+
+default_stages: [pre-commit]
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=1600']
+        exclude: ^backend/static/vendor/
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.7
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: validate-config
+        name: Validate config catalog
+        entry: python3 scripts/check_config_catalog.py
+        language: system
+        pass_filenames: false
+        files: ^(config/deml\.catalog\.json|\.env\.example|\.env\.frontend\.example|backend/\.env\.example|backend/fly\.toml|backend/Dockerfile|docker-compose\.yml)$
+
+      - id: semgrep-sast
+        name: Semgrep SAST Scan
+        entry: bash scripts/run_semgrep.sh
+        language: system
+        pass_filenames: false
+        stages: [pre-push]

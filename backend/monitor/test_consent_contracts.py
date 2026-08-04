@@ -6,7 +6,12 @@ import json
 import logging
 
 import pytest
-from deml_contracts import ConsentRecordOut, NewsletterSubscribeOut, make_consent_in, make_newsletter_in
+from deml_contracts import (
+  ConsentRecordOut,
+  NewsletterSubscribeOut,
+  make_consent_in,
+  make_newsletter_in,
+)
 from django.test import Client
 
 
@@ -24,7 +29,9 @@ def test_consent_in_factory_matches_contract() -> None:
 
 @pytest.mark.django_db
 @pytest.mark.usecase("UC-CONSENT-001")
-def test_cookie_consent_telemetry_and_users_paths(client: Client, caplog: pytest.LogCaptureFixture) -> None:
+def test_cookie_consent_telemetry_and_users_paths(
+  client: Client, caplog: pytest.LogCaptureFixture
+) -> None:
   body = make_consent_in(analytical=True, marketing=True).model_dump()
   with caplog.at_level(logging.INFO):
     telemetry = client.post(

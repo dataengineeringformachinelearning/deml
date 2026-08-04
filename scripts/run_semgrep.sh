@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-CMD=(uvx semgrep scan --error)
+CMD=(uvx semgrep scan --config=auto --error)
 
 # Exclude generated CSS, swagger CDN templates, and lockfiles from SAST noise.
 CMD+=(--exclude '**/deml-ui.css')

@@ -10,7 +10,6 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,7 +33,9 @@ def _env_keys(path: Path) -> set[str]:
     if re.fullmatch(r"[A-Z][A-Z0-9_]*", key):
       keys.add(key)
   # Also accept commented KEY= lines
-  for match in re.finditer(r"(?m)^[ \t]*#?[ \t]*([A-Z][A-Z0-9_]*)=", path.read_text(encoding="utf-8")):
+  for match in re.finditer(
+    r"(?m)^[ \t]*#?[ \t]*([A-Z][A-Z0-9_]*)=", path.read_text(encoding="utf-8")
+  ):
     keys.add(match.group(1))
   return keys
 
@@ -88,7 +89,10 @@ def main() -> int:
 
   compose = (ROOT / "docker-compose.yml").read_text(encoding="utf-8")
   backend_port = (catalog.get("ports") or {}).get("backend_local", 8000)
-  if f'"{backend_port}:{backend_port}"' not in compose and f"{backend_port}:{backend_port}" not in compose:
+  if (
+    f'"{backend_port}:{backend_port}"' not in compose
+    and f"{backend_port}:{backend_port}" not in compose
+  ):
     failures.append(f"docker-compose.yml must publish backend port {backend_port}")
 
   report = {"checked": checked, "failures": failures, "ok": not failures}
