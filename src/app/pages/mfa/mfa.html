@@ -1,0 +1,61 @@
+<app-page-section variant="auth" ariaLabel="Two-factor authentication">
+  <app-form-panel
+    eyebrow="Account"
+    title="Verify it's you"
+    [description]="description()"
+  >
+    <form class="form-panel__form" (submit)="submit($event)" novalidate>
+      <div id="mfa-recaptcha-container" class="visually-hidden" aria-hidden="true"></div>
+
+      <app-text-field
+        label="Verification code"
+        type="text"
+        name="verificationCode"
+        autocomplete="one-time-code"
+        placeholder="6-digit code"
+        [required]="true"
+        [value]="code()"
+        (valueChange)="code.set($event)"
+        [error]="codeError()"
+        [disabled]="busy() || sending() || !codeSent()"
+        [hint]="
+          codeSent()
+            ? 'Codes expire quickly — request a new one if needed.'
+            : sending()
+              ? 'Sending a verification code…'
+              : 'Request a code to continue.'
+        "
+      />
+
+      @if (formError()) {
+        <p class="form-panel__error" role="alert">{{ formError() }}</p>
+      }
+
+      <app-button-group align="start" layout="column">
+        <app-button
+          variant="primary"
+          shape="pill"
+          type="submit"
+          [disabled]="busy() || sending() || !codeSent()"
+        >
+          {{ busy() ? 'Verifying…' : 'Verify' }}
+        </app-button>
+        <app-button
+          variant="secondary"
+          shape="pill"
+          type="button"
+          [disabled]="busy() || sending()"
+          (pressed)="resend()"
+        >
+          {{ sending() ? 'Sending…' : 'Resend code' }}
+        </app-button>
+      </app-button-group>
+    </form>
+
+    <p formFooter>
+      <a routerLink="/login" [queryParams]="loginQueryParams()" (click)="cancel()">
+        Back to log in
+      </a>
+    </p>
+  </app-form-panel>
+</app-page-section>

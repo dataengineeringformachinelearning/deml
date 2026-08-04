@@ -14,7 +14,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { LucideBoxes, LucideMenu, LucideX } from '@lucide/angular';
+import { LucideMenu, LucideX } from '@lucide/angular';
 
 import { AuthService } from '../../services/auth.service';
 import { BREAKPOINT_MD_MQ } from '../../shared/breakpoints';
@@ -29,7 +29,6 @@ export type { NavLink };
   encapsulation: ViewEncapsulation.None,
   selector: 'app-navbar',
   imports: [
-    LucideBoxes,
     LucideMenu,
     LucideX,
     RouterLink,

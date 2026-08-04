@@ -15,6 +15,7 @@ import {
   User as FirebaseUser,
   PhoneAuthProvider,
   PhoneMultiFactorGenerator,
+  RecaptchaVerifier,
   getMultiFactorResolver,
   multiFactor,
   OAuthProvider,
@@ -35,6 +36,7 @@ import {
 
 import { SessionApiService } from './session-api.service';
 import { SwrCacheService } from '../core/cache/swr-cache.service';
+import { logFirebaseAuthError, mapFirebaseMfaError } from '../core/utils/phone.utils';
 
 type AuthUserResponse = {
   status: string;
@@ -187,12 +189,18 @@ export class AuthService {
   public mfaEnrolled = signal<boolean>(false);
   /** Current ID token includes MFA verification (`amr` contains `mfa`). */
   public mfaVerifiedInSession = signal<boolean>(false);
+  /** True while a sign-in MFA challenge is pending resolution. */
+  public mfaChallengeActive = signal<boolean>(false);
+  /** Masked phone hint from the enrolled SMS factor, when available. */
+  public mfaPhoneHint = signal<string>('');
   /** Browser session id registered in Postgres session registry. */
   public sessionId = signal<string | null>(null);
   private http = inject(HttpClient);
   private sessionApi = inject(SessionApiService);
   private swrCache = inject(SwrCacheService);
   public auth: Auth | MockAuth | null = null;
+  private pendingMfaResolver: MultiFactorResolver | null = null;
+  private pendingMfaVerificationId: string | null = null;
 
   private useMock =
     typeof window !== 'undefined' && environment.firebase.apiKey === 'PLACEHOLDER_API_KEY'; // pragma: allowlist secret
@@ -490,6 +498,7 @@ export class AuthService {
     await this.clearServerSession();
     this.mfaEnrolled.set(false);
     this.mfaVerifiedInSession.set(false);
+    this.clearMfaChallenge();
     this.clearMfaSessionFlag();
     // Drop in-memory SWR entries so the next account cannot see prior tenant data.
     this.swrCache.clear();
@@ -847,6 +856,132 @@ export class AuthService {
 
   async unenrollMfa(factorInfo: MultiFactorInfo | string): Promise<void> {
     await multiFactor(this.requireFirebaseUser()).unenroll(factorInfo);
+  }
+
+  /**
+   * Hold the Firebase multi-factor resolver across the login → MFA panel navigation.
+   */
+  beginMfaChallenge(resolver: MultiFactorResolver): void {
+    this.pendingMfaResolver = resolver;
+    this.pendingMfaVerificationId = null;
+    this.mfaChallengeActive.set(true);
+
+    const phoneHint =
+      resolver.hints.find((hint) => hint.factorId === PhoneMultiFactorGenerator.FACTOR_ID) ??
+      resolver.hints[0];
+    const phoneNumber =
+      phoneHint && 'phoneNumber' in phoneHint && typeof phoneHint.phoneNumber === 'string'
+        ? phoneHint.phoneNumber
+        : '';
+    this.mfaPhoneHint.set(phoneNumber);
+  }
+
+  clearMfaChallenge(): void {
+    this.pendingMfaResolver = null;
+    this.pendingMfaVerificationId = null;
+    this.mfaChallengeActive.set(false);
+    this.mfaPhoneHint.set('');
+  }
+
+  hasPendingMfaChallenge(): boolean {
+    return this.pendingMfaResolver !== null;
+  }
+
+  /**
+   * Send the SMS second-factor code for the pending login MFA challenge.
+   */
+  async sendMfaSignInCode(
+    containerId = 'mfa-recaptcha-container',
+  ): Promise<{ success: boolean; error?: string }> {
+    const resolver = this.pendingMfaResolver;
+    if (!resolver) {
+      return {
+        success: false,
+        error: 'Your sign-in session expired. Sign in again to continue MFA verification.',
+      };
+    }
+
+    const phoneHint =
+      resolver.hints.find((hint) => hint.factorId === PhoneMultiFactorGenerator.FACTOR_ID) ??
+      resolver.hints[0];
+    if (!phoneHint || phoneHint.factorId !== PhoneMultiFactorGenerator.FACTOR_ID) {
+      return {
+        success: false,
+        error: 'SMS multi-factor authentication is required, but no phone factor is enrolled.',
+      };
+    }
+
+    let verifier: RecaptchaVerifier | null = null;
+    try {
+      const auth = this.requireFirebaseAuth();
+      const container = this.ensureRecaptchaContainer(containerId);
+      verifier = new RecaptchaVerifier(auth, container, { size: 'invisible' });
+      const phoneAuthProvider = new PhoneAuthProvider(auth);
+      this.pendingMfaVerificationId = await phoneAuthProvider.verifyPhoneNumber(
+        { multiFactorHint: phoneHint, session: resolver.session },
+        verifier,
+      );
+      return { success: true };
+    } catch (e: unknown) {
+      logFirebaseAuthError('MFA sign-in send', e);
+      return { success: false, error: mapFirebaseMfaError(firebaseErrorCode(e)) };
+    } finally {
+      if (verifier) {
+        try {
+          verifier.clear();
+        } catch {
+          /* ignore cleanup failures */
+        }
+      }
+    }
+  }
+
+  /**
+   * Complete the pending MFA challenge with the SMS verification code.
+   */
+  async resolveMfaSignIn(
+    verificationCode: string,
+  ): Promise<{ success: boolean; error?: string }> {
+    const resolver = this.pendingMfaResolver;
+    const verificationId = this.pendingMfaVerificationId;
+    const code = verificationCode.trim();
+
+    if (!resolver || !verificationId) {
+      return {
+        success: false,
+        error: 'Your sign-in session expired. Sign in again to continue MFA verification.',
+      };
+    }
+    if (!code) {
+      return { success: false, error: 'Enter the verification code.' };
+    }
+
+    try {
+      const cred = PhoneAuthProvider.credential(verificationId, code);
+      const assertion = PhoneMultiFactorGenerator.assertion(cred);
+      await resolver.resolveSignIn(assertion);
+      this.markMfaSessionVerified();
+      await this.refreshMfaState(true);
+      this.clearMfaChallenge();
+      return { success: true };
+    } catch (e: unknown) {
+      logFirebaseAuthError('MFA sign-in resolve', e);
+      return { success: false, error: mapFirebaseMfaError(firebaseErrorCode(e)) };
+    }
+  }
+
+  private ensureRecaptchaContainer(containerId: string): HTMLElement {
+    if (typeof document === 'undefined') {
+      throw new Error('reCAPTCHA requires a browser environment.');
+    }
+    let element = document.getElementById(containerId);
+    if (!element) {
+      element = document.createElement('div');
+      element.id = containerId;
+      element.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(element);
+    }
+    return element;
   }
 
   private async signInWithPopupCentered(provider: AuthProvider): Promise<UserCredential> {

@@ -18,11 +18,18 @@ describe('Login', () => {
       isAuthenticated.set(false);
       currentUserId.set(null);
     }),
-    login: vi.fn(async () => {
-      isAuthenticated.set(true);
-      currentUserId.set(1);
-      return { success: true };
-    }),
+    login: vi.fn(
+      async (): Promise<{
+        success: boolean;
+        error?: string;
+        resolver?: unknown;
+      }> => {
+        isAuthenticated.set(true);
+        currentUserId.set(1);
+        return { success: true };
+      },
+    ),
+    beginMfaChallenge: vi.fn(),
   };
 
   beforeEach(async () => {
@@ -30,11 +37,15 @@ describe('Login', () => {
     currentUserId.set(null);
     authMock.login.mockClear();
     authMock.logout.mockClear();
+    authMock.beginMfaChallenge.mockClear();
 
     await TestBed.configureTestingModule({
       imports: [Login],
       providers: [
-        provideRouter([{ path: 'dashboard', children: [] }]),
+        provideRouter([
+          { path: 'dashboard', children: [] },
+          { path: 'mfa', children: [] },
+        ]),
         { provide: AuthService, useValue: authMock },
       ],
     }).compileComponents();
@@ -82,5 +93,26 @@ describe('Login', () => {
     expect(authMock.isAuthenticated()).toBe(true);
     expect(authMock.currentUserId()).toBe(1);
     expect(navigateSpy).toHaveBeenCalledWith('/dashboard');
+  });
+
+  it('should open the MFA panel when Firebase requires a second factor', async () => {
+    const resolver = { hints: [], session: {} };
+    authMock.login.mockResolvedValueOnce({
+      success: false,
+      error: 'MFA_REQUIRED',
+      resolver,
+    });
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    const component = fixture.componentInstance;
+
+    component.email.set('ada@example.com');
+    component.password.set('secret123');
+    await component.submit(new Event('submit'));
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(authMock.beginMfaChallenge).toHaveBeenCalledWith(resolver);
+    expect(navigateSpy).toHaveBeenCalledWith(['/mfa'], { queryParams: undefined });
+    expect(component.formError()).toBe('');
   });
 });

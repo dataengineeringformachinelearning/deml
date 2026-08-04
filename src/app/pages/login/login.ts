@@ -61,6 +61,14 @@ export class Login {
     try {
       const result = await this.auth.login({ username: email.toLowerCase(), password });
       if (!result.success) {
+        if (result.error === 'MFA_REQUIRED' && result.resolver) {
+          this.auth.beginMfaChallenge(result.resolver);
+          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+          await this.router.navigate(['/mfa'], {
+            queryParams: returnUrl ? { returnUrl } : undefined,
+          });
+          return;
+        }
         this.formError.set(result.error ?? 'Unable to log in.');
         return;
       }

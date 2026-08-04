@@ -33,6 +33,14 @@ export const ROUTE_PAGE_META: Record<string, PageMeta> = {
     keywords: `${DEFAULT_KEYWORDS}, sign in, authentication`,
     ogType: 'website',
   },
+  mfa: {
+    title: 'Verify Sign-In - DEML APP',
+    description:
+      'Complete multi-factor authentication to access the DEML control plane for FORJD.',
+    robots: NOINDEX,
+    keywords: `${DEFAULT_KEYWORDS}, MFA, two-factor authentication`,
+    ogType: 'website',
+  },
   dashboard: {
     title: 'Dashboard - DEML APP',
     description:

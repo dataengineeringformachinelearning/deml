@@ -51,6 +51,12 @@ export const routes: Routes = [
     data: { preload: 'guest' },
   },
   {
+    path: 'mfa',
+    loadComponent: () => import('./pages/mfa/mfa').then((m) => m.Mfa),
+    title: 'Verify · DEML',
+    data: { preload: 'guest' },
+  },
+  {
     path: 'signup',
     loadComponent: () => import('./pages/signup/signup').then((m) => m.Signup),
     title: 'Sign up · DEML',
