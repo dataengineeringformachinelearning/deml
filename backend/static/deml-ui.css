@@ -795,7 +795,7 @@ a:hover {
 }
 
 /* inlined: components/brand/brand.css */
-/* Component: brand — atelier wordmark */
+/* Component: brand — NFTS wordmark */
 
 .component--brand .demo {
   display: grid;
@@ -1081,7 +1081,7 @@ a:hover {
 }
 
 /* inlined: components/page-header/page-header.css */
-/* Component: page-header — atelier page title */
+/* Component: page-header — NFTS page title */
 
 .component--page-header .demo {
   display: grid;
@@ -1687,7 +1687,7 @@ app-button-group {
 
 /* Layout */
 /* inlined: components/section/section.css */
-/* Component: section — atelier content section */
+/* Component: section — NFTS content section */
 
 .component--section .demo {
   display: grid;
@@ -1730,7 +1730,7 @@ app-button-group {
 }
 
 /* inlined: components/section-template/section-template.css */
-/* Component: section-template — atelier section chrome */
+/* Component: section-template — NFTS section chrome */
 
 .component--section-template .demo {
   display: grid;
@@ -1769,7 +1769,7 @@ app-button-group {
 }
 
 /* inlined: components/section-header/section-header.css */
-/* Component: section-header — NFTS outer margin + atelier type */
+/* Component: section-header — NFTS section header */
 
 .component--section-header .demo {
   display: grid;
@@ -2829,7 +2829,7 @@ deml-panel-grid > *,
 }
 
 /* inlined: components/form-section/form-section.css */
-/* Component: form-section — atelier form region */
+/* Component: form-section — NFTS form region */
 
 .component--form-section .demo {
   display: grid;
@@ -4481,7 +4481,7 @@ progress::-moz-progress-bar {
 
 /* Feedback */
 /* inlined: components/badge/badge.css */
-/* Component: badge — atelier mark */
+/* Component: badge — NFTS mark */
 
 .component--badge .demo {
   display: grid;
@@ -4608,7 +4608,7 @@ progress::-moz-progress-bar {
 }
 
 /* inlined: components/callout/callout.css */
-/* Component: callout — atelier inline notice */
+/* Component: callout — NFTS inline notice */
 
 .component--callout .demo {
   display: grid;
@@ -4804,7 +4804,7 @@ progress::-moz-progress-bar {
 }
 
 /* inlined: components/empty-state/empty-state.css */
-/* Component: empty-state — atelier empty module */
+/* Component: empty-state — NFTS empty module */
 
 .component--empty-state .demo {
   display: grid;
@@ -4863,7 +4863,7 @@ progress::-moz-progress-bar {
 }
 
 /* inlined: components/error-state/error-state.css */
-/* Component: error-state — atelier error module */
+/* Component: error-state — NFTS error module */
 
 .component--error-state .demo {
   display: grid;
