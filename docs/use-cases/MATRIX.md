@@ -41,7 +41,7 @@ are imported at runtime. FORJD resource bodies stay FORJD-owned (proxied).
 | UC-WIDGET-001 | full | na embed | full widget-telemetry | full | ErrorCode | full | rate limit |
 | UC-HEALTH-001 | full | full product-home probe | full health/ready/capabilities | full | full ReadyResponse | full | FORJD_* |
 | UC-SETTINGS-001 | full | full `/settings` | full composed | na | na | partial | na |
-| UC-ACCOUNT-001 | partial | full `/account` | na | na | na | partial | na |
+| UC-ACCOUNT-001 | partial | full `/settings#account` | na | na | na | partial | na |
 | UC-ONBOARD-001 | partial | full dashboard | na | na | na (deml-ui) | partial | na |
 | UC-CORS-001 | full | na | full cors_utils | na | na | full | DB domains |
 | UC-LEARN-001 | deferred | missing | missing | missing | reserved only | missing | na |

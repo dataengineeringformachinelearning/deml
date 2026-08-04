@@ -272,10 +272,10 @@
       }
     },
     "UC-ACCOUNT-001": {
-      "unit": ["src/app/pages/account/account.spec.ts"],
-      "integration": ["src/app/pages/account/account.spec.ts"],
+      "unit": ["src/app/pages/settings/settings.spec.ts"],
+      "integration": ["src/app/pages/settings/settings.spec.ts"],
       "observability": {
-        "deferred_observability": "Client preferences; billing/auth child UCs own server logs"
+        "deferred_observability": "Client preferences on unified /settings; billing/auth child UCs own server logs"
       }
     },
     "UC-ONBOARD-001": {

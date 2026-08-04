@@ -603,14 +603,14 @@ Flow diagrams: [`DIAGRAMS.md`](DIAGRAMS.md) (linked from each UC **How it works*
 | Field | Contract |
 |-------|----------|
 | **ID** | `UC-ACCOUNT-001` |
-| **Name** | Account page (preferences, pipeline deep link) |
+| **Name** | Account section on unified settings (preferences, pipeline deep link) |
 | **Actors** | Authenticated user |
-| **Trigger** | `/account` |
-| **Happy path** | deml-ui preferences panel; disclosure; link to UC-PIPE-001 |
+| **Trigger** | `/settings` (`#account`; `/account` redirects here) |
+| **Happy path** | deml-ui preferences panel on Settings; disclosure; link to UC-PIPE-001 |
 | **Errors / edges** | Preferences local/browser; no server workflow persist |
 | **Data contracts** | deml-ui preference types |
 | **Observability** | Minimal |
-| **How it works** | Account prefs stay DEML-local; pipeline entry deep-links to Pipeline Studio. Diagram: [`DIAGRAMS.md#settings`](DIAGRAMS.md#settings) |
+| **How it works** | Account prefs stay DEML-local under the Settings shell; pipeline entry deep-links to Pipeline Studio. Diagram: [`DIAGRAMS.md#settings`](DIAGRAMS.md#settings) |
 | **Ownership** | `frontend` + `deml-ui` |
 
 ---
