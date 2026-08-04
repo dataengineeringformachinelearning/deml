@@ -158,11 +158,11 @@
   --module-pad: var(--space-3);
   --module-pad-lg: var(--space-4);
 
-  /* Navbar — equal inset on all four sides (8px grid) */
+  /* Navbar — equal inset; solid opaque shell (never see-through) */
   --navbar-inset: var(--space-2);
   --navbar-hit: var(--hit-target);
   --navbar-icon-size: var(--space-3);
-  --navbar-bg: var(--color-bg);
+  --navbar-bg: var(--color-surface);
   --navbar-fg: var(--color-text);
   --navbar-muted: var(--color-text-secondary);
   --navbar-accent: var(--color-highlight);
@@ -1280,11 +1280,10 @@ deml-content-layout,
   padding: var(--navbar-inset);
   color: var(--navbar-fg);
   background-color: var(--navbar-bg);
-  background-image: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-primary) 18%, var(--navbar-bg)) 0%,
-    var(--navbar-bg) 100%
-  );
+  background-image: none;
+  isolation: isolate;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   border-bottom: var(--border-width) solid var(--color-border);
   grid-template-columns: 1fr auto;
   grid-template-areas:
@@ -1370,7 +1369,7 @@ deml-content-layout,
   gap: var(--navbar-inset);
   width: 100%;
   box-sizing: border-box;
-  background-color: transparent;
+  background-color: var(--navbar-bg);
 }
 
 .main-navigation {
@@ -1438,18 +1437,13 @@ app-button-group {
   max-height: 100dvh;
   overflow-y: auto;
   background-color: var(--navbar-bg);
-  background-image: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-primary) 14%, var(--navbar-bg)) 0%,
-    var(--navbar-bg) 40%,
-    var(--navbar-bg) 100%
-  );
+  background-image: none;
 }
 
 .site-navbar.is-menu-open .site-navbar-panel {
   display: flex;
   padding-top: var(--space-1);
-  background-color: transparent;
+  background-color: var(--navbar-bg);
 }
 
 /* Full-width actions when stacked in the mobile menu */
@@ -7943,6 +7937,12 @@ body:has(.site-navbar) {
   padding-top: calc(var(--navbar-inset) * 2 + var(--navbar-hit));
 }
 
+app-navbar,
+deml-navbar {
+  display: block;
+  background-color: var(--navbar-bg);
+}
+
 .site-navbar {
   position: fixed;
   top: 0;
@@ -7958,12 +7958,13 @@ body:has(.site-navbar) {
   padding-block: var(--navbar-inset);
   padding-inline: var(--navbar-inset);
   color: var(--navbar-fg);
+  /* Opaque shell — no backdrop blur / no transparent paint */
   background-color: var(--navbar-bg);
-  background-image: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-primary) 18%, var(--navbar-bg)) 0%,
-    var(--navbar-bg) 100%
-  );
+  background-image: none;
+  isolation: isolate;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  opacity: 1;
   border-bottom: var(--border-width) solid var(--color-border);
   grid-template-columns: 1fr auto;
   grid-template-areas:
@@ -8049,7 +8050,7 @@ body:has(.site-navbar) {
   gap: var(--navbar-inset);
   width: 100%;
   box-sizing: border-box;
-  background-color: transparent;
+  background-color: var(--navbar-bg);
 }
 
 .main-navigation {
@@ -8117,18 +8118,13 @@ app-button-group {
   max-height: 100dvh;
   overflow-y: auto;
   background-color: var(--navbar-bg);
-  background-image: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-primary) 14%, var(--navbar-bg)) 0%,
-    var(--navbar-bg) 40%,
-    var(--navbar-bg) 100%
-  );
+  background-image: none;
 }
 
 .site-navbar.is-menu-open .site-navbar-panel {
   display: flex;
   padding-top: var(--space-1);
-  background-color: transparent;
+  background-color: var(--navbar-bg);
 }
 
 /* Full-width actions when stacked in the mobile menu */

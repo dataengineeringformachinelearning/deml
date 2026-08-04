@@ -156,11 +156,11 @@
   --module-pad: var(--space-3);
   --module-pad-lg: var(--space-4);
 
-  /* Navbar — equal inset on all four sides (8px grid) */
+  /* Navbar — equal inset; solid opaque shell (never see-through) */
   --navbar-inset: var(--space-2);
   --navbar-hit: var(--hit-target);
   --navbar-icon-size: var(--space-3);
-  --navbar-bg: var(--color-bg);
+  --navbar-bg: var(--color-surface);
   --navbar-fg: var(--color-text);
   --navbar-muted: var(--color-text-secondary);
   --navbar-accent: var(--color-highlight);
