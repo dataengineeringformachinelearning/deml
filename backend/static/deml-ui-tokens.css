@@ -128,7 +128,9 @@
   --chart-aspect: 2.4;
   --chart-spark-aspect: 2.4;
   --chart-min-block: calc(var(--grid) * 20);
-  --chart-max-block: calc(var(--grid) * 40);
+  /* Soft ceiling for SVG plot block height — keeps aspect without giant wells */
+  --chart-max-block: calc(var(--grid) * 32);
+  --chart-stage-max-inline: calc(var(--chart-max-block) * var(--chart-aspect));
   --chart-spark-min-block: calc(var(--grid) * 12);
   --chart-spark-max-block: calc(var(--grid) * 25);
   --chart-panel-block: var(--chart-min-block);
@@ -188,24 +190,27 @@
   --font-sans: var(--font-family);
   --font-serif: var(--font-family);
   --font-display: var(--font-sans);
+  --font-mark: var(--font-sans);
   --font-secondary: var(--font-sans);
   --font-body: var(--font-sans);
   --font-stretch-display: normal;
   --font-weight-display: 700;
+  --font-weight-mark: 600;
   --font-weight-bold: 700;
   --font-weight-semibold: 600;
   --font-weight-medium: 600;
   --font-weight-regular: 400;
-  --leading-display: 1.1;
+  --leading-display: 1.05;
   --leading-tight: 1.15;
   --leading-snug: 1.35;
   --leading-body: 1.5;
   --leading-relaxed: 1.6;
   --leading-ui: 1.3;
 
-  --tracking-eyebrow: 0.22em;
-  --tracking-intro: 0.06em;
+  /* Marks / eyebrows share wide tracking; display titles use tight tracking */
   --tracking-mark: 0.22em;
+  --tracking-eyebrow: var(--tracking-mark);
+  --tracking-intro: 0.06em;
   --tracking-display: -0.04em;
   --tracking-tight: -0.025em;
 

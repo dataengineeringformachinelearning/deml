@@ -1,30 +1,250 @@
 <app-banner
   preheader="DEML"
   heading="Settings"
-  lede="Tune account preferences, security, and delivery."
-/>
+  lede="Edit your account, sites, and workspace preferences in one place."
+>
+  <app-button-group>
+    @for (section of sections; track section.id) {
+      <app-button variant="secondary" shape="pill" [href]="'#' + section.id">
+        {{ section.label }}
+      </app-button>
+    }
+  </app-button-group>
+</app-banner>
 
-<app-page-section variant="catalog" labelledBy="settings-heading">
-  <app-section-header
-    eyebrow="Account"
-    heading="Controls"
-    lede="Preference modules keep every settings surface aligned."
-    headingId="settings-heading"
-  />
+<app-page-section variant="catalog" ariaLabel="Settings">
+  <section id="account" class="catalog-group" tabindex="-1" aria-labelledby="account-heading">
+    <app-form-panel
+      eyebrow="Identity"
+      title="Account"
+      description="Update how you appear in DEML. Email is managed by your sign-in provider."
+      titleId="account-heading"
+      [headingLevel]="2"
+    >
+      <form class="form-panel__form" (submit)="saveProfile($event)" novalidate>
+        <app-text-field
+          label="Display name"
+          name="displayName"
+          autocomplete="name"
+          placeholder="Your name"
+          [required]="true"
+          [value]="displayName()"
+          (valueChange)="displayName.set($event)"
+        />
 
-  <app-card-grid>
-    @for (card of cards; track card.id) {
-      <app-card
-        [heading]="card.heading"
-        [subtext]="card.subtext"
-        [visual]="card.visual"
-      >
-        <app-button-group align="center" layout="row">
-          <app-button variant="primary" shape="pill" [routerLink]="card.href">
-            {{ card.cta }}
+        <app-text-field
+          label="Email"
+          type="email"
+          name="email"
+          autocomplete="email"
+          [value]="email()"
+          [disabled]="true"
+          hint="Sign-in email cannot be changed here."
+        />
+
+        <app-text-field
+          label="Role"
+          name="role"
+          [value]="role() || '—'"
+          [disabled]="true"
+        />
+
+        <p>
+          Multi-factor authentication:
+          {{ mfaEnrolled() ? 'Enrolled on this account.' : 'Not enrolled.' }}
+          MFA challenges use the
+          <a routerLink="/mfa">verify flow</a>.
+        </p>
+
+        @if (profileError()) {
+          <p class="form-panel__error" role="alert">{{ profileError() }}</p>
+        }
+        @if (profileMessage()) {
+          <p role="status">{{ profileMessage() }}</p>
+        }
+
+        <app-button-group align="start" layout="column">
+          <app-button variant="primary" shape="pill" type="submit" [disabled]="profileBusy()">
+            {{ profileBusy() ? 'Saving…' : 'Save profile' }}
           </app-button>
         </app-button-group>
-      </app-card>
-    }
-  </app-card-grid>
+      </form>
+    </app-form-panel>
+  </section>
+
+  <section id="sites" class="catalog-group" tabindex="-1" aria-labelledby="sites-heading">
+    <app-form-panel
+      eyebrow="Connected"
+      title="Sites"
+      description="Create and manage status pages linked to this account."
+      titleId="sites-heading"
+      [headingLevel]="2"
+    >
+      @if (sitesLoading() && sites().length === 0) {
+        <p role="status">Loading sites…</p>
+      } @else if (sites().length === 0) {
+        <p>No sites yet. Add one below to publish a status page.</p>
+      } @else {
+        <table>
+          <caption>Your sites</caption>
+          <thead>
+            <tr>
+              <th scope="col">Title</th>
+              <th scope="col">Slug</th>
+              <th scope="col">Visibility</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (site of sites(); track site.id) {
+              <tr>
+                <th scope="row">{{ site.title }}</th>
+                <td>{{ site.slug }}</td>
+                <td>{{ site.is_published ? 'Published' : 'Private' }}</td>
+                <td>
+                  <app-button-group align="start" layout="row">
+                    <app-button
+                      variant="secondary"
+                      shape="pill"
+                      type="button"
+                      [disabled]="siteBusy()"
+                      (pressed)="startEditSite(site)"
+                    >
+                      Edit
+                    </app-button>
+                    <app-button
+                      variant="accent"
+                      shape="pill"
+                      type="button"
+                      [disabled]="siteBusy()"
+                      (pressed)="deleteSite(site)"
+                    >
+                      Delete
+                    </app-button>
+                  </app-button-group>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+      <form class="form-panel__form" (submit)="saveSite($event)" novalidate>
+        <p>
+          {{ editingSiteId() ? 'Edit site' : 'Add a site' }}
+        </p>
+
+        <app-text-field
+          label="Title"
+          name="siteTitle"
+          placeholder="Studio status"
+          [required]="true"
+          [value]="siteTitle()"
+          (valueChange)="siteTitle.set($event)"
+          [error]="siteTitleError()"
+        />
+
+        <app-text-field
+          label="Slug"
+          name="siteSlug"
+          placeholder="studio-status"
+          [required]="true"
+          [value]="siteSlug()"
+          (valueChange)="siteSlug.set($event)"
+          [error]="siteSlugError()"
+          hint="Lowercase letters, numbers, and hyphens."
+        />
+
+        <app-text-field
+          label="Description"
+          name="siteDescription"
+          placeholder="Public status for core services"
+          [value]="siteDescription()"
+          (valueChange)="siteDescription.set($event)"
+        />
+
+        <app-checkbox-field
+          label="Publish publicly"
+          name="sitePublished"
+          [checked]="sitePublished()"
+          (checkedChange)="sitePublished.set($event)"
+        />
+
+        @if (sitesError()) {
+          <p class="form-panel__error" role="alert">{{ sitesError() }}</p>
+        }
+        @if (sitesMessage()) {
+          <p role="status">{{ sitesMessage() }}</p>
+        }
+
+        <app-button-group align="start" layout="column">
+          <app-button variant="primary" shape="pill" type="submit" [disabled]="siteBusy()">
+            {{
+              siteBusy()
+                ? 'Saving…'
+                : editingSiteId()
+                  ? 'Save site'
+                  : 'Create site'
+            }}
+          </app-button>
+          @if (editingSiteId()) {
+            <app-button
+              variant="secondary"
+              shape="pill"
+              type="button"
+              [disabled]="siteBusy()"
+              (pressed)="startCreateSite()"
+            >
+              Cancel edit
+            </app-button>
+          }
+        </app-button-group>
+      </form>
+    </app-form-panel>
+  </section>
+
+  <section
+    id="preferences"
+    class="catalog-group"
+    tabindex="-1"
+    aria-labelledby="preferences-heading"
+  >
+    <app-form-panel
+      eyebrow="Workspace"
+      title="Preferences"
+      description="Appearance and delivery defaults for this browser."
+      titleId="preferences-heading"
+      [headingLevel]="2"
+    >
+      <form class="form-panel__form" (submit)="savePreferences($event)" novalidate>
+        <app-button-group align="start" layout="column">
+          <app-button variant="secondary" shape="pill" type="button" (pressed)="toggleTheme()">
+            {{ isDark() ? 'Use light mode' : 'Use dark mode' }}
+          </app-button>
+        </app-button-group>
+
+        <app-checkbox-field
+          label="Email me about incidents and site alerts"
+          name="emailAlerts"
+          [checked]="emailAlerts()"
+          (checkedChange)="emailAlerts.set($event)"
+        />
+
+        <app-checkbox-field
+          label="Weekly status digest"
+          name="statusDigest"
+          [checked]="statusDigest()"
+          (checkedChange)="statusDigest.set($event)"
+        />
+
+        @if (prefsMessage()) {
+          <p role="status">{{ prefsMessage() }}</p>
+        }
+
+        <app-button-group align="start" layout="column">
+          <app-button variant="primary" shape="pill" type="submit">Save preferences</app-button>
+        </app-button-group>
+      </form>
+    </app-form-panel>
+  </section>
 </app-page-section>

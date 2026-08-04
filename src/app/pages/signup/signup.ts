@@ -7,6 +7,7 @@ import { CheckboxField } from '../../components/checkbox-field/checkbox-field';
 import { FormPanel } from '../../components/form-panel/form-panel';
 import { PageSection } from '../../components/page-section/page-section';
 import { TextField } from '../../components/text-field/text-field';
+import { DEFAULT_POST_LOGIN_PATH } from '../../core/utils/return-url.utils';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -97,7 +98,7 @@ export class Signup {
         this.formError.set(result.error ?? 'Unable to create account.');
         return;
       }
-      await this.router.navigateByUrl('/dashboard');
+      await this.router.navigateByUrl(DEFAULT_POST_LOGIN_PATH);
     } finally {
       this.busy.set(false);
     }

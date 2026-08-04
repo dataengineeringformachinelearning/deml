@@ -1,46 +1,33 @@
-import type { CardVisual } from '../components/card/card';
+export type SettingsSectionId = 'account' | 'sites' | 'preferences';
 
-export interface SettingsCard {
-  readonly id: string;
-  readonly heading: string;
-  readonly subtext: string;
-  readonly visual: CardVisual;
-  readonly cta: string;
-  readonly href: string;
+export interface SettingsSectionLink {
+  readonly id: SettingsSectionId;
+  readonly label: string;
 }
 
-/** Settings modules — interactive cards, same rhythm as account prefs. */
-export const SETTINGS_CARDS: readonly SettingsCard[] = [
-  {
-    id: 'profile',
-    heading: 'Profile',
-    subtext: 'Name, avatar, and how you appear across DEML.',
-    visual: 'olive',
-    cta: 'Edit profile',
-    href: '/account',
-  },
-  {
-    id: 'security',
-    heading: 'Security',
-    subtext: 'Sessions, sign-in methods, and recovery options.',
-    visual: 'red',
-    cta: 'Review security',
-    href: '/account',
-  },
-  {
-    id: 'notifications',
-    heading: 'Notifications',
-    subtext: 'Email delivery and alert preferences for this workspace.',
-    visual: 'gold',
-    cta: 'Open delivery',
-    href: '/account',
-  },
-  {
-    id: 'sites',
-    heading: 'Connected sites',
-    subtext: 'Environments linked to this account and their status.',
-    visual: 'olive',
-    cta: 'Manage sites',
-    href: '/sites',
-  },
+/** In-page section anchors for the unified settings editor. */
+export const SETTINGS_SECTION_LINKS: readonly SettingsSectionLink[] = [
+  { id: 'account', label: 'Account' },
+  { id: 'sites', label: 'Sites' },
+  { id: 'preferences', label: 'Preferences' },
 ];
+
+const SECTION_IDS = new Set<string>(SETTINGS_SECTION_LINKS.map((link) => link.id));
+
+/** Map legacy `?tab=` / `?section=` values onto a settings section id. */
+export const resolveSettingsSection = (raw: string | null | undefined): SettingsSectionId | null => {
+  if (!raw) {
+    return null;
+  }
+  const key = raw.trim().toLowerCase();
+  if (SECTION_IDS.has(key)) {
+    return key as SettingsSectionId;
+  }
+  if (key === 'profile' || key === 'security' || key === 'billing') {
+    return 'account';
+  }
+  if (key === 'notifications' || key === 'theme' || key === 'delivery') {
+    return 'preferences';
+  }
+  return null;
+};

@@ -63,9 +63,7 @@ describe('Navbar', () => {
       'Dashboard',
       'Analytics',
       'Vulnerabilities',
-      'Sites',
       'Settings',
-      'Account',
     ]);
   });
 

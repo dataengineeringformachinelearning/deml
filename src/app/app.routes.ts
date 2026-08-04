@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { getBlogPost } from './data/blog-posts';
 import { getLearnTopic } from './data/packages';
 import { authGuard } from './guards/auth.guard';
+import { settingsSectionRedirect } from './shared/settings-redirect';
 
 export const routes: Routes = [
   {
@@ -110,17 +111,15 @@ export const routes: Routes = [
   },
   {
     path: 'sites',
-    canActivate: [authGuard],
-    loadComponent: () => import('./pages/sites/sites').then((m) => m.Sites),
-    title: 'Sites · DEML',
-    data: { preload: 'auth' },
+    canActivate: [authGuard, settingsSectionRedirect('sites')],
+    loadComponent: () => import('./pages/settings/settings').then((m) => m.Settings),
+    title: 'Settings · DEML',
   },
   {
     path: 'account',
-    canActivate: [authGuard],
-    loadComponent: () => import('./pages/account/account').then((m) => m.Account),
-    title: 'Account · DEML',
-    data: { preload: 'auth' },
+    canActivate: [authGuard, settingsSectionRedirect('account')],
+    loadComponent: () => import('./pages/settings/settings').then((m) => m.Settings),
+    title: 'Settings · DEML',
   },
   {
     path: 'pipeline',

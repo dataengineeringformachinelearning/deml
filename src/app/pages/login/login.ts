@@ -7,6 +7,7 @@ import { CheckboxField } from '../../components/checkbox-field/checkbox-field';
 import { FormPanel } from '../../components/form-panel/form-panel';
 import { PageSection } from '../../components/page-section/page-section';
 import { TextField } from '../../components/text-field/text-field';
+import { navigateAfterLogin } from '../../core/utils/return-url.utils';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -72,8 +73,7 @@ export class Login {
         this.formError.set(result.error ?? 'Unable to log in.');
         return;
       }
-      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
-      await this.router.navigateByUrl(returnUrl);
+      await navigateAfterLogin(this.router, this.route.snapshot.queryParamMap.get('returnUrl'));
     } finally {
       this.busy.set(false);
     }

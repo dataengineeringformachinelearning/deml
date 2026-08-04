@@ -6,6 +6,8 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 
+export type FormPanelHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+
 let formPanelIdSeq = 0;
 
 @Component({
@@ -21,6 +23,8 @@ export class FormPanel {
   readonly title = input.required<string>();
   readonly description = input('');
   readonly titleId = input<string>();
+  /** Document outline level — use 2+ when a page banner already owns h1. */
+  readonly headingLevel = input<FormPanelHeadingLevel>(1);
 
   readonly resolvedTitleId = computed(() => this.titleId() || this.autoId);
 }

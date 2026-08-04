@@ -65,14 +65,23 @@ export const ROUTE_PAGE_META: Record<string, PageMeta> = {
     ogType: 'website',
   },
   settings: {
-    title: 'Sites - DEML APP',
-    description: 'Configure monitors, embed widgets, and manage site-level DEML integrations.',
+    title: 'Settings - DEML APP',
+    description:
+      'Edit your DEML account, connected sites, appearance, and workspace preferences in one place.',
     robots: NOINDEX,
     ogType: 'website',
   },
   account: {
-    title: 'Account - DEML APP',
-    description: 'Manage your DEML profile, billing tier, API access, and security settings.',
+    title: 'Settings - DEML APP',
+    description:
+      'Edit your DEML account, connected sites, appearance, and workspace preferences in one place.',
+    robots: NOINDEX,
+    ogType: 'website',
+  },
+  sites: {
+    title: 'Settings - DEML APP',
+    description:
+      'Edit your DEML account, connected sites, appearance, and workspace preferences in one place.',
     robots: NOINDEX,
     ogType: 'website',
   },

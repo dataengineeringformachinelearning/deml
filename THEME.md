@@ -41,23 +41,24 @@ Dark default: light cream modules on warm ash ground. Light: cream cards on `#D4
 
 ## Type
 
-**Geist only** for display, intro, eyebrows, and body (`--font-display` / `--font-secondary` /
-`--font-sans` all resolve to Geist). Do not ship Syne or Fraunces in the product UI.
+**Geist only** for display, marks, intro, and body (`--font-display` / `--font-mark` /
+`--font-secondary` / `--font-sans` all resolve to Geist). Do not ship Syne or Fraunces
+in the product UI.
 
 | Role | Treatment |
 |------|-----------|
-| Primary headings | Geist bold, tight tracking (`--tracking-display` / `--tracking-tight`) |
-| Eyebrows / marks | Geist semibold, generous letter-spacing (`--tracking-eyebrow`) |
+| Primary headings | Geist bold via `--font-display`, tight tracking (`--tracking-display`) |
+| Marks / eyebrows | Geist semibold via `--font-mark`, wide tracking (`--tracking-mark`; `--tracking-eyebrow` aliases it) |
 | Intro / lede | Geist regular, slight tracking (`--tracking-intro`) |
-| Body | Geist regular, readable line-height |
+| Body | Geist regular, readable line-height (`--leading-body`) |
 
 ---
 
 ## Layout & charts
 
 1. **8px grid** — `--grid` / `--space-*` / `--tile-gap` / `--module-pad`.
-2. **Fluid equal cells** — `grid-auto-rows: minmax(var(--tile-row-unit), auto)` so tiles and charts can grow; never squash with fixed-only row tracks.
-3. **Charts** — `--chart-aspect: 2.4` inside `app-chart-card`; series from NFTS tokens only.
+2. **Fluid equal cells** — `grid-auto-rows: minmax(var(--tile-row-unit), auto)` so tiles in a row stretch equally; never squash with fixed-only row tracks.
+3. **Charts** — `--chart-aspect: 2.4` inside `app-chart-card`; plots size from aspect + `--chart-stage-max-inline`, never `height: 100%`. Extra row height letterboxes via the chart-card body spacer.
 4. **Sharp modules** — `--radius-sm/md/lg: 0` (pill radius for chips only).
 5. **Dual theme** — `data-theme="light"|"dark"` on `<html>`.
 6. **WCAG 2.0 AA** — contrast, `:focus-visible`, ≥44px hit targets, reduced motion.

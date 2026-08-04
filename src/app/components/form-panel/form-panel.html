@@ -3,7 +3,26 @@
     @if (eyebrow()) {
       <p class="form-panel__eyebrow">{{ eyebrow() }}</p>
     }
-    <h1 class="form-panel__title" [id]="resolvedTitleId()">{{ title() }}</h1>
+    @switch (headingLevel()) {
+      @case (2) {
+        <h2 class="form-panel__title" [id]="resolvedTitleId()">{{ title() }}</h2>
+      }
+      @case (3) {
+        <h3 class="form-panel__title" [id]="resolvedTitleId()">{{ title() }}</h3>
+      }
+      @case (4) {
+        <h4 class="form-panel__title" [id]="resolvedTitleId()">{{ title() }}</h4>
+      }
+      @case (5) {
+        <h5 class="form-panel__title" [id]="resolvedTitleId()">{{ title() }}</h5>
+      }
+      @case (6) {
+        <h6 class="form-panel__title" [id]="resolvedTitleId()">{{ title() }}</h6>
+      }
+      @default {
+        <h1 class="form-panel__title" [id]="resolvedTitleId()">{{ title() }}</h1>
+      }
+    }
     @if (description()) {
       <p class="form-panel__description">{{ description() }}</p>
     }

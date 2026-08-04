@@ -204,7 +204,7 @@ export const DASH_TILES: readonly DashTile[] = [
   {
     kind: 'area',
     id: 'this-week',
-    size: 'wide',
+    size: 'lg',
     accent: 'primary',
     heading: 'This week',
     meta: 'Daily listeners',
@@ -214,7 +214,7 @@ export const DASH_TILES: readonly DashTile[] = [
   {
     kind: 'bar',
     id: 'devices',
-    size: 'tall',
+    size: 'lg',
     accent: 'gold',
     heading: 'Devices',
     meta: 'Share of sessions',

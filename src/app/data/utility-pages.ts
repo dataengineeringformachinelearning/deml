@@ -53,27 +53,27 @@ export const SUCCESS_CARDS: readonly UtilityCard[] = [
     subtext: 'Review connected environments and deployments.',
     visual: 'gold',
     cta: 'Manage sites',
-    href: '/sites',
+    href: '/settings#sites',
   },
   {
-    id: 'account',
-    heading: 'Account',
-    subtext: 'Confirm preferences and security settings.',
+    id: 'settings',
+    heading: 'Settings',
+    subtext: 'Confirm profile, sites, and workspace preferences.',
     visual: 'red',
-    cta: 'Open account',
-    href: '/account',
+    cta: 'Open settings',
+    href: '/settings',
   },
 ];
 
 /** Auth status destinations. */
 export const AUTH_STATUS_CARDS: readonly UtilityCard[] = [
   {
-    id: 'account',
-    heading: 'Account',
-    subtext: 'Profile, sessions, and workspace controls.',
+    id: 'settings',
+    heading: 'Settings',
+    subtext: 'Profile, sites, and workspace controls.',
     visual: 'olive',
-    cta: 'Open account',
-    href: '/account',
+    cta: 'Open settings',
+    href: '/settings',
   },
   {
     id: 'login',

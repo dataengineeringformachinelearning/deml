@@ -36,7 +36,7 @@ export const HOME_CARDS: readonly HomeCard[] = [
     subtext: 'Connect domains, embed widgets, and manage monitored surfaces.',
     visual: 'gold',
     guestPrimary: { label: 'Get started', routerLink: '/signup', variant: 'primary' },
-    signedInPrimary: { label: 'Open Sites', routerLink: '/sites', variant: 'primary' },
+    signedInPrimary: { label: 'Manage sites', routerLink: '/settings#sites', variant: 'primary' },
     actions: [{ label: 'Learn the stack', routerLink: '/learn', variant: 'secondary' }],
   },
   {

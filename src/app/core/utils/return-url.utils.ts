@@ -1,3 +1,7 @@
+import type { Router } from '@angular/router';
+
+import { environment } from '../../../environments/environment';
+
 /** Default post-login destination inside the Angular app. */
 export const DEFAULT_POST_LOGIN_PATH = '/dashboard';
 
@@ -9,11 +13,37 @@ type ResolveOptions = {
   fallback?: string;
 };
 
-const AUTH_PATHS = new Set(['/login', '/register', '/auth-status']);
+type NavigateOptions = ResolveOptions & {
+  /** Override for tests / SSR; defaults to `window.location.assign`. */
+  assignLocation?: (url: string) => void;
+};
+
+const AUTH_PATHS = new Set(['/login', '/register', '/signup', '/mfa', '/auth-status']);
+
+const originOf = (value: string | undefined): string => {
+  const raw = typeof value === 'string' ? value.trim() : '';
+  if (!raw) {
+    return '';
+  }
+  try {
+    return new URL(raw).origin;
+  } catch {
+    return '';
+  }
+};
 
 const isAuthPath = (pathname: string): boolean => {
   const normalized = pathname.replace(/\/+$/, '') || '/';
   return AUTH_PATHS.has(normalized) || normalized.startsWith('/auth-status/');
+};
+
+const isBareHomePath = (path: string): boolean => {
+  try {
+    const parsed = new URL(path, 'https://deml.invalid');
+    return (parsed.pathname.replace(/\/+$/, '') || '/') === '/' && !parsed.search && !parsed.hash;
+  } catch {
+    return false;
+  }
 };
 
 const isSafeAppPath = (path: string): boolean => {
@@ -48,6 +78,10 @@ export const resolvePostLoginTarget = (
   }
 
   if (isSafeAppPath(raw)) {
+    // Bare home is not a useful post-login destination — land on the dashboard.
+    if (isBareHomePath(raw)) {
+      return { kind: 'app', url: fallback };
+    }
     return { kind: 'app', url: raw };
   }
 
@@ -66,7 +100,7 @@ export const resolvePostLoginTarget = (
     if (appOrigin && absolute.origin === appOrigin) {
       const path = `${absolute.pathname}${absolute.search}${absolute.hash}`;
       // Bare app origin should land on the dashboard after sign-in.
-      if (absolute.pathname === '/' && !absolute.search && !absolute.hash) {
+      if (isBareHomePath(path)) {
         return { kind: 'app', url: fallback };
       }
       if (isSafeAppPath(path)) {
@@ -79,4 +113,45 @@ export const resolvePostLoginTarget = (
   }
 
   return { kind: 'app', url: fallback };
+};
+
+/** Options derived from the running app environment. */
+export const defaultPostLoginResolveOptions = (): ResolveOptions => {
+  const appOrigin =
+    originOf(environment.frontendUrl) ||
+    (typeof window !== 'undefined' ? window.location.origin : '');
+  return {
+    marketingOrigin: originOf(environment.marketingUrl),
+    appOrigin,
+    fallback: DEFAULT_POST_LOGIN_PATH,
+  };
+};
+
+/**
+ * Navigate after successful authentication using a validated `returnUrl`.
+ * Defaults to `/dashboard` when the param is missing or unsafe.
+ */
+export const navigateAfterLogin = async (
+  router: Router,
+  returnUrl: string | null | undefined,
+  options: NavigateOptions = {},
+): Promise<boolean> => {
+  const target = resolvePostLoginTarget(returnUrl, {
+    ...defaultPostLoginResolveOptions(),
+    ...options,
+  });
+
+  if (target.kind === 'external') {
+    const assign =
+      options.assignLocation ??
+      ((url: string) => {
+        if (typeof window !== 'undefined') {
+          window.location.assign(url);
+        }
+      });
+    assign(target.url);
+    return true;
+  }
+
+  return router.navigateByUrl(target.url);
 };

@@ -44,11 +44,11 @@ export function apiErrorMessage(err: unknown, fallback: string): string {
     if (err.status === 403) {
       return (
         'Permission denied. Saving sites requires multi-factor authentication (MFA). ' +
-        'Enroll MFA under Account, then sign out and sign back in to complete verification.'
+        'Complete MFA from Settings, then sign out and sign back in to finish verification.'
       );
     }
     if (err.status === 404) {
-      return 'Status page not found. Refresh the Sites page and try again.';
+      return 'Status page not found. Refresh Settings and try again.';
     }
     if (err.status === 401) {
       return 'Your session expired. Sign in again and retry.';

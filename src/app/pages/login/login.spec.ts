@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
+import { convertToParamMap, provideRouter, Router, ActivatedRoute } from '@angular/router';
 import { vi } from 'vitest';
 
 import { AuthService } from '../../services/auth.service';
@@ -9,6 +9,7 @@ import { Login } from './login';
 describe('Login', () => {
   let fixture: ComponentFixture<Login>;
   let router: Router;
+  let queryParams: Record<string, string>;
   const isAuthenticated = signal(false);
   const currentUserId = signal<number | null>(null);
   const authMock = {
@@ -35,6 +36,7 @@ describe('Login', () => {
   beforeEach(async () => {
     isAuthenticated.set(false);
     currentUserId.set(null);
+    queryParams = {};
     authMock.login.mockClear();
     authMock.logout.mockClear();
     authMock.beginMfaChallenge.mockClear();
@@ -44,9 +46,20 @@ describe('Login', () => {
       providers: [
         provideRouter([
           { path: 'dashboard', children: [] },
+          { path: 'settings', children: [] },
           { path: 'mfa', children: [] },
         ]),
         { provide: AuthService, useValue: authMock },
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: {
+              get queryParamMap() {
+                return convertToParamMap(queryParams);
+              },
+            },
+          },
+        },
       ],
     }).compileComponents();
 
@@ -76,7 +89,7 @@ describe('Login', () => {
     expect(authMock.login).not.toHaveBeenCalled();
   });
 
-  it('should log in and navigate when the form is valid', async () => {
+  it('should log in and navigate to the dashboard by default', async () => {
     const navigateSpy = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
     const component = fixture.componentInstance;
 
@@ -92,6 +105,34 @@ describe('Login', () => {
     });
     expect(authMock.isAuthenticated()).toBe(true);
     expect(authMock.currentUserId()).toBe(1);
+    expect(navigateSpy).toHaveBeenCalledWith('/dashboard');
+  });
+
+  it('should honor a safe in-app returnUrl', async () => {
+    queryParams = { returnUrl: '/settings?tab=billing' };
+    const navigateSpy = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+    const component = fixture.componentInstance;
+
+    component.email.set('ada@example.com');
+    component.password.set('secret123');
+    await component.submit(new Event('submit'));
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(navigateSpy).toHaveBeenCalledWith('/settings?tab=billing');
+  });
+
+  it('should reject unsafe returnUrl values and land on the dashboard', async () => {
+    queryParams = { returnUrl: 'https://evil.example/phish' };
+    const navigateSpy = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+    const component = fixture.componentInstance;
+
+    component.email.set('ada@example.com');
+    component.password.set('secret123');
+    await component.submit(new Event('submit'));
+    fixture.detectChanges();
+    await fixture.whenStable();
+
     expect(navigateSpy).toHaveBeenCalledWith('/dashboard');
   });
 
@@ -114,5 +155,25 @@ describe('Login', () => {
     expect(authMock.beginMfaChallenge).toHaveBeenCalledWith(resolver);
     expect(navigateSpy).toHaveBeenCalledWith(['/mfa'], { queryParams: undefined });
     expect(component.formError()).toBe('');
+  });
+
+  it('should forward returnUrl to MFA when a second factor is required', async () => {
+    queryParams = { returnUrl: '/settings' };
+    const resolver = { hints: [], session: {} };
+    authMock.login.mockResolvedValueOnce({
+      success: false,
+      error: 'MFA_REQUIRED',
+      resolver,
+    });
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    const component = fixture.componentInstance;
+
+    component.email.set('ada@example.com');
+    component.password.set('secret123');
+    await component.submit(new Event('submit'));
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/mfa'], { queryParams: { returnUrl: '/settings' } });
   });
 });

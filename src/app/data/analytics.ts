@@ -96,7 +96,7 @@ export const ANALYTICS_TILES: readonly DashTile[] = [
   {
     kind: 'area',
     id: 'week',
-    size: 'wide',
+    size: 'lg',
     accent: 'primary',
     heading: 'This week',
     meta: 'Daily volume',
@@ -106,7 +106,7 @@ export const ANALYTICS_TILES: readonly DashTile[] = [
   {
     kind: 'bar',
     id: 'clients',
-    size: 'tall',
+    size: 'lg',
     accent: 'gold',
     heading: 'Clients',
     meta: 'Share of traffic',

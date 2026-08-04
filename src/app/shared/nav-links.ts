@@ -16,7 +16,5 @@ export const AUTH_NAV_LINKS: NavLink[] = [
   { label: 'Dashboard', path: '/dashboard' },
   { label: 'Analytics', path: '/analytics' },
   { label: 'Vulnerabilities', path: '/vulnerabilities' },
-  { label: 'Sites', path: '/sites' },
   { label: 'Settings', path: '/settings' },
-  { label: 'Account', path: '/account' },
 ];

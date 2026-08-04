@@ -130,7 +130,9 @@
   --chart-aspect: 2.4;
   --chart-spark-aspect: 2.4;
   --chart-min-block: calc(var(--grid) * 20);
-  --chart-max-block: calc(var(--grid) * 40);
+  /* Soft ceiling for SVG plot block height — keeps aspect without giant wells */
+  --chart-max-block: calc(var(--grid) * 32);
+  --chart-stage-max-inline: calc(var(--chart-max-block) * var(--chart-aspect));
   --chart-spark-min-block: calc(var(--grid) * 12);
   --chart-spark-max-block: calc(var(--grid) * 25);
   --chart-panel-block: var(--chart-min-block);
@@ -190,24 +192,27 @@
   --font-sans: var(--font-family);
   --font-serif: var(--font-family);
   --font-display: var(--font-sans);
+  --font-mark: var(--font-sans);
   --font-secondary: var(--font-sans);
   --font-body: var(--font-sans);
   --font-stretch-display: normal;
   --font-weight-display: 700;
+  --font-weight-mark: 600;
   --font-weight-bold: 700;
   --font-weight-semibold: 600;
   --font-weight-medium: 600;
   --font-weight-regular: 400;
-  --leading-display: 1.1;
+  --leading-display: 1.05;
   --leading-tight: 1.15;
   --leading-snug: 1.35;
   --leading-body: 1.5;
   --leading-relaxed: 1.6;
   --leading-ui: 1.3;
 
-  --tracking-eyebrow: 0.22em;
-  --tracking-intro: 0.06em;
+  /* Marks / eyebrows share wide tracking; display titles use tight tracking */
   --tracking-mark: 0.22em;
+  --tracking-eyebrow: var(--tracking-mark);
+  --tracking-intro: 0.06em;
   --tracking-display: -0.04em;
   --tracking-tight: -0.025em;
 
@@ -388,13 +393,14 @@ body {
   border: 0;
 }
 
+.type-mark,
 .type-eyebrow,
 .preheader {
   margin: 0;
-  font-family: var(--font-sans);
+  font-family: var(--font-mark);
   font-size: var(--font-size-xs);
-  font-weight: 600;
-  letter-spacing: var(--tracking-eyebrow);
+  font-weight: var(--font-weight-mark);
+  letter-spacing: var(--tracking-mark);
   line-height: 1.2;
   text-transform: uppercase;
   color: var(--color-highlight);
@@ -402,22 +408,22 @@ body {
 
 .type-display {
   margin: 0;
-  font-family: var(--font-sans);
-  font-size: clamp(1.5rem, 3vw, var(--font-size-lg));
-  font-weight: 700;
-  letter-spacing: var(--tracking-tight);
-  line-height: 1.15;
+  font-family: var(--font-display);
+  font-size: clamp(calc(var(--grid) * 3.5), 4.5vw, var(--font-size-xl));
+  font-weight: var(--font-weight-display);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
   color: var(--color-text);
 }
 
 .type-intro,
 .lede {
   margin: 0;
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   font-size: var(--font-size-sm);
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-intro);
-  line-height: 1.5;
+  line-height: var(--leading-body);
   color: var(--color-text-secondary);
 }
 
@@ -2122,14 +2128,14 @@ deml-dashboard-grid > *,
   justify-self: stretch;
 }
 
+/*
+ * Mobile: single column; one fluid track per tile (content sets height).
+ * Avoid multi-row spans that force empty height / inner overflow.
+ */
 app-dashboard-grid > [data-size='sm'],
 deml-dashboard-grid > [data-size='sm'],
 .dashboard-grid > [data-size='sm'],
-:host > [data-size='sm'] {
-  grid-column: 1 / -1;
-  grid-row: span 2;
-}
-
+:host > [data-size='sm'],
 app-dashboard-grid > [data-size='md'],
 deml-dashboard-grid > [data-size='md'],
 .dashboard-grid > [data-size='md'],
@@ -2151,7 +2157,7 @@ deml-dashboard-grid > [data-size='hero'],
 .dashboard-grid > [data-size='hero'],
 :host > [data-size='hero'] {
   grid-column: 1 / -1;
-  grid-row: span 3;
+  grid-row: span 1;
 }
 
 .dashboard-grid__cell {
@@ -2180,44 +2186,36 @@ deml-dashboard-grid > [data-size='hero'],
     grid-template-columns: repeat(var(--tile-cols), minmax(0, 1fr));
   }
 
+  /*
+   * Equal column boards on a 6-col track:
+   * sm ×3 · md/lg/wide/tall ×2 · hero ×1 — single fluid row each.
+   */
   app-dashboard-grid > [data-size='sm'],
   deml-dashboard-grid > [data-size='sm'],
   .dashboard-grid > [data-size='sm'],
   :host > [data-size='sm'] {
     grid-column: span 2;
-    grid-row: span 2;
+    grid-row: span 1;
   }
 
   app-dashboard-grid > [data-size='md'],
   deml-dashboard-grid > [data-size='md'],
   .dashboard-grid > [data-size='md'],
-  :host > [data-size='md'] {
-    grid-column: span 3;
-    grid-row: span 3;
-  }
-
+  :host > [data-size='md'],
   app-dashboard-grid > [data-size='lg'],
   deml-dashboard-grid > [data-size='lg'],
   .dashboard-grid > [data-size='lg'],
-  :host > [data-size='lg'] {
-    grid-column: span 3;
-    grid-row: span 3;
-  }
-
+  :host > [data-size='lg'],
   app-dashboard-grid > [data-size='wide'],
   deml-dashboard-grid > [data-size='wide'],
   .dashboard-grid > [data-size='wide'],
-  :host > [data-size='wide'] {
-    grid-column: span 4;
-    grid-row: span 3;
-  }
-
+  :host > [data-size='wide'],
   app-dashboard-grid > [data-size='tall'],
   deml-dashboard-grid > [data-size='tall'],
   .dashboard-grid > [data-size='tall'],
   :host > [data-size='tall'] {
-    grid-column: span 2;
-    grid-row: span 3;
+    grid-column: span 3;
+    grid-row: span 1;
   }
 
   app-dashboard-grid > [data-size='hero'],
@@ -2225,7 +2223,7 @@ deml-dashboard-grid > [data-size='hero'],
   .dashboard-grid > [data-size='hero'],
   :host > [data-size='hero'] {
     grid-column: span 6;
-    grid-row: span 3;
+    grid-row: span 1;
   }
 }
 
@@ -5438,10 +5436,10 @@ deml-metric-card[data-accent='primary'],
 
 .stat-card-label {
   margin: 0;
-  font-family: var(--font-sans);
+  font-family: var(--font-mark);
   font-size: var(--font-size-xs);
-  font-weight: 600;
-  letter-spacing: var(--tracking-eyebrow);
+  font-weight: var(--font-weight-mark);
+  letter-spacing: var(--tracking-mark);
   line-height: 1.2;
   text-transform: uppercase;
   color: var(--stat-accent);
@@ -5501,15 +5499,19 @@ deml-stat-card[data-trend='down'] .stat-card-delta,
 .stat-card-spark {
   display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
   align-items: stretch;
+  justify-content: flex-end;
   width: 100%;
   min-height: var(--chart-spark-min-block);
   margin-top: var(--space-3);
 }
 
+/* Spark keeps --chart-spark-aspect; never stretch to fill leftover tile height */
 .stat-card-spark > :first-child {
   width: 100%;
-  min-height: 100%;
+  flex: 0 0 auto;
+  align-self: stretch;
 }
 
 app-stat-card[data-size='sm'] .stat-card-spark,
@@ -6206,7 +6208,7 @@ caption {
 }
 
 /* inlined: components/metric-list/metric-list.css */
-/* Component: metric-list — aspect-locked plot band peer to charts */
+/* Component: metric-list — content-sized plot band peer to charts */
 
 .component--metric-list .demo {
   display: grid;
@@ -6242,6 +6244,9 @@ app-metric-list[data-accent='primary'],
   --chart-accent: var(--chart-series-1);
 }
 
+/*
+ * Content-sized list band — same stage width as charts; no aspect lock / inner scroll.
+ */
 .metric-list {
   display: flex;
   flex: 0 0 auto;
@@ -6249,13 +6254,12 @@ app-metric-list[data-accent='primary'],
   justify-content: flex-start;
   gap: 0;
   box-sizing: border-box;
-  width: 100%;
-  max-width: var(--chart-stage-max-inline);
-  aspect-ratio: var(--chart-aspect);
+  width: min(100%, var(--chart-stage-max-inline));
+  min-height: var(--chart-min-block);
   height: auto;
   margin: 0 auto;
   padding: var(--space-3);
-  overflow: auto;
+  overflow: visible;
   list-style: none;
   background-color: var(--color-plot);
   border: var(--border-width) solid var(--color-plot-border);
@@ -6378,7 +6382,7 @@ app-chart-card[data-accent='primary'],
   min-height: 100%;
   margin: 0;
   padding: var(--module-pad);
-  overflow: clip;
+  overflow: visible;
   color: var(--color-card-text);
   background-color: var(--color-card);
   background-image: linear-gradient(
@@ -6411,17 +6415,19 @@ app-chart-card[data-accent='primary'],
 
 .chart-card-meta {
   margin: 0;
-  font-family: var(--font-sans);
+  font-family: var(--font-mark);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  letter-spacing: var(--tracking-eyebrow);
+  font-weight: var(--font-weight-mark);
+  letter-spacing: var(--tracking-mark);
   text-transform: uppercase;
   color: var(--chart-accent);
 }
 
 /*
- * Plot band — hosts fill width; charts size themselves via --chart-aspect.
+ * Plot band — hosts fill width; SVG charts size via --chart-aspect.
+ * Content lists/bars grow with items — never clip or scroll inside the tile.
  * Do not force height:100% on children (that squashes viewBox plots).
+ * Equal-height peer tiles: ::after spacer absorbs leftover row height (letterbox).
  */
 .chart-card-body {
   display: flex;
@@ -6432,7 +6438,14 @@ app-chart-card[data-accent='primary'],
   gap: 0;
   min-height: 0;
   width: 100%;
-  overflow: hidden;
+  overflow: visible;
+}
+
+.chart-card-body::after {
+  content: '';
+  flex: 1 1 auto;
+  min-height: 0;
+  pointer-events: none;
 }
 
 .chart-card-body > *,
@@ -6441,7 +6454,7 @@ deml-chart-card .chart-card-body > * {
   width: 100%;
   min-width: 0;
   min-height: 0;
-  flex: 0 1 auto;
+  flex: 0 0 auto;
 }
 
 :host([data-size='hero']) .chart-card-heading,
@@ -6529,7 +6542,7 @@ deml-area-chart:not([data-variant='spark']) .area-chart-frame,
 .component--area-chart .area-chart-frame,
 .component--chart-card .area-chart-frame {
   aspect-ratio: var(--chart-aspect);
-  width: min(100%, calc(var(--chart-max-block) * var(--chart-aspect)));
+  width: min(100%, var(--chart-stage-max-inline));
   height: auto;
   max-height: var(--chart-max-block);
   margin-inline: auto;
@@ -6638,7 +6651,7 @@ app-area-chart[data-variant='spark'] .area-chart-node,
 }
 
 /* inlined: components/bar-chart/bar-chart.css */
-/* Component: bar-chart — aspect-locked plot band (same size as area) */
+/* Component: bar-chart — content-sized plot band (peer width to area) */
 
 .component--bar-chart .demo {
   display: grid;
@@ -6678,23 +6691,22 @@ app-bar-chart[data-accent='primary'],
 }
 
 /*
- * Same proportions as area plots — --chart-aspect container.
- * Rows scroll inside the band; the band never stretches.
+ * Content-sized plot band — peer width to area charts via --chart-stage-max-inline.
+ * Height grows with rows (no aspect lock / inner scroll); tiles stretch around it.
  */
 .bar-chart {
   display: flex;
   flex: 0 1 auto;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: var(--space-2);
   box-sizing: border-box;
-  width: min(100%, calc(var(--chart-max-block) * var(--chart-aspect)));
-  aspect-ratio: var(--chart-aspect);
+  width: min(100%, var(--chart-stage-max-inline));
+  min-height: var(--chart-min-block);
   height: auto;
-  max-height: var(--chart-max-block);
   margin: 0 auto;
   padding: var(--chart-inset) var(--space-3);
-  overflow: auto;
+  overflow: visible;
   list-style: none;
   background-color: var(--chart-plot);
   border: var(--border-width) solid var(--color-plot-border);
@@ -6781,7 +6793,7 @@ app-bar-chart[data-accent='primary'],
 .chart-figure__plot {
   display: block;
   box-sizing: border-box;
-  width: min(100%, calc(var(--chart-max-block) * var(--chart-aspect)));
+  width: min(100%, var(--chart-stage-max-inline));
   aspect-ratio: var(--chart-aspect);
   height: auto;
   max-height: var(--chart-max-block);
@@ -6838,7 +6850,7 @@ deml-chart-panel,
   min-height: 100%;
   margin: 0;
   padding: var(--module-pad);
-  overflow: clip;
+  overflow: visible;
   color: var(--color-card-text);
   background-color: var(--color-card);
   background-image: linear-gradient(
@@ -6886,13 +6898,13 @@ deml-chart-panel,
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
-  width: min(100%, calc(var(--chart-max-block) * var(--chart-aspect)));
+  width: min(100%, var(--chart-stage-max-inline));
   aspect-ratio: var(--chart-aspect);
   height: auto;
   max-height: var(--chart-max-block);
   margin: 0 auto;
   padding: var(--chart-inset);
-  overflow: hidden;
+  overflow: visible;
   background-color: var(--chart-plot);
   border: var(--border-width) solid var(--color-plot-border);
   color: var(--color-plot-ink);
@@ -6927,10 +6939,10 @@ deml-chart-empty-state,
   place-items: center;
   gap: var(--space-2);
   box-sizing: border-box;
-  width: 100%;
-  max-width: var(--chart-stage-max-inline);
+  width: min(100%, var(--chart-stage-max-inline));
   aspect-ratio: var(--chart-aspect);
   height: auto;
+  max-height: var(--chart-max-block);
   margin: 0 auto;
   padding: var(--module-pad);
   text-align: center;
@@ -7622,9 +7634,10 @@ deml-chart-empty-state,
 
 .banner .preheader {
   margin: 0 0 var(--space-3);
+  font-family: var(--font-mark);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  letter-spacing: var(--tracking-eyebrow);
+  font-weight: var(--font-weight-mark);
+  letter-spacing: var(--tracking-mark);
   color: var(--color-highlight);
 }
 
@@ -7635,15 +7648,16 @@ deml-chart-empty-state,
   font-size: clamp(calc(var(--grid) * 4.5), 6vw, var(--font-size-2xl));
   font-weight: var(--font-weight-display);
   letter-spacing: var(--tracking-display);
-  line-height: 0.98;
+  line-height: var(--leading-display);
   color: var(--color-text);
 }
 
 .banner .lede {
   max-width: 42ch;
   margin: 0 0 var(--space-5);
-  font-family: var(--font-serif);
+  font-family: var(--font-body);
   letter-spacing: var(--tracking-intro);
+  line-height: var(--leading-body);
   color: var(--color-text-secondary);
 }
 
@@ -8208,10 +8222,10 @@ deml-explore-card,
 
 .form-panel__eyebrow {
   margin: 0;
-  font-family: var(--font-sans);
+  font-family: var(--font-mark);
   font-size: var(--font-size-xs);
-  font-weight: 600;
-  letter-spacing: var(--tracking-eyebrow);
+  font-weight: var(--font-weight-mark);
+  letter-spacing: var(--tracking-mark);
   line-height: 1.2;
   text-transform: uppercase;
   color: var(--color-primary);
@@ -8219,22 +8233,22 @@ deml-explore-card,
 
 .form-panel__title {
   margin: 0;
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   font-size: clamp(calc(var(--grid) * 3.5), 4vw, var(--font-size-lg));
-  font-weight: 700;
+  font-weight: var(--font-weight-display);
   letter-spacing: var(--tracking-display);
-  line-height: 1.1;
+  line-height: var(--leading-display);
   color: var(--color-card-text);
 }
 
 .form-panel__description {
   margin: 0;
   max-width: 42ch;
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   font-size: var(--font-size-sm);
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-intro);
-  line-height: 1.45;
+  line-height: var(--leading-body);
   color: var(--color-card-text-secondary);
 }
 
@@ -8255,6 +8269,55 @@ deml-explore-card,
   width: 100%;
   margin: 0;
   padding: 0;
+}
+
+/* Settings / account tables compose inside form panels without one-off app CSS */
+.form-panel table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  line-height: var(--leading-body);
+  color: var(--color-card-text);
+}
+
+.form-panel caption {
+  caption-side: top;
+  margin: 0 0 var(--space-2);
+  text-align: left;
+  font-family: var(--font-mark);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-mark);
+  letter-spacing: var(--tracking-mark);
+  text-transform: uppercase;
+  color: var(--color-card-text-secondary);
+}
+
+.form-panel th,
+.form-panel td {
+  padding: var(--space-2) var(--space-2) var(--space-2) 0;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: var(--border-width) solid var(--color-card-border);
+}
+
+.form-panel th {
+  font-family: var(--font-mark);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-mark);
+  letter-spacing: var(--tracking-mark);
+  text-transform: uppercase;
+  color: var(--color-card-text-secondary);
+}
+
+.form-panel tbody th {
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-tight);
+  text-transform: none;
+  color: var(--color-card-text);
 }
 
 .form-panel__error {

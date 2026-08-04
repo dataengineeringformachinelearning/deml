@@ -29,6 +29,13 @@ describe('resolvePostLoginTarget', () => {
     });
   });
 
+  it('sends bare home to the dashboard', () => {
+    expect(resolvePostLoginTarget('/', options)).toEqual({
+      kind: 'app',
+      url: DEFAULT_POST_LOGIN_PATH,
+    });
+  });
+
   it('rejects absolute URLs passed through navigateByUrl (the /https: bug)', () => {
     expect(resolvePostLoginTarget('https://deml.app/dashboard', options)).toEqual({
       kind: 'app',
@@ -62,6 +69,14 @@ describe('resolvePostLoginTarget', () => {
 
   it('sends auth loops and unknown hosts to the dashboard', () => {
     expect(resolvePostLoginTarget('/login', options)).toEqual({
+      kind: 'app',
+      url: DEFAULT_POST_LOGIN_PATH,
+    });
+    expect(resolvePostLoginTarget('/signup', options)).toEqual({
+      kind: 'app',
+      url: DEFAULT_POST_LOGIN_PATH,
+    });
+    expect(resolvePostLoginTarget('/mfa', options)).toEqual({
       kind: 'app',
       url: DEFAULT_POST_LOGIN_PATH,
     });

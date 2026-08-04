@@ -8,6 +8,7 @@ import { provideClientHydration } from '@angular/platform-browser';
 import {
   provideRouter,
   withComponentInputBinding,
+  withInMemoryScrolling,
   withPreloading,
   withViewTransitions,
 } from '@angular/router';
@@ -23,6 +24,10 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes,
       withComponentInputBinding(),
+      withInMemoryScrolling({
+        anchorScrolling: 'enabled',
+        scrollPositionRestoration: 'enabled',
+      }),
       withViewTransitions(),
       withPreloading(CriticalPathPreloadingStrategy),
     ),
