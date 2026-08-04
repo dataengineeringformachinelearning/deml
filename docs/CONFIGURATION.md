@@ -9,7 +9,7 @@
 | Layer | Runtime loader | Example file | Deploy |
 |-------|----------------|--------------|--------|
 | Backend | `backend/config/settings.py` + `backend/utils/env.py` | `backend/.env.example` | Fly (`backend/fly.toml`); Railway standby |
-| Frontend | `frontend/set-env.js` → `environment*.ts` | `frontend/.env.example` | Vercel (`frontend/vercel.json`) |
+| Frontend | `set-env.js` → `environment*.ts` | `.env.frontend.example` | Vercel (repo root / `frontend/` shim) |
 | Shared suite URLs | Catalog `suite_urls` | Root `.env.example` | Documented only |
 
 ## Fail-fast

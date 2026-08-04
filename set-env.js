@@ -112,7 +112,7 @@ if (onVercel) {
   if (missing.length) {
     console.error(
       `set-env: Vercel build missing required env: ${missing.join(', ')}. ` +
-        'See config/deml.catalog.json and frontend/.env.example.',
+        'See config/deml.catalog.json and .env.frontend.example.',
     );
     process.exit(1);
   }

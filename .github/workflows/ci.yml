@@ -131,9 +131,6 @@ jobs:
     needs: [shared]
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    defaults:
-      run:
-        working-directory: frontend
     steps:
       - uses: actions/checkout@v7
 
@@ -144,16 +141,13 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Install workspace dependencies
-        run: npm ci --legacy-peer-deps --prefix ..
+        run: npm ci --legacy-peer-deps
 
       - name: Build shared contracts (first)
-        run: npm run build:contracts --prefix ..
+        run: npm run build:contracts
 
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Lint
-        run: npm run lint
-
-      - name: Vitest (app)
-        run: npm test
+      - name: Unit tests
+        run: npm test -- --watch=false

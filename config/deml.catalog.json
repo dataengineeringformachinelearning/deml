@@ -4,7 +4,7 @@
   "docs": "docs/CONFIGURATION.md",
   "runtime": {
     "backend": "backend/config/settings.py + backend/utils/env.py",
-    "frontend": "frontend/set-env.js → src/environments/environment*.ts",
+    "frontend": "set-env.js → src/environments/environment*.ts",
     "contracts": "packages/deml-contracts"
   },
   "suite_urls": {
@@ -75,7 +75,7 @@
       "layers": ["backend", "frontend"],
       "secret": false,
       "required_on": ["vercel"],
-      "example": ["backend/.env.example", "frontend/.env.example"],
+      "example": ["backend/.env.example", ".env.frontend.example"],
       "group": "urls"
     },
     {
@@ -83,7 +83,7 @@
       "layers": ["backend", "frontend"],
       "secret": false,
       "required_on": ["vercel"],
-      "example": ["backend/.env.example", "frontend/.env.example"],
+      "example": ["backend/.env.example", ".env.frontend.example"],
       "group": "urls"
     },
     {
@@ -91,7 +91,7 @@
       "layers": ["backend", "frontend"],
       "secret": false,
       "required_on": [],
-      "example": ["backend/.env.example", "frontend/.env.example"],
+      "example": ["backend/.env.example", ".env.frontend.example"],
       "group": "urls"
     },
     {
@@ -115,7 +115,7 @@
       "layers": ["backend", "frontend"],
       "secret": false,
       "required_on": ["vercel"],
-      "example": ["backend/.env.example", "frontend/.env.example"],
+      "example": ["backend/.env.example", ".env.frontend.example"],
       "group": "firebase"
     },
     {
@@ -131,7 +131,7 @@
       "layers": ["frontend"],
       "secret": false,
       "required_on": ["vercel"],
-      "example": "frontend/.env.example",
+      "example": ".env.frontend.example",
       "group": "firebase"
     },
     {
@@ -139,7 +139,7 @@
       "layers": ["frontend"],
       "secret": false,
       "required_on": ["vercel"],
-      "example": "frontend/.env.example",
+      "example": ".env.frontend.example",
       "group": "firebase"
     },
     {
@@ -147,7 +147,7 @@
       "layers": ["frontend"],
       "secret": false,
       "required_on": ["vercel"],
-      "example": "frontend/.env.example",
+      "example": ".env.frontend.example",
       "group": "firebase"
     },
     {
@@ -155,7 +155,7 @@
       "layers": ["frontend"],
       "secret": false,
       "required_on": ["vercel"],
-      "example": "frontend/.env.example",
+      "example": ".env.frontend.example",
       "group": "firebase"
     },
     {
@@ -163,7 +163,7 @@
       "layers": ["backend", "frontend"],
       "secret": false,
       "required_on": ["paas"],
-      "example": ["backend/.env.example", "frontend/.env.example"],
+      "example": ["backend/.env.example", ".env.frontend.example"],
       "group": "forjd"
     },
     {
@@ -271,7 +271,7 @@
       "layers": ["backend", "frontend"],
       "secret": false,
       "required_on": [],
-      "example": ["backend/.env.example", "frontend/.env.example"],
+      "example": ["backend/.env.example", ".env.frontend.example"],
       "group": "observability"
     },
     {
@@ -303,7 +303,7 @@
       "layers": ["frontend", "backend"],
       "secret": false,
       "required_on": [],
-      "example": "frontend/.env.example",
+      "example": ".env.frontend.example",
       "group": "ingest",
       "default": "false"
     },
@@ -312,7 +312,7 @@
       "layers": ["frontend"],
       "secret": false,
       "required_on": [],
-      "example": "frontend/.env.example",
+      "example": ".env.frontend.example",
       "group": "sanity"
     },
     {
@@ -320,7 +320,7 @@
       "layers": ["frontend"],
       "secret": false,
       "required_on": [],
-      "example": "frontend/.env.example",
+      "example": ".env.frontend.example",
       "group": "sanity"
     },
     {

@@ -39,6 +39,13 @@ testem.log
 /typings
 __screenshots__/
 
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+**/.venv/
+/uv.lock
+
 # System files
 .DS_Store
 Thumbs.db

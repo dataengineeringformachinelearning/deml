@@ -27,7 +27,7 @@
       }
     },
     "UC-AUTH-004": {
-      "unit": ["frontend/src/app/services/auth.service.spec.ts"],
+      "unit": ["src/app/services/auth.service.spec.ts"],
       "integration": ["backend/config/test_auth_usecases.py::test_logout_revokes_session"],
       "observability": {
         "sources": ["backend/config/api_auth.py"],
@@ -102,7 +102,7 @@
       }
     },
     "UC-ANALYTICS-001": {
-      "unit": ["frontend/src/app/services/live-updates.service.spec.ts"],
+      "unit": ["src/app/services/live-updates.service.spec.ts"],
       "integration": ["backend/forjd/test_live.py::test_live_stream_emits_ready_and_projection_events"],
       "observability": {
         "sources": ["backend/forjd/live.py"],
@@ -134,7 +134,7 @@
       }
     },
     "UC-VULN-001": {
-      "unit": ["frontend/src/app/services/vulnerability.service.spec.ts"],
+      "unit": ["src/app/services/vulnerability.service.spec.ts"],
       "integration": ["backend/forjd/test_angular_compat.py::test_vulnerabilities_proxy_maps_forjd"],
       "observability": {
         "sources": ["backend/forjd/views.py"],
@@ -142,7 +142,7 @@
       }
     },
     "UC-STATUS-001": {
-      "unit": ["frontend/src/app/services/monitor.service.spec.ts"],
+      "unit": ["src/app/services/monitor.service.spec.ts"],
       "integration": ["backend/forjd/test_angular_compat.py::test_status_pages_list_fallback_on_outage"],
       "observability": {
         "sources": ["backend/forjd/views.py"],
@@ -185,7 +185,7 @@
       }
     },
     "UC-PIPE-001": {
-      "unit": ["frontend/src/app/core/workflow-yaml.spec.ts"],
+      "unit": ["src/app/core/workflow-yaml.spec.ts"],
       "integration": ["backend/forjd/test_usecase_proxies.py::test_workflows_list_proxy"],
       "observability": {
         "sources": ["backend/forjd/views.py"],
@@ -201,7 +201,7 @@
       }
     },
     "UC-EXPORT-001": {
-      "unit": ["frontend/src/app/pages/analytics/analytics.spec.ts"],
+      "unit": ["src/app/pages/analytics/analytics.spec.ts"],
       "integration": ["backend/forjd/test_headless_contract.py::test_export_create_detail_and_signed_download_are_tenant_bound"],
       "observability": {
         "sources": ["backend/forjd/views.py"],
@@ -209,7 +209,7 @@
       }
     },
     "UC-ML-001": {
-      "unit": ["frontend/src/app/services/ml.service.spec.ts"],
+      "unit": ["src/app/services/ml.service.spec.ts"],
       "integration": ["backend/forjd/test_angular_compat.py::test_deml_export_jobs_and_ml_latest"],
       "observability": {
         "sources": ["backend/forjd/views.py"],
@@ -257,7 +257,7 @@
       }
     },
     "UC-HEALTH-001": {
-      "unit": ["frontend/src/app/core/continuity-health.spec.ts"],
+      "unit": ["src/app/core/continuity-health.spec.ts"],
       "integration": ["backend/config/test_ready_contract.py::test_ready_exposes_forjd_health_and_mode"],
       "observability": {
         "sources": ["backend/config/api.py"],
@@ -265,21 +265,21 @@
       }
     },
     "UC-SETTINGS-001": {
-      "unit": ["frontend/src/app/pages/settings/settings.spec.ts"],
-      "integration": ["frontend/src/app/pages/settings/settings.spec.ts"],
+      "unit": ["src/app/pages/settings/settings.spec.ts"],
+      "integration": ["src/app/pages/settings/settings.spec.ts"],
       "observability": {
         "deferred_observability": "Composed UI; child UC boundaries own server logs"
       }
     },
     "UC-ACCOUNT-001": {
-      "unit": ["frontend/src/app/pages/account/account.spec.ts"],
-      "integration": ["frontend/src/app/pages/account/account.spec.ts"],
+      "unit": ["src/app/pages/account/account.spec.ts"],
+      "integration": ["src/app/pages/account/account.spec.ts"],
       "observability": {
         "deferred_observability": "Client preferences; billing/auth child UCs own server logs"
       }
     },
     "UC-ONBOARD-001": {
-      "unit": ["frontend/src/app/services/onboarding.service.spec.ts"],
+      "unit": ["src/app/services/onboarding.service.spec.ts"],
       "integration": ["src/app/services/onboarding.service.spec.ts"],
       "observability": {
         "deferred_observability": "Client-only checklist; no server boundary"

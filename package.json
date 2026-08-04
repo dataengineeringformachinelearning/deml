@@ -15,8 +15,12 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "typecheck": "node set-env.js && ng build --configuration development",
     "serve:ssr:deml": "node dist/deml/server/server.mjs",
-    "build:contracts": "npm run build --workspace @dataengineeringformachinelearning/deml-contracts"
+    "build:contracts": "npm run build --workspace @dataengineeringformachinelearning/deml-contracts",
+    "validate:config": "python3 scripts/check_config_catalog.py",
+    "validate:contracts": "npm run build:contracts && uv run --project packages/deml-contracts python -c \"from deml_contracts import USE_CASE_IDS, SealedEvent; assert len(USE_CASE_IDS)==37\"",
+    "validate:usecase-coverage": "python3 scripts/check_usecase_coverage.py"
   },
   "dependencies": {
     "@angular/common": "^22.1.0",
