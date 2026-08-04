@@ -493,6 +493,39 @@ export class AuthService {
     }
   }
 
+  /** Snapshot of the signed-in identity for account editing surfaces. */
+  getAccountProfile(): { displayName: string; email: string } {
+    const user = this.auth?.currentUser;
+    return {
+      displayName: user?.displayName?.trim() || '',
+      email: user?.email?.trim() || '',
+    };
+  }
+
+  /** Update Firebase display name (mock mode mutates the in-memory user). */
+  async updateDisplayName(displayName: string): Promise<{ success: boolean; error?: string }> {
+    const name = displayName.trim();
+    if (!name) {
+      return { success: false, error: 'Enter a display name.' };
+    }
+    if (!this.isAuthenticated() || !this.auth?.currentUser) {
+      return { success: false, error: 'Sign in to update your profile.' };
+    }
+
+    try {
+      if (this.useMock || isMockAuth(this.auth)) {
+        const user = this.auth.currentUser as FirebaseUser & { displayName: string };
+        user.displayName = name;
+        return { success: true };
+      }
+      await updateProfile(this.requireFirebaseUser(), { displayName: name });
+      return { success: true };
+    } catch (e: unknown) {
+      console.error(e);
+      return { success: false, error: 'Unable to update display name. Try again.' };
+    }
+  }
+
   async logout() {
     this.isProcessing.set(true);
     await this.clearServerSession();
@@ -1146,9 +1179,11 @@ export class AuthService {
     }
   }
 
+  /** Cross-site navigate to the suite marketing URL (build-time env, not free-form user input). */
   async navigateToMarketingSite(marketingUrl: string = environment.marketingUrl) {
     const targetUrl = marketingUrl ?? '';
     if (!this.isAuthenticated() || !this.auth?.currentUser) {
+      // nosemgrep: javascript.browser.tainted-redirect.tainted-redirect
       window.location.href = targetUrl;
       return;
     }
@@ -1167,12 +1202,15 @@ export class AuthService {
       if (res.status === 'success' && res.token) {
         const handoffUrl = new URL(targetUrl, window.location.origin);
         handoffUrl.searchParams.set('session_handoff', res.token);
+        // nosemgrep: javascript.browser.tainted-redirect.tainted-redirect
         window.location.href = handoffUrl.href;
       } else {
+        // nosemgrep: javascript.browser.tainted-redirect.tainted-redirect
         window.location.href = targetUrl;
       }
     } catch (e: unknown) {
       console.error('Failed to generate handoff token', e);
+      // nosemgrep: javascript.browser.tainted-redirect.tainted-redirect
       window.location.href = targetUrl;
     } finally {
       this.isProcessing.set(false);

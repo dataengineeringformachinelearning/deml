@@ -18,7 +18,8 @@ def _slugify(title: str) -> str:
 
 
 def _section_id(title: str) -> str:
-  digest = hashlib.md5(title.encode("utf-8")).hexdigest()[:6]
+  # Non-cryptographic short stable id for anchor uniqueness (not a signature).
+  digest = hashlib.sha256(title.encode("utf-8")).hexdigest()[:6]
   return f"{_slugify(title)}-{digest}"
 
 

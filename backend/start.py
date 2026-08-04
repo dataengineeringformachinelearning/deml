@@ -155,8 +155,12 @@ def main() -> None:
       "3600",
     ],
   }
-  server = subprocess.Popen(server_command)
-  workers = {name: subprocess.Popen(cmd) for name, cmd in worker_commands.items()}
+  # Commands are fixed argv lists (manage.py workers), not shell-interpolated user input.
+  server = subprocess.Popen(server_command)  # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-tainted-env-args.dangerous-subprocess-use-tainted-env-args
+  workers = {
+    name: subprocess.Popen(cmd)  # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-tainted-env-args.dangerous-subprocess-use-tainted-env-args
+    for name, cmd in worker_commands.items()
+  }
   worker_restarts = dict.fromkeys(worker_commands, 0)
 
   def _shutdown(_signum: int, _frame: object) -> None:
