@@ -18,43 +18,45 @@ export interface HomeCard {
   readonly signedInPrimary?: HomeCardAction;
 }
 
+/** Home entry cards — product surfaces only (no fictional Write editor). */
 export const HOME_CARDS: readonly HomeCard[] = [
   {
-    id: 'write',
-    heading: 'Write',
-    subtext: 'Capture ideas with a calm, focused editor.',
-    visual: 'gold',
+    id: 'explore',
+    heading: 'Explore',
+    subtext: 'Browse public status pages with live SLA, latency, and uptime.',
+    visual: 'olive',
     actions: [
-      { label: 'Learn more', routerLink: '/blog', variant: 'primary' },
-      { label: 'Learn', routerLink: '/learn', variant: 'secondary' },
+      { label: 'Open directory', routerLink: '/explore', variant: 'primary' },
+      { label: 'Platform status', routerLink: '/status/platform-status', variant: 'secondary' },
     ],
   },
   {
     id: 'sites',
     heading: 'Sites',
-    subtext: 'Ship a clean presence without the clutter.',
-    visual: 'olive',
+    subtext: 'Connect domains, embed widgets, and manage monitored surfaces.',
+    visual: 'gold',
     guestPrimary: { label: 'Get started', routerLink: '/signup', variant: 'primary' },
     signedInPrimary: { label: 'Open Sites', routerLink: '/sites', variant: 'primary' },
-    actions: [{ label: 'Learn more', routerLink: '/learn', variant: 'secondary' }],
+    actions: [{ label: 'Learn the stack', routerLink: '/learn', variant: 'secondary' }],
   },
   {
     id: 'dashboard',
     heading: 'Dashboard',
-    subtext: 'See what matters across your workspace.',
+    subtext: 'Workspace pulse for sessions, traffic, and continuity signals.',
     visual: 'red',
     guestPrimary: { label: 'Sign in', routerLink: '/login', variant: 'primary' },
-    signedInPrimary: { label: 'Open', routerLink: '/dashboard', variant: 'primary' },
-    actions: [{ label: 'Read', routerLink: '/blog', variant: 'secondary' }],
+    signedInPrimary: { label: 'Open dashboard', routerLink: '/dashboard', variant: 'primary' },
+    actions: [{ label: 'Analytics', routerLink: '/analytics', variant: 'secondary' }],
   },
   {
-    id: 'account',
-    heading: 'Account',
-    subtext: 'Preferences that stay out of the way.',
-    visual: 'gold',
-    guestPrimary: { label: 'Sign up', routerLink: '/signup', variant: 'primary' },
-    signedInPrimary: { label: 'Manage', routerLink: '/account', variant: 'primary' },
-    actions: [{ label: 'Learn more', routerLink: '/learn', variant: 'secondary' }],
+    id: 'learn',
+    heading: 'Learn',
+    subtext: 'Catalog of packages, install paths, and reference notes for the stack.',
+    visual: 'olive',
+    actions: [
+      { label: 'Open catalog', routerLink: '/learn', variant: 'primary' },
+      { label: 'Read the blog', routerLink: '/blog', variant: 'secondary' },
+    ],
   },
 ];
 

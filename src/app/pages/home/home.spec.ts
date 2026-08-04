@@ -28,7 +28,9 @@ describe('Home', () => {
   it('should render the banner with homepage copy', () => {
     const host = fixture.nativeElement as HTMLElement;
     expect(host.querySelector('app-banner')).toBeTruthy();
-    expect(host.querySelector('h1.banner-heading')?.textContent).toContain('Build with clarity');
+    expect(host.querySelector('h1.banner-heading')?.textContent).toContain(
+      'Control plane for ML data',
+    );
   });
 
   it('should show auth CTAs when logged out', () => {
@@ -47,6 +49,6 @@ describe('Home', () => {
     );
 
     expect(host.querySelector('app-card-grid')).toBeTruthy();
-    expect(headings).toEqual(['Write', 'Sites', 'Dashboard', 'Account']);
+    expect(headings).toEqual(['Explore', 'Sites', 'Dashboard', 'Learn']);
   });
 });

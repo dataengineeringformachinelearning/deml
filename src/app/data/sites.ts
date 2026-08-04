@@ -20,7 +20,7 @@ export const SITE_CARDS: readonly SiteCard[] = [
   {
     id: 'studio',
     heading: 'Studio',
-    subtext: 'Primary marketing presence with blog and learn routes.',
+    subtext: 'Primary site with status embeds, blog, and learn routes.',
     meta: 'Live',
     visual: 'olive',
     status: 'Healthy',

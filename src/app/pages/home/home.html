@@ -1,22 +1,23 @@
 <app-banner
   preheader="DEML"
-  heading="Build with clarity."
-  lede="A focused space for ideas, writing, and work that stays out of the way."
+  heading="Control plane for ML data."
+  lede="Monitor sites, publish status, run analytics, and learn the stack — without clutter."
 >
   <app-button-group>
     @if (!loggedIn()) {
       <app-button variant="primary" shape="pill" routerLink="/signup">Sign up</app-button>
       <app-button variant="secondary" shape="pill" routerLink="/login">Log in</app-button>
     } @else {
-      <app-button variant="primary" shape="pill" routerLink="/blog">Read the blog</app-button>
+      <app-button variant="primary" shape="pill" routerLink="/dashboard">Open dashboard</app-button>
+      <app-button variant="secondary" shape="pill" routerLink="/explore">Status directory</app-button>
     }
   </app-button-group>
 </app-banner>
 
 <app-page-section variant="catalog" labelledBy="home-cards-heading">
   <app-section-header
-    heading="Explore"
-    lede="Jump into writing, sites, metrics, and account controls."
+    heading="Product surfaces"
+    lede="Jump into status, sites, dashboards, and the learning catalog."
     headingId="home-cards-heading"
   />
 
