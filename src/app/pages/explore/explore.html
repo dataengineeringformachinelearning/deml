@@ -1,34 +1,63 @@
 <app-banner
   preheader="DEML"
   heading="Explore"
-  lede="Browse platform surfaces and documentation paths."
-/>
+  lede="Browse status cards published on the platform. Open a page for live service health."
+>
+  <app-button variant="secondary" shape="pill" routerLink="/status/platform-status">
+    Platform status
+  </app-button>
+</app-banner>
 
 <app-page-section variant="catalog" labelledBy="explore-heading">
   <app-section-header
-    eyebrow="Catalog"
-    heading="Surfaces"
-    lede="Entry points composed from the shared card grid."
+    eyebrow="Public"
+    heading="Status directory"
+    lede="Public status mega-cards — one full-width card per page."
     headingId="explore-heading"
   />
 
-  <app-card-grid>
-    @for (card of cards; track card.id) {
-      <app-card
-        [heading]="card.heading"
-        [subtext]="card.subtext"
-        [visual]="card.visual"
-      >
-        <app-button-group align="center" layout="row">
-          <app-button
-            [variant]="card.ctaVariant ?? 'primary'"
-            shape="pill"
-            [routerLink]="card.href"
-          >
-            {{ card.cta }}
-          </app-button>
-        </app-button-group>
-      </app-card>
+  <div class="explore-directory">
+    @if (loadFailed()) {
+      <div class="explore-card__error" role="alert">
+        <h2 class="explore-card__error-title">Unable to connect</h2>
+        <p class="explore-card__error-lede">
+          We couldn’t reach the status service. Verify the backend is running, then retry.
+        </p>
+        <app-button
+          variant="primary"
+          shape="pill"
+          [disabled]="isRetrying()"
+          (pressed)="retryLoad()"
+        >
+          Retry connection
+        </app-button>
+      </div>
+    } @else if (!isLoading() && statusPages().length === 0) {
+      <div class="explore-card__empty">
+        <h2 class="explore-card__empty-title">No public status pages</h2>
+        <p class="explore-card__empty-lede">
+          Users haven’t published any status pages yet. Create and publish one from settings.
+        </p>
+        <app-button variant="primary" shape="pill" routerLink="/settings">
+          Open settings
+        </app-button>
+      </div>
+    } @else {
+      @for (page of displayPages(); track page.id) {
+        <app-explore-card
+          [title]="page.title"
+          [description]="page.description || 'Monitoring core services'"
+          [href]="getPageUrl(page)"
+          [proVerified]="!!page.is_pro_verified"
+          [status]="getPageStatus(page)"
+          [statusLabel]="getPageStatusLabel(page)"
+          [tag]="pageTag(page)"
+          [metrics]="exploreMetrics(page)"
+          [uptimeHistory]="exploreUptimeHistory(page)"
+          [uptimePercentage]="overallUptime(page)"
+          [uptimeSummary]="uptimeSummary(page)"
+        />
+      }
     }
-  </app-card-grid>
+  </div>
 </app-page-section>

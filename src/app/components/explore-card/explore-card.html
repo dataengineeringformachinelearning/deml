@@ -1,0 +1,50 @@
+<article class="explore-card" [attr.data-status]="status()">
+  <header class="explore-card__header">
+    <div class="explore-card__meta">
+      <span class="status-pill" [attr.data-status]="pillStatus()">{{ statusLabel() }}</span>
+      <span class="explore-card__tag">{{ tag() }}</span>
+      @if (proVerified()) {
+        <span class="explore-card__tag">Pro</span>
+      }
+    </div>
+    <h3 class="explore-card__title">{{ title() }}</h3>
+    @if (description()) {
+      <p class="explore-card__lede">{{ description() }}</p>
+    }
+  </header>
+
+  @if (metrics().length) {
+    <ul class="explore-card__metrics" role="list">
+      @for (metric of metrics(); track metric.label) {
+        <li class="explore-card__metric">
+          <span class="explore-card__metric-label">{{ metric.label }}</span>
+          <span class="explore-card__metric-value">{{ metric.value }}</span>
+          @if (metric.meta) {
+            <span class="explore-card__metric-meta">{{ metric.meta }}</span>
+          }
+        </li>
+      }
+    </ul>
+  }
+
+  <div class="explore-card__uptime">
+    <div class="explore-card__uptime-head">
+      <span class="explore-card__uptime-label">Uptime</span>
+      <span class="explore-card__uptime-value">{{ uptimeDisplay() }}</span>
+    </div>
+    @if (uptimeHistory().length) {
+      <div class="explore-card__uptime-track" aria-hidden="true">
+        @for (point of uptimeHistory(); track point.date) {
+          <span class="explore-card__uptime-seg" [attr.data-status]="point.status"></span>
+        }
+      </div>
+    }
+    @if (uptimeSummary()) {
+      <p class="explore-card__uptime-summary">{{ uptimeSummary() }}</p>
+    }
+  </div>
+
+  <footer class="explore-card__footer">
+    <app-button variant="primary" shape="pill" [routerLink]="href()">View status</app-button>
+  </footer>
+</article>
