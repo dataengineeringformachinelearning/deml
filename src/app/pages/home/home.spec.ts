@@ -43,11 +43,13 @@ describe('Home', () => {
     expect(labels).toContain('Status directory');
   });
 
-  it('should not render a product-surface card board', () => {
+  it('should not render product-surface cards or settings hash sections', () => {
     const host = fixture.nativeElement as HTMLElement;
     expect(host.querySelector('app-card-grid')).toBeNull();
     expect(host.querySelector('app-card')).toBeNull();
+    expect(host.querySelector('#account')).toBeNull();
     expect(host.querySelector('#sites')).toBeNull();
+    expect(host.querySelector('#preferences')).toBeNull();
     expect(host.querySelector('#explore')).toBeNull();
     expect(host.textContent).not.toContain('Product surfaces');
   });

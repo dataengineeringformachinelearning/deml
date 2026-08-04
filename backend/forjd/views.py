@@ -200,11 +200,7 @@ async def _status_directory_read_client(
 
 
 def _published_directory_pages(pages: list[dict[str, Any]]) -> list[dict[str, Any]]:
-  return [
-    page
-    for page in pages
-    if page.get("is_published") or _is_platform_status_page(page)
-  ]
+  return [page for page in pages if page.get("is_published") or _is_platform_status_page(page)]
 
 
 async def _fetch_published_directory(
@@ -1053,9 +1049,7 @@ async def status_pages_list_proxy(request: HttpRequest) -> HttpResponse:
         upstream = json.loads(response.body)
         if not isinstance(upstream, dict):
           raise AdapterError(502, "FORJD returned an invalid status pages list")
-        pages = _owned_status_pages(
-          deml_status_pages(upstream, deml_user_id=deml_user_id)
-        )
+        pages = _owned_status_pages(deml_status_pages(upstream, deml_user_id=deml_user_id))
         return JsonResponse(pages, status=200, safe=False)
 
       if published_only or client is None:
