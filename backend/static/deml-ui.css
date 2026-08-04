@@ -8049,6 +8049,126 @@ deml-explore-card,
   color: var(--color-card-text-secondary);
 }
 
+/* Detail mega-card — stacked sections inside one opaque module */
+.explore-card[data-layout='detail'] {
+  gap: var(--space-4);
+  min-height: 0;
+}
+
+.explore-card__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tile-gap);
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+}
+
+.explore-card__section-title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-card-text-secondary);
+}
+
+.explore-card__services {
+  display: grid;
+  gap: var(--tile-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.explore-card__service {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--module-pad);
+  background-color: color-mix(in srgb, var(--color-surface) 8%, var(--color-card));
+  border: var(--border-width) solid var(--color-card-border);
+}
+
+.explore-card__service-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.explore-card__service-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-card-text);
+}
+
+.explore-card__service-url {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  word-break: break-word;
+  color: var(--color-card-text-secondary);
+}
+
+.explore-card__incidents {
+  display: grid;
+  gap: var(--tile-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.explore-card__incident {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--module-pad);
+  background-color: color-mix(in srgb, var(--color-surface) 8%, var(--color-card));
+  border: var(--border-width) solid var(--color-card-border);
+}
+
+.explore-card__incident-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-card-text);
+}
+
+.explore-card__incident-meta {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-card-text-secondary);
+}
+
+.explore-card__incident-body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  line-height: var(--leading-body);
+  color: var(--color-card-text-secondary);
+}
+
+.explore-card__muted {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  color: var(--color-card-text-secondary);
+}
+
 /* inlined: components/form-panel/form-panel.css */
 /* Component: form-panel — from deml new-from-the-start */
 

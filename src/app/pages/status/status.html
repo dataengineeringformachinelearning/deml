@@ -1,14 +1,16 @@
 <app-banner
   preheader="DEML"
   heading="Status"
-  lede="Service health and continuity signals."
-/>
+  lede="Continuity overview. Open a public page from Explore for the full individual mega-card."
+>
+  <app-button variant="primary" shape="pill" routerLink="/explore">Browse directory</app-button>
+</app-banner>
 
 <app-page-section variant="catalog" labelledBy="status-heading">
   <app-section-header
     eyebrow="Continuity"
     heading="Systems"
-    lede="Health tiles from the shared board — equal rows, equal gaps."
+    lede="High-level health tiles. Individual public statuses use the mega-card detail view."
     headingId="status-heading"
   />
 

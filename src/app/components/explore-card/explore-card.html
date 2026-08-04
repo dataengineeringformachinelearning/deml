@@ -1,4 +1,4 @@
-<article class="explore-card" [attr.data-status]="status()">
+<article class="explore-card" [attr.data-status]="status()" [attr.data-layout]="layout()">
   <header class="explore-card__header">
     <div class="explore-card__meta">
       <span class="status-pill" [attr.data-status]="pillStatus()">{{ statusLabel() }}</span>
@@ -27,9 +27,81 @@
     </ul>
   }
 
+  @for (group of metricGroups(); track group.id) {
+    <section class="explore-card__section" [attr.aria-label]="group.heading">
+      <h4 class="explore-card__section-title">{{ group.heading }}</h4>
+      <ul class="explore-card__metrics" role="list">
+        @for (metric of group.metrics; track metric.label) {
+          <li class="explore-card__metric">
+            <span class="explore-card__metric-label">{{ metric.label }}</span>
+            <span class="explore-card__metric-value">{{ metric.value }}</span>
+            @if (metric.meta) {
+              <span class="explore-card__metric-meta">{{ metric.meta }}</span>
+            }
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  @if (layout() === 'detail') {
+    <section class="explore-card__section" aria-label="Monitored services">
+      <h4 class="explore-card__section-title">Active monitored services</h4>
+      @if (!services().length) {
+        <p class="explore-card__muted">No monitored services configured for this page.</p>
+      } @else {
+        <ul class="explore-card__services" role="list">
+          @for (service of services(); track service.id) {
+            <li class="explore-card__service">
+              <div class="explore-card__service-head">
+                <div>
+                  <h5 class="explore-card__service-title">{{ service.name }}</h5>
+                  <p class="explore-card__service-url">{{ service.url }}</p>
+                </div>
+                <span class="status-pill" [attr.data-status]="servicePillStatus(service.status)">
+                  {{ service.statusLabel }}
+                </span>
+              </div>
+              <ul class="explore-card__metrics" role="list">
+                @for (metric of service.metrics; track metric.label) {
+                  <li class="explore-card__metric">
+                    <span class="explore-card__metric-label">{{ metric.label }}</span>
+                    <span class="explore-card__metric-value">{{ metric.value }}</span>
+                    @if (metric.meta) {
+                      <span class="explore-card__metric-meta">{{ metric.meta }}</span>
+                    }
+                  </li>
+                }
+              </ul>
+              <div class="explore-card__uptime">
+                <div class="explore-card__uptime-head">
+                  <span class="explore-card__uptime-label">Uptime</span>
+                  <span class="explore-card__uptime-value">
+                    {{ uptimeDisplay(service.uptimePercentage) }}
+                  </span>
+                </div>
+                @if (service.uptimeHistory.length) {
+                  <div class="explore-card__uptime-track" aria-hidden="true">
+                    @for (point of service.uptimeHistory; track point.date) {
+                      <span
+                        class="explore-card__uptime-seg"
+                        [attr.data-status]="point.status"
+                      ></span>
+                    }
+                  </div>
+                }
+                <p class="explore-card__uptime-summary">{{ service.uptimeSummary }}</p>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+
   <div class="explore-card__uptime">
     <div class="explore-card__uptime-head">
-      <span class="explore-card__uptime-label">Uptime</span>
+      <span class="explore-card__uptime-label">{{ uptimeLabel() }}</span>
       <span class="explore-card__uptime-value">{{ uptimeDisplay() }}</span>
     </div>
     @if (uptimeHistory().length) {
@@ -44,7 +116,28 @@
     }
   </div>
 
-  <footer class="explore-card__footer">
-    <app-button variant="primary" shape="pill" [routerLink]="href()">View status</app-button>
-  </footer>
+  @if (layout() === 'detail' && incidents().length) {
+    <section class="explore-card__section" aria-label="Incidents">
+      <h4 class="explore-card__section-title">Recent incidents &amp; maintenance</h4>
+      <ul class="explore-card__incidents" role="list">
+        @for (incident of incidents(); track incident.id) {
+          <li class="explore-card__incident">
+            <h5 class="explore-card__incident-title">{{ incident.title }}</h5>
+            <p class="explore-card__incident-meta">
+              {{ incident.status }} · {{ incident.updatedAt }}
+            </p>
+            <p class="explore-card__incident-body">{{ incident.message }}</p>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  @if (showCta() && href()) {
+    <footer class="explore-card__footer">
+      <app-button variant="primary" shape="pill" [routerLink]="href()!">
+        {{ ctaLabel() }}
+      </app-button>
+    </footer>
+  }
 </article>
