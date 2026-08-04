@@ -127,17 +127,19 @@
   --radius-md: 0;
   --radius-lg: 0;
 
+  /* Plot contract: card width → aspect height; soft ceiling via max-inline only */
   --chart-aspect: 2.4;
   --chart-spark-aspect: 2.4;
   --chart-min-block: calc(var(--grid) * 20);
-  /* Soft ceiling for SVG plot block height — keeps aspect without giant wells */
   --chart-max-block: calc(var(--grid) * 32);
   --chart-stage-max-inline: calc(var(--chart-max-block) * var(--chart-aspect));
   --chart-spark-min-block: calc(var(--grid) * 12);
   --chart-spark-max-block: calc(var(--grid) * 25);
+  --chart-spark-stage-max-inline: calc(var(--chart-spark-max-block) * var(--chart-spark-aspect));
   --chart-panel-block: var(--chart-min-block);
   --chart-plot-block: var(--chart-min-block);
-  --chart-inset: var(--space-2);
+  /* Equal inset from plot-well edges to the SVG/stage content */
+  --chart-inset: var(--space-3);
   --chart-plot: var(--color-plot);
   --chart-grid: var(--color-plot-grid);
   --chart-baseline: var(--color-plot-baseline);
@@ -6424,10 +6426,10 @@ app-chart-card[data-accent='primary'],
 }
 
 /*
- * Plot band — hosts fill width; SVG charts size via --chart-aspect.
- * Content lists/bars grow with items — never clip or scroll inside the tile.
- * Do not force height:100% on children (that squashes viewBox plots).
- * Equal-height peer tiles: ::after spacer absorbs leftover row height (letterbox).
+ * Plot band — hosts fill the card content width; plots size via --chart-aspect
+ * (wider well → taller plot). Equal --chart-inset lives on the plot stage.
+ * Do not stretch children with height:100% (squashes viewBox plots).
+ * Peer equal-height rows: ::after letterboxes leftover tile height, not the SVG.
  */
 .chart-card-body {
   display: flex;
@@ -6455,6 +6457,7 @@ deml-chart-card .chart-card-body > * {
   min-width: 0;
   min-height: 0;
   flex: 0 0 auto;
+  align-self: stretch;
 }
 
 :host([data-size='hero']) .chart-card-heading,
@@ -6474,7 +6477,7 @@ app-chart-card[data-size='wide'] .chart-card-heading {
 }
 
 /* inlined: components/area-chart/area-chart.css */
-/* Component: area-chart — aspect-locked plot; never squash viewBox */
+/* Component: area-chart — width→aspect height; equal inset; never squash */
 
 .component--area-chart .demo {
   display: grid;
@@ -6490,7 +6493,7 @@ deml-area-chart,
   width: 100%;
   min-width: 0;
   min-height: 0;
-  flex: 0 1 auto;
+  flex: 0 0 auto;
   --chart-accent: var(--color-primary);
   --chart-plot: var(--color-plot);
   --chart-grid: var(--color-plot-grid);
@@ -6520,21 +6523,22 @@ deml-area-chart[data-accent='primary'],
 
 .area-chart-frame {
   display: flex;
-  flex: 0 1 auto;
+  flex: 0 0 auto;
   align-items: stretch;
-  justify-content: center;
+  justify-content: stretch;
   box-sizing: border-box;
   width: 100%;
-  margin: 0;
+  max-width: var(--chart-stage-max-inline);
+  margin: 0 auto;
   padding: var(--chart-inset);
   background-color: var(--chart-plot);
   border: var(--border-width) solid var(--color-plot-border);
 }
 
 /*
- * Full plot — width fills card; height from --chart-aspect only.
- * Soft ceiling via max-width derived from --chart-max-block.
- * Never set height:100% or conflicting min-height that breaks aspect.
+ * Full plot — fill the well width; height from --chart-aspect only.
+ * Soft ceiling is max-width (--chart-stage-max-inline), never max-height
+ * (max-height fights aspect and leaves empty black wells).
  */
 app-area-chart:not([data-variant='spark']) .area-chart-frame,
 deml-area-chart:not([data-variant='spark']) .area-chart-frame,
@@ -6542,17 +6546,20 @@ deml-area-chart:not([data-variant='spark']) .area-chart-frame,
 .component--area-chart .area-chart-frame,
 .component--chart-card .area-chart-frame {
   aspect-ratio: var(--chart-aspect);
-  width: min(100%, var(--chart-stage-max-inline));
+  width: 100%;
+  max-width: var(--chart-stage-max-inline);
   height: auto;
-  max-height: var(--chart-max-block);
-  margin-inline: auto;
+  max-height: none;
 }
 
 .area-chart {
   display: block;
+  box-sizing: border-box;
   width: 100%;
   height: 100%;
+  min-width: 0;
   min-height: 0;
+  flex: 1 1 auto;
   overflow: visible;
 }
 
@@ -6610,14 +6617,15 @@ deml-area-chart:not([data-variant='spark']) .area-chart-frame,
   letter-spacing: var(--tracking-mark);
 }
 
-/* Spark — same aspect contract as full plots */
+/* Spark — same aspect contract; soft ceiling via spark max-inline */
 app-area-chart[data-variant='spark'] .area-chart-frame,
 deml-area-chart[data-variant='spark'] .area-chart-frame,
 :host([data-variant='spark']) .area-chart-frame {
-  width: min(100%, calc(var(--chart-spark-max-block) * var(--chart-spark-aspect)));
+  width: 100%;
+  max-width: var(--chart-spark-stage-max-inline);
   aspect-ratio: var(--chart-spark-aspect);
   height: auto;
-  max-height: var(--chart-spark-max-block);
+  max-height: none;
   margin-inline: auto;
   padding: 0;
   border: 0;
@@ -6651,7 +6659,7 @@ app-area-chart[data-variant='spark'] .area-chart-node,
 }
 
 /* inlined: components/bar-chart/bar-chart.css */
-/* Component: bar-chart — content-sized plot band (peer width to area) */
+/* Component: bar-chart — peer width + equal inset; content-tall rows */
 
 .component--bar-chart .demo {
   display: grid;
@@ -6667,7 +6675,7 @@ deml-bar-chart,
   width: 100%;
   min-width: 0;
   min-height: 0;
-  flex: 0 1 auto;
+  flex: 0 0 auto;
   --chart-accent: var(--color-primary);
   --chart-plot: var(--color-plot);
   --chart-label: var(--color-plot-muted);
@@ -6691,21 +6699,22 @@ app-bar-chart[data-accent='primary'],
 }
 
 /*
- * Content-sized plot band — peer width to area charts via --chart-stage-max-inline.
- * Height grows with rows (no aspect lock / inner scroll); tiles stretch around it.
+ * Plot well — same max-inline + equal inset as area charts.
+ * Height grows with rows (no aspect lock); peer tiles letterbox around it.
  */
 .bar-chart {
   display: flex;
-  flex: 0 1 auto;
+  flex: 0 0 auto;
   flex-direction: column;
   justify-content: flex-start;
   gap: var(--space-2);
   box-sizing: border-box;
-  width: min(100%, var(--chart-stage-max-inline));
+  width: 100%;
+  max-width: var(--chart-stage-max-inline);
   min-height: var(--chart-min-block);
   height: auto;
   margin: 0 auto;
-  padding: var(--chart-inset) var(--space-3);
+  padding: var(--chart-inset);
   overflow: visible;
   list-style: none;
   background-color: var(--chart-plot);
@@ -6793,10 +6802,11 @@ app-bar-chart[data-accent='primary'],
 .chart-figure__plot {
   display: block;
   box-sizing: border-box;
-  width: min(100%, var(--chart-stage-max-inline));
+  width: 100%;
+  max-width: var(--chart-stage-max-inline);
   aspect-ratio: var(--chart-aspect);
   height: auto;
-  max-height: var(--chart-max-block);
+  max-height: none;
   margin-inline: auto;
   padding: var(--chart-inset);
   background-color: var(--chart-plot);
@@ -6894,14 +6904,16 @@ deml-chart-panel,
 
 .chart-panel__body {
   display: flex;
-  flex: 0 1 auto;
+  flex: 0 0 auto;
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
-  width: min(100%, var(--chart-stage-max-inline));
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--chart-stage-max-inline);
   aspect-ratio: var(--chart-aspect);
   height: auto;
-  max-height: var(--chart-max-block);
+  max-height: none;
   margin: 0 auto;
   padding: var(--chart-inset);
   overflow: visible;
@@ -6915,6 +6927,8 @@ deml-chart-panel,
   display: block;
   width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
 }
 
 @media screen and (min-width: 800px) {
@@ -6939,12 +6953,13 @@ deml-chart-empty-state,
   place-items: center;
   gap: var(--space-2);
   box-sizing: border-box;
-  width: min(100%, var(--chart-stage-max-inline));
+  width: 100%;
+  max-width: var(--chart-stage-max-inline);
   aspect-ratio: var(--chart-aspect);
   height: auto;
-  max-height: var(--chart-max-block);
+  max-height: none;
   margin: 0 auto;
-  padding: var(--module-pad);
+  padding: var(--chart-inset);
   text-align: center;
   color: var(--color-plot-muted);
   background-color: var(--chart-plot);

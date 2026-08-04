@@ -125,17 +125,19 @@
   --radius-md: 0;
   --radius-lg: 0;
 
+  /* Plot contract: card width → aspect height; soft ceiling via max-inline only */
   --chart-aspect: 2.4;
   --chart-spark-aspect: 2.4;
   --chart-min-block: calc(var(--grid) * 20);
-  /* Soft ceiling for SVG plot block height — keeps aspect without giant wells */
   --chart-max-block: calc(var(--grid) * 32);
   --chart-stage-max-inline: calc(var(--chart-max-block) * var(--chart-aspect));
   --chart-spark-min-block: calc(var(--grid) * 12);
   --chart-spark-max-block: calc(var(--grid) * 25);
+  --chart-spark-stage-max-inline: calc(var(--chart-spark-max-block) * var(--chart-spark-aspect));
   --chart-panel-block: var(--chart-min-block);
   --chart-plot-block: var(--chart-min-block);
-  --chart-inset: var(--space-2);
+  /* Equal inset from plot-well edges to the SVG/stage content */
+  --chart-inset: var(--space-3);
   --chart-plot: var(--color-plot);
   --chart-grid: var(--color-plot-grid);
   --chart-baseline: var(--color-plot-baseline);
