@@ -1,7 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { MonitorService, publicStatusPageTag } from './monitor.service';
+import {
+  MonitorService,
+  filterOwnedStatusPages,
+  isPlatformStatusPage,
+  publicStatusPageTag,
+} from './monitor.service';
 import { API_ENDPOINTS } from '../core/constants/api.constants';
 
 describe('MonitorService', () => {
@@ -28,6 +33,14 @@ describe('MonitorService', () => {
     expect(publicStatusPageTag('joealongi-dev')).toBe('Public Status Page');
     expect(publicStatusPageTag('platform-status')).toBe('Platform Status');
     expect(publicStatusPageTag('loading')).toBe('Loading');
+    expect(isPlatformStatusPage('platform-status')).toBe(true);
+    expect(isPlatformStatusPage({ slug: 'joealongi-dev' })).toBe(false);
+    expect(
+      filterOwnedStatusPages([
+        { slug: 'platform-status' },
+        { slug: 'joealongi-dev' },
+      ]).map(page => page.slug),
+    ).toEqual(['joealongi-dev']);
   });
 
   it('should fetch all endpoints', () => {
@@ -53,7 +66,7 @@ describe('MonitorService', () => {
     req.flush(mockData);
   });
 
-  it('should fetch status pages', () => {
+  it('should fetch the public status directory including platform', () => {
     const mockPages = [
       {
         id: 'p1',
@@ -68,6 +81,35 @@ describe('MonitorService', () => {
     service.getStatusPages().subscribe(pages => {
       expect(pages.length).toBe(1);
       expect(pages[0].slug).toBe('platform-status');
+    });
+
+    const req = httpMock.expectOne(API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockPages);
+  });
+
+  it('should filter platform pages from owned status lists', () => {
+    const mockPages = [
+      {
+        id: 'p1',
+        title: 'Platform Status',
+        slug: 'platform-status',
+        description: '',
+        created_at: '',
+        user_id: null,
+      },
+      {
+        id: 'p2',
+        title: 'joealongi.dev',
+        slug: 'joealongi-dev',
+        description: '',
+        created_at: '',
+        user_id: 1,
+      },
+    ];
+
+    service.getOwnedStatusPages().subscribe(pages => {
+      expect(pages.map(page => page.slug)).toEqual(['joealongi-dev']);
     });
 
     const req = httpMock.expectOne(API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES);

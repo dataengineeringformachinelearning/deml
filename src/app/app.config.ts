@@ -1,4 +1,4 @@
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import {
   ApplicationConfig,
   ErrorHandler,
@@ -15,12 +15,13 @@ import {
 
 import { routes } from './app.routes';
 import { CriticalPathPreloadingStrategy } from './core/critical-path-preloading.strategy';
+import { credentialsInterceptor } from './core/interceptors/credentials.interceptor';
 import { GlobalErrorHandler } from './core/handlers/global-error.handler';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideHttpClient(withFetch()),
+    provideHttpClient(withFetch(), withInterceptors([credentialsInterceptor])),
     provideRouter(
       routes,
       withComponentInputBinding(),

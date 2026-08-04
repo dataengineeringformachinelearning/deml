@@ -22,8 +22,8 @@ describe('Settings', () => {
         {
           provide: MonitorService,
           useValue: {
-            peekStatusPages: () => undefined,
-            getStatusPages: () =>
+            peekOwnedStatusPages: () => undefined,
+            getOwnedStatusPages: () =>
               of([
                 {
                   id: 'p1',
@@ -33,6 +33,15 @@ describe('Settings', () => {
                   is_published: true,
                   created_at: '',
                   user_id: 1,
+                },
+                {
+                  id: 'platform',
+                  title: 'Platform Status',
+                  slug: 'platform-status',
+                  description: 'Should be filtered',
+                  is_published: true,
+                  created_at: '',
+                  user_id: null,
                 },
               ]),
             createStatusPage: () => of({}),
@@ -76,7 +85,22 @@ describe('Settings', () => {
     expect(host.querySelector('app-form-panel')).toBeTruthy();
     expect(host.querySelector('app-card-grid')).toBeNull();
     expect(fixture.componentInstance.sites().length).toBe(1);
+    expect(fixture.componentInstance.sites()[0].slug).toBe('studio');
     expect(host.querySelector('table')).toBeTruthy();
+    expect(host.textContent).not.toContain('Platform Status');
+  });
+
+  it('should refuse to edit the platform status page', () => {
+    fixture.componentInstance.startEditSite({
+      id: 'platform',
+      title: 'Platform Status',
+      slug: 'platform-status',
+      description: '',
+      created_at: '',
+      user_id: null,
+    });
+    expect(fixture.componentInstance.editingSiteId()).toBeNull();
+    expect(fixture.componentInstance.sitesError()).toContain('Platform status');
   });
 
   it('should toggle theme from preferences', () => {

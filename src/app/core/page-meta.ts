@@ -22,7 +22,7 @@ export const ROUTE_PAGE_META: Record<string, PageMeta> = {
     description:
       'DEML is the learning library and Firebase-authenticated control plane for FORJD — identity, billing, consent, dashboards, and status surfaces powered by FORJD sealed streaming.',
     robots: INDEXABLE,
-    keywords: `${DEFAULT_KEYWORDS}, product showcase, observability, SLA forecasting`,
+    keywords: `${DEFAULT_KEYWORDS}, observability, SLA forecasting`,
     ogType: 'website',
   },
   login: {

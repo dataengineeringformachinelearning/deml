@@ -1,31 +1,21 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
 import { Banner } from '../../components/banner/banner';
 import { Button } from '../../components/button/button';
 import { ButtonGroup } from '../../components/button-group/button-group';
-import { Card } from '../../components/card/card';
-import { CardGrid } from '../../components/card-grid/card-grid';
-import { PageSection } from '../../components/page-section/page-section';
-import { SectionHeader } from '../../components/section-header/section-header';
-import { HOME_CARDS, resolveHomeCardActions } from '../../data/home';
+import { HOME_HERO } from '../../data/home';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-home',
-  imports: [Banner, Button, ButtonGroup, Card, CardGrid, PageSection, SectionHeader],
+  imports: [Banner, Button, ButtonGroup],
   templateUrl: './home.html',
-  host: { class: 'page page--catalog' },
+  host: { class: 'page' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home {
   private readonly auth = inject(AuthService);
 
   readonly loggedIn = this.auth.isAuthenticated;
-
-  readonly cards = computed(() =>
-    HOME_CARDS.map((card) => ({
-      ...card,
-      actions: resolveHomeCardActions(card, this.loggedIn()),
-    })),
-  );
+  readonly hero = HOME_HERO;
 }

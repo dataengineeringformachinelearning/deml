@@ -1,45 +1,16 @@
 <app-banner
-  preheader="DEML"
-  heading="Control plane for ML data."
-  lede="Monitor sites, publish status, run analytics, and learn the stack — without clutter."
+  [preheader]="hero.preheader"
+  [heading]="hero.heading"
+  [lede]="hero.lede"
 >
   <app-button-group>
     @if (!loggedIn()) {
       <app-button variant="primary" shape="pill" routerLink="/signup">Sign up</app-button>
       <app-button variant="secondary" shape="pill" routerLink="/login">Log in</app-button>
+      <app-button variant="secondary" shape="pill" routerLink="/explore">Status directory</app-button>
     } @else {
       <app-button variant="primary" shape="pill" routerLink="/dashboard">Open dashboard</app-button>
       <app-button variant="secondary" shape="pill" routerLink="/explore">Status directory</app-button>
     }
   </app-button-group>
 </app-banner>
-
-<app-page-section variant="catalog" labelledBy="home-cards-heading">
-  <app-section-header
-    heading="Product surfaces"
-    lede="Jump into status, sites, dashboards, and the learning catalog."
-    headingId="home-cards-heading"
-  />
-
-  <app-card-grid [columns]="2">
-    @for (card of cards(); track card.id) {
-      <app-card
-        [heading]="card.heading"
-        [subtext]="card.subtext"
-        [visual]="card.visual"
-      >
-        <app-button-group align="center" layout="row">
-          @for (action of card.actions; track action.label) {
-            <app-button
-              [variant]="action.variant"
-              shape="pill"
-              [routerLink]="action.routerLink"
-            >
-              {{ action.label }}
-            </app-button>
-          }
-        </app-button-group>
-      </app-card>
-    }
-  </app-card-grid>
-</app-page-section>

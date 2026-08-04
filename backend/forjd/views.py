@@ -146,6 +146,10 @@ def _client_for_credential(credential: ForjdTenantCredential) -> ForjdClient:
   )
 
 
+# Platform / tenant0 status page — public directory only, never account "My Sites".
+PLATFORM_STATUS_SLUG: Final[str] = "platform-status"
+
+
 def _request_has_end_user_auth(request: HttpRequest) -> bool:
   """True when Firebase/API-key identity terminated on this request."""
   has_token = bool(
@@ -156,6 +160,19 @@ def _request_has_end_user_auth(request: HttpRequest) -> bool:
     and getattr(request.user, "is_authenticated", False)
     and getattr(request.user, "is_active", False)
   )
+
+
+def _is_platform_status_page(page: dict[str, Any] | str | None) -> bool:
+  if isinstance(page, str):
+    return page == PLATFORM_STATUS_SLUG
+  if not isinstance(page, dict):
+    return False
+  return str(page.get("slug") or "") == PLATFORM_STATUS_SLUG
+
+
+def _owned_status_pages(pages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+  """Account-scoped list: never include DEML platform / tenant0 status."""
+  return [page for page in pages if not _is_platform_status_page(page)]
 
 
 async def _status_directory_read_client(
@@ -184,7 +201,9 @@ async def _status_directory_read_client(
 
 def _published_directory_pages(pages: list[dict[str, Any]]) -> list[dict[str, Any]]:
   return [
-    page for page in pages if page.get("is_published") or page.get("slug") == "platform-status"
+    page
+    for page in pages
+    if page.get("is_published") or _is_platform_status_page(page)
   ]
 
 
@@ -1011,8 +1030,34 @@ async def status_pages_list_proxy(request: HttpRequest) -> HttpResponse:
   if request.method == "GET":
     try:
       client, deml_user_id, published_only = await _status_directory_read_client(request)
-      # Anonymous explore must use the cross-tenant published directory so
-      # platform-status (DEML) and customer pages (joealongi) keep unique stats.
+      # Anonymous explore: cross-tenant published directory so platform-status
+      # (DEML/tenant0) and customer pages (e.g. joealongi.dev) stay distinct.
+      # Authenticated Settings: tenant-scoped only — never fall back to the
+      # public directory (fail closed) and never include platform-status.
+      if _request_has_end_user_auth(request) and not published_only:
+        if client is None:
+          return JsonResponse([], status=200, safe=False)
+        query_string = f"tenant_id={client.tenant_id}"
+        response = await client.proxy(
+          "GET",
+          "/api/v1/status/pages",
+          body=None,
+          query_string=query_string,
+          content_type="application/json",
+          request_id=request_id_from(request),
+        )
+        if response.status >= 400:
+          if empty_read_fallback_enabled() and response.status >= 500:
+            return JsonResponse([], status=200, safe=False)
+          return _upstream_error_response(response)
+        upstream = json.loads(response.body)
+        if not isinstance(upstream, dict):
+          raise AdapterError(502, "FORJD returned an invalid status pages list")
+        pages = _owned_status_pages(
+          deml_status_pages(upstream, deml_user_id=deml_user_id)
+        )
+        return JsonResponse(pages, status=200, safe=False)
+
       if published_only or client is None:
         try:
           pages = _published_directory_pages(
@@ -1028,24 +1073,7 @@ async def status_pages_list_proxy(request: HttpRequest) -> HttpResponse:
           return _forjd_error_response(exc)
         return JsonResponse(pages, status=200, safe=False)
 
-      query_string = f"tenant_id={client.tenant_id}"
-      response = await client.proxy(
-        "GET",
-        "/api/v1/status/pages",
-        body=None,
-        query_string=query_string,
-        content_type="application/json",
-        request_id=request_id_from(request),
-      )
-      if response.status >= 400:
-        if empty_read_fallback_enabled() and response.status >= 500:
-          return JsonResponse([], status=200, safe=False)
-        return _upstream_error_response(response)
-      upstream = json.loads(response.body)
-      if not isinstance(upstream, dict):
-        raise AdapterError(502, "FORJD returned an invalid status pages list")
-      pages = deml_status_pages(upstream, deml_user_id=deml_user_id)
-      return JsonResponse(pages, status=200, safe=False)
+      return JsonResponse([], status=200, safe=False)
     except AdapterError as exc:
       return _adapter_error_response(exc)
     except ForjdError as exc:
@@ -1068,10 +1096,16 @@ async def status_pages_list_proxy(request: HttpRequest) -> HttpResponse:
     credential = await _credential_for_request(request)
     deml_user_id = await sync_to_async(lambda: getattr(request.user, "id", None))()
     payload = _json_object(request)
+    slug = str(payload.get("slug") or "").strip().lower()
+    if _is_platform_status_page(slug):
+      return JsonResponse(
+        {"detail": "Platform status slug is reserved", "code": "platform_status_immutable"},
+        status=403,
+      )
     body = json.dumps(
       {
         "tenant_id": str(credential.tenant_id),
-        "slug": str(payload.get("slug") or ""),
+        "slug": slug,
         "title": str(payload.get("title") or ""),
         "description": str(payload.get("description") or ""),
         "is_published": bool(payload.get("is_published")),
@@ -1127,10 +1161,16 @@ async def status_page_detail_proxy(request: HttpRequest, page_id: str) -> HttpRe
       return JsonResponse({"ok": True}, status=200)
 
     payload = _json_object(request)
+    slug_raw = payload.get("slug")
+    if slug_raw is not None and _is_platform_status_page(str(slug_raw).strip().lower()):
+      return JsonResponse(
+        {"detail": "Platform status slug is reserved", "code": "platform_status_immutable"},
+        status=403,
+      )
     body = json.dumps(
       {
         "tenant_id": str(credential.tenant_id),
-        "slug": payload.get("slug"),
+        "slug": slug_raw,
         "title": payload.get("title"),
         "description": payload.get("description"),
         "is_published": payload.get("is_published"),

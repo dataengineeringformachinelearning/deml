@@ -1,8 +1,9 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { HttpClient, HttpContext } from '@angular/common/http';
+import { Observable, map, tap } from 'rxjs';
 import { API_ENDPOINTS } from '../core/constants/api.constants';
 import { SwrCacheService } from '../core/cache/swr-cache.service';
+import { SKIP_AUTH } from '../core/interceptors/credentials.interceptor';
 
 export interface EndpointData {
   id: string;
@@ -70,9 +71,24 @@ export interface IncidentData {
   updated_at: string;
 }
 
+/** DEML platform status page (tenant0) — never a user-owned site. */
+export const PLATFORM_STATUS_SLUG = 'platform-status';
+
+export const isPlatformStatusPage = (
+  page: Pick<StatusPageData, 'slug'> | string | null | undefined,
+): boolean => {
+  const slug = typeof page === 'string' ? page : page?.slug;
+  return slug === PLATFORM_STATUS_SLUG;
+};
+
+/** Drop platform/tenant0 pages from account-scoped site lists. */
+export const filterOwnedStatusPages = <T extends Pick<StatusPageData, 'slug'>>(
+  pages: readonly T[] | null | undefined,
+): T[] => (Array.isArray(pages) ? pages.filter(page => !isPlatformStatusPage(page)) : []);
+
 export const publicStatusPageTag = (slug: string): string => {
   if (slug === 'loading') return 'Loading';
-  return slug === 'platform-status' ? 'Platform Status' : 'Public Status Page';
+  return isPlatformStatusPage(slug) ? 'Platform Status' : 'Public Status Page';
 };
 
 @Injectable({
@@ -143,23 +159,45 @@ export class MonitorService {
     return this.http.get<EndpointData[]>(API_ENDPOINTS.SYSTEM_STATUS.ENDPOINTS);
   }
 
+  /** Public explore directory (cross-tenant published + platform). Never send auth. */
   getStatusPages(): Observable<StatusPageData[]> {
-    const key = this.swr.key('status:pages', {});
+    const key = this.swr.key('status:pages:public', {});
     return this.swr.observe(
       key,
       () =>
         this.http.get<StatusPageData[]>(API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES, {
           withCredentials: true,
+          context: new HttpContext().set(SKIP_AUTH, true),
         }),
       // Status telemetry is time-sensitive: paint a warm value immediately,
       // then always revalidate it instead of treating it as fresh for 30s.
+      { freshMs: 0, staleMs: 5 * 60_000, scope: 'public-status' },
+    );
+  }
+
+  /** Account-scoped sites for Settings — excludes platform/tenant0. */
+  getOwnedStatusPages(): Observable<StatusPageData[]> {
+    const key = this.swr.key('status:pages:owned', {});
+    return this.swr.observe(
+      key,
+      () =>
+        this.http
+          .get<StatusPageData[]>(API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES, {
+            withCredentials: true,
+          })
+          .pipe(map(pages => filterOwnedStatusPages(pages))),
       { freshMs: 0, staleMs: 5 * 60_000, scope: 'auth' },
     );
   }
 
-  /** Synchronous SWR peek for optimistic directory / settings paint. */
+  /** Synchronous SWR peek for optimistic explore directory paint. */
   peekStatusPages(): StatusPageData[] | undefined {
-    return this.swr.get<StatusPageData[]>(this.swr.key('status:pages', {}));
+    return this.swr.get<StatusPageData[]>(this.swr.key('status:pages:public', {}));
+  }
+
+  /** Synchronous SWR peek for Settings sites (already platform-filtered). */
+  peekOwnedStatusPages(): StatusPageData[] | undefined {
+    return this.swr.get<StatusPageData[]>(this.swr.key('status:pages:owned', {}));
   }
 
   getStatusPageBySlug(slug: string) {
@@ -170,7 +208,10 @@ export class MonitorService {
       () =>
         this.http.get<StatusPageData>(
           `${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES}/slug/${encodeURIComponent(slug)}`,
-          { withCredentials: true },
+          {
+            withCredentials: true,
+            context: new HttpContext().set(SKIP_AUTH, true),
+          },
         ),
       { freshMs: 0, staleMs: 10 * 60_000, scope: 'public-status' },
     );

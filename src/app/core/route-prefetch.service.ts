@@ -71,9 +71,11 @@ export class RoutePrefetchService {
       case 'analytics':
         this.analyticsQuery.getTenants<unknown>().subscribe({ next: ignore, error: ignore });
         this.analyticsQuery.getOverview<unknown>().subscribe({ next: ignore, error: ignore });
-        this.monitor.getStatusPages().subscribe({ next: ignore, error: ignore });
+        this.monitor.getOwnedStatusPages().subscribe({ next: ignore, error: ignore });
         break;
       case 'settings':
+        this.monitor.getOwnedStatusPages().subscribe({ next: ignore, error: ignore });
+        break;
       case 'explore':
         this.monitor.getStatusPages().subscribe({ next: ignore, error: ignore });
         break;

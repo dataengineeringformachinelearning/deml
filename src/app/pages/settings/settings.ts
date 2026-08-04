@@ -26,7 +26,12 @@ import {
   type SettingsSectionId,
 } from '../../data/settings';
 import { AuthService } from '../../services/auth.service';
-import { MonitorService, type StatusPageData } from '../../services/monitor.service';
+import {
+  MonitorService,
+  filterOwnedStatusPages,
+  isPlatformStatusPage,
+  type StatusPageData,
+} from '../../services/monitor.service';
 import { ThemeService } from '../../services/theme';
 
 const NOTIFY_STORAGE_KEY = 'deml-notification-prefs';
@@ -162,6 +167,10 @@ export class Settings {
   }
 
   startEditSite(site: StatusPageData): void {
+    if (isPlatformStatusPage(site)) {
+      this.sitesError.set('Platform status is managed by DEML and cannot be edited here.');
+      return;
+    }
     this.editingSiteId.set(site.id);
     this.siteTitle.set(site.title);
     this.siteSlug.set(site.slug);
@@ -196,6 +205,9 @@ export class Settings {
     } else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
       this.siteSlugError.set('Use lowercase letters, numbers, and hyphens.');
       valid = false;
+    } else if (isPlatformStatusPage(slug)) {
+      this.siteSlugError.set('That slug is reserved for DEML platform status.');
+      valid = false;
     }
     if (!valid) {
       return;
@@ -229,6 +241,10 @@ export class Settings {
 
   async deleteSite(site: StatusPageData): Promise<void> {
     if (!this.isBrowser) {
+      return;
+    }
+    if (isPlatformStatusPage(site)) {
+      this.sitesError.set('Platform status is managed by DEML and cannot be deleted here.');
       return;
     }
     const confirmed = globalThis.confirm(`Delete site “${site.title}”? This cannot be undone.`);
@@ -302,18 +318,18 @@ export class Settings {
 
   private async loadSites(): Promise<void> {
     this.sitesLoading.set(true);
-    const peek = this.monitor.peekStatusPages();
-    if (peek) {
+    const peek = filterOwnedStatusPages(this.monitor.peekOwnedStatusPages());
+    if (peek.length) {
       this.sites.set(peek);
       this.sitesLoading.set(false);
     }
 
     try {
-      const pages = await firstValueFrom(this.monitor.getStatusPages());
-      this.sites.set(Array.isArray(pages) ? pages : []);
+      const pages = await firstValueFrom(this.monitor.getOwnedStatusPages());
+      this.sites.set(filterOwnedStatusPages(pages));
       this.sitesError.set('');
     } catch (err: unknown) {
-      if (!peek) {
+      if (!peek.length) {
         this.sitesError.set(apiErrorMessage(err, 'Unable to load sites. Try again.'));
       }
     } finally {

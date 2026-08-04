@@ -455,6 +455,60 @@ def test_anonymous_status_pages_list_returns_published_directory(
 
 
 @pytest.mark.django_db
+@override_settings(
+  FORJD_CUTOVER_PHASE="2",
+  FORJD_READ_MODE="forjd",
+  FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
+)
+@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
+def test_authenticated_status_pages_list_excludes_platform_and_skips_directory(
+  mock_proxy: AsyncMock,
+  client: Client,
+) -> None:
+  """Settings sites must be tenant-scoped and never include platform-status."""
+  tenant_id = _mapped_user("sitesowner")
+  mock_proxy.return_value = ForjdResponse(
+    status=200,
+    body=json.dumps(
+      {
+        "ok": True,
+        "pages": [
+          {
+            "id": "page-mine",
+            "slug": "joealongi-dev",
+            "title": "joealongi.dev",
+            "description": "",
+            "is_published": True,
+            "created_at": "2026-07-19T00:00:00Z",
+          },
+          {
+            "id": "page-platform",
+            "slug": "platform-status",
+            "title": "Platform Status",
+            "description": "",
+            "is_published": True,
+            "created_at": "2026-07-19T00:00:00Z",
+          },
+        ],
+      }
+    ).encode(),
+    content_type="application/json",
+  )
+
+  with override_settings(FORJD_TENANT_ID=str(tenant_id)):
+    response = client.get(
+      "/api/v1/system-status/status_pages",
+      HTTP_AUTHORIZATION="Bearer mock-token-sitesowner-sitesowner@example.com",
+    )
+
+  assert response.status_code == 200
+  pages = response.json()
+  assert {page["slug"] for page in pages} == {"joealongi-dev"}
+  assert mock_proxy.await_args.args[:2] == ("GET", "/api/v1/status/pages")
+  assert f"tenant_id={tenant_id}" in (mock_proxy.await_args.kwargs.get("query_string") or "")
+
+
+@pytest.mark.django_db
 @patch("forjd.views.ForjdClient")
 def test_public_status_page_unwraps_forjd_response_for_existing_angular_shape(
   mock_client: MagicMock,

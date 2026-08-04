@@ -40,15 +40,29 @@ describe('Home', () => {
 
     expect(labels).toContain('Sign up');
     expect(labels).toContain('Log in');
+    expect(labels).toContain('Status directory');
   });
 
-  it('should render the home card grid', () => {
+  it('should not render a product-surface card board', () => {
     const host = fixture.nativeElement as HTMLElement;
-    const headings = Array.from(host.querySelectorAll('app-card h3')).map((el) =>
-      el.textContent?.trim(),
-    );
+    expect(host.querySelector('app-card-grid')).toBeNull();
+    expect(host.querySelector('app-card')).toBeNull();
+    expect(host.querySelector('#sites')).toBeNull();
+    expect(host.querySelector('#explore')).toBeNull();
+    expect(host.textContent).not.toContain('Product surfaces');
+  });
 
-    expect(host.querySelector('app-card-grid')).toBeTruthy();
-    expect(headings).toEqual(['Explore', 'Sites', 'Dashboard', 'Learn']);
+  it('should show dashboard CTA when logged in', async () => {
+    auth.isAuthenticated.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const labels = Array.from(fixture.nativeElement.querySelectorAll('app-button')).map((el) =>
+      (el as HTMLElement).textContent?.trim(),
+    );
+    expect(labels).toContain('Open dashboard');
+    expect(labels).toContain('Status directory');
+    expect(labels).not.toContain('Sign up');
+    expect(fixture.nativeElement.querySelector('app-card-grid')).toBeNull();
   });
 });

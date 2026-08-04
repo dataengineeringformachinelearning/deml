@@ -32,7 +32,10 @@ describe('RoutePrefetchService', () => {
         },
         {
           provide: MonitorService,
-          useValue: { getStatusPages: () => of([]) },
+          useValue: {
+            getStatusPages: () => of([]),
+            getOwnedStatusPages: () => of([]),
+          },
         },
         {
           provide: VulnerabilityService,
