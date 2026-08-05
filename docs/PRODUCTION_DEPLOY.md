@@ -11,7 +11,7 @@ Pair with [`PRODUCTION_CHECKLIST.md`](./PRODUCTION_CHECKLIST.md),
 | Angular product | this repo (`frontend/`) → Vercel `deml` | `deml.app` |
 | Django BFF | this repo (`backend/`) → Fly `deml-backend` | `backend.deml.app` |
 | Community Astro | [`dataengineeringformachinelearning`](https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning) | `dataengineeringformachinelearning.com` |
-| FORJD API / landing | [`forjd`](https://github.com/dataengineeringformachinelearning/forjd) | `backend.forjd.co` / `forjd.co` |
+| FORJD API | [`forjd`](https://github.com/dataengineeringformachinelearning/forjd) | `backend.forjd.co` (forjd.co retired) |
 
 **Last live baseline (2026-07-18, before the SIEM/SOAR hardening in this
 change set):**

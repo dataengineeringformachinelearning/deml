@@ -1,6 +1,6 @@
 # Suite UI Unification Mandate
 
-> **Superseded (2026-08):** Product visual SoT is **deml-ui** (new-from-the-start / atelier). See [THEME.md](../THEME.md) and [DEML_UI.md](./DEML_UI.md). Viking-UI / `packages/viking-ui` is retired. This document is historical.
+> **Superseded (2026-08):** Product visual SoT is **deml-ui** (warm ash NFTS). See [THEME.md](../THEME.md) and [DEML_UI.md](./DEML_UI.md). Viking-UI / forjd.co Angular landing are retired; FORJD public host is **backend.forjd.co** only. This document is historical.
 
 
 **Status:** Law for the multi-repo system (DEML + FORJD).

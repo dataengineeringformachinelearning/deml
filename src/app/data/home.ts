@@ -29,7 +29,7 @@ export interface HomePillar {
 export const HOME_HERO = {
   preheader: 'DEML',
   heading: 'Control plane for ML data.',
-  lede: 'Identity, status, analytics, and learning in one warm-ash surface — FORJD stays the sealed data plane.',
+  lede: 'Identity, status, analytics, and learning — FORJD handles the sealed streaming engine.',
 } as const;
 
 /**
@@ -40,7 +40,7 @@ export const HOME_DESTINATIONS: readonly HomeCard[] = [
   {
     id: 'explore',
     heading: 'Explore',
-    subtext: 'Browse the public status directory — live SLA, latency, and uptime mega-cards.',
+    subtext: 'Public status directory — SLA, latency, and uptime at a glance.',
     visual: 'olive',
     actions: [
       { label: 'Open directory', routerLink: '/explore', variant: 'primary' },
@@ -50,7 +50,7 @@ export const HOME_DESTINATIONS: readonly HomeCard[] = [
   {
     id: 'dashboard',
     heading: 'Dashboard',
-    subtext: 'Workspace pulse for sessions, traffic, and continuity signals across your accounts.',
+    subtext: 'Your workspace pulse — sessions, traffic, and continuity.',
     visual: 'red',
     guestPrimary: { label: 'Sign in', routerLink: '/login', variant: 'primary' },
     signedInPrimary: { label: 'Dashboard', routerLink: '/dashboard', variant: 'primary' },
@@ -59,7 +59,7 @@ export const HOME_DESTINATIONS: readonly HomeCard[] = [
   {
     id: 'learn',
     heading: 'Learn',
-    subtext: 'Catalog of packages, install paths, and reference notes for the stack.',
+    subtext: 'Catalog and notes for the stack you are building with.',
     visual: 'gold',
     actions: [
       { label: 'Open catalog', routerLink: '/learn', variant: 'primary' },
@@ -69,7 +69,7 @@ export const HOME_DESTINATIONS: readonly HomeCard[] = [
   {
     id: 'analytics',
     heading: 'Analytics',
-    subtext: 'Projection-backed charts for traffic and continuity — same aspect contract app-wide.',
+    subtext: 'Charts for traffic and continuity — same look everywhere.',
     visual: 'olive',
     guestPrimary: { label: 'Sign in', routerLink: '/login', variant: 'primary' },
     signedInPrimary: { label: 'Open analytics', routerLink: '/analytics', variant: 'primary' },
@@ -81,31 +81,27 @@ export const HOME_DESTINATIONS: readonly HomeCard[] = [
 export const HOME_PILLARS: readonly HomePillar[] = [
   {
     id: 'identity',
-    eyebrow: 'Control plane',
-    title: 'Identity & tenancy',
-    description:
-      'Firebase-authenticated accounts, roles, consent, and explicit FORJD tenant binding — fail closed on mismatch.',
+    eyebrow: 'You',
+    title: 'Identity & accounts',
+    description: 'Sign in, roles, consent, and your link to a FORJD tenant — kept local and clear.',
   },
   {
     id: 'status',
     eyebrow: 'Public',
-    title: 'Status & directories',
-    description:
-      'Publish status pages and browse the directory. Platform health stays separate from account site management.',
+    title: 'Status pages',
+    description: 'Publish status and browse the directory without mixing in account settings.',
   },
   {
     id: 'insights',
     eyebrow: 'Signals',
     title: 'Analytics & dashboards',
-    description:
-      'Read projections through the BFF. Charts keep a fixed aspect and equal inset so peers never squash plots.',
+    description: 'Read live projections through DEML. Charts stay the same size so nothing squashes.',
   },
   {
     id: 'learn',
     eyebrow: 'Docs',
     title: 'Learn the stack',
-    description:
-      'Direct-dependency catalog and notes for backend, frontend, Rust engine, and infra — no cluttered stubs.',
+    description: 'Packages and notes for the control plane and sealed data plane.',
   },
 ] as const;
 

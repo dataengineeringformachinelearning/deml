@@ -16,7 +16,7 @@ export const SITE_FOOTER_COLUMNS: readonly FooterColumn[] = [
     title: 'Platforms',
     links: [
       { label: 'DEML', routerLink: '/', href: '/' },
-      { label: 'FORJD', href: 'https://forjd.co/', external: true },
+      { label: 'FORJD', href: 'https://backend.forjd.co/', external: true },
       { label: 'Explore', routerLink: '/explore', href: '/explore' },
       { label: 'Dashboard', routerLink: '/dashboard', href: '/dashboard' },
       { label: 'Learn', routerLink: '/learn', href: '/learn' },
