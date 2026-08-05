@@ -251,6 +251,7 @@ function stripCommentsTs(source) {
 }
 
 // --- 8) Chart / grid squash patterns in product sources ---
+// CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE
 {
   const squash =
     /grid-auto-rows\s*:\s*var\(--(?:dash-row|tile-row[^)]*)\)\s*;/;
@@ -260,6 +261,29 @@ function stripCommentsTs(source) {
     if (squash.test(text) && !/minmax\s*\(/i.test(text)) {
       fail(`Fixed-only grid-auto-rows (must use minmax(..., auto)): ${rel(p)}`);
     }
+  }
+
+  const scalePath = join(ROOT, 'src/app/components/dashboard/chart-scale.ts');
+  if (!existsSync(scalePath)) {
+    fail('src/app/components/dashboard/chart-scale.ts missing');
+  } else {
+    const scale = read(scalePath);
+    if (!/sparkHeight:\s*140/.test(scale) || !/panelHeight:\s*280/.test(scale)) {
+      fail(
+        'chart-scale.ts must lock sparkHeight: 140 and panelHeight: 280',
+      );
+    }
+    if (!/function computeSharedDomain/.test(scale)) {
+      fail('chart-scale.ts must export computeSharedDomain for shared y-scale');
+    }
+    if (!/CHART RULES LOCKED/.test(scale)) {
+      fail('chart-scale.ts must include CHART RULES LOCKED comment');
+    }
+  }
+
+  const areaTs = join(ROOT, 'src/app/components/area-chart/area-chart.ts');
+  if (existsSync(areaTs) && !/CHART RULES LOCKED/.test(read(areaTs))) {
+    fail('area-chart.ts must include CHART RULES LOCKED comment');
   }
 }
 

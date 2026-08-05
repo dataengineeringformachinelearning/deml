@@ -30,6 +30,8 @@
 
   /* Chart plot — never theme-invert the series */
   --color-plot: #1c1916;
+  /* Activity-graph stage (panel line charts only) — not general page chrome */
+  --color-plot-stage: #121212;
   --color-plot-ink: #f3f0ea;
   --color-plot-muted: #c6c0b7;
   --color-plot-grid: color-mix(in srgb, #c6c0b7 22%, transparent);
@@ -125,26 +127,31 @@
   --radius-md: 0;
   --radius-lg: 0;
 
-  /* Plot contract: card width → aspect height; soft ceiling via max-inline only.
-     chart-card / chart-panel override --chart-stage-max-inline to 100% so full-width
-     tiles fill the content band (standalone stages keep this absolute soft ceiling). */
+  /*
+   * CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE
+   * Line/area stages: width 100%; height spark 140px / panel 280px; never data-driven.
+   */
+  --chart-height-spark: 140px;
+  --chart-height-panel: 280px;
+  /* Compat aliases — fixed heights supersede aspect-driven sizing for line charts */
   --chart-aspect: 2.4;
   --chart-spark-aspect: 2.4;
-  --chart-min-block: calc(var(--grid) * 20);
-  --chart-max-block: calc(var(--grid) * 72);
-  --chart-stage-max-inline: calc(var(--chart-max-block) * var(--chart-aspect));
-  --chart-spark-min-block: calc(var(--grid) * 12);
-  --chart-spark-max-block: calc(var(--grid) * 25);
-  --chart-spark-stage-max-inline: calc(var(--chart-spark-max-block) * var(--chart-spark-aspect));
-  --chart-panel-block: var(--chart-min-block);
-  --chart-plot-block: var(--chart-min-block);
+  --chart-min-block: var(--chart-height-panel);
+  --chart-max-block: var(--chart-height-panel);
+  --chart-stage-max-inline: 100%;
+  --chart-spark-min-block: var(--chart-height-spark);
+  --chart-spark-max-block: var(--chart-height-spark);
+  --chart-spark-stage-max-inline: 100%;
+  --chart-panel-block: var(--chart-height-panel);
+  --chart-plot-block: var(--chart-height-panel);
   /* Equal inset from plot-well edges to the SVG/stage content */
   --chart-inset: var(--space-3);
   --chart-plot: var(--color-plot);
+  --chart-stage-ink: var(--color-plot-stage);
   --chart-grid: var(--color-plot-grid);
   --chart-baseline: var(--color-plot-baseline);
   --chart-accent: var(--color-primary);
-  --chart-node: var(--color-plot-ink);
+  --chart-node: #ffffff;
   --chart-label: var(--color-plot-muted);
   --chart-value: var(--color-plot-ink);
   --chart-series-1: var(--color-primary);
@@ -259,6 +266,7 @@
   --color-text: #f3f0ea;
   --color-text-secondary: #c6c0b7;
   --color-plot: #1c1916;
+  --color-plot-stage: #121212;
   --color-plot-ink: #f3f0ea;
   --color-plot-muted: #c6c0b7;
   --color-plot-grid: color-mix(in srgb, #c6c0b7 22%, transparent);
@@ -316,6 +324,7 @@
   --color-text: #1c1916;
   --color-text-secondary: #4a453f;
   --color-plot: #1c1916;
+  --color-plot-stage: #121212;
   --color-plot-ink: #f3f0ea;
   --color-plot-muted: #c6c0b7;
   --color-plot-grid: color-mix(in srgb, #c6c0b7 22%, transparent);

@@ -15,7 +15,9 @@ chart contracts, or app-local design-system chrome. Expand only inside deml-ui.
 - **Palette:** dark ground `#35312D` / surface `#1C1916` / cream modules `#F3F0EA`; light ground `#D4CEC5`; primary `#2F5F8F`; accents `#3F6B54` / `#9E3D47`; muted `#C6C0B7` / `#4A453F`.
 - **Type:** **Geist only** (display, marks, intro, body). No Syne / Fraunces / Inter product stacks.
 - **Layout:** 8px grid, dual `data-theme`, equal `--tile-gap`, fluid dash-rows `minmax(--tile-row-unit, auto)`, solid opaque navbar, no page overflow.
-- **Charts:** fixed `--chart-aspect: 2.4`, equal `--chart-inset`, width-driven height; never squash, stretch, or theme-invert series.
+- **Charts (LOCKED):** `--chart-height-spark: 140px` / `--chart-height-panel: 280px`,
+  width `100%`, shared global y-scale (`computeSharedDomain`); equal `--chart-inset`;
+  never data-driven height, per-chart auto-scale, or theme-invert series.
 - **Docs:** `THEME.md` (locked contract), `docs/DEML_UI.md`, `AGENTS.md` (deml-ui Uniformity Law).
 - **Storybook:** https://ui.deml.app
 

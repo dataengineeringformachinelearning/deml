@@ -1,3 +1,4 @@
+// CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE
 import {
   ChangeDetectionStrategy,
   Component,

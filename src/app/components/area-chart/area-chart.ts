@@ -1,3 +1,4 @@
+// CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE
 import {
   ChangeDetectionStrategy,
   Component,
@@ -6,10 +7,15 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 
-import { CHART_SCALE } from '../dashboard/chart-scale';
+import {
+  CHART_SCALE,
+  type ChartDomain,
+  computeSharedDomain,
+  mapValueToY,
+} from '../dashboard/chart-scale';
 import type { DashAccent, DashPoint } from '../dashboard/dashboard.types';
 
-/** SVG viewBox — aspect locked to CHART_SCALE.fullAspect (360/150 = 2.4). */
+/** SVG viewBox — display size is CSS-fixed (140 spark / 280 panel); width 100%. */
 const VIEW_W = CHART_SCALE.viewInline;
 const VIEW_H = CHART_SCALE.viewBlock;
 const PAD_L = 32;
@@ -20,6 +26,33 @@ const PAD_B = 26;
 let areaChartSeq = 0;
 
 export type AreaChartVariant = 'full' | 'spark';
+
+type PlotNode = { x: number; y: number; label: string };
+
+/** Catmull-Rom → cubic bezier path (smooth activity-graph curve). */
+function smoothLinePath(nodes: readonly PlotNode[]): string {
+  if (nodes.length === 0) return '';
+  if (nodes.length === 1) {
+    return `M${nodes[0].x.toFixed(2)},${nodes[0].y.toFixed(2)}`;
+  }
+  if (nodes.length === 2) {
+    return `M${nodes[0].x.toFixed(2)},${nodes[0].y.toFixed(2)} L${nodes[1].x.toFixed(2)},${nodes[1].y.toFixed(2)}`;
+  }
+
+  let d = `M${nodes[0].x.toFixed(2)},${nodes[0].y.toFixed(2)}`;
+  for (let i = 0; i < nodes.length - 1; i++) {
+    const p0 = nodes[i === 0 ? 0 : i - 1];
+    const p1 = nodes[i];
+    const p2 = nodes[i + 1];
+    const p3 = nodes[i + 2] ?? p2;
+    const cp1x = p1.x + (p2.x - p0.x) / 6;
+    const cp1y = p1.y + (p2.y - p0.y) / 6;
+    const cp2x = p2.x - (p3.x - p1.x) / 6;
+    const cp2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C${cp1x.toFixed(2)},${cp1y.toFixed(2)} ${cp2x.toFixed(2)},${cp2y.toFixed(2)} ${p2.x.toFixed(2)},${p2.y.toFixed(2)}`;
+  }
+  return d;
+}
 
 @Component({
   encapsulation: ViewEncapsulation.None,
@@ -38,9 +71,15 @@ export class AreaChart {
   /** Series points plotted left → right. */
   readonly points = input.required<readonly DashPoint[]>();
 
+  /**
+   * Shared board y-domain. When omitted, falls back to this series only
+   * (tests); production boards MUST pass computeSharedDomain(...).
+   */
+  readonly domain = input<ChartDomain | null>(null);
+
   readonly accent = input<DashAccent>('primary');
 
-  /** `full` = labelled plot; `spark` = compact sparkline. */
+  /** `full` = labelled activity graph; `spark` = compact sparkline. */
   readonly variant = input<AreaChartVariant>('full');
 
   readonly ariaLabel = input('Area chart');
@@ -49,8 +88,11 @@ export class AreaChart {
   readonly viewRight = VIEW_W - PAD_R;
   readonly axisLabelY = VIEW_H - 8;
 
-  /** Full and spark plots always meet — never stretch the series. */
-  readonly preserveAspectRatio = 'xMidYMid meet' as const;
+  /**
+   * Stretch to the fixed CSS stage so width is fluid and height stays locked.
+   * Y mapping uses the shared domain — never local auto-scale.
+   */
+  readonly preserveAspectRatio = 'none' as const;
 
   readonly plot = computed(() => {
     const pts = this.points();
@@ -59,44 +101,42 @@ export class AreaChart {
     const padR = isSpark ? 4 : PAD_R;
     const padT = isSpark ? 8 : PAD_T;
     const padB = isSpark ? 8 : PAD_B;
+    const innerW = VIEW_W - padL - padR;
+    const innerH = VIEW_H - padT - padB;
+    const floorY = padT + innerH;
+
+    const resolvedDomain =
+      this.domain() ?? computeSharedDomain(pts.length ? [pts] : []);
 
     if (pts.length === 0) {
       return {
         line: '',
         area: '',
         baselineY: VIEW_H / 2,
-        nodes: [] as { x: number; y: number; label: string }[],
+        nodes: [] as PlotNode[],
         gridXs: [] as number[],
         yTop: '',
         yBottom: '',
         showAxes: false,
+        showGrid: false,
         padL,
-        floorY: VIEW_H - padB,
+        floorY,
         nodeRadius: isSpark ? 2.25 : 3.5,
       };
     }
 
-    const values = pts.map((p) => p.value);
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    const range = max - min || 1;
-    const innerW = VIEW_W - padL - padR;
-    const innerH = VIEW_H - padT - padB;
     const step = pts.length === 1 ? 0 : innerW / (pts.length - 1);
     const baselineY = padT + innerH / 2;
 
-    const nodes = pts.map((p, i) => {
+    const nodes: PlotNode[] = pts.map((p, i) => {
       const x = padL + step * i;
-      const y = padT + innerH - ((p.value - min) / range) * innerH;
+      const y = mapValueToY(p.value, resolvedDomain, padT, innerH);
       return { x, y, label: p.label };
     });
 
-    const line = nodes
-      .map((c, i) => `${i === 0 ? 'M' : 'L'}${c.x.toFixed(2)},${c.y.toFixed(2)}`)
-      .join(' ');
+    const line = smoothLinePath(nodes);
     const last = nodes[nodes.length - 1];
     const first = nodes[0];
-    const floorY = padT + innerH;
     const area = `${line} L${last.x.toFixed(2)},${floorY.toFixed(2)} L${first.x.toFixed(2)},${floorY.toFixed(2)} Z`;
 
     return {
@@ -104,10 +144,13 @@ export class AreaChart {
       area,
       baselineY,
       nodes,
-      gridXs: nodes.map((n) => n.x),
-      yTop: max.toLocaleString(undefined, { maximumFractionDigits: 0 }),
-      yBottom: min.toLocaleString(undefined, { maximumFractionDigits: 0 }),
+      gridXs: isSpark ? [] : nodes.map((n) => n.x),
+      yTop: resolvedDomain.max.toLocaleString(undefined, { maximumFractionDigits: 0 }),
+      yBottom: resolvedDomain.min.toLocaleString(undefined, {
+        maximumFractionDigits: 0,
+      }),
       showAxes: !isSpark,
+      showGrid: !isSpark,
       padL,
       floorY,
       nodeRadius: isSpark ? 2.25 : 3.5,

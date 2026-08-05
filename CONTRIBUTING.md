@@ -87,7 +87,7 @@ Do not add Viking-UI dependencies, `viking-*` components, or `--viking-*` tokens
 
 - 8px grid; equal tile gaps via `--tile-gap` / dashboard row units
 - `data-theme` light/dark
-- Charts keep `--chart-aspect` — never squash or stretch
+- Charts keep fixed `--chart-height-spark: 140px` / `--chart-height-panel: 280px` and shared y-scale — never data-size or auto-scale independently
 - WCAG 2.0 AA / Section 508
 - Compose with shared `app-*` components and dynamic tile data
 

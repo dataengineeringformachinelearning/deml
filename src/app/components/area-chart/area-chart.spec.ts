@@ -1,7 +1,8 @@
+// CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CHART_SCALE } from '../dashboard/chart-scale';
+import { CHART_SCALE, computeSharedDomain } from '../dashboard/chart-scale';
 import { AreaChart } from './area-chart';
 
 @Component({
@@ -10,6 +11,7 @@ import { AreaChart } from './area-chart';
   template: `
     <app-area-chart
       [points]="points"
+      [domain]="domain"
       accent="gold"
       ariaLabel="Weekly sessions"
     />
@@ -17,10 +19,11 @@ import { AreaChart } from './area-chart';
 })
 class Host {
   readonly points = [
-    { label: 'Mon', value: 10 },
-    { label: 'Tue', value: 20 },
-    { label: 'Wed', value: 15 },
+    { label: 'W1', value: 1200 },
+    { label: 'W2', value: 1560 },
+    { label: 'W8', value: 2510 },
   ];
+  readonly domain = computeSharedDomain([this.points]);
 }
 
 @Component({
@@ -29,6 +32,7 @@ class Host {
   template: `
     <app-area-chart
       [points]="points"
+      [domain]="domain"
       variant="spark"
       ariaLabel="Trend"
     />
@@ -36,9 +40,16 @@ class Host {
 })
 class SparkHost {
   readonly points = [
-    { label: '1', value: 4 },
-    { label: '2', value: 8 },
+    { label: '1', value: 1280 },
+    { label: '2', value: 2180 },
   ];
+  readonly domain = computeSharedDomain([
+    this.points,
+    [
+      { label: 'W1', value: 1200 },
+      { label: 'W8', value: 2510 },
+    ],
+  ]);
 }
 
 describe('AreaChart', () => {
@@ -62,7 +73,7 @@ describe('AreaChart', () => {
       'Weekly sessions',
     );
     expect(chart?.querySelectorAll('table.visually-hidden tbody tr').length).toBe(3);
-    expect(svg?.getAttribute('preserveAspectRatio')).toBe('xMidYMid meet');
+    expect(svg?.getAttribute('preserveAspectRatio')).toBe('none');
     expect(svg?.getAttribute('viewBox')).toBe(
       `0 0 ${CHART_SCALE.viewInline} ${CHART_SCALE.viewBlock}`,
     );
@@ -71,9 +82,10 @@ describe('AreaChart', () => {
     expect(chart?.querySelectorAll('circle.area-chart-node').length).toBe(3);
     expect(chart?.querySelectorAll('line.area-chart-grid-v').length).toBe(3);
     expect(chart?.querySelector('line.area-chart-baseline')).toBeTruthy();
+    expect(chart?.querySelector('.area-chart-y')?.textContent).toContain('2,510');
   });
 
-  it('should keep spark plots on meet so the series is never stretched', async () => {
+  it('should omit axes and grid on spark plots while using the shared domain', async () => {
     await TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [SparkHost],
@@ -83,7 +95,12 @@ describe('AreaChart', () => {
     sparkFixture.detectChanges();
     await sparkFixture.whenStable();
 
-    const svg = (sparkFixture.nativeElement as HTMLElement).querySelector('svg.area-chart');
-    expect(svg?.getAttribute('preserveAspectRatio')).toBe('xMidYMid meet');
+    const chart = (sparkFixture.nativeElement as HTMLElement).querySelector('app-area-chart');
+    const svg = chart?.querySelector('svg.area-chart');
+    expect(svg?.getAttribute('preserveAspectRatio')).toBe('none');
+    expect(chart?.getAttribute('data-variant')).toBe('spark');
+    expect(chart?.querySelectorAll('line.area-chart-grid-v').length).toBe(0);
+    expect(chart?.querySelector('.area-chart-y')).toBeNull();
+    expect(chart?.querySelectorAll('circle.area-chart-node').length).toBe(2);
   });
 });

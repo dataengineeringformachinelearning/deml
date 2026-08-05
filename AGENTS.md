@@ -170,10 +170,13 @@ Canonical docs: [.cursorrules](.cursorrules), [THEME.md](THEME.md),
 - **Compose pages** with `app-banner` → `app-page-section` → `app-section-header`
   → `app-tile-board` / `app-dashboard-grid` / `app-card-grid` (+ `app-site-footer`,
   `app-navbar`, `app-theme-toggle`).
-- **Charts:** `app-area-chart` / `app-bar-chart` inside `app-chart-card` only.
-  Keep `--chart-aspect: 2.4` and equal `--chart-inset`; fluid
-  `minmax(--tile-row-unit, auto)` rows — never squash with fixed-only tracks;
-  never theme-invert plot series.
+- **Charts (LOCKED):** `app-area-chart` / `app-bar-chart` inside `app-chart-card`
+  only. Fixed heights `--chart-height-spark: 140px` /
+  `--chart-height-panel: 280px`; width `100%`; shared board y-domain via
+  `computeSharedDomain` — **never** per-chart auto-scale or data-driven size.
+  Equal `--chart-inset`; fluid `minmax(--tile-row-unit, auto)` rows; never
+  theme-invert plot series. Do not change height/width/scale logic unless
+  explicitly asked.
 - **Shell:** solid opaque navbar; no page horizontal overflow; dynamic boards
   grow within scaffolding.
 - **Theme:** `data-theme="light"|"dark"`; deml-ui warm-ash tokens only.

@@ -26,7 +26,7 @@ electric `#2176ff` chrome on top of NFTS — that creates a frankenstein UI and 
 | Ownership | All visual values originate in **deml-ui** |
 | Product tree | Angular at repo-root `src/` (not `frontend/`) |
 | Type | **Geist only** — no Syne, Fraunces, Inter product stacks |
-| Charts | `--chart-aspect: 2.4`; never squash / stretch / theme-invert series |
+| Charts | Fixed `140` / `280` heights; width `100%`; shared y-scale; never theme-invert |
 | Layout | 8px grid; fluid `minmax(--tile-row-unit, auto)` peer rows |
 | Theme | Dual `data-theme="light"\|"dark"` via deml-ui tokens |
 | A11y | WCAG 2.0 AA — focus-visible, contrast, ≥44px hit targets, reduced motion |
@@ -107,16 +107,24 @@ Scale (8px-linked): `--font-size-xs` … `--font-size-2xl` via deml-ui tokens. D
 
 ## Charts (locked contract)
 
+> **CHART RULES LOCKED:** height fixed, width 100%, shared global scale — **DO NOT CHANGE**
+> unless the user explicitly asks. Regenerating a chart component must keep the same
+> size constants (`140` / `280`) and `computeSharedDomain`.
+
 | Token / rule | Value / law |
 |--------------|-------------|
-| `--chart-aspect` | `2.4` (also spark) |
+| `--chart-height-spark` | `140px` — stat / spark stages only |
+| `--chart-height-panel` | `280px` — full-width / chart-card / chart-panel stages |
+| Width | Always `100%` of parent; resize only in width |
+| Shared y-scale | `computeSharedDomain` over **all** line series on the board; no per-chart auto-scale |
+| Stage ink | `--chart-stage-ink` (`#121212`) on panel activity graphs; sparks stay transparent |
 | Inset | Equal `--chart-inset` from plot-well edges to SVG/stage |
-| Width → height | Plot wells fill card width (capped by `--chart-stage-max-inline`); wider cards grow taller |
+| Component | One shared `app-area-chart` (SVG activity graph) for spark + panel |
 | Placement | `app-area-chart` / `app-bar-chart` **inside** `app-chart-card` only |
 | Series | `--chart-series-*` from warm-ash tokens; do not invent hex |
-| Forbidden | `height: 100%` / max-height squash on stages; stretching SVG; theme-inverting plot ink; letterboxing the plot instead of peer tiles |
+| Forbidden | Aspect-driven taller-when-wider for line charts; data-driven height; independent y-domains; theme-inverting plot ink |
 
-Peer tiles letterbox; **never** the chart SVG.
+Peer tiles letterbox; **never** change the chart stage height.
 
 ---
 

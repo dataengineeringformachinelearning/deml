@@ -32,6 +32,8 @@
 
   /* Chart plot — never theme-invert the series */
   --color-plot: #1c1916;
+  /* Activity-graph stage (panel line charts only) — not general page chrome */
+  --color-plot-stage: #121212;
   --color-plot-ink: #f3f0ea;
   --color-plot-muted: #c6c0b7;
   --color-plot-grid: color-mix(in srgb, #c6c0b7 22%, transparent);
@@ -127,26 +129,31 @@
   --radius-md: 0;
   --radius-lg: 0;
 
-  /* Plot contract: card width → aspect height; soft ceiling via max-inline only.
-     chart-card / chart-panel override --chart-stage-max-inline to 100% so full-width
-     tiles fill the content band (standalone stages keep this absolute soft ceiling). */
+  /*
+   * CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE
+   * Line/area stages: width 100%; height spark 140px / panel 280px; never data-driven.
+   */
+  --chart-height-spark: 140px;
+  --chart-height-panel: 280px;
+  /* Compat aliases — fixed heights supersede aspect-driven sizing for line charts */
   --chart-aspect: 2.4;
   --chart-spark-aspect: 2.4;
-  --chart-min-block: calc(var(--grid) * 20);
-  --chart-max-block: calc(var(--grid) * 72);
-  --chart-stage-max-inline: calc(var(--chart-max-block) * var(--chart-aspect));
-  --chart-spark-min-block: calc(var(--grid) * 12);
-  --chart-spark-max-block: calc(var(--grid) * 25);
-  --chart-spark-stage-max-inline: calc(var(--chart-spark-max-block) * var(--chart-spark-aspect));
-  --chart-panel-block: var(--chart-min-block);
-  --chart-plot-block: var(--chart-min-block);
+  --chart-min-block: var(--chart-height-panel);
+  --chart-max-block: var(--chart-height-panel);
+  --chart-stage-max-inline: 100%;
+  --chart-spark-min-block: var(--chart-height-spark);
+  --chart-spark-max-block: var(--chart-height-spark);
+  --chart-spark-stage-max-inline: 100%;
+  --chart-panel-block: var(--chart-height-panel);
+  --chart-plot-block: var(--chart-height-panel);
   /* Equal inset from plot-well edges to the SVG/stage content */
   --chart-inset: var(--space-3);
   --chart-plot: var(--color-plot);
+  --chart-stage-ink: var(--color-plot-stage);
   --chart-grid: var(--color-plot-grid);
   --chart-baseline: var(--color-plot-baseline);
   --chart-accent: var(--color-primary);
-  --chart-node: var(--color-plot-ink);
+  --chart-node: #ffffff;
   --chart-label: var(--color-plot-muted);
   --chart-value: var(--color-plot-ink);
   --chart-series-1: var(--color-primary);
@@ -261,6 +268,7 @@
   --color-text: #f3f0ea;
   --color-text-secondary: #c6c0b7;
   --color-plot: #1c1916;
+  --color-plot-stage: #121212;
   --color-plot-ink: #f3f0ea;
   --color-plot-muted: #c6c0b7;
   --color-plot-grid: color-mix(in srgb, #c6c0b7 22%, transparent);
@@ -318,6 +326,7 @@
   --color-text: #1c1916;
   --color-text-secondary: #4a453f;
   --color-plot: #1c1916;
+  --color-plot-stage: #121212;
   --color-plot-ink: #f3f0ea;
   --color-plot-muted: #c6c0b7;
   --color-plot-grid: color-mix(in srgb, #c6c0b7 22%, transparent);
@@ -5680,20 +5689,24 @@ deml-stat-card[data-trend='down'] .stat-card-delta,
   color: var(--color-card-text-secondary);
 }
 
+/* CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE */
 .stat-card-spark {
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-end;
   width: 100%;
-  min-height: var(--chart-spark-min-block);
+  height: var(--chart-height-spark);
+  min-height: var(--chart-height-spark);
+  max-height: var(--chart-height-spark);
   margin-top: var(--space-3);
 }
 
-/* Spark keeps --chart-spark-aspect; never stretch to fill leftover tile height */
+/* Spark: fixed 140px; never stretch to fill leftover tile height */
 .stat-card-spark > :first-child {
   width: 100%;
+  height: var(--chart-height-spark);
   flex: 0 0 auto;
   align-self: stretch;
 }
@@ -6559,14 +6572,15 @@ app-metric-list[data-accent='primary'],
 }
 
 /* inlined: components/chart-card/chart-card.css */
-/* Component: chart-card — NFTS fill + aspect-safe plot band */
+/* CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE */
+/* Component: chart-card — NFTS fill; plot band hosts fixed-height line charts */
 
 .component--chart-card .demo {
   display: grid;
   gap: var(--tile-gap);
 }
 
-/* Chart card — titled shell; plot band hosts aspect-locked charts */
+/* Chart card — titled shell; plot band hosts fixed 140/280 line charts */
 
 app-chart-card,
 deml-chart-card,
@@ -6576,7 +6590,6 @@ deml-chart-card,
   height: 100%;
   min-width: 0;
   --chart-accent: var(--color-primary);
-  /* Fill the card content width; aspect drives height (wider → taller). */
   --chart-stage-max-inline: 100%;
   background-color: transparent;
 }
@@ -6606,7 +6619,6 @@ app-chart-card[data-accent='primary'],
   margin: 0;
   padding: var(--module-pad);
   overflow: visible;
-  /* Nested plot stages inherit this — fill the well, never a centered max-inline island. */
   --chart-stage-max-inline: 100%;
   color: var(--color-card-text);
   background-color: var(--color-card);
@@ -6649,10 +6661,10 @@ app-chart-card[data-accent='primary'],
 }
 
 /*
- * Plot band — hosts fill the card content width; plots size via --chart-aspect
- * (wider well → taller plot). Equal --chart-inset lives on the plot stage.
- * Do not stretch children with height:100% (squashes viewBox plots).
- * Peer equal-height rows: ::after letterboxes leftover tile height, not the SVG.
+ * Plot band — hosts fill the card content width; line charts use fixed
+ * --chart-height-panel (280px) / --chart-height-spark (140px). Equal
+ * --chart-inset lives on the plot stage. Peer equal-height rows: ::after
+ * letterboxes leftover tile height, not the SVG.
  */
 .chart-card-body {
   display: flex;
@@ -6716,7 +6728,8 @@ app-chart-card[data-size='wide'] .chart-card-heading {
 }
 
 /* inlined: components/area-chart/area-chart.css */
-/* Component: area-chart — width→aspect height; equal inset; never squash */
+/* CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE */
+/* Component: area-chart — fixed spark 140 / panel 280; width 100%; never data-sized */
 
 .component--area-chart .demo {
   display: grid;
@@ -6738,7 +6751,7 @@ deml-area-chart,
   --chart-grid: var(--color-plot-grid);
   --chart-baseline: var(--color-plot-baseline);
   --chart-label: var(--color-plot-muted);
-  --chart-node: var(--color-plot-ink);
+  --chart-node: #ffffff;
   background-color: transparent;
 }
 
@@ -6768,31 +6781,30 @@ deml-area-chart[data-accent='primary'],
   align-self: stretch;
   box-sizing: border-box;
   width: 100%;
-  max-width: var(--chart-stage-max-inline);
+  max-width: none;
+  height: var(--chart-height-panel);
   margin-inline: 0;
   margin-block: 0;
   padding: var(--chart-inset);
-  background-color: var(--chart-plot);
+  background-color: var(--chart-stage-ink);
   border: var(--border-width) solid var(--color-plot-border);
 }
 
 /*
- * Full plot — fill the well width; height from --chart-aspect only.
- * Inside chart-card/panel, --chart-stage-max-inline is 100% so the stage
- * spans the content band (never a tiny centered black island). Soft ceiling
- * for standalone stages remains the token; never max-height (fights aspect).
+ * Panel / full plot — fixed 280px; width 100%; height never follows data or aspect.
  */
 app-area-chart:not([data-variant='spark']) .area-chart-frame,
 deml-area-chart:not([data-variant='spark']) .area-chart-frame,
 :host(:not([data-variant='spark'])) .area-chart-frame,
 .component--area-chart .area-chart-frame,
 .component--chart-card .area-chart-frame {
-  aspect-ratio: var(--chart-aspect);
   width: 100%;
-  max-width: var(--chart-stage-max-inline);
-  height: auto;
+  max-width: none;
+  height: var(--chart-height-panel);
+  aspect-ratio: auto;
   max-height: none;
   margin-inline: 0;
+  background-color: var(--chart-stage-ink);
 }
 
 .area-chart {
@@ -6832,7 +6844,7 @@ deml-area-chart:not([data-variant='spark']) .area-chart-frame,
 
 .area-chart-node {
   fill: var(--chart-node);
-  stroke: var(--chart-plot);
+  stroke: var(--chart-stage-ink);
   stroke-width: 1.5;
 }
 
@@ -6860,16 +6872,16 @@ deml-area-chart:not([data-variant='spark']) .area-chart-frame,
   letter-spacing: var(--tracking-mark);
 }
 
-/* Spark — same aspect contract; soft ceiling via spark max-inline */
+/* Spark — fixed 140px; no axes/grid chrome (markup omits them); transparent stage */
 app-area-chart[data-variant='spark'] .area-chart-frame,
 deml-area-chart[data-variant='spark'] .area-chart-frame,
 :host([data-variant='spark']) .area-chart-frame {
   width: 100%;
-  max-width: var(--chart-spark-stage-max-inline);
-  aspect-ratio: var(--chart-spark-aspect);
-  height: auto;
+  max-width: none;
+  height: var(--chart-height-spark);
+  aspect-ratio: auto;
   max-height: none;
-  margin-inline: auto;
+  margin-inline: 0;
   padding: 0;
   border: 0;
   background-color: transparent;
@@ -6885,19 +6897,9 @@ app-area-chart[data-variant='spark'] .area-chart-line,
   stroke-width: 2.75;
 }
 
-app-area-chart[data-variant='spark'] .area-chart-grid-v,
-:host([data-variant='spark']) .area-chart-grid-v {
-  stroke: color-mix(in srgb, var(--color-card-text) 12%, transparent);
-}
-
-app-area-chart[data-variant='spark'] .area-chart-baseline,
-:host([data-variant='spark']) .area-chart-baseline {
-  stroke: color-mix(in srgb, var(--color-card-text) 14%, transparent);
-}
-
 app-area-chart[data-variant='spark'] .area-chart-node,
 :host([data-variant='spark']) .area-chart-node {
-  fill: var(--chart-accent);
+  fill: var(--chart-node);
   stroke: var(--color-card);
 }
 
@@ -7030,7 +7032,8 @@ app-bar-chart[data-accent='primary'],
 }
 
 /* inlined: components/chart/chart.css */
-/* Component: chart — aspect-locked native SVG plot shell */
+/* CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE */
+/* Component: chart — fixed 280px native SVG plot shell */
 
 .component--chart .demo {
   display: grid;
@@ -7048,13 +7051,13 @@ app-bar-chart[data-accent='primary'],
   display: block;
   box-sizing: border-box;
   width: 100%;
-  max-width: var(--chart-stage-max-inline);
-  aspect-ratio: var(--chart-aspect);
-  height: auto;
+  max-width: none;
+  height: var(--chart-height-panel);
+  aspect-ratio: auto;
   max-height: none;
   margin-inline: 0;
   padding: var(--chart-inset);
-  background-color: var(--chart-plot);
+  background-color: var(--chart-stage-ink);
   border: var(--border-width) solid var(--color-plot-border);
   color: var(--color-plot-ink);
 }
@@ -7078,7 +7081,8 @@ app-bar-chart[data-accent='primary'],
 }
 
 /* inlined: components/chart-panel/chart-panel.css */
-/* Component: chart-panel — titled shell with aspect-locked plot */
+/* CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE */
+/* Component: chart-panel — titled shell with fixed 280px plot stage */
 
 .component--chart-panel .demo {
   display: grid;
@@ -7093,7 +7097,6 @@ deml-chart-panel,
   height: 100%;
   min-width: 0;
   --chart-accent: var(--color-primary);
-  /* Fill the panel content width; aspect drives height (wider → taller). */
   --chart-stage-max-inline: 100%;
   background-color: transparent;
 }
@@ -7159,13 +7162,13 @@ deml-chart-panel,
   box-sizing: border-box;
   width: 100%;
   max-width: none;
-  aspect-ratio: var(--chart-aspect);
-  height: auto;
+  height: var(--chart-height-panel);
+  aspect-ratio: auto;
   max-height: none;
   margin: 0;
   padding: var(--chart-inset);
   overflow: visible;
-  background-color: var(--chart-plot);
+  background-color: var(--chart-stage-ink);
   border: var(--border-width) solid var(--color-plot-border);
   color: var(--color-plot-ink);
 }
@@ -7186,7 +7189,8 @@ deml-chart-panel,
 }
 
 /* inlined: components/chart-empty-state/chart-empty-state.css */
-/* Component: chart-empty-state — aspect-locked empty plot band */
+/* CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE */
+/* Component: chart-empty-state — fixed 280px empty plot band */
 
 .component--chart-empty-state .demo {
   display: grid;
@@ -7202,16 +7206,16 @@ deml-chart-empty-state,
   gap: var(--space-2);
   box-sizing: border-box;
   width: 100%;
-  max-width: var(--chart-stage-max-inline);
-  aspect-ratio: var(--chart-aspect);
-  height: auto;
+  max-width: none;
+  height: var(--chart-height-panel);
+  aspect-ratio: auto;
   max-height: none;
   margin-inline: 0;
   margin-block: 0;
   padding: var(--chart-inset);
   text-align: center;
   color: var(--color-plot-muted);
-  background-color: var(--chart-plot);
+  background-color: var(--chart-stage-ink);
   border: var(--border-width) dashed var(--color-plot-border);
 }
 

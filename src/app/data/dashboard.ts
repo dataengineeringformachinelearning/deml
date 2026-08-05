@@ -7,14 +7,15 @@ import type {
 } from '../components/dashboard/dashboard.types';
 
 /** Demo analytics for the dashboard — shaped for reusable chart components. */
+/** Daily volume — same shared scale band as sessions (board-global domain). */
 export const DASH_LISTENERS_WEEK: readonly DashPoint[] = [
-  { label: 'Mon', value: 420 },
-  { label: 'Tue', value: 510 },
-  { label: 'Wed', value: 480 },
-  { label: 'Thu', value: 640 },
-  { label: 'Fri', value: 720 },
-  { label: 'Sat', value: 890 },
-  { label: 'Sun', value: 760 },
+  { label: 'Mon', value: 1320 },
+  { label: 'Tue', value: 1480 },
+  { label: 'Wed', value: 1410 },
+  { label: 'Thu', value: 1680 },
+  { label: 'Fri', value: 1920 },
+  { label: 'Sat', value: 2210 },
+  { label: 'Sun', value: 2040 },
 ];
 
 export const DASH_SESSIONS_MONTH: readonly DashPoint[] = [
@@ -28,24 +29,26 @@ export const DASH_SESSIONS_MONTH: readonly DashPoint[] = [
   { label: 'W8', value: 2510 },
 ];
 
+/** Coverage-style spark — upward; values on the shared board domain. */
 export const DASH_ENGAGEMENT_SPARK: readonly DashPoint[] = [
-  { label: '1', value: 32 },
-  { label: '2', value: 40 },
-  { label: '3', value: 38 },
-  { label: '4', value: 52 },
-  { label: '5', value: 61 },
-  { label: '6', value: 58 },
-  { label: '7', value: 70 },
+  { label: '1', value: 1280 },
+  { label: '2', value: 1420 },
+  { label: '3', value: 1380 },
+  { label: '4', value: 1620 },
+  { label: '5', value: 1840 },
+  { label: '6', value: 1980 },
+  { label: '7', value: 2180 },
 ];
 
+/** Health-style spark — high, dip, rise; values on the shared board domain. */
 export const DASH_RETENTION_SPARK: readonly DashPoint[] = [
-  { label: '1', value: 78 },
-  { label: '2', value: 74 },
-  { label: '3', value: 76 },
-  { label: '4', value: 71 },
-  { label: '5', value: 69 },
-  { label: '6', value: 73 },
-  { label: '7', value: 75 },
+  { label: '1', value: 2360 },
+  { label: '2', value: 2140 },
+  { label: '3', value: 1680 },
+  { label: '4', value: 1520 },
+  { label: '5', value: 1760 },
+  { label: '6', value: 2020 },
+  { label: '7', value: 2280 },
 ];
 
 export const DASH_TOP_CHANNELS: readonly DashBarItem[] = [

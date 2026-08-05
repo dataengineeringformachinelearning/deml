@@ -1,3 +1,4 @@
+// CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE
 import {
   ChangeDetectionStrategy,
   Component,
@@ -8,6 +9,7 @@ import {
 import { LucideTrendingDown, LucideTrendingUp } from '@lucide/angular';
 
 import { AreaChart } from '../area-chart/area-chart';
+import type { ChartDomain } from '../dashboard/chart-scale';
 import type { DashAccent, DashPoint, DashSize } from '../dashboard/dashboard.types';
 
 let statCardIdSeq = 0;
@@ -45,6 +47,9 @@ export class StatCard {
 
   /** Optional sparkline series. */
   readonly sparkline = input<readonly DashPoint[]>();
+
+  /** Shared board y-domain — required when a sparkline is shown. */
+  readonly domain = input<ChartDomain | null>(null);
 
   readonly labelId = input<string>();
 

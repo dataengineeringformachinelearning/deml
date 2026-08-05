@@ -1,3 +1,4 @@
+<!-- CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE -->
 <div class="area-chart-frame">
   <table class="visually-hidden">
     <caption>{{ ariaLabel() }}</caption>
@@ -39,23 +40,25 @@
       </filter>
     </defs>
 
-    @for (x of plot().gridXs; track x) {
+    @if (plot().showGrid) {
+      @for (x of plot().gridXs; track x) {
+        <line
+          class="area-chart-grid-v"
+          [attr.x1]="x"
+          [attr.x2]="x"
+          [attr.y1]="16"
+          [attr.y2]="plot().floorY"
+        />
+      }
+
       <line
-        class="area-chart-grid-v"
-        [attr.x1]="x"
-        [attr.x2]="x"
-        [attr.y1]="plot().padL > 8 ? 16 : 8"
-        [attr.y2]="plot().floorY"
+        class="area-chart-baseline"
+        [attr.x1]="plot().padL"
+        [attr.x2]="viewRight"
+        [attr.y1]="plot().baselineY"
+        [attr.y2]="plot().baselineY"
       />
     }
-
-    <line
-      class="area-chart-baseline"
-      [attr.x1]="plot().padL"
-      [attr.x2]="viewRight"
-      [attr.y1]="plot().baselineY"
-      [attr.y2]="plot().baselineY"
-    />
 
     <path
       class="area-chart-fill"

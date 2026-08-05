@@ -1,3 +1,4 @@
+<!-- CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE -->
 <app-dashboard-grid>
   @for (tile of tiles(); track tile.id) {
     @switch (tile.kind) {
@@ -10,6 +11,7 @@
           [delta]="tile.delta"
           [meta]="tile.meta"
           [sparkline]="tile.sparkline"
+          [domain]="sharedDomain()"
         />
       }
       @case ('area') {
@@ -22,6 +24,7 @@
           <app-area-chart
             [points]="tile.points"
             [accent]="tile.accent"
+            [domain]="sharedDomain()"
             [ariaLabel]="tile.ariaLabel"
           />
         </app-chart-card>
