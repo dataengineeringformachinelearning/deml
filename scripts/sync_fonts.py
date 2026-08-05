@@ -18,8 +18,7 @@ def main() -> int:
     file=sys.stderr,
   )
   print(
-    "Do not sync Inter or Viking font bundles. "
-    "See THEME.md and npm run check:nfts.",
+    "Do not sync Inter or Viking font bundles. See THEME.md and npm run check:nfts.",
     file=sys.stderr,
   )
   return 1
