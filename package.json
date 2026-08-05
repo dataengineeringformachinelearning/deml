@@ -40,7 +40,7 @@
     "@sentry/angular": "^10.69.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
-    "deml-ui": "github:dataengineeringformachinelearning/deml-ui#ef102ce733406e5c92cb09727dda045456890fff",
+    "deml-ui": "github:dataengineeringformachinelearning/deml-ui#6e2938afd6063e3d705e1103247054e70c1df11c",
     "express": "^5.1.0",
     "firebase": "^12.17.0",
     "leaflet": "^1.9.4",

@@ -125,11 +125,13 @@
   --radius-md: 0;
   --radius-lg: 0;
 
-  /* Plot contract: card width → aspect height; soft ceiling via max-inline only */
+  /* Plot contract: card width → aspect height; soft ceiling via max-inline only.
+     chart-card / chart-panel override --chart-stage-max-inline to 100% so full-width
+     tiles fill the content band (standalone stages keep this absolute soft ceiling). */
   --chart-aspect: 2.4;
   --chart-spark-aspect: 2.4;
   --chart-min-block: calc(var(--grid) * 20);
-  --chart-max-block: calc(var(--grid) * 32);
+  --chart-max-block: calc(var(--grid) * 72);
   --chart-stage-max-inline: calc(var(--chart-max-block) * var(--chart-aspect));
   --chart-spark-min-block: calc(var(--grid) * 12);
   --chart-spark-max-block: calc(var(--grid) * 25);

@@ -127,11 +127,13 @@
   --radius-md: 0;
   --radius-lg: 0;
 
-  /* Plot contract: card width → aspect height; soft ceiling via max-inline only */
+  /* Plot contract: card width → aspect height; soft ceiling via max-inline only.
+     chart-card / chart-panel override --chart-stage-max-inline to 100% so full-width
+     tiles fill the content band (standalone stages keep this absolute soft ceiling). */
   --chart-aspect: 2.4;
   --chart-spark-aspect: 2.4;
   --chart-min-block: calc(var(--grid) * 20);
-  --chart-max-block: calc(var(--grid) * 32);
+  --chart-max-block: calc(var(--grid) * 72);
   --chart-stage-max-inline: calc(var(--chart-max-block) * var(--chart-aspect));
   --chart-spark-min-block: calc(var(--grid) * 12);
   --chart-spark-max-block: calc(var(--grid) * 25);
@@ -6574,6 +6576,8 @@ deml-chart-card,
   height: 100%;
   min-width: 0;
   --chart-accent: var(--color-primary);
+  /* Fill the card content width; aspect drives height (wider → taller). */
+  --chart-stage-max-inline: 100%;
   background-color: transparent;
 }
 
@@ -6602,6 +6606,8 @@ app-chart-card[data-accent='primary'],
   margin: 0;
   padding: var(--module-pad);
   overflow: visible;
+  /* Nested plot stages inherit this — fill the well, never a centered max-inline island. */
+  --chart-stage-max-inline: 100%;
   color: var(--color-card-text);
   background-color: var(--color-card);
   background-image: linear-gradient(
@@ -6671,10 +6677,26 @@ app-chart-card[data-accent='primary'],
 app-chart-card .chart-card-body > *,
 deml-chart-card .chart-card-body > * {
   width: 100%;
+  max-width: none;
   min-width: 0;
   min-height: 0;
   flex: 0 0 auto;
   align-self: stretch;
+  margin-inline: 0;
+}
+
+/* Plot wells stretch the content band (equal --chart-inset stays on the stage). */
+.chart-card-body .area-chart-frame,
+.chart-card-body .bar-chart,
+.chart-card-body .chart-figure__plot,
+.chart-card-body .chart-empty-state,
+app-chart-card .chart-card-body .area-chart-frame,
+app-chart-card .chart-card-body .bar-chart,
+deml-chart-card .chart-card-body .area-chart-frame,
+deml-chart-card .chart-card-body .bar-chart {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
 }
 
 :host([data-size='hero']) .chart-card-heading,
@@ -6743,10 +6765,12 @@ deml-area-chart[data-accent='primary'],
   flex: 0 0 auto;
   align-items: stretch;
   justify-content: stretch;
+  align-self: stretch;
   box-sizing: border-box;
   width: 100%;
   max-width: var(--chart-stage-max-inline);
-  margin: 0 auto;
+  margin-inline: 0;
+  margin-block: 0;
   padding: var(--chart-inset);
   background-color: var(--chart-plot);
   border: var(--border-width) solid var(--color-plot-border);
@@ -6754,8 +6778,9 @@ deml-area-chart[data-accent='primary'],
 
 /*
  * Full plot — fill the well width; height from --chart-aspect only.
- * Soft ceiling is max-width (--chart-stage-max-inline), never max-height
- * (max-height fights aspect and leaves empty black wells).
+ * Inside chart-card/panel, --chart-stage-max-inline is 100% so the stage
+ * spans the content band (never a tiny centered black island). Soft ceiling
+ * for standalone stages remains the token; never max-height (fights aspect).
  */
 app-area-chart:not([data-variant='spark']) .area-chart-frame,
 deml-area-chart:not([data-variant='spark']) .area-chart-frame,
@@ -6767,6 +6792,7 @@ deml-area-chart:not([data-variant='spark']) .area-chart-frame,
   max-width: var(--chart-stage-max-inline);
   height: auto;
   max-height: none;
+  margin-inline: 0;
 }
 
 .area-chart {
@@ -6924,13 +6950,15 @@ app-bar-chart[data-accent='primary'],
   flex: 0 0 auto;
   flex-direction: column;
   justify-content: flex-start;
+  align-self: stretch;
   gap: var(--space-2);
   box-sizing: border-box;
   width: 100%;
   max-width: var(--chart-stage-max-inline);
   min-height: var(--chart-min-block);
   height: auto;
-  margin: 0 auto;
+  margin-inline: 0;
+  margin-block: 0;
   padding: var(--chart-inset);
   overflow: visible;
   list-style: none;
@@ -7024,7 +7052,7 @@ app-bar-chart[data-accent='primary'],
   aspect-ratio: var(--chart-aspect);
   height: auto;
   max-height: none;
-  margin-inline: auto;
+  margin-inline: 0;
   padding: var(--chart-inset);
   background-color: var(--chart-plot);
   border: var(--border-width) solid var(--color-plot-border);
@@ -7065,6 +7093,8 @@ deml-chart-panel,
   height: 100%;
   min-width: 0;
   --chart-accent: var(--color-primary);
+  /* Fill the panel content width; aspect drives height (wider → taller). */
+  --chart-stage-max-inline: 100%;
   background-color: transparent;
 }
 
@@ -7078,6 +7108,7 @@ deml-chart-panel,
   margin: 0;
   padding: var(--module-pad);
   overflow: visible;
+  --chart-stage-max-inline: 100%;
   color: var(--color-card-text);
   background-color: var(--color-card);
   background-image: linear-gradient(
@@ -7127,11 +7158,11 @@ deml-chart-panel,
   justify-content: flex-start;
   box-sizing: border-box;
   width: 100%;
-  max-width: var(--chart-stage-max-inline);
+  max-width: none;
   aspect-ratio: var(--chart-aspect);
   height: auto;
   max-height: none;
-  margin: 0 auto;
+  margin: 0;
   padding: var(--chart-inset);
   overflow: visible;
   background-color: var(--chart-plot);
@@ -7175,7 +7206,8 @@ deml-chart-empty-state,
   aspect-ratio: var(--chart-aspect);
   height: auto;
   max-height: none;
-  margin: 0 auto;
+  margin-inline: 0;
+  margin-block: 0;
   padding: var(--chart-inset);
   text-align: center;
   color: var(--color-plot-muted);
