@@ -6,8 +6,8 @@ system only. See [THEME.md](../THEME.md).
 
 ## App consumption
 
-- Dependency: `"deml-ui": "github:dataengineeringformachinelearning/deml-ui#main"`
-  (local iteration may use `file:../deml-ui`).
+- Dependency: `"deml-ui": "^1.1.0"` from the npm registry (published package).
+  Local DS iteration may temporarily use `file:../deml-ui`, then restore the npm pin.
 - Global styles: `node_modules/deml-ui/dist/styles/deml-ui.css` in `angular.json`
   (Geist via `@fontsource-variable/geist` — not Google Fonts CDN).
 - Behavioral Angular components live in `src/app/components` with

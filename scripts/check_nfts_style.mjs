@@ -291,6 +291,17 @@ function stripCommentsTs(source) {
   const deps = { ...pkg.dependencies, ...pkg.devDependencies };
   if (!deps['deml-ui']) {
     fail('package.json must depend on deml-ui');
+  } else {
+    const pin = String(deps['deml-ui']);
+    // Pure npm consumer — no github:/file:/git: pins for product installs.
+    if (/^(github:|git\+|file:|http:|https:\/\/github)/i.test(pin)) {
+      fail(
+        `deml-ui must be an npm semver range (published package), not "${pin}"`,
+      );
+    }
+    if (!/^[\^~]?[0-9]/.test(pin) && !/^[0-9]/.test(pin)) {
+      fail(`deml-ui pin must be a semver range, got "${pin}"`);
+    }
   }
   const banned = [
     '@angular/material',

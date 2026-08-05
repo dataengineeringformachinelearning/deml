@@ -24,7 +24,7 @@ function run(command, args, cwd, envExtra = {}) {
   }
 }
 
-// Ensure root deps (including github:deml-ui) are installed when Vercel only
+// Ensure root deps (including npm deml-ui) are installed when Vercel only
 // installs inside frontend/. Prefer ignore-scripts: deml-ui ships dist, and
 // prepare rebuilds blow the 8GB builder before ng even starts.
 if (!fs.existsSync(path.join(root, 'node_modules', 'deml-ui'))) {

@@ -160,10 +160,10 @@ Canonical docs: [.cursorrules](.cursorrules), [THEME.md](THEME.md),
 `#3F6B54` `#9E3D47` (+ muted `#C6C0B7` / `#4A453F`; highlight `#9BB8D4`).
 `theme-color`: `#35312D` / `#D4CEC5`.
 
-- **SoT:** sibling / GitHub package `deml-ui` owns tokens (`styles/tokens.css`),
+- **SoT:** published npm package `deml-ui` owns tokens (`styles/tokens.css`),
   component HTML/CSS (`components/<name>/`), Web Components, and Angular markup.
 - **App shape:** Product UI lives at repo-root `src/`. Depend on
-  `deml-ui` (`github:…/deml-ui#main`). Load
+  published npm package `deml-ui` (`^1.1.0`+). Load
   `node_modules/deml-ui/dist/styles/deml-ui.css` via `angular.json`.
 - **Behavioral wrappers:** `src/app/components/*` use `ViewEncapsulation.None`
   and deml-ui class contracts — **zero app-level DS chrome CSS**.

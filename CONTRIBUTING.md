@@ -48,8 +48,9 @@ cd deml-ui && npm install && npm run build && npm run storybook   # :6006
 cd ../deml && npm install && npx ng serve                         # product
 ```
 
-Production installs resolve `deml-ui` from GitHub (`#main`). For local DS work,
-you may temporarily use `"deml-ui": "file:../deml-ui"`.
+Production installs resolve `deml-ui` from the npm registry (`^1.1.0`+). For local
+DS work, you may temporarily use `"deml-ui": "file:../deml-ui"`, then restore the
+npm pin before merge.
 
 ---
 

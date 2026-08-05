@@ -10,7 +10,7 @@ chart contracts, or app-local design-system chrome. Expand only inside deml-ui.
 
 ## Design system (required)
 
-- **SoT:** `deml-ui` (sibling repo / `github:dataengineeringformachinelearning/deml-ui#main`).
+- **SoT:** published npm package `deml-ui` (`^1.1.0`+); expand visuals only in the deml-ui repo.
 - **Look:** **new-from-the-start (warm ash)** — mandatory; expand from that system only.
 - **Palette:** dark ground `#35312D` / surface `#1C1916` / cream modules `#F3F0EA`; light ground `#D4CEC5`; primary `#2F5F8F`; accents `#3F6B54` / `#9E3D47`; muted `#C6C0B7` / `#4A453F`.
 - **Type:** **Geist only** (display, marks, intro, body). No Syne / Fraunces / Inter product stacks.

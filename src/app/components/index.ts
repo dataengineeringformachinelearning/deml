@@ -12,7 +12,6 @@ export { Card } from './card/card';
 export { CardGrid } from './card-grid/card-grid';
 export { ChartCard } from './chart-card/chart-card';
 export { CheckboxField } from './checkbox-field/checkbox-field';
-export { Container } from './container/container';
 export { DashboardGrid } from './dashboard-grid/dashboard-grid';
 export { ExploreCard } from './explore-card/explore-card';
 export { FormPanel } from './form-panel/form-panel';

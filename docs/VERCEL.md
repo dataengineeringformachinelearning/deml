@@ -29,7 +29,7 @@ Browser (Vercel deml.app)
 | Node.js | **24.x** |
 | Git | `dataengineeringformachinelearning/deml` (`main`) |
 
-Dependency: `"deml-ui": "github:dataengineeringformachinelearning/deml-ui#main"`.
+Dependency: `"deml-ui": "^1.1.0"` (npm registry).
 
 ## Project: `deml-ui` (Storybook)
 
