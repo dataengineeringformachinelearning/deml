@@ -18,6 +18,13 @@ export const CHART_SCALE = {
   /** SVG viewBox height (coordinate space only). */
   viewBlock: 150,
 
+  /**
+   * Spark viewBox — ~4:1 to match md tile width × 140px stage so
+   * preserveAspectRatio=none does not flatten the series.
+   */
+  sparkViewInline: 560,
+  sparkViewBlock: 140,
+
   /** @deprecated Compat — fixed heights supersede aspect. */
   fullAspect: 2.4,
   /** @deprecated Compat — fixed heights supersede aspect. */

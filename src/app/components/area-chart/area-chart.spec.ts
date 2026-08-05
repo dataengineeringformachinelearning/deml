@@ -98,6 +98,9 @@ describe('AreaChart', () => {
     const chart = (sparkFixture.nativeElement as HTMLElement).querySelector('app-area-chart');
     const svg = chart?.querySelector('svg.area-chart');
     expect(svg?.getAttribute('preserveAspectRatio')).toBe('none');
+    expect(svg?.getAttribute('viewBox')).toBe(
+      `0 0 ${CHART_SCALE.sparkViewInline} ${CHART_SCALE.sparkViewBlock}`,
+    );
     expect(chart?.getAttribute('data-variant')).toBe('spark');
     expect(chart?.querySelectorAll('line.area-chart-grid-v').length).toBe(0);
     expect(chart?.querySelector('.area-chart-y')).toBeNull();

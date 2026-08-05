@@ -18,6 +18,12 @@ import type { DashAccent, DashPoint } from '../dashboard/dashboard.types';
 /** SVG viewBox — display size is CSS-fixed (140 spark / 280 panel); width 100%. */
 const VIEW_W = CHART_SCALE.viewInline;
 const VIEW_H = CHART_SCALE.viewBlock;
+/**
+ * Spark viewBox ~4:1 matches typical md tile width × 140px height so
+ * preserveAspectRatio=none does not flatten slopes horizontally.
+ */
+const SPARK_VIEW_W = CHART_SCALE.sparkViewInline;
+const SPARK_VIEW_H = CHART_SCALE.sparkViewBlock;
 const PAD_L = 32;
 const PAD_R = 12;
 const PAD_T = 14;
@@ -84,9 +90,20 @@ export class AreaChart {
 
   readonly ariaLabel = input('Area chart');
 
-  readonly viewBox = `0 0 ${VIEW_W} ${VIEW_H}`;
-  readonly viewRight = VIEW_W - PAD_R;
-  readonly axisLabelY = VIEW_H - 8;
+  readonly viewBox = computed(() => {
+    if (this.variant() === 'spark') {
+      return `0 0 ${SPARK_VIEW_W} ${SPARK_VIEW_H}`;
+    }
+    return `0 0 ${VIEW_W} ${VIEW_H}`;
+  });
+
+  readonly viewRight = computed(() =>
+    this.variant() === 'spark' ? SPARK_VIEW_W - 4 : VIEW_W - PAD_R,
+  );
+
+  readonly axisLabelY = computed(() =>
+    this.variant() === 'spark' ? SPARK_VIEW_H - 4 : VIEW_H - 8,
+  );
 
   /**
    * Stretch to the fixed CSS stage so width is fluid and height stays locked.
@@ -97,12 +114,14 @@ export class AreaChart {
   readonly plot = computed(() => {
     const pts = this.points();
     const isSpark = this.variant() === 'spark';
+    const viewW = isSpark ? SPARK_VIEW_W : VIEW_W;
+    const viewH = isSpark ? SPARK_VIEW_H : VIEW_H;
     const padL = isSpark ? 4 : PAD_L;
     const padR = isSpark ? 4 : PAD_R;
     const padT = isSpark ? 8 : PAD_T;
     const padB = isSpark ? 8 : PAD_B;
-    const innerW = VIEW_W - padL - padR;
-    const innerH = VIEW_H - padT - padB;
+    const innerW = viewW - padL - padR;
+    const innerH = viewH - padT - padB;
     const floorY = padT + innerH;
 
     const resolvedDomain =
@@ -112,7 +131,7 @@ export class AreaChart {
       return {
         line: '',
         area: '',
-        baselineY: VIEW_H / 2,
+        baselineY: viewH / 2,
         nodes: [] as PlotNode[],
         gridXs: [] as number[],
         yTop: '',

@@ -16,6 +16,8 @@ describe('CHART_SCALE', () => {
   it('keeps SVG viewBox as coordinate space only', () => {
     expect(CHART_SCALE.viewInline).toBe(360);
     expect(CHART_SCALE.viewBlock).toBe(150);
+    expect(CHART_SCALE.sparkViewInline).toBe(560);
+    expect(CHART_SCALE.sparkViewBlock).toBe(140);
   });
 
   it('maps series and accents to deml-ui palette tokens only', () => {
