@@ -231,11 +231,21 @@ function stripCommentsTs(source) {
 {
   const forbiddenType =
     /\bSyne\b|\bFraunces\b|fonts\.googleapis\.com|fonts\.gstatic\.com/i;
-  for (const p of walk(join(ROOT, 'src'))) {
-    if (!SCAN_EXTS.has(extname(p))) continue;
-    const text = read(p);
-    if (forbiddenType.test(text)) {
-      fail(`Forbidden font stack / Google Fonts CDN in product: ${rel(p)}`);
+  const interBinary =
+    /fonts\/inter\/|InterVariable|InterVariable-Italic/i;
+  for (const rootName of ['src', 'backend/templates']) {
+    const root = join(ROOT, rootName);
+    for (const p of walk(root)) {
+      if (!SCAN_EXTS.has(extname(p)) && extname(p) !== '.html') continue;
+      const text = read(p);
+      // Allow "no Syne / Fraunces" / retirement prose in HTML comments only when
+      // not loading those stacks; still fail live Google Fonts / Syne / Fraunces.
+      if (forbiddenType.test(text)) {
+        fail(`Forbidden font stack / Google Fonts CDN in product: ${rel(p)}`);
+      }
+      if (rootName === 'backend/templates' && interBinary.test(text)) {
+        fail(`Inter font binary references are forbidden (Geist only): ${rel(p)}`);
+      }
     }
   }
 }

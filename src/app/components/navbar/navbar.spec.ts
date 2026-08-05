@@ -38,6 +38,17 @@ describe('Navbar', () => {
     );
   });
 
+  it('should render the Lucide ship brand mark with home aria-label', () => {
+    const host = fixture.nativeElement as HTMLElement;
+    const brand = host.querySelector('.site-navbar-icon') as HTMLAnchorElement | null;
+    const ship = host.querySelector('.site-navbar-icon svg[lucideShip]');
+
+    expect(brand).toBeTruthy();
+    expect(brand?.getAttribute('aria-label')).toBe('DEML home');
+    expect(ship).toBeTruthy();
+    expect(ship?.getAttribute('aria-hidden')).toBe('true');
+  });
+
   it('should render guest nav links when logged out', () => {
     const host = fixture.nativeElement as HTMLElement;
     const links = Array.from(host.querySelectorAll('#site-navbar-menu a'));

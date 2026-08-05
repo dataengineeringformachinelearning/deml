@@ -752,7 +752,7 @@ a:hover {
 /* inlined: components/skip-link/skip-link.css */
 /* Component: Skip Link
    Markup: components/skip-link/skip-link.html
-   Barebones structure — customize freely.
+   NFTS layout primitive — expand from warm ash tokens only.
 */
 
 .component--skip-link .demo {
@@ -1061,7 +1061,7 @@ a:hover {
 /* inlined: components/page-shell/page-shell.css */
 /* Component: Page Shell
    Markup: components/page-shell/page-shell.html
-   Barebones structure — customize freely.
+   NFTS layout primitive — expand from warm ash tokens only.
 */
 
 .component--page-shell .demo {
@@ -1967,7 +1967,7 @@ deml-page-section[data-variant='auth'] .page-body--auth,
 /* inlined: components/stack/stack.css */
 /* Component: Stack
    Markup: components/stack/stack.html
-   Barebones structure — customize freely.
+   NFTS layout primitive — expand from warm ash tokens only.
 */
 
 .component--stack .demo {
@@ -2548,7 +2548,7 @@ deml-panel-grid > *,
 /* inlined: components/cluster/cluster.css */
 /* Component: Cluster
    Markup: components/cluster/cluster.html
-   Barebones structure — customize freely.
+   NFTS layout primitive — expand from warm ash tokens only.
 */
 
 .component--cluster .demo {
@@ -2564,7 +2564,7 @@ deml-panel-grid > *,
 }
 
 /* inlined: components/box/box.css */
-/* Component: box — NFTS surface */
+/* Component: box — NFTS cream surface module */
 
 .component--box .demo {
   display: grid;
@@ -2577,10 +2577,17 @@ deml-panel-grid > *,
   height: 100%;
   min-height: var(--tile-row-unit);
   padding: var(--module-pad);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
   border-radius: var(--radius-sm);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 10%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 /* inlined: components/separator/separator.css */
@@ -2608,7 +2615,7 @@ deml-panel-grid > *,
 }
 
 /* inlined: components/scroll-area/scroll-area.css */
-/* Component: scroll-area — NFTS scroll region */
+/* Component: scroll-area — NFTS cream scroll region */
 
 .component--scroll-area .demo {
   display: grid;
@@ -2621,9 +2628,12 @@ deml-panel-grid > *,
   max-height: var(--tile-row-unit);
   overflow: auto;
   padding: var(--module-pad);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  border: var(--border-width) solid var(--color-card-border);
+  background-color: var(--color-card);
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
 }
 
 /* inlined: components/split-panel/split-panel.css */
@@ -2676,7 +2686,7 @@ deml-panel-grid > *,
 
 /* Forms */
 /* inlined: components/form-field/form-field.css */
-/* Shared form control baseline — NFTS tokens */
+/* Shared form control baseline — NFTS cream tokens */
 
 .form-field {
   display: grid;
@@ -2695,7 +2705,7 @@ deml-panel-grid > *,
   letter-spacing: var(--tracking-eyebrow);
   line-height: 1.2;
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .form-field input,
@@ -2712,17 +2722,17 @@ deml-panel-grid > *,
   width: 100%;
   min-height: var(--hit-target);
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-radius: var(--radius-sm);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
+  color: var(--color-card-text);
   appearance: none;
 }
 
 .form-field input:focus-visible,
 .form-field select:focus-visible,
 .form-field textarea:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
   border-color: var(--color-primary);
 }
@@ -2730,7 +2740,7 @@ deml-panel-grid > *,
 /* inlined: components/label/label.css */
 /* Component: Label
    Markup: components/label/label.html
-   Barebones structure — customize freely.
+   NFTS layout primitive — expand from warm ash tokens only.
 */
 
 .component--label .demo {
@@ -2751,7 +2761,7 @@ deml-panel-grid > *,
 }
 
 /* inlined: components/field/field.css */
-/* Component: field — NFTS form field */
+/* Component: field — NFTS cream form field */
 
 .component--field .demo {
   display: grid;
@@ -2777,7 +2787,7 @@ deml-panel-grid > *,
   letter-spacing: var(--tracking-eyebrow);
   line-height: var(--leading-ui);
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .field__required {
@@ -2791,7 +2801,7 @@ deml-panel-grid > *,
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
   letter-spacing: var(--tracking-intro);
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .field__error {
@@ -2807,25 +2817,45 @@ deml-panel-grid > *,
   width: 100%;
   min-height: var(--hit-target);
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-body);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-body);
   line-height: var(--leading-ui);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
+  color: var(--color-card-text);
   appearance: none;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.field__control:hover:not(:disabled),
+.field input:hover:not(:disabled),
+.field select:hover:not(:disabled),
+.field textarea:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-card-border));
 }
 
 .field__control:focus-visible,
 .field input:focus-visible,
 .field select:focus-visible,
 .field textarea:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
   border-color: var(--color-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field__control,
+  .field input,
+  .field select,
+  .field textarea {
+    transition: none;
+  }
 }
 
 /* inlined: components/form-section/form-section.css */
@@ -3251,7 +3281,7 @@ deml-button-group > *,
   letter-spacing: var(--tracking-eyebrow);
   line-height: 1.2;
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .component--input-email label, .input-email input,
@@ -3263,15 +3293,15 @@ deml-button-group > *,
   min-height: var(--hit-target);
   margin: 0;
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-intro);
   line-height: 1.3;
-  color: var(--color-text);
-  background-color: var(--color-surface);
+  color: var(--color-card-text);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
   appearance: none;
   transition:
     border-color 120ms ease,
@@ -3281,14 +3311,14 @@ deml-button-group > *,
 
 .component--input-email label, .input-email input::placeholder,
 .component--input-email label, .input-email textarea::placeholder {
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
   opacity: 0.72;
 }
 
 .component--input-email label, .input-email input:hover:not(:disabled),
 .component--input-email label, .input-email select:hover:not(:disabled),
 .component--input-email label, .input-email textarea:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-border));
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-card-border));
 }
 
 .component--input-email label, .input-email input:focus,
@@ -3300,7 +3330,7 @@ deml-button-group > *,
 .component--input-email label, .input-email input:focus-visible,
 .component--input-email label, .input-email select:focus-visible,
 .component--input-email label, .input-email textarea:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
   border-color: var(--color-primary);
 }
@@ -3348,7 +3378,7 @@ deml-button-group > *,
   letter-spacing: var(--tracking-eyebrow);
   line-height: 1.2;
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .component--input-password label, .input-password input,
@@ -3360,15 +3390,15 @@ deml-button-group > *,
   min-height: var(--hit-target);
   margin: 0;
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-intro);
   line-height: 1.3;
-  color: var(--color-text);
-  background-color: var(--color-surface);
+  color: var(--color-card-text);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
   appearance: none;
   transition:
     border-color 120ms ease,
@@ -3378,14 +3408,14 @@ deml-button-group > *,
 
 .component--input-password label, .input-password input::placeholder,
 .component--input-password label, .input-password textarea::placeholder {
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
   opacity: 0.72;
 }
 
 .component--input-password label, .input-password input:hover:not(:disabled),
 .component--input-password label, .input-password select:hover:not(:disabled),
 .component--input-password label, .input-password textarea:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-border));
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-card-border));
 }
 
 .component--input-password label, .input-password input:focus,
@@ -3397,7 +3427,7 @@ deml-button-group > *,
 .component--input-password label, .input-password input:focus-visible,
 .component--input-password label, .input-password select:focus-visible,
 .component--input-password label, .input-password textarea:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
   border-color: var(--color-primary);
 }
@@ -3445,7 +3475,7 @@ deml-button-group > *,
   letter-spacing: var(--tracking-eyebrow);
   line-height: 1.2;
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .component--input-search label, .input-search input,
@@ -3457,15 +3487,15 @@ deml-button-group > *,
   min-height: var(--hit-target);
   margin: 0;
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-intro);
   line-height: 1.3;
-  color: var(--color-text);
-  background-color: var(--color-surface);
+  color: var(--color-card-text);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
   appearance: none;
   transition:
     border-color 120ms ease,
@@ -3475,14 +3505,14 @@ deml-button-group > *,
 
 .component--input-search label, .input-search input::placeholder,
 .component--input-search label, .input-search textarea::placeholder {
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
   opacity: 0.72;
 }
 
 .component--input-search label, .input-search input:hover:not(:disabled),
 .component--input-search label, .input-search select:hover:not(:disabled),
 .component--input-search label, .input-search textarea:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-border));
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-card-border));
 }
 
 .component--input-search label, .input-search input:focus,
@@ -3494,7 +3524,7 @@ deml-button-group > *,
 .component--input-search label, .input-search input:focus-visible,
 .component--input-search label, .input-search select:focus-visible,
 .component--input-search label, .input-search textarea:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
   border-color: var(--color-primary);
 }
@@ -3542,7 +3572,7 @@ deml-button-group > *,
   letter-spacing: var(--tracking-eyebrow);
   line-height: 1.2;
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .component--input-number label, .input-number input,
@@ -3554,15 +3584,15 @@ deml-button-group > *,
   min-height: var(--hit-target);
   margin: 0;
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-intro);
   line-height: 1.3;
-  color: var(--color-text);
-  background-color: var(--color-surface);
+  color: var(--color-card-text);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
   appearance: none;
   transition:
     border-color 120ms ease,
@@ -3572,14 +3602,14 @@ deml-button-group > *,
 
 .component--input-number label, .input-number input::placeholder,
 .component--input-number label, .input-number textarea::placeholder {
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
   opacity: 0.72;
 }
 
 .component--input-number label, .input-number input:hover:not(:disabled),
 .component--input-number label, .input-number select:hover:not(:disabled),
 .component--input-number label, .input-number textarea:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-border));
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-card-border));
 }
 
 .component--input-number label, .input-number input:focus,
@@ -3591,7 +3621,7 @@ deml-button-group > *,
 .component--input-number label, .input-number input:focus-visible,
 .component--input-number label, .input-number select:focus-visible,
 .component--input-number label, .input-number textarea:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
   border-color: var(--color-primary);
 }
@@ -3639,7 +3669,7 @@ deml-button-group > *,
   letter-spacing: var(--tracking-eyebrow);
   line-height: 1.2;
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .component--input-date label, .input-date input,
@@ -3651,15 +3681,15 @@ deml-button-group > *,
   min-height: var(--hit-target);
   margin: 0;
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-intro);
   line-height: 1.3;
-  color: var(--color-text);
-  background-color: var(--color-surface);
+  color: var(--color-card-text);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
   appearance: none;
   transition:
     border-color 120ms ease,
@@ -3669,14 +3699,14 @@ deml-button-group > *,
 
 .component--input-date label, .input-date input::placeholder,
 .component--input-date label, .input-date textarea::placeholder {
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
   opacity: 0.72;
 }
 
 .component--input-date label, .input-date input:hover:not(:disabled),
 .component--input-date label, .input-date select:hover:not(:disabled),
 .component--input-date label, .input-date textarea:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-border));
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-card-border));
 }
 
 .component--input-date label, .input-date input:focus,
@@ -3688,7 +3718,7 @@ deml-button-group > *,
 .component--input-date label, .input-date input:focus-visible,
 .component--input-date label, .input-date select:focus-visible,
 .component--input-date label, .input-date textarea:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
   border-color: var(--color-primary);
 }
@@ -3736,7 +3766,7 @@ deml-button-group > *,
   letter-spacing: var(--tracking-eyebrow);
   line-height: 1.2;
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .component--input-time label, .input-time input,
@@ -3748,15 +3778,15 @@ deml-button-group > *,
   min-height: var(--hit-target);
   margin: 0;
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-intro);
   line-height: 1.3;
-  color: var(--color-text);
-  background-color: var(--color-surface);
+  color: var(--color-card-text);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
   appearance: none;
   transition:
     border-color 120ms ease,
@@ -3766,14 +3796,14 @@ deml-button-group > *,
 
 .component--input-time label, .input-time input::placeholder,
 .component--input-time label, .input-time textarea::placeholder {
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
   opacity: 0.72;
 }
 
 .component--input-time label, .input-time input:hover:not(:disabled),
 .component--input-time label, .input-time select:hover:not(:disabled),
 .component--input-time label, .input-time textarea:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-border));
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-card-border));
 }
 
 .component--input-time label, .input-time input:focus,
@@ -3785,7 +3815,7 @@ deml-button-group > *,
 .component--input-time label, .input-time input:focus-visible,
 .component--input-time label, .input-time select:focus-visible,
 .component--input-time label, .input-time textarea:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
   border-color: var(--color-primary);
 }
@@ -3833,7 +3863,7 @@ deml-button-group > *,
   letter-spacing: var(--tracking-eyebrow);
   line-height: 1.2;
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .component--input-range label, .input-range input,
@@ -3845,15 +3875,15 @@ deml-button-group > *,
   min-height: var(--hit-target);
   margin: 0;
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-intro);
   line-height: 1.3;
-  color: var(--color-text);
-  background-color: var(--color-surface);
+  color: var(--color-card-text);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
   appearance: none;
   transition:
     border-color 120ms ease,
@@ -3863,14 +3893,14 @@ deml-button-group > *,
 
 .component--input-range label, .input-range input::placeholder,
 .component--input-range label, .input-range textarea::placeholder {
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
   opacity: 0.72;
 }
 
 .component--input-range label, .input-range input:hover:not(:disabled),
 .component--input-range label, .input-range select:hover:not(:disabled),
 .component--input-range label, .input-range textarea:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-border));
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-card-border));
 }
 
 .component--input-range label, .input-range input:focus,
@@ -3882,7 +3912,7 @@ deml-button-group > *,
 .component--input-range label, .input-range input:focus-visible,
 .component--input-range label, .input-range select:focus-visible,
 .component--input-range label, .input-range textarea:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
   border-color: var(--color-primary);
 }
@@ -3930,7 +3960,7 @@ deml-button-group > *,
   letter-spacing: var(--tracking-eyebrow);
   line-height: var(--leading-ui);
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .component--textarea label, .textarea input,
@@ -3942,15 +3972,15 @@ deml-button-group > *,
   min-height: var(--hit-target);
   margin: 0;
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-body);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-body);
   line-height: var(--leading-body);
-  color: var(--color-text);
-  background-color: var(--color-surface);
+  color: var(--color-card-text);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
   appearance: none;
   transition:
     border-color 120ms ease,
@@ -3960,14 +3990,14 @@ deml-button-group > *,
 
 .component--textarea label, .textarea input::placeholder,
 .component--textarea label, .textarea textarea::placeholder {
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
   opacity: 0.72;
 }
 
 .component--textarea label, .textarea input:hover:not(:disabled),
 .component--textarea label, .textarea select:hover:not(:disabled),
 .component--textarea label, .textarea textarea:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-border));
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-card-border));
 }
 
 .component--textarea label, .textarea input:focus,
@@ -3979,7 +4009,7 @@ deml-button-group > *,
 .component--textarea label, .textarea input:focus-visible,
 .component--textarea label, .textarea select:focus-visible,
 .component--textarea label, .textarea textarea:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
   border-color: var(--color-primary);
 }
@@ -4027,7 +4057,7 @@ deml-button-group > *,
   letter-spacing: var(--tracking-eyebrow);
   line-height: var(--leading-ui);
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .component--select label, .select input,
@@ -4039,15 +4069,15 @@ deml-button-group > *,
   min-height: var(--hit-target);
   margin: 0;
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-body);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-body);
   line-height: var(--leading-ui);
-  color: var(--color-text);
-  background-color: var(--color-surface);
+  color: var(--color-card-text);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
   appearance: none;
   transition:
     border-color 120ms ease,
@@ -4057,14 +4087,14 @@ deml-button-group > *,
 
 .component--select label, .select input::placeholder,
 .component--select label, .select textarea::placeholder {
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
   opacity: 0.72;
 }
 
 .component--select label, .select input:hover:not(:disabled),
 .component--select label, .select select:hover:not(:disabled),
 .component--select label, .select textarea:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-border));
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-card-border));
 }
 
 .component--select label, .select input:focus,
@@ -4076,7 +4106,7 @@ deml-button-group > *,
 .component--select label, .select input:focus-visible,
 .component--select label, .select select:focus-visible,
 .component--select label, .select textarea:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
   border-color: var(--color-primary);
 }
@@ -4178,7 +4208,7 @@ deml-button-group > *,
 }
 
 /* inlined: components/radio-group/radio-group.css */
-/* Component: radio-group — NFTS choice set */
+/* Component: radio-group — NFTS cream choice set */
 
 .component--radio-group .demo {
   display: grid;
@@ -4192,18 +4222,26 @@ deml-button-group > *,
   width: 100%;
   max-width: var(--content-width-sm);
   padding: var(--module-pad);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 10%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 .radio-group__legend {
   padding-inline: var(--space-1);
-  font-family: var(--font-sans);
+  font-family: var(--font-mark);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-mark);
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .radio-group__option {
@@ -4211,15 +4249,18 @@ deml-button-group > *,
   align-items: center;
   gap: var(--space-2);
   min-height: var(--hit-target);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  color: var(--color-card-text);
 }
 
 .radio-group input:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
 }
 
 /* inlined: components/switch/switch.css */
-/* Component: switch — NFTS binary control */
+/* Component: switch — NFTS cream binary control */
 
 .component--switch .demo {
   display: grid;
@@ -4241,9 +4282,9 @@ deml-button-group > *,
   align-items: center;
   width: var(--hit-target);
   height: var(--space-3);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-radius: var(--radius-pill);
-  background-color: var(--color-surface);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
   transition: background-color 120ms ease, border-color 120ms ease;
 }
 
@@ -4263,7 +4304,7 @@ deml-button-group > *,
   width: var(--space-2);
   height: var(--space-2);
   border-radius: var(--radius-pill);
-  background-color: var(--color-text);
+  background-color: var(--color-card-text);
   transition: transform 120ms ease;
   pointer-events: none;
 }
@@ -4279,7 +4320,7 @@ deml-button-group > *,
 }
 
 .switch__track:has(input:focus-visible) {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
 }
 
@@ -4289,12 +4330,12 @@ deml-button-group > *,
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   letter-spacing: var(--tracking-intro);
-  color: var(--color-text);
+  color: var(--color-card-text);
 }
 
 .switch__description {
   display: block;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
   font-size: var(--font-size-xs);
   letter-spacing: var(--tracking-intro);
 }
@@ -4307,7 +4348,7 @@ deml-button-group > *,
 }
 
 /* inlined: components/toggle/toggle.css */
-/* Component: toggle — NFTS segmented control */
+/* Component: toggle — NFTS cream segmented control */
 
 .component--toggle .demo {
   display: grid;
@@ -4317,8 +4358,9 @@ deml-button-group > *,
 .toggle-group {
   display: inline-flex;
   flex-wrap: wrap;
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-card-border);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-card);
 }
 
 .toggle {
@@ -4326,7 +4368,7 @@ deml-button-group > *,
   padding: var(--space-1) var(--space-2);
   border: 0;
   background: transparent;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
@@ -4335,7 +4377,7 @@ deml-button-group > *,
 }
 
 .toggle + .toggle {
-  border-inline-start: var(--border-width) solid var(--color-border);
+  border-inline-start: var(--border-width) solid var(--color-card-border);
 }
 
 .toggle[aria-pressed='true'],
@@ -4345,12 +4387,12 @@ deml-button-group > *,
 }
 
 .toggle:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
 }
 
 /* inlined: components/autocomplete/autocomplete.css */
-/* Component: autocomplete — NFTS combobox */
+/* Component: autocomplete — NFTS cream combobox */
 
 .component--autocomplete .demo {
   display: grid;
@@ -4370,14 +4412,16 @@ deml-button-group > *,
   width: 100%;
   min-height: var(--hit-target);
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  font: inherit;
+  border: var(--border-width) solid var(--color-card-border);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
+  color: var(--color-card-text);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  appearance: none;
 }
 
 .autocomplete__input:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
   border-color: var(--color-primary);
 }
@@ -4390,24 +4434,33 @@ deml-button-group > *,
   margin: 0;
   padding: var(--space-1);
   list-style: none;
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
-  box-shadow: var(--shadow-md);
+  border: var(--border-width) solid var(--color-card-border);
+  background-color: var(--color-card);
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 .autocomplete__option {
   min-height: var(--hit-target);
   padding: var(--space-1) var(--space-2);
   cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  color: var(--color-card-text);
 }
 
 .autocomplete__option[aria-selected='true'],
 .autocomplete__option:hover {
-  background-color: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  background-color: color-mix(in srgb, var(--color-primary) 12%, var(--color-card));
+}
+
+.autocomplete__option:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
 }
 
 /* inlined: components/file-upload/file-upload.css */
-/* Component: file-upload — NFTS dropzone */
+/* Component: file-upload — NFTS cream dropzone */
 
 .component--file-upload .demo {
   display: grid;
@@ -4427,25 +4480,35 @@ deml-button-group > *,
   box-sizing: border-box;
   min-height: var(--tile-row-unit);
   padding: var(--module-pad-lg);
-  border: var(--border-width) dashed var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  border: var(--border-width) dashed var(--color-card-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 10%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
+  color: var(--color-card-text);
   text-align: center;
+  box-shadow: var(--shadow-card);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
 }
 
 .file-upload__dropzone:focus-within {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
 }
 
 .file-upload__hint {
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
+  font-family: var(--font-sans);
   font-size: var(--font-size-xs);
   letter-spacing: var(--tracking-intro);
 }
 
 /* inlined: components/progress/progress.css */
-/* Component: progress — NFTS meter */
+/* Component: progress — NFTS cream meter */
 
 .component--progress .demo {
   display: grid;
@@ -4457,15 +4520,15 @@ progress {
   display: block;
   width: min(100%, var(--content-width-sm));
   height: var(--space-2);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-card-border);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
   color: var(--color-primary);
   appearance: none;
 }
 
 .component--progress progress::-webkit-progress-bar,
 progress::-webkit-progress-bar {
-  background-color: var(--color-surface);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
 }
 
 .component--progress progress::-webkit-progress-value,
@@ -4481,7 +4544,7 @@ progress::-moz-progress-bar {
 
 /* Feedback */
 /* inlined: components/badge/badge.css */
-/* Component: badge — NFTS mark */
+/* Component: badge — NFTS cream mark */
 
 .component--badge .demo {
   display: grid;
@@ -4494,15 +4557,15 @@ progress::-moz-progress-bar {
   gap: var(--space-1);
   min-height: var(--space-3);
   padding: 0 var(--space-1);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-radius: var(--radius-pill);
-  font-family: var(--font-sans);
+  font-family: var(--font-mark);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-mark);
   letter-spacing: var(--tracking-mark);
   text-transform: uppercase;
-  color: var(--color-text);
-  background-color: var(--color-surface);
+  color: var(--color-card-text);
+  background-color: var(--color-card);
 }
 
 /* inlined: components/status-badge/status-badge.css */
@@ -4558,7 +4621,7 @@ progress::-moz-progress-bar {
 }
 
 /* inlined: components/status-pill/status-pill.css */
-/* Component: status-pill — NFTS mark */
+/* Component: status-pill — NFTS cream mark */
 
 .component--status-pill .demo {
   display: grid;
@@ -4571,16 +4634,16 @@ progress::-moz-progress-bar {
   gap: var(--space-1);
   min-height: var(--space-3);
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-radius: var(--radius-pill);
-  font-family: var(--font-sans);
+  font-family: var(--font-mark);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-mark);
   letter-spacing: var(--tracking-mark);
   text-transform: uppercase;
   line-height: var(--leading-ui);
-  color: var(--color-text);
-  background-color: var(--color-surface);
+  color: var(--color-card-text);
+  background-color: var(--color-card);
 }
 
 .status-pill[data-status='up'],
@@ -4608,7 +4671,7 @@ progress::-moz-progress-bar {
 }
 
 /* inlined: components/callout/callout.css */
-/* Component: callout — NFTS inline notice */
+/* Component: callout — NFTS cream notice module */
 
 .component--callout .demo {
   display: grid;
@@ -4624,23 +4687,44 @@ progress::-moz-progress-bar {
   width: 100%;
   min-height: var(--hit-target);
   padding: var(--module-pad);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-inline-start: calc(var(--border-width) * 4) solid var(--color-primary);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 .callout[data-tone='warning'] {
   border-inline-start-color: var(--color-highlight);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-highlight) 14%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
 }
 
 .callout[data-tone='error'],
 .callout[data-tone='danger'] {
   border-inline-start-color: var(--color-error);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-error) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
 }
 
 .callout[data-tone='success'] {
   border-inline-start-color: var(--color-success);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-success) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
 }
 
 .callout__body {
@@ -4655,13 +4739,14 @@ progress::-moz-progress-bar {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
+  color: var(--color-card-text);
 }
 
 .callout__text {
   margin: 0;
   font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .callout__close {
@@ -4670,17 +4755,17 @@ progress::-moz-progress-bar {
   min-height: var(--hit-target);
   border: 0;
   background: transparent;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
   cursor: pointer;
 }
 
 .callout__close:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
 }
 
 /* inlined: components/toast/toast.css */
-/* Component: toast — NFTS notification */
+/* Component: toast — NFTS cream notification module */
 
 .component--toast .demo {
   display: grid;
@@ -4694,11 +4779,16 @@ progress::-moz-progress-bar {
   box-sizing: border-box;
   width: min(var(--content-width-sm), 100%);
   padding: var(--module-pad);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-inline-start: calc(var(--border-width) * 4) solid var(--color-primary);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  box-shadow: var(--shadow-md);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 .toast__title {
@@ -4707,6 +4797,7 @@ progress::-moz-progress-bar {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
+  color: var(--color-card-text);
 }
 
 .toast__description,
@@ -4715,7 +4806,7 @@ progress::-moz-progress-bar {
   margin: 0;
   font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .toast__close {
@@ -4726,25 +4817,35 @@ progress::-moz-progress-bar {
   min-height: var(--hit-target);
   border: 0;
   background: transparent;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
   cursor: pointer;
 }
 
 .toast__close:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
 }
 
 .toast[data-tone='error'] {
   border-inline-start-color: var(--color-error);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-error) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
 }
 
 .toast[data-tone='success'] {
   border-inline-start-color: var(--color-success);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-success) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
 }
 
 /* inlined: components/flashbar/flashbar.css */
-/* Component: flashbar — NFTS alert stack */
+/* Component: flashbar — NFTS cream alert stack */
 
 .component--flashbar .demo {
   display: grid;
@@ -4769,24 +4870,42 @@ progress::-moz-progress-bar {
   width: 100%;
   min-height: var(--hit-target);
   padding: var(--module-pad);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-inline-start: calc(var(--border-width) * 4) solid var(--color-primary);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 .flashbar__item[data-tone='error'] {
   border-inline-start-color: var(--color-error);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-error) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
 }
 
 .flashbar__item[data-tone='success'] {
   border-inline-start-color: var(--color-success);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-success) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
 }
 
 .flashbar__message {
   margin: 0;
+  font-family: var(--font-body);
   font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
+  color: var(--color-card-text);
 }
 
 .flashbar__dismiss {
@@ -4794,17 +4913,17 @@ progress::-moz-progress-bar {
   min-height: var(--hit-target);
   border: 0;
   background: transparent;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
   cursor: pointer;
 }
 
 .flashbar__dismiss:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
 }
 
 /* inlined: components/empty-state/empty-state.css */
-/* Component: empty-state — NFTS empty module */
+/* Component: empty-state — NFTS cream empty module */
 
 .component--empty-state .demo {
   display: grid;
@@ -4820,20 +4939,26 @@ progress::-moz-progress-bar {
   width: 100%;
   min-height: var(--tile-row-unit);
   padding: var(--module-pad-lg);
-  border: var(--border-width) dashed var(--color-border);
+  border: var(--border-width) dashed var(--color-card-border);
   border-radius: var(--radius-sm);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 10%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 .empty-state__eyebrow {
   margin: 0;
-  font-family: var(--font-sans);
+  font-family: var(--font-mark);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-mark);
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
-  color: var(--color-highlight);
+  color: var(--color-primary);
 }
 
 .empty-state__title {
@@ -4842,7 +4967,7 @@ progress::-moz-progress-bar {
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
-  color: var(--color-text);
+  color: var(--color-card-text);
 }
 
 .empty-state__description {
@@ -4851,7 +4976,7 @@ progress::-moz-progress-bar {
   font-family: var(--font-body);
   font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .empty-state__actions {
@@ -4863,7 +4988,7 @@ progress::-moz-progress-bar {
 }
 
 /* inlined: components/error-state/error-state.css */
-/* Component: error-state — NFTS error module */
+/* Component: error-state — NFTS cream error module */
 
 .component--error-state .demo {
   display: grid;
@@ -4879,10 +5004,17 @@ progress::-moz-progress-bar {
   width: 100%;
   min-height: var(--tile-row-unit);
   padding: var(--module-pad-lg);
-  border: var(--border-width) solid var(--color-error);
+  border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-error);
   border-radius: var(--radius-sm);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-error) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 .error-state__title {
@@ -4891,7 +5023,7 @@ progress::-moz-progress-bar {
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
-  color: var(--color-text);
+  color: var(--color-card-text);
 }
 
 .error-state__description {
@@ -4900,7 +5032,7 @@ progress::-moz-progress-bar {
   font-family: var(--font-body);
   font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .error-state__actions {
@@ -5047,7 +5179,7 @@ progress::-moz-progress-bar {
 }
 
 /* inlined: components/avatar/avatar.css */
-/* Component: avatar — NFTS identity mark */
+/* Component: avatar — NFTS cream identity mark */
 
 .component--avatar .demo {
   display: grid;
@@ -5062,15 +5194,16 @@ progress::-moz-progress-bar {
   width: var(--hit-target);
   height: var(--hit-target);
   border-radius: var(--radius-pill);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  font-family: var(--font-sans);
+  border: var(--border-width) solid var(--color-card-border);
+  background-color: var(--color-card);
+  color: var(--color-card-text);
+  font-family: var(--font-mark);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-mark);
   letter-spacing: var(--tracking-mark);
   text-transform: uppercase;
   overflow: hidden;
+  box-shadow: var(--shadow-card);
 }
 
 .avatar img {
@@ -5082,7 +5215,7 @@ progress::-moz-progress-bar {
 /* inlined: components/icon/icon.css */
 /* Component: Icon
    Markup: components/icon/icon.html
-   Barebones structure — customize freely.
+   NFTS layout primitive — expand from warm ash tokens only.
 */
 
 .component--icon .demo {
@@ -5094,7 +5227,7 @@ progress::-moz-progress-bar {
 .icon-label { margin-inline-start: var(--space-sm); }
 
 /* inlined: components/kbd/kbd.css */
-/* Component: kbd — NFTS keycap */
+/* Component: kbd — NFTS cream keycap */
 
 .component--kbd .demo {
   display: grid;
@@ -5108,10 +5241,10 @@ kbd {
   justify-content: center;
   min-height: var(--space-3);
   padding: 0 var(--space-1);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-radius: var(--radius-sm);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
+  color: var(--color-card-text);
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
@@ -6057,7 +6190,7 @@ deml-microcard[data-visual='olive'],
 }
 
 /* inlined: components/table/table.css */
-/* Component: table — NFTS data table */
+/* Component: table — NFTS cream data table */
 
 .component--table .demo {
   display: grid;
@@ -6069,8 +6202,10 @@ table {
   width: 100%;
   border-collapse: collapse;
   font: inherit;
-  color: var(--color-text);
-  background-color: var(--color-surface);
+  color: var(--color-card-text);
+  background-color: var(--color-card);
+  border: var(--border-width) solid var(--color-card-border);
+  box-shadow: var(--shadow-card);
 }
 
 .component--table th,
@@ -6079,32 +6214,43 @@ th,
 td {
   /* Equal L/R inset so headers/cells never sit flush on the panel edge */
   padding: var(--space-2) var(--space-3);
-  border-block-end: var(--border-width) solid var(--color-border);
+  border-block-end: var(--border-width) solid var(--color-card-border);
   text-align: start;
 }
 
 .component--table th,
 th {
-  font-family: var(--font-sans);
+  font-family: var(--font-mark);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-mark);
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
+  background-color: color-mix(in srgb, var(--color-primary) 8%, var(--color-card));
+}
+
+.component--table td,
+td {
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  letter-spacing: var(--tracking-intro);
+  color: var(--color-card-text);
 }
 
 .component--table caption,
 caption {
   text-align: start;
-  padding-block-end: var(--space-sm);
-  color: var(--color-text-secondary);
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-card-text-secondary);
+  font-family: var(--font-mark);
   font-size: var(--font-size-xs);
   letter-spacing: var(--tracking-mark);
   text-transform: uppercase;
+  background-color: var(--color-card);
 }
 
 /* inlined: components/pagination/pagination.css */
-/* Component: pagination — NFTS controls */
+/* Component: pagination — NFTS cream controls */
 
 .component--pagination .demo {
   display: grid;
@@ -6142,14 +6288,14 @@ caption {
   min-height: var(--hit-target);
   min-width: var(--hit-target);
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   letter-spacing: var(--tracking-intro);
-  color: var(--color-text);
-  background-color: var(--color-surface);
+  color: var(--color-card-text);
+  background-color: var(--color-card);
   text-decoration: none;
   cursor: pointer;
 }
@@ -6159,7 +6305,7 @@ caption {
 .pagination__pages button:focus-visible,
 .pagination button:focus-visible,
 .pagination a:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
 }
 
@@ -6171,7 +6317,7 @@ caption {
 }
 
 /* inlined: components/activity-list/activity-list.css */
-/* Component: activity-list — NFTS feed */
+/* Component: activity-list — NFTS cream feed module */
 
 .component--activity-list .demo {
   display: grid;
@@ -6185,8 +6331,16 @@ caption {
   margin: 0;
   padding: 0;
   list-style: none;
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 10%, var(--color-card)) 0%,
+    var(--color-card) 36%
+  );
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 .activity-list__item {
@@ -6194,7 +6348,7 @@ caption {
   grid-template-columns: var(--space-10) 1fr;
   gap: var(--space-1) var(--space-md);
   padding: var(--module-pad);
-  border-block-end: var(--border-width) solid var(--color-border);
+  border-block-end: var(--border-width) solid var(--color-card-border);
 }
 
 .activity-list__item:last-child {
@@ -6203,7 +6357,8 @@ caption {
 
 .activity-list__item time {
   grid-row: 1 / span 2;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
+  font-family: var(--font-mark);
   font-size: var(--font-size-xs);
   letter-spacing: var(--tracking-mark);
   text-transform: uppercase;
@@ -6211,15 +6366,16 @@ caption {
 
 .activity-list__title {
   margin: 0;
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--color-text);
+  color: var(--color-card-text);
 }
 
 .activity-list__meta {
   margin: 0;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
+  font-family: var(--font-body);
   font-size: var(--font-size-xs);
   letter-spacing: var(--tracking-intro);
 }
@@ -7047,7 +7203,7 @@ deml-chart-empty-state,
 }
 
 /* inlined: components/property-filter/property-filter.css */
-/* Component: property-filter — NFTS filter bar */
+/* Component: property-filter — NFTS cream filter bar */
 
 .component--property-filter .demo {
   display: grid;
@@ -7066,15 +7222,18 @@ deml-chart-empty-state,
   width: 100%;
   min-height: var(--hit-target);
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  font: inherit;
+  border: var(--border-width) solid var(--color-card-border);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
+  color: var(--color-card-text);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  appearance: none;
 }
 
 .property-filter__control:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
+  border-color: var(--color-primary);
 }
 
 .property-filter__tokens {
@@ -7089,15 +7248,17 @@ deml-chart-empty-state,
   gap: var(--space-1);
   min-height: var(--space-4);
   padding: 0 var(--space-1);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-card-border);
+  background-color: var(--color-card);
+  color: var(--color-card-text);
+  font-family: var(--font-mark);
   font-size: var(--font-size-xs);
   letter-spacing: var(--tracking-mark);
   text-transform: uppercase;
 }
 
 /* inlined: components/bulk-toolbar/bulk-toolbar.css */
-/* Component: bulk-toolbar — NFTS selection actions */
+/* Component: bulk-toolbar — NFTS cream selection actions */
 
 .component--bulk-toolbar .demo {
   display: grid;
@@ -7113,32 +7274,41 @@ deml-chart-empty-state,
   width: 100%;
   min-height: var(--hit-target);
   padding: var(--space-2);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 10%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 .bulk-toolbar__count {
   margin: 0;
+  font-family: var(--font-mark);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-mark);
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .bulk-toolbar button {
   min-height: var(--hit-target);
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font: inherit;
+  border: var(--border-width) solid var(--color-card-border);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
+  color: var(--color-card-text);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
   cursor: pointer;
 }
 
 .bulk-toolbar button:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
 }
 
@@ -7156,7 +7326,7 @@ deml-chart-empty-state,
 }
 
 /* inlined: components/confirm-dialog/confirm-dialog.css */
-/* Component: confirm-dialog — NFTS modal */
+/* Component: confirm-dialog — NFTS cream modal module */
 
 .component--confirm-dialog .demo {
   display: grid;
@@ -7169,10 +7339,16 @@ deml-chart-empty-state,
   box-sizing: border-box;
   width: min(var(--content-width-sm), calc(100vw - var(--space-4)));
   padding: var(--module-pad-lg);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  box-shadow: var(--shadow-md);
+  border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 40%
+  );
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 .confirm-dialog__title {
@@ -7181,13 +7357,15 @@ deml-chart-empty-state,
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
+  color: var(--color-card-text);
 }
 
 .confirm-dialog__body {
   margin: 0;
+  font-family: var(--font-body);
   font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .confirm-dialog__actions {
@@ -7198,7 +7376,7 @@ deml-chart-empty-state,
 }
 
 /* inlined: components/sheet/sheet.css */
-/* Component: sheet — NFTS slide-over */
+/* Component: sheet — NFTS cream slide-over module */
 
 .component--sheet .demo {
   display: grid;
@@ -7211,10 +7389,16 @@ deml-chart-empty-state,
   box-sizing: border-box;
   width: min(var(--content-width-sm), 100%);
   min-height: var(--space-28);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  box-shadow: var(--shadow-md);
+  border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 40%
+  );
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 .sheet__header,
@@ -7227,11 +7411,11 @@ deml-chart-empty-state,
 }
 
 .sheet__header {
-  border-block-end: var(--border-width) solid var(--color-border);
+  border-block-end: var(--border-width) solid var(--color-card-border);
 }
 
 .sheet__footer {
-  border-block-start: var(--border-width) solid var(--color-border);
+  border-block-start: var(--border-width) solid var(--color-card-border);
   margin-top: auto;
 }
 
@@ -7241,15 +7425,18 @@ deml-chart-empty-state,
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
+  color: var(--color-card-text);
 }
 
 .sheet__body {
   flex: 1 1 auto;
   padding: var(--module-pad);
+  font-family: var(--font-body);
+  color: var(--color-card-text-secondary);
 }
 
 /* inlined: components/dropdown/dropdown.css */
-/* Component: dropdown — NFTS menu */
+/* Component: dropdown — NFTS cream menu */
 
 .component--dropdown .demo {
   display: grid;
@@ -7264,15 +7451,16 @@ deml-chart-empty-state,
 .dropdown__trigger {
   min-height: var(--hit-target);
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  font: inherit;
+  border: var(--border-width) solid var(--color-card-border);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
+  color: var(--color-card-text);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
   cursor: pointer;
 }
 
 .dropdown__trigger:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
 }
 
@@ -7285,24 +7473,33 @@ deml-chart-empty-state,
   margin: 0;
   padding: var(--space-1);
   list-style: none;
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
-  box-shadow: var(--shadow-md);
+  border: var(--border-width) solid var(--color-card-border);
+  background-color: var(--color-card);
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 .dropdown__item {
   min-height: var(--hit-target);
   padding: var(--space-1) var(--space-2);
   cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  color: var(--color-card-text);
 }
 
 .dropdown__item:hover,
 .dropdown__item[aria-selected='true'] {
-  background-color: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  background-color: color-mix(in srgb, var(--color-primary) 12%, var(--color-card));
+}
+
+.dropdown__item:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
 }
 
 /* inlined: components/popover/popover.css */
-/* Component: popover — NFTS overlay */
+/* Component: popover — NFTS cream overlay */
 
 .component--popover .demo {
   display: grid;
@@ -7318,15 +7515,16 @@ deml-chart-empty-state,
 .popover__trigger {
   min-height: var(--hit-target);
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  font: inherit;
+  border: var(--border-width) solid var(--color-card-border);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
+  color: var(--color-card-text);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
   cursor: pointer;
 }
 
 .popover__trigger:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
 }
 
@@ -7338,14 +7536,22 @@ deml-chart-empty-state,
   inset-inline-start: 0;
   min-width: calc(var(--grid) * 28);
   padding: var(--module-pad);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  box-shadow: var(--shadow-md);
+  border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 40%
+  );
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
 }
 
 /* inlined: components/tooltip/tooltip.css */
-/* Component: tooltip — NFTS overlay */
+/* Component: tooltip — NFTS cream overlay */
 
 .component--tooltip .demo {
   display: grid;
@@ -7356,15 +7562,16 @@ deml-chart-empty-state,
 .tooltip-trigger {
   min-height: var(--hit-target);
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  font: inherit;
+  border: var(--border-width) solid var(--color-card-border);
+  background-color: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
+  color: var(--color-card-text);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
   cursor: pointer;
 }
 
 .tooltip-trigger:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
 }
 
@@ -7372,13 +7579,13 @@ deml-chart-empty-state,
   display: inline-block;
   max-width: var(--content-width-sm);
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  border: var(--border-width) solid var(--color-card-border);
+  background-color: var(--color-card);
+  color: var(--color-card-text);
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
   letter-spacing: var(--tracking-intro);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-card);
 }
 
 /* inlined: components/tabs/tabs.css */
@@ -7393,7 +7600,7 @@ deml-chart-empty-state,
 }
 
 /* inlined: components/accordion/accordion.css */
-/* Component: accordion — NFTS disclosure list */
+/* Component: accordion — NFTS cream disclosure module */
 
 .component--accordion .demo {
   display: grid;
@@ -7401,15 +7608,22 @@ deml-chart-empty-state,
 }
 
 .accordion {
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
   border-radius: var(--radius-sm);
   overflow: hidden;
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 10%, var(--color-card)) 0%,
+    var(--color-card) 36%
+  );
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 .accordion__item + .accordion__item {
-  border-block-start: var(--border-width) solid var(--color-border);
+  border-block-start: var(--border-width) solid var(--color-card-border);
 }
 
 .accordion__trigger {
@@ -7422,7 +7636,7 @@ deml-chart-empty-state,
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
-  color: var(--color-text);
+  color: var(--color-card-text);
   list-style: none;
 }
 
@@ -7431,15 +7645,16 @@ deml-chart-empty-state,
 }
 
 .accordion__trigger:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
 }
 
 .accordion__panel {
   padding: 0 var(--space-md) var(--space-md);
+  font-family: var(--font-body);
   font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 /* inlined: components/disclosure/disclosure.css */
@@ -7454,7 +7669,7 @@ deml-chart-empty-state,
 }
 
 /* inlined: components/command/command.css */
-/* Component: command — NFTS command palette */
+/* Component: command — NFTS cream command palette */
 
 .component--command .demo {
   display: grid;
@@ -7466,10 +7681,16 @@ deml-chart-empty-state,
   box-sizing: border-box;
   width: 100%;
   max-width: var(--content-width-sm);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  box-shadow: var(--shadow-md);
+  border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 40%
+  );
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 .command__input {
@@ -7478,14 +7699,15 @@ deml-chart-empty-state,
   min-height: var(--hit-target);
   padding: var(--space-2);
   border: 0;
-  border-block-end: var(--border-width) solid var(--color-border);
+  border-block-end: var(--border-width) solid var(--color-card-border);
   background: transparent;
   color: inherit;
-  font: inherit;
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
 }
 
 .command__input:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-primary);
   outline-offset: calc(-1 * var(--focus-ring-offset));
 }
 
@@ -7501,15 +7723,23 @@ deml-chart-empty-state,
   min-height: var(--hit-target);
   padding: var(--space-1) var(--space-2);
   cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  color: var(--color-card-text);
 }
 
 .command__item[aria-selected='true'],
 .command__item:hover {
-  background-color: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  background-color: color-mix(in srgb, var(--color-primary) 12%, var(--color-card));
+}
+
+.command__item:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
 }
 
 /* inlined: components/wizard/wizard.css */
-/* Component: wizard — NFTS multi-step */
+/* Component: wizard — NFTS cream multi-step module */
 
 .component--wizard .demo {
   display: grid;
@@ -7523,9 +7753,16 @@ deml-chart-empty-state,
   width: 100%;
   max-width: var(--content-width-md);
   padding: var(--module-pad);
-  border: var(--border-width) solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  border: var(--border-width) solid var(--color-card-border);
+  border-top: calc(var(--border-width) * 4) solid var(--color-primary);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 40%
+  );
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 .wizard__steps {
@@ -7538,16 +7775,16 @@ deml-chart-empty-state,
 }
 
 .wizard__step {
-  font-family: var(--font-sans);
+  font-family: var(--font-mark);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-mark);
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 .wizard__step[aria-current='step'] {
-  color: var(--color-highlight);
+  color: var(--color-primary);
 }
 
 .wizard__title {
@@ -7556,6 +7793,7 @@ deml-chart-empty-state,
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
+  color: var(--color-card-text);
 }
 
 .wizard__actions {
@@ -7565,7 +7803,7 @@ deml-chart-empty-state,
 }
 
 /* inlined: components/help-panel/help-panel.css */
-/* Component: help-panel — NFTS side help */
+/* Component: help-panel — NFTS cream side-help module */
 
 .component--help-panel .demo {
   display: grid;
@@ -7579,10 +7817,16 @@ deml-chart-empty-state,
   width: 100%;
   max-width: calc(var(--grid) * 44);
   padding: var(--module-pad);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-card-border);
   border-inline-start: calc(var(--border-width) * 4) solid var(--color-primary);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-card)) 0%,
+    var(--color-card) 42%
+  );
+  color: var(--color-card-text);
+  box-shadow: var(--shadow-card);
 }
 
 .help-panel h3,
@@ -7592,14 +7836,16 @@ deml-chart-empty-state,
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
+  color: var(--color-card-text);
 }
 
 .help-panel p,
 .help-panel__body {
   margin: 0;
+  font-family: var(--font-body);
   font-size: var(--font-size-sm);
   letter-spacing: var(--tracking-intro);
-  color: var(--color-text-secondary);
+  color: var(--color-card-text-secondary);
 }
 
 

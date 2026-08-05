@@ -1,68 +1,29 @@
 #!/usr/bin/env python3
-"""Sync self-hosted Inter variable font files to all DEML static asset paths."""
+"""NFTS font policy — Geist only. Inter / Viking font sync is retired.
+
+Product Angular loads Geist via `@fontsource-variable/geist` (angular.json).
+Django / deml-ui CSS declare the Geist stack; do not reintroduce Inter binaries
+or Google Fonts CDNs for Syne / Fraunces.
+"""
 
 from __future__ import annotations
 
-import os
-import shutil
 import sys
-from typing import Final
-
-FONT_FILES: Final = ("InterVariable.woff2", "InterVariable-Italic.woff2")
-WOFF2_MAGIC: Final = b"wOF2"
-
-FONT_TARGETS: Final = (
-  # Absolute /fonts/inter/ (suite-fonts.css / forjd.co parity)
-  "frontend/public/fonts/inter",
-  "marketing/public/fonts/inter",
-  "deml-ui-docs/public/fonts/inter",
-  # Relative fonts/inter/ next to viking-*.css asset bundles
-  "frontend/src/assets/fonts/inter",
-  "frontend/public/assets/fonts/inter",
-  "backend/static/fonts/inter",
-  "marketing/public/assets/fonts/inter",
-  "deml-ui-docs/public/assets/fonts/inter",
-)
 
 
-def validate_woff2(path: str) -> None:
-  with open(path, "rb") as font_file:
-    header = font_file.read(4)
-  if header != WOFF2_MAGIC:
-    print(f"Invalid WOFF2 font header in {path}: {header!r}", file=sys.stderr)
-    sys.exit(1)
-
-
-def sync_fonts() -> None:
-  root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-  src_dir = os.path.join(root, "packages", "deml-ui", "src", "assets", "fonts", "inter")
-
-  if not os.path.isdir(src_dir):
-    print(f"Font source directory missing: {src_dir}", file=sys.stderr)
-    sys.exit(1)
-
-  for name in FONT_FILES:
-    src = os.path.join(src_dir, name)
-    if not os.path.isfile(src):
-      print(f"Expected font file missing: {src}", file=sys.stderr)
-      sys.exit(1)
-    validate_woff2(src)
-
-  marketing_alive = os.path.isfile(
-    os.path.join(root, "marketing", "src", "layouts", "Layout.astro")
+def main() -> int:
+  print(
+    "sync_fonts.py retired: NFTS uses Geist only "
+    "(@fontsource-variable/geist in Angular; deml-ui token stack).",
+    file=sys.stderr,
   )
-
-  for rel in FONT_TARGETS:
-    if rel.startswith("marketing/") and not marketing_alive:
-      continue
-    dst_dir = os.path.join(root, rel)
-    os.makedirs(dst_dir, exist_ok=True)
-    for name in FONT_FILES:
-      dst = os.path.join(dst_dir, name)
-      shutil.copy2(os.path.join(src_dir, name), dst)
-      validate_woff2(dst)
-    print(f"Synced Inter fonts -> {rel}")
+  print(
+    "Do not sync Inter or Viking font bundles. "
+    "See THEME.md and npm run check:nfts.",
+    file=sys.stderr,
+  )
+  return 1
 
 
 if __name__ == "__main__":
-  sync_fonts()
+  raise SystemExit(main())
