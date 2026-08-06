@@ -7,5 +7,5 @@ preferences) are documented in the FORJD repository:
 - Decision: FORJD ADR-0023
 
 DEML consumes the same dual-adapter helpers from deml-ui
-(`createShortcutRegistry`, `viking-shortcut-help`). Press **`?`** on deml.app
+(product keyboard help on deml.app). Press **`?`** on deml.app
 (outside a text field) to open the in-app reference.

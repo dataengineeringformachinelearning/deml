@@ -286,7 +286,7 @@ clients reconnect with backoff. Auth / policy failures return `401`/`403` with
 `code=forjd_forbidden` (not treated as data-plane outage). Upstream outages emit
 a typed SSE `degraded` event and REST paths return `503` with
 `code=forjd_degraded`. Angular binds `LiveUpdatesService.latestEvent` and
-`degraded` for Viking callouts, then refreshes dashboards via authenticated
+`degraded` for deml-ui callouts, then refreshes dashboards via authenticated
 read adapters; 60-second polling remains as fallback. Tune with
 `DEML_LIVE_UPDATES_ENABLED`, `DEML_LIVE_POLL_SECONDS`, and
 `DEML_LIVE_STREAM_MAX_SECONDS`.

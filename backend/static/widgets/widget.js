@@ -51,10 +51,11 @@
   /* Self-contained shadow tokens for third-party embeds.
      Do not link page-relative /static/*.css — that resolves against the host origin
      (e.g. joealongi.dev/static/...) and breaks external sites. */
+  /* NFTS warm ash — matches deml-ui / THEME.md (no void/electric suite chrome). */
   const PLATFORM_WIDGET_STYLES = `
     :host {
       color-scheme: dark;
-      --deml-widget-font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --deml-widget-font-family: "Geist Variable", Geist, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       --deml-widget-font-size: 16px;
       --deml-widget-font-size-sm: 14px;
       --deml-widget-font-size-md: 18px;
@@ -62,7 +63,7 @@
       --deml-widget-font-weight-medium: 500;
       --deml-widget-font-weight-semibold: 600;
       --deml-widget-line-height-normal: 1.5;
-      --deml-widget-letter-spacing-caps: 0.1em;
+      --deml-widget-letter-spacing-caps: 0.22em;
       --deml-widget-letter-spacing-wide: 0.08em;
       --deml-widget-space-half: 4px;
       --deml-widget-space-1: 8px;
@@ -71,39 +72,40 @@
       --deml-widget-space-2-5: 20px;
       --deml-widget-space-3: 24px;
       --deml-widget-space-4: 32px;
-      --deml-widget-radius: 8px;
-      --deml-widget-radius-md: 8px;
-      --deml-widget-radius-lg: 12px;
+      --deml-widget-radius: 0;
+      --deml-widget-radius-md: 0;
+      --deml-widget-radius-lg: 0;
       --deml-widget-radius-pill: 999px;
       --deml-widget-radius-full: var(--deml-widget-radius-pill);
       --deml-widget-control-height: 40px;
       --deml-widget-touch-target-min: 44px;
       --deml-widget-ring-width: 2px;
       --deml-widget-ring-offset: 2px;
-      --deml-widget-text: rgb(245 245 245);
-      --deml-widget-text-muted: rgb(170 170 170);
+      /* Cream module ink (widget pill is elevated cream on host pages) */
+      --deml-widget-text: rgb(28 25 22);
+      --deml-widget-text-muted: rgb(74 69 63);
       --deml-widget-white-pure: rgb(255 255 255);
-      --deml-widget-bg: rgb(10 10 10);
-      --deml-widget-surface: rgb(17 17 17);
-      --deml-widget-surface-alt: rgb(26 26 26);
-      --deml-widget-surface-recipe: rgb(17 17 17);
-      --deml-widget-surface-recipe-muted: rgb(26 26 26);
-      --deml-widget-metallic-200: rgb(170 170 170);
-      --deml-widget-metallic-300: rgb(153 153 153);
-      --deml-widget-border: rgb(34 34 34);
-      --deml-widget-border-strong: rgb(51 51 51);
-      --deml-widget-accent: rgb(33 118 255);
-      --deml-widget-accent-hover: rgb(77 148 255);
+      --deml-widget-bg: rgb(53 49 45);
+      --deml-widget-surface: rgb(28 25 22);
+      --deml-widget-surface-alt: rgb(28 25 22);
+      --deml-widget-surface-recipe: rgb(243 240 234);
+      --deml-widget-surface-recipe-muted: rgb(212 206 197);
+      --deml-widget-metallic-200: rgb(74 69 63);
+      --deml-widget-metallic-300: rgb(74 69 63);
+      --deml-widget-border: color-mix(in srgb, rgb(198 192 183) 30%, rgb(53 49 45));
+      --deml-widget-border-strong: color-mix(in srgb, rgb(198 192 183) 42%, rgb(53 49 45));
+      --deml-widget-accent: rgb(47 95 143);
+      --deml-widget-accent-hover: color-mix(in srgb, rgb(47 95 143) 78%, rgb(255 255 255));
       --deml-widget-accent-content: rgb(255 255 255);
-      --deml-widget-accent-strong: rgb(122 176 255);
-      --deml-widget-success: rgb(42 157 143);
-      --deml-widget-warning: rgb(214 158 46);
-      --deml-widget-danger: rgb(168 51 68);
-      --deml-widget-green-500: rgb(42 157 143);
-      --deml-widget-gold-500: rgb(212 175 55);
-      --deml-widget-crimson-500: rgb(168 51 68);
-      --deml-widget-ring: rgb(77 148 255);
-      --deml-widget-overlay-backdrop: color-mix(in srgb, rgb(10 10 10) 72%, transparent);
+      --deml-widget-accent-strong: rgb(155 184 212);
+      --deml-widget-success: rgb(63 107 84);
+      --deml-widget-warning: rgb(198 192 183);
+      --deml-widget-danger: rgb(158 61 71);
+      --deml-widget-green-500: rgb(63 107 84);
+      --deml-widget-gold-500: rgb(63 107 84);
+      --deml-widget-crimson-500: rgb(158 61 71);
+      --deml-widget-ring: rgb(243 240 234);
+      --deml-widget-overlay-backdrop: color-mix(in srgb, rgb(53 49 45) 72%, transparent);
       --deml-widget-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
       --deml-widget-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.12);
       --deml-widget-shadow-md: 0 2px 4px rgba(0, 0, 0, 0.18), 0 10px 24px rgba(0, 0, 0, 0.16);
