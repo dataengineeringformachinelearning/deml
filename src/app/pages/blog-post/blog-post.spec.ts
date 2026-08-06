@@ -20,12 +20,12 @@ describe('BlogPostPage', () => {
     await fixture.whenStable();
   });
 
-  it('should render Blue Note reading layout', () => {
+  it('should render blog reading layout', () => {
     const host = fixture.nativeElement as HTMLElement;
 
     expect(host.querySelector('h1.page-header__title')?.textContent?.trim()).toBe(sample.title);
     expect(host.querySelector('.article-body')?.innerHTML).toContain('<h2');
-    expect(host.textContent).toContain('All Blue Notes');
+    expect(host.textContent).toContain('All posts');
     if (sample.headings.length > 0) {
       expect(host.querySelector('.toc__heading')?.textContent).toContain('In this note');
     }

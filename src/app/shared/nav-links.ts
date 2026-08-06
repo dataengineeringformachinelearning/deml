@@ -7,7 +7,7 @@ export interface NavLink {
 export const GUEST_NAV_LINKS: NavLink[] = [
   { label: 'Home', path: '/' },
   { label: 'Learn', path: '/learn' },
-  { label: 'Blue Notes', path: '/blog' },
+  { label: 'Blog', path: '/blog' },
   { label: 'Explore', path: '/explore' },
 ];
 

@@ -85,4 +85,4 @@ def test_home_splash_and_documentation_copy(client: Client) -> None:
   assert "/api/v1/forjd/ingest" in docs_body
   assert "/api/v1/forjd/capabilities" in docs_body
   assert "/api/v1/predict" not in docs_body
-  assert "Blue Notes" in docs_body
+  assert "Blog" in docs_body

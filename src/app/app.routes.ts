@@ -34,7 +34,7 @@ export const routes: Routes = [
   {
     path: 'blog',
     loadComponent: () => import('./pages/blog/blog').then((m) => m.Blog),
-    title: 'Blue Notes · DEML',
+    title: 'Blog · DEML',
     data: { preload: 'guest' },
   },
   {
@@ -42,7 +42,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/blog-post/blog-post').then((m) => m.BlogPostPage),
     title: (route) => {
       const post = getBlogPost(String(route.params['slug'] ?? ''));
-      return post ? `${post.title} · Blue Notes · DEML` : 'Note not found · DEML';
+      return post ? `${post.title} · Blog · DEML` : 'Post not found · DEML';
     },
   },
   {

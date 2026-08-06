@@ -203,7 +203,7 @@ writeFileSync(
 	`<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>DEML Blue Notes</title>
+    <title>DEML Blog</title>
     <link>${SITE}/blog</link>
     <description>Field log of DEML platform releases, architecture, and operator capabilities.</description>
     <language>en-us</language>

@@ -22,12 +22,12 @@ describe('Blog', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render Blue Notes branding and archive cards', () => {
+  it('should render Blog branding and archive cards', () => {
     const host = fixture.nativeElement as HTMLElement;
     const cards = host.querySelectorAll('app-microcard');
 
-    expect(host.querySelector('h1.banner-heading')?.textContent).toContain('Blue Notes');
-    expect(cards.length).toBeGreaterThanOrEqual(1);
+    expect(host.querySelector('h1.banner-heading')?.textContent).toContain('Blog');
+    expect(cards.length).toBe(BLUE_NOTES.length);
     expect(host.textContent).toContain(BLUE_NOTES[0].title);
     expect(host.querySelector('.microcard-cta')?.textContent?.trim()).toMatch(/Read/);
   });

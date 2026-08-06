@@ -34,7 +34,7 @@ def api_redoc(request: HttpRequest) -> HttpResponse:
 
 
 def documentation(request: HttpRequest) -> HttpResponse:
-  """Single Documentation page — API reference plus Blue Notes field log."""
+  """Single Documentation page — API reference plus blog field log."""
   return render(
     request,
     "documentation.html",

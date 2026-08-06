@@ -6,7 +6,7 @@
     [headingId]="headingId()"
   >
     <app-button-group>
-      <app-button variant="secondary" shape="pill" routerLink="/blog">All Blue Notes</app-button>
+      <app-button variant="secondary" shape="pill" routerLink="/blog">All posts</app-button>
     </app-button-group>
   </app-banner>
 
@@ -41,7 +41,7 @@
       <div class="callout__body">
         <p class="callout__heading">Living release record</p>
         <p class="callout__text">
-          Blue Notes summarize shipped outcomes. The public repository remains the detailed
+          Blog posts summarize shipped outcomes. The public repository remains the detailed
           engineering record.
         </p>
       </div>
@@ -55,31 +55,31 @@
       </a>
     </aside>
 
-    <nav class="pagination" aria-label="Blue Note navigation">
+    <nav class="pagination" aria-label="Blog navigation">
       @if (older(); as prev) {
         <a class="pagination__prev" [routerLink]="['/blog', prev.slug]" rel="prev">
           Earlier: {{ prev.title }}
         </a>
       } @else {
-        <span class="pagination__prev" aria-disabled="true">Earlier note</span>
+        <span class="pagination__prev" aria-disabled="true">Earlier post</span>
       }
       @if (newer(); as next) {
         <a class="pagination__next" [routerLink]="['/blog', next.slug]" rel="next">
           Newer: {{ next.title }}
         </a>
       } @else {
-        <span class="pagination__next" aria-disabled="true">Newer note</span>
+        <span class="pagination__next" aria-disabled="true">Newer post</span>
       }
     </nav>
   </app-page-section>
 } @else {
   <app-banner
-    preheader="Blue Notes"
-    heading="Note not found"
-    lede="That dispatch is not in the archive."
+    preheader="Blog"
+    heading="Post not found"
+    lede="That post is not in the archive."
   >
     <app-button-group>
-      <app-button variant="primary" shape="pill" routerLink="/blog">All Blue Notes</app-button>
+      <app-button variant="primary" shape="pill" routerLink="/blog">All posts</app-button>
     </app-button-group>
   </app-banner>
 }

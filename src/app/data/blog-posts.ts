@@ -1,5 +1,5 @@
 /**
- * Blog archive is Blue Notes — field log of platform engineering.
+ * Blog archive — field log of platform engineering.
  * Content: `src/content/blue-notes/*.md` → `scripts/generate_blue_notes.mjs`.
  */
 export {

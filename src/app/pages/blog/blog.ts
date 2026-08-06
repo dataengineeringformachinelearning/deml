@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { Banner } from '../../components/banner/banner';
 import { Button } from '../../components/button/button';
@@ -18,17 +18,4 @@ import { BLUE_NOTES } from '../../data/blue-notes';
 })
 export class Blog {
   readonly notes = BLUE_NOTES;
-
-  readonly lead = computed(() => this.notes[0]);
-
-  readonly spotlight = computed(() => {
-    const leadSlug = this.lead()?.slug;
-    return this.notes.filter((n) => n.featured && n.slug !== leadSlug).slice(0, 3);
-  });
-
-  readonly archive = computed(() => {
-    const spot = new Set(this.spotlight().map((n) => n.slug));
-    const leadSlug = this.lead()?.slug;
-    return this.notes.filter((n) => n.slug !== leadSlug && !spot.has(n.slug));
-  });
 }

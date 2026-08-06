@@ -40,7 +40,7 @@ export const SITE_FOOTER_COLUMNS: readonly FooterColumn[] = [
         href: 'https://dataengineeringformachinelearning.com/book/',
         external: true,
       },
-      { label: 'Blue Notes', routerLink: '/blog', href: '/blog' },
+      { label: 'Blog', routerLink: '/blog', href: '/blog' },
       {
         label: 'DEML Swagger',
         href: 'https://backend.deml.app/api/v1/docs',

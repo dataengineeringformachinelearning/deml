@@ -2,7 +2,7 @@
   "name": "deml",
   "version": "0.0.0",
   "private": true,
-  "description": "DEML control plane \u2014 Angular app on deml-ui, Django BFF, contracts",
+  "description": "DEML control plane — Angular app on deml-ui, Django BFF, contracts",
   "packageManager": "npm@11.18.0",
   "workspaces": [
     "packages/*"
@@ -41,7 +41,7 @@
     "@sentry/angular": "^10.69.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
-    "deml-ui": "github:dataengineeringformachinelearning/deml-ui#df16eadf452f1d91166fd0cb88891b5258586104",
+    "deml-ui": "github:dataengineeringformachinelearning/deml-ui#493fe6b06745a58be9cf82e6c4a18d9d6297f270",
     "express": "^5.1.0",
     "firebase": "^12.17.0",
     "leaflet": "^1.9.4",
