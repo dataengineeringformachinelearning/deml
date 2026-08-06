@@ -60,16 +60,22 @@ Canonical hex values (case-insensitive in CSS; prefer lowercase in tokens):
 | `#1C1916` | Deep surface / plot · `--color-surface` / `--color-plot` |
 | `#F3F0EA` | Cream elevated modules / card fill · `--color-card` / dark `--color-text` |
 | `#D4CEC5` | Light page ground (`theme-color` light) · light `--color-bg` |
-| `#2F5F8F` | Primary / focus · `--color-primary` |
-| `#3F6B54` | Success / positive · `--color-accent-gold` / `--color-success` |
-| `#9E3D47` | Danger / accent · `--color-accent-red` / `--color-error` |
+| `#2F5F8F` | Primary fill (dark theme) · `--color-primary` |
+| `#23486D` | Primary / links (light theme only — AA on `#D4CEC5`) · light `--color-primary` / `--color-highlight` |
+| `#3F6B54` | Success fill (dark) · `--color-accent-gold` / `--color-success` |
+| `#2F5540` | Success fill + ink (light) · light `--color-success` |
+| `#9E3D47` | Danger fill (dark) · `--color-accent-red` / `--color-error` |
+| `#7A3038` | Danger fill + ink (light) · light `--color-error` |
 | `#C6C0B7` | Muted text on dark ground · `--color-text-secondary` |
-| `#4A453F` | Secondary text on cream modules · `--color-card-text-secondary` |
-| `#9BB8D4` | Highlight on dark ground · `--color-highlight` |
+| `#4A453F` | Secondary text on cream modules / light ground · `--color-card-text-secondary` |
+| `#9BB8D4` | Highlight / links on dark ground · dark `--color-highlight` |
+| `#9BC4A8` | Success **label** ink on dark ground · `--color-success-ink` |
+| `#E8A0A6` | Danger **label** ink on dark ground · `--color-error-ink` |
 
 **Dark default:** cream modules (`#F3F0EA`) on warm ash ground (`#35312D`), deep surface `#1C1916`.  
-**Light:** cream cards on `#D4CEC5` ground; ink `#1C1916`.  
-**Plot wells:** always dark plot (`#1C1916`) with light ink — **never theme-invert chart series**.
+**Light:** cream cards on `#D4CEC5` ground; ink `#1C1916`; deepened primary/success/error for AA links and labels.  
+**Plot wells:** always dark plot (`#1C1916`) with light ink — **never theme-invert chart series**.  
+**Contrast:** body text and links ≥ **4.5:1** (WCAG 2.0 AA); white-on-fill CTAs ≥ **4.5:1**; status labels on page ground use `*-ink` tokens.
 
 On-primary / on-accent text: `#FFFFFF`.
 
