@@ -25,11 +25,12 @@ electric `#2176ff` chrome on top of NFTS — that creates a frankenstein UI and 
 | Style | **new-from-the-start (warm ash)** only |
 | Ownership | All visual values originate in **deml-ui** |
 | Product tree | Angular at repo-root `src/` (not `frontend/`) |
-| Type | **Geist only** — no Syne, Fraunces, Inter product stacks |
-| Charts | Fixed `140` / `280` heights; width `100%`; shared y-scale; never theme-invert |
-| Layout | 8px grid; fluid `minmax(--tile-row-unit, auto)` peer rows |
+| Type | **Geist only** — bold display (weight 800, tight tracking); wide-tracked mark caps; open intro tracking |
+| Charts | Fixed `140` / `280` heights; width `100%`; shared y-scale; never theme-invert (**golden rule**) |
+| Layout | 8px grid; equal `--module-pad` / `--module-pad-lg` on elevated modules; peer rows stretch equally |
 | Theme | Dual `data-theme="light"\|"dark"` via deml-ui tokens |
-| A11y | WCAG 2.0 AA — focus-visible, contrast, ≥44px hit targets, reduced motion |
+| A11y | WCAG 2.0 Level AA / §508 — focus-visible, contrast, ≥44px hit targets, reduced motion, skip link |
+| Composition | Product pages compose deml-ui / `app-*` components only — no parallel chrome CSS |
 
 **Forbidden:** Viking-UI / `packages/viking-ui` / `viking-*` / `--viking-*`; void-black + `#2176ff`;
 cold seven-color frankenstein palettes; Syne/Fraunces; Material / Bootstrap / Tailwind utility
@@ -81,9 +82,9 @@ On-primary / on-accent text: `#FFFFFF`.
 
 | Role | Treatment |
 |------|-----------|
-| Primary headings | Geist bold (`--font-weight-display: 700`), tight tracking (`--tracking-display` / `--tracking-tight`) |
-| Marks / eyebrows | Geist semibold (`--font-weight-mark: 600`), wide tracking (`--tracking-mark` / `--tracking-eyebrow: 0.22em`), uppercase |
-| Intro / lede | Geist regular, `--tracking-intro: 0.06em`, `--leading-body: 1.5` |
+| Primary headings | Geist heavy (`--font-weight-display: 800`), tight tracking (`--tracking-display: -0.045em`) |
+| Marks / eyebrows | Geist semibold (`--font-weight-mark: 600`), wide tracking (`--tracking-mark: 0.24em`), uppercase |
+| Intro / lede | Geist regular, open tracking (`--tracking-intro: 0.08em`), `--leading-body: 1.55` |
 | Body | Geist regular, readable line-height (`--leading-body`) |
 
 **Forbidden type:** Syne, Fraunces, Inter-as-product-UI, decorative display mixes.
@@ -95,8 +96,8 @@ Scale (8px-linked): `--font-size-xs` … `--font-size-2xl` via deml-ui tokens. D
 ## Spacing & layout
 
 1. **8px grid** — `--grid: 8px`; use `--space-*` only.
-2. **Tile rhythm** — `--tile-gap`, `--tile-row-unit`, `--module-pad` / `--module-pad-lg`.
-3. **Fluid equal cells** — `grid-auto-rows: minmax(var(--tile-row-unit), auto)` so tiles in a row stretch equally; **never** squash with fixed-only row tracks.
+2. **Tile rhythm** — `--tile-gap`, `--tile-row-unit`, equal `--module-pad` / `--module-pad-lg` on every elevated module (same inset all sides).
+3. **Fluid equal cells** — `grid-auto-rows: minmax(var(--tile-row-unit), auto|1fr)` so peer tiles share height with no ragged gaps; **never** squash with fixed-only row tracks.
 4. **Sharp modules** — `--radius-sm/md/lg: 0` (pill radius for chips/controls only).
 5. **Content widths** — `--content-width*` / `--reading-width`; page body uses deml-ui `.page` / `.page-body` recipes.
 6. **No overflow** — page chrome must not introduce horizontal page scroll; clip/contain within scaffolding (`overflow-x: clip` on body per deml-ui base). Dynamic boards grow with content; do not force fixed heights that clip charts or CTAs.

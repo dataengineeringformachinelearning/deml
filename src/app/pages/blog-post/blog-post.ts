@@ -9,12 +9,16 @@ import {
 import { DomSanitizer } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 
+import { Banner } from '../../components/banner/banner';
+import { Button } from '../../components/button/button';
+import { ButtonGroup } from '../../components/button-group/button-group';
+import { PageSection } from '../../components/page-section/page-section';
 import { adjacentBlueNotes, getBlueNote } from '../../data/blue-notes';
 
 @Component({
   encapsulation: ViewEncapsulation.None,
   selector: 'app-blog-post',
-  imports: [RouterLink],
+  imports: [RouterLink, Banner, Button, ButtonGroup, PageSection],
   templateUrl: './blog-post.html',
   host: { class: 'page page--prose' },
   changeDetection: ChangeDetectionStrategy.OnPush,
