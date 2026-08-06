@@ -1,6 +1,6 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
 
-import { BLOG_POSTS } from './data/blog-posts';
+import { BLUE_NOTES } from './data/blue-notes';
 import { LEARN_TOPICS } from './data/packages';
 
 export const serverRoutes: ServerRoute[] = [
@@ -15,7 +15,7 @@ export const serverRoutes: ServerRoute[] = [
     path: 'blog/:slug',
     renderMode: RenderMode.Prerender,
     async getPrerenderParams() {
-      return BLOG_POSTS.map((post) => ({ slug: post.slug }));
+      return BLUE_NOTES.map((post) => ({ slug: post.slug }));
     },
   },
   {

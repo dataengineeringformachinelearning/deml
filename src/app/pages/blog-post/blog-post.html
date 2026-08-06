@@ -1,17 +1,95 @@
 @if (post(); as entry) {
-  <app-article
-    [title]="entry.title"
-    [lede]="entry.meta"
-    [body]="entry.body"
-    backLink="/blog"
-    backLabel="All posts"
-    [headingId]="headingId()"
-  />
+  <article class="article page page--prose" [attr.aria-labelledby]="headingId()">
+    <header class="page-header">
+      <div class="page-header__text">
+        <p class="page-header__meta">
+          <a routerLink="/blog">Blue Notes</a>
+          <span class="page-header__meta-sep" aria-hidden="true">/</span>
+          <span aria-current="page">{{ entry.note }}</span>
+        </p>
+        <p class="page-header__eyebrow">
+          <span class="badge">{{ entry.note }}</span>
+          <time [attr.datetime]="entry.publishedAt">{{ entry.publishedLabel }}</time>
+        </p>
+        <h1 class="page-header__title" [id]="headingId()">{{ entry.title }}</h1>
+        <p class="page-header__lede">{{ entry.summary }}</p>
+        <aside class="cluster" aria-label="Categories">
+          @for (category of entry.categories; track category) {
+            <span class="badge">{{ category }}</span>
+          }
+        </aside>
+      </div>
+      <div class="page-header__actions">
+        <a class="page-back-link" routerLink="/blog">← All Blue Notes</a>
+      </div>
+    </header>
+
+    <section class="page-body page-body--prose stack">
+      @if (entry.headings.length > 0) {
+        <nav class="toc" aria-label="On this page">
+          <h2 class="toc__heading">In this note</h2>
+          <ol class="toc__list">
+            @for (heading of entry.headings; track heading.slug) {
+              <li>
+                <a class="toc__item" [href]="'#' + heading.slug">
+                  <span class="toc__num">§</span>
+                  <span class="toc__label">{{ heading.text }}</span>
+                </a>
+              </li>
+            }
+          </ol>
+        </nav>
+      }
+
+      <div class="article-body" [innerHTML]="safeHtml()"></div>
+
+      <aside class="callout" data-tone="info" role="note">
+        <div class="callout__body">
+          <p class="callout__heading">Living release record</p>
+          <p class="callout__text">
+            Blue Notes summarize shipped outcomes. The public repository remains the detailed
+            engineering record.
+          </p>
+        </div>
+        <a
+          class="button button--secondary button--pill"
+          href="https://github.com/dataengineeringformachinelearning/deml"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View source
+        </a>
+      </aside>
+
+      <nav class="pagination" aria-label="Blue Note navigation">
+        @if (older(); as prev) {
+          <a class="pagination__prev" [routerLink]="['/blog', prev.slug]" rel="prev">
+            Earlier: {{ prev.title }}
+          </a>
+        } @else {
+          <span class="pagination__prev" aria-disabled="true">Earlier note</span>
+        }
+        @if (newer(); as next) {
+          <a class="pagination__next" [routerLink]="['/blog', next.slug]" rel="next">
+            Newer: {{ next.title }}
+          </a>
+        } @else {
+          <span class="pagination__next" aria-disabled="true">Newer note</span>
+        }
+      </nav>
+    </section>
+  </article>
 } @else {
-  <app-article
-    backLink="/blog"
-    backLabel="Back to blog"
-    missingHeading="Post not found"
-    missingLede="That note is not in the archive."
-  />
+  <article class="article page page--prose">
+    <header class="page-header">
+      <div class="page-header__text">
+        <p class="page-header__eyebrow">Blue Notes</p>
+        <h1 class="page-header__title">Note not found</h1>
+        <p class="page-header__lede">That dispatch is not in the archive.</p>
+      </div>
+      <div class="page-header__actions">
+        <a class="page-back-link" routerLink="/blog">← All Blue Notes</a>
+      </div>
+    </header>
+  </article>
 }

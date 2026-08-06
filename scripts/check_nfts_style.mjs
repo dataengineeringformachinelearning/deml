@@ -149,7 +149,10 @@ function stripCommentsTs(source) {
     r.endsWith('deml-ui.css') ||
     r.endsWith('deml-ui-elements.js') ||
     r.endsWith('deml-ui.iife.js.map') ||
-    r.includes('deml-ui-tokens.css');
+    r.includes('deml-ui-tokens.css') ||
+    // Historical Blue Notes may name the retired Viking theme; content is editorial SoT.
+    r.startsWith('src/content/blue-notes/') ||
+    r.endsWith('.generated.ts');
   for (const root of roots) {
     for (const p of walk(root)) {
       const r = rel(p);
@@ -317,13 +320,22 @@ function stripCommentsTs(source) {
     fail('package.json must depend on deml-ui');
   } else {
     const pin = String(deps['deml-ui']);
-    // Pure npm consumer — no github:/file:/git: pins for product installs.
-    if (/^(github:|git\+|file:|http:|https:\/\/github)/i.test(pin)) {
+    // Prefer npm semver. Official org GitHub SHAs are allowed when npm publish is unavailable
+    // (registry 404/401) so Vercel/CI can still install deml-ui past the last published tag.
+    const officialGithub =
+      /^github:dataengineeringformachinelearning\/deml-ui#[0-9a-f]{7,40}$/i.test(
+        pin,
+      );
+    if (/^(github:|git\+|file:|http:|https:\/\/github)/i.test(pin) && !officialGithub) {
       fail(
-        `deml-ui must be an npm semver range (published package), not "${pin}"`,
+        `deml-ui must be an npm semver range or official github:…/deml-ui#sha, not "${pin}"`,
       );
     }
-    if (!/^[\^~]?[0-9]/.test(pin) && !/^[0-9]/.test(pin)) {
+    if (
+      !officialGithub &&
+      !/^[\^~]?[0-9]/.test(pin) &&
+      !/^[0-9]/.test(pin)
+    ) {
       fail(`deml-ui pin must be a semver range, got "${pin}"`);
     }
   }

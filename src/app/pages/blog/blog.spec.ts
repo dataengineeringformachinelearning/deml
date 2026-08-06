@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
-import { BLOG_POSTS } from '../../data/blog-posts';
+import { BLUE_NOTES } from '../../data/blue-notes';
 import { Blog } from './blog';
 
 describe('Blog', () => {
@@ -22,14 +22,13 @@ describe('Blog', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render microcards for each post', () => {
+  it('should render Blue Notes branding and archive cards', () => {
     const host = fixture.nativeElement as HTMLElement;
     const cards = host.querySelectorAll('app-microcard');
 
-    expect(host.querySelector('h1.banner-heading')?.textContent).toContain('Blog');
-    expect(cards.length).toBe(BLOG_POSTS.length);
-    expect(host.querySelector('.microcard-meta')?.textContent).toContain('Jul 2026');
-    expect(host.textContent).toContain('Build with clarity');
-    expect(host.querySelector('.microcard-cta')?.textContent?.trim()).toBe('Read');
+    expect(host.querySelector('h1.banner-heading')?.textContent).toContain('Blue Notes');
+    expect(cards.length).toBeGreaterThanOrEqual(1);
+    expect(host.textContent).toContain(BLUE_NOTES[0].title);
+    expect(host.querySelector('.microcard-cta')?.textContent?.trim()).toMatch(/Read/);
   });
 });

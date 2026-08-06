@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>DEML Blue Notes</title>
+    <link>https://deml.app/blog</link>
+    <description>Field log of DEML platform releases, architecture, and operator capabilities.</description>
+    <language>en-us</language>
+    <item>
+      <title>Viking-UI 7.0.0 operational dashboard components</title>
+      <link>https://deml.app/blog/2026-07-11-viking-ui-7</link>
+      <guid isPermaLink="true">https://deml.app/blog/2026-07-11-viking-ui-7</guid>
+      <pubDate>Sat, 11 Jul 2026 12:00:00 GMT</pubDate>
+      <description>The seventh major Viking-UI release adds Cloudscape-inspired operational components: split-panel, flashbar, property-filter, collection-preferences, form-template, chart-container, and enhanced table primitives.</description>
+      <category>Platform Note 007</category>
+    </item>
+    <item>
+      <title>Viking-UI 6.0 interlocks navigation across every DEML surface</title>
+      <link>https://deml.app/blog/2026-07-11-viking-ui-6</link>
+      <guid isPermaLink="true">https://deml.app/blog/2026-07-11-viking-ui-6</guid>
+      <pubDate>Sat, 11 Jul 2026 12:00:00 GMT</pubDate>
+      <description>The sixth major Viking-UI release gives the application, marketing site, backend pages, and component docs one shared authentication-aware navigation contract.</description>
+      <category>Platform Note 006</category>
+    </item>
+    <item>
+      <title>Analytics exports via FORJD</title>
+      <link>https://deml.app/blog/2026-07-10-analytics-exports</link>
+      <guid isPermaLink="true">https://deml.app/blog/2026-07-10-analytics-exports</guid>
+      <pubDate>Fri, 10 Jul 2026 12:00:00 GMT</pubDate>
+      <description>Export jobs are tenant-scoped and executed in FORJD; DEML exposes them through the BFF.</description>
+      <category>Platform Note 015</category>
+    </item>
+    <item>
+      <title>FORJD owns the streaming hot path</title>
+      <link>https://deml.app/blog/2026-07-09-rust-data-plane</link>
+      <guid isPermaLink="true">https://deml.app/blog/2026-07-09-rust-data-plane</guid>
+      <pubDate>Thu, 09 Jul 2026 12:00:00 GMT</pubDate>
+      <description>DEML stays the control plane; FORJD’s Rust engine runs sealed pipeline and data-plane roles.</description>
+      <category>Platform Note 014</category>
+    </item>
+    <item>
+      <title>Temporal forecasting arrives across the platform</title>
+      <link>https://deml.app/blog/2026-07-05-temporal-forecasting-and-viking-ui</link>
+      <guid isPermaLink="true">https://deml.app/blog/2026-07-05-temporal-forecasting-and-viking-ui</guid>
+      <pubDate>Sun, 05 Jul 2026 12:00:00 GMT</pubDate>
+      <description>A Norse spiking-neural-network forecaster moved from training infrastructure into live tenant-scoped status, analytics, and dashboard experiences.</description>
+      <category>Platform Note 003</category>
+    </item>
+    <item>
+      <title>Projection health on the status surface</title>
+      <link>https://deml.app/blog/2026-06-28-event-projections</link>
+      <guid isPermaLink="true">https://deml.app/blog/2026-06-28-event-projections</guid>
+      <pubDate>Sun, 28 Jun 2026 12:00:00 GMT</pubDate>
+      <description>Platform status reflects FORJD readiness and sealed projection availability through the Django BFF.</description>
+      <category>Platform Note 013</category>
+    </item>
+    <item>
+      <title>The first release train: content, prediction, and security controls</title>
+      <link>https://deml.app/blog/2026-06-13-first-release-train</link>
+      <guid isPermaLink="true">https://deml.app/blog/2026-06-13-first-release-train</guid>
+      <pubDate>Sat, 13 Jun 2026 12:00:00 GMT</pubDate>
+      <description>The v0 release series connected the public content system, threat prediction, subscriptions, compliance reporting, encryption, and performance work.</description>
+      <category>Platform Note 001</category>
+    </item>
+    <item>
+      <title>Platform Log 000: The first line of the operating system</title>
+      <link>https://deml.app/blog/2026-02-24-platform-origin</link>
+      <guid isPermaLink="true">https://deml.app/blog/2026-02-24-platform-origin</guid>
+      <pubDate>Tue, 24 Feb 2026 12:00:00 GMT</pubDate>
+      <description>DEML began as an open technical book and grew into a working platform for telemetry, predictive operations, and cybersecurity engineering.</description>
+      <category>Platform Note 000</category>
+    </item>
+    <item>
+      <title>ML Models: Temporal Forecasting and Countermeasure Effectiveness Standard</title>
+      <link>https://deml.app/blog/2025-05-15-ml-temporal-forecasting</link>
+      <guid isPermaLink="true">https://deml.app/blog/2025-05-15-ml-temporal-forecasting</guid>
+      <pubDate>Thu, 15 May 2025 12:00:00 GMT</pubDate>
+      <description>PyTorch-based machine learning pipeline for predictive analytics including SLA forecasting, threat detection, and temporal spiking neural networks.</description>
+      <category>Platform Note 006</category>
+    </item>
+    <item>
+      <title>Viking-UI Premium Theme: Dark-First Engineering Aesthetic</title>
+      <link>https://deml.app/blog/2025-03-01-viking-ui-premium-theme</link>
+      <guid isPermaLink="true">https://deml.app/blog/2025-03-01-viking-ui-premium-theme</guid>
+      <pubDate>Sat, 01 Mar 2025 12:00:00 GMT</pubDate>
+      <description>The Viking-UI design system introduces aerospace-inspired dark themes, machined metallic borders, and WCAG 2.1 AA compliance across all DEML surfaces.</description>
+      <category>Platform Note 005</category>
+    </item>
+    <item>
+      <title>Sealed projections through FORJD</title>
+      <link>https://deml.app/blog/2025-02-10-event-projections-architecture</link>
+      <guid isPermaLink="true">https://deml.app/blog/2025-02-10-event-projections-architecture</guid>
+      <pubDate>Mon, 10 Feb 2025 12:00:00 GMT</pubDate>
+      <description>Durable projections and analytics execute in FORJD; DEML adapts product paths through Django.</description>
+      <category>Platform Note 012</category>
+    </item>
+    <item>
+      <title>Containerized control plane</title>
+      <link>https://deml.app/blog/2025-01-20-docker-deployment</link>
+      <guid isPermaLink="true">https://deml.app/blog/2025-01-20-docker-deployment</guid>
+      <pubDate>Mon, 20 Jan 2025 12:00:00 GMT</pubDate>
+      <description>Distroless Django and Angular images keep DEML’s user plane portable across hosts.</description>
+      <category>Platform Note 011</category>
+    </item>
+    <item>
+      <title>DEML architecture: control plane + FORJD</title>
+      <link>https://deml.app/blog/2025-01-15-initial-architecture</link>
+      <guid isPermaLink="true">https://deml.app/blog/2025-01-15-initial-architecture</guid>
+      <pubDate>Wed, 15 Jan 2025 12:00:00 GMT</pubDate>
+      <description>DEML owns identity and the Angular product; FORJD is the universal secure streaming engine.</description>
+      <category>Platform Note 010</category>
+    </item>
+  </channel>
+</rss>

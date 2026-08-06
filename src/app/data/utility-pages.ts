@@ -29,10 +29,10 @@ export const NOT_FOUND_CARDS: readonly UtilityCard[] = [
   },
   {
     id: 'blog',
-    heading: 'Blog',
-    subtext: 'Read the latest notes on craft and calm software.',
+    heading: 'Blue Notes',
+    subtext: 'Field log of platform releases, architecture, and operator capabilities.',
     visual: 'red',
-    cta: 'Read blog',
+    cta: 'Read notes',
     href: '/blog',
   },
 ];

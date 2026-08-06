@@ -1,23 +1,81 @@
 <app-banner
-  preheader="DEML"
-  heading="Blog"
-  lede="Notes on status, sites, analytics, and calm control-plane craft."
-/>
+  preheader="DEML Field Log · Built in public"
+  heading="Blue Notes"
+  lede="The operating record behind DEML: releases, architecture decisions, reliability work, and the details that turn a platform into durable infrastructure."
+>
+  <app-button-group>
+    <app-button variant="primary" shape="pill" href="#latest-dispatch">Read the latest</app-button>
+    <app-button variant="secondary" shape="pill" href="/blog/rss.xml">Follow via RSS</app-button>
+  </app-button-group>
+</app-banner>
+
+@if (lead(); as latest) {
+  <app-page-section variant="catalog" labelledBy="latest-dispatch">
+    <app-section-header
+      eyebrow="Latest dispatch"
+      heading="Newest note"
+      lede="Start with the most recent field note, then browse the archive."
+      headingId="latest-dispatch"
+    />
+
+    <app-microcard-grid ariaLabel="Latest Blue Note" [columns]="1">
+      <li>
+        <app-microcard
+          [heading]="latest.title"
+          [subtext]="latest.summary"
+          [meta]="latest.note + ' · ' + latest.meta"
+          [visual]="latest.visual"
+          headingId="blog-lead"
+          [routerLink]="['/blog', latest.slug]"
+          cta="Read note"
+        />
+      </li>
+    </app-microcard-grid>
+  </app-page-section>
+}
+
+@if (spotlight().length > 0) {
+  <app-page-section variant="catalog" labelledBy="spotlight-heading">
+    <app-section-header
+      eyebrow="Spotlight"
+      heading="Featured notes"
+      lede="Pinned dispatches worth reading first."
+      headingId="spotlight-heading"
+    />
+
+    <app-microcard-grid ariaLabel="Featured Blue Notes" [columns]="3">
+      @for (post of spotlight(); track post.slug) {
+        <li>
+          <app-microcard
+            [heading]="post.title"
+            [subtext]="post.summary"
+            [meta]="post.meta"
+            [visual]="post.visual"
+            [headingId]="'blog-spot-' + post.slug"
+            [routerLink]="['/blog', post.slug]"
+            cta="Read"
+          />
+        </li>
+      }
+    </app-microcard-grid>
+  </app-page-section>
+}
 
 <app-page-section variant="catalog" labelledBy="blog-list-heading">
   <app-section-header
-    heading="Latest"
-    lede="Essays and notes, newest first."
+    eyebrow="Archive"
+    heading="All Blue Notes"
+    lede="Every shipped dispatch, newest first."
     headingId="blog-list-heading"
   />
 
-  <app-microcard-grid ariaLabel="Blog posts" [columns]="1">
-    @for (post of posts; track post.slug) {
+  <app-microcard-grid ariaLabel="Blue Notes archive" [columns]="1">
+    @for (post of archive(); track post.slug) {
       <li>
         <app-microcard
           [heading]="post.title"
-          [subtext]="post.excerpt"
-          [meta]="post.meta"
+          [subtext]="post.summary"
+          [meta]="post.note + ' · ' + post.meta"
           [visual]="post.visual"
           [headingId]="'blog-' + post.slug"
           [routerLink]="['/blog', post.slug]"

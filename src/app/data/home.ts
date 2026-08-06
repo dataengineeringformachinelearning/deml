@@ -63,7 +63,7 @@ export const HOME_DESTINATIONS: readonly HomeCard[] = [
     visual: 'gold',
     actions: [
       { label: 'Open catalog', routerLink: '/learn', variant: 'primary' },
-      { label: 'Read the blog', routerLink: '/blog', variant: 'secondary' },
+      { label: 'Blue Notes', routerLink: '/blog', variant: 'secondary' },
     ],
   },
   {
