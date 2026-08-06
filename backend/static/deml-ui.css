@@ -153,7 +153,7 @@
   --chart-grid: var(--color-plot-grid);
   --chart-baseline: var(--color-plot-baseline);
   --chart-accent: var(--color-primary);
-  --chart-node: #ffffff;
+  --chart-node: var(--color-accent-gold);
   --chart-label: var(--color-plot-muted);
   --chart-value: var(--color-plot-ink);
   --chart-series-1: var(--color-primary);
@@ -6641,14 +6641,23 @@ app-metric-list[data-accent='primary'],
 
 /* inlined: components/chart-card/chart-card.css */
 /* CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE */
-/* Component: chart-card — NFTS fill; plot band hosts fixed-height line charts */
+/* Component: chart-card — cream module + value/trend header; hosts 140/280 plots */
 
 .component--chart-card .demo {
-  display: grid;
-  gap: var(--tile-gap);
+  max-height: 100%;
+  overflow: hidden;
 }
 
-/* Chart card — titled shell; plot band hosts fixed 140/280 line charts */
+.component--chart-card .chart-board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
 
 app-chart-card,
 deml-chart-card,
@@ -6658,22 +6667,26 @@ deml-chart-card,
   height: 100%;
   min-width: 0;
   --chart-accent: var(--color-primary);
+  --chart-node: var(--color-accent-gold);
   --chart-stage-max-inline: 100%;
   background-color: transparent;
 }
 
 app-chart-card[data-accent='gold'],
-:host([data-accent='gold']) {
+:host([data-accent='gold']),
+.chart-card[data-accent='gold'] {
   --chart-accent: var(--color-accent-gold);
 }
 
 app-chart-card[data-accent='red'],
-:host([data-accent='red']) {
+:host([data-accent='red']),
+.chart-card[data-accent='red'] {
   --chart-accent: var(--color-accent-red);
 }
 
 app-chart-card[data-accent='primary'],
-:host([data-accent='primary']) {
+:host([data-accent='primary']),
+.chart-card[data-accent='primary'] {
   --chart-accent: var(--color-primary);
 }
 
@@ -6683,10 +6696,10 @@ app-chart-card[data-accent='primary'],
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  min-height: 100%;
+  min-height: 0;
   margin: 0;
-  padding: var(--module-pad);
-  overflow: visible;
+  padding: var(--space-2);
+  overflow: hidden;
   --chart-stage-max-inline: 100%;
   color: var(--color-card-text);
   background-color: var(--color-card);
@@ -6696,21 +6709,35 @@ app-chart-card[data-accent='primary'],
     var(--color-card) 48%
   );
   border: var(--border-width) solid var(--color-card-border);
-  border-top: calc(var(--border-width) * 4) solid var(--chart-accent);
+  border-block-start: calc(var(--border-width) * 3) solid var(--chart-accent);
   box-shadow: var(--shadow-card);
+  border-radius: var(--radius-lg);
+  transition: box-shadow 180ms ease, border-color 160ms ease;
+}
+
+.chart-card:hover {
+  border-color: color-mix(in srgb, var(--color-accent-gold) 40%, var(--color-card-border));
+  box-shadow: var(--shadow-md);
 }
 
 .chart-card-header {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  margin: 0 0 var(--space-3);
+  margin: 0 0 var(--space-2);
   flex: 0 0 auto;
+}
+
+.chart-card-header__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
 }
 
 .chart-card-heading {
   margin: 0;
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
@@ -6718,21 +6745,53 @@ app-chart-card[data-accent='primary'],
   color: var(--color-card-text);
 }
 
+.chart-card-value {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-tight);
+  line-height: 1;
+  color: var(--color-card-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-card-unit {
+  margin-inline-start: 0.15em;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-card-text-secondary);
+}
+
 .chart-card-meta {
   margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
   font-family: var(--font-mark);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-mark);
   letter-spacing: var(--tracking-mark);
   text-transform: uppercase;
-  color: var(--chart-accent);
+  color: var(--color-card-text-secondary);
+}
+
+.chart-card-trend {
+  color: var(--color-accent-gold);
+}
+
+.chart-card-trend[data-trend='down'] {
+  color: var(--color-accent-red);
+}
+
+.chart-card-trend[data-trend='up'] {
+  color: var(--color-accent-gold);
 }
 
 /*
  * Plot band — hosts fill the card content width; line charts use fixed
- * --chart-height-panel (280px) / --chart-height-spark (140px). Equal
- * --chart-inset lives on the plot stage. Peer equal-height rows: ::after
- * letterboxes leftover tile height, not the SVG.
+ * --chart-height-panel (280px) / --chart-height-spark (140px).
  */
 .chart-card-body {
   display: flex;
@@ -6743,7 +6802,7 @@ app-chart-card[data-accent='primary'],
   gap: 0;
   min-height: 0;
   width: 100%;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .chart-card-body::after {
@@ -6765,9 +6824,9 @@ deml-chart-card .chart-card-body > * {
   margin-inline: 0;
 }
 
-/* Plot wells stretch the content band (equal --chart-inset stays on the stage). */
 .chart-card-body .area-chart-frame,
 .chart-card-body .bar-chart,
+.chart-card-body .donut-chart-frame,
 .chart-card-body .chart-figure__plot,
 .chart-card-body .chart-empty-state,
 app-chart-card .chart-card-body .area-chart-frame,
@@ -6791,17 +6850,28 @@ app-chart-card[data-size='wide'] .chart-card-heading {
 
 @media screen and (min-width: 800px) {
   .chart-card {
-    padding: var(--module-pad-lg);
+    padding: var(--space-3);
   }
 }
 
 /* inlined: components/area-chart/area-chart.css */
 /* CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE */
-/* Component: area-chart — fixed spark 140 / panel 280; width 100%; never data-sized */
+/* Component: area-chart — premium SVG; spark 140 / panel 280; NFTS tokens */
 
 .component--area-chart .demo {
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.component--area-chart .chart-board {
   display: grid;
-  gap: var(--tile-gap);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 app-area-chart,
@@ -6819,25 +6889,28 @@ deml-area-chart,
   --chart-grid: var(--color-plot-grid);
   --chart-baseline: var(--color-plot-baseline);
   --chart-label: var(--color-plot-muted);
-  --chart-node: #ffffff;
+  --chart-node: var(--color-accent-gold);
   background-color: transparent;
 }
 
 app-area-chart[data-accent='gold'],
 deml-area-chart[data-accent='gold'],
-:host([data-accent='gold']) {
+:host([data-accent='gold']),
+.chart-card[data-accent='gold'] {
   --chart-accent: var(--color-accent-gold);
 }
 
 app-area-chart[data-accent='red'],
 deml-area-chart[data-accent='red'],
-:host([data-accent='red']) {
+:host([data-accent='red']),
+.chart-card[data-accent='red'] {
   --chart-accent: var(--color-accent-red);
 }
 
 app-area-chart[data-accent='primary'],
 deml-area-chart[data-accent='primary'],
-:host([data-accent='primary']) {
+:host([data-accent='primary']),
+.chart-card[data-accent='primary'] {
   --chart-accent: var(--color-primary);
 }
 
@@ -6848,24 +6921,24 @@ deml-area-chart[data-accent='primary'],
   justify-content: stretch;
   align-self: stretch;
   box-sizing: border-box;
+  position: relative;
   width: 100%;
   max-width: none;
   height: var(--chart-height-panel);
-  margin-inline: 0;
-  margin-block: 0;
+  margin: 0;
   padding: var(--chart-inset);
   background-color: var(--chart-stage-ink);
   border: var(--border-width) solid var(--color-plot-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
 }
 
-/*
- * Panel / full plot — fixed 280px; width 100%; height never follows data or aspect.
- */
 app-area-chart:not([data-variant='spark']) .area-chart-frame,
 deml-area-chart:not([data-variant='spark']) .area-chart-frame,
 :host(:not([data-variant='spark'])) .area-chart-frame,
-.component--area-chart .area-chart-frame,
-.component--chart-card .area-chart-frame {
+.component--area-chart .area-chart-frame:not([data-variant='spark']),
+.component--chart-card .area-chart-frame:not([data-variant='spark']),
+.component--chart-panel .area-chart-frame:not([data-variant='spark']) {
   width: 100%;
   max-width: none;
   height: var(--chart-height-panel);
@@ -6875,6 +6948,7 @@ deml-area-chart:not([data-variant='spark']) .area-chart-frame,
   background-color: var(--chart-stage-ink);
 }
 
+.area-chart-mount,
 .area-chart {
   display: block;
   box-sizing: border-box;
@@ -6883,13 +6957,29 @@ deml-area-chart:not([data-variant='spark']) .area-chart-frame,
   min-width: 0;
   min-height: 0;
   flex: 1 1 auto;
+  position: relative;
   overflow: visible;
+}
+
+.area-chart-mount > .area-chart {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.area-chart-grid-h {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+  vector-effect: non-scaling-stroke;
 }
 
 .area-chart-grid-v {
   stroke: var(--chart-grid);
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
+  opacity: 0.55;
 }
 
 .area-chart-baseline {
@@ -6914,6 +7004,15 @@ deml-area-chart:not([data-variant='spark']) .area-chart-frame,
   fill: var(--chart-node);
   stroke: var(--chart-stage-ink);
   stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.area-chart-cursor {
+  stroke: color-mix(in srgb, var(--color-plot-ink) 32%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+  pointer-events: none;
+  vector-effect: non-scaling-stroke;
 }
 
 .area-chart-stop--top {
@@ -6938,45 +7037,88 @@ deml-area-chart:not([data-variant='spark']) .area-chart-frame,
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   letter-spacing: var(--tracking-mark);
+  font-variant-numeric: tabular-nums;
 }
 
-/* Spark — fixed 140px; no axes/grid chrome (markup omits them); transparent stage */
+.chart-tooltip {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 4.5rem;
+  padding: var(--space-1) var(--space-2);
+  pointer-events: none;
+  color: var(--color-text);
+  background-color: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+}
+
+.chart-tooltip[hidden] {
+  display: none;
+}
+
+.chart-tooltip__label {
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-mark);
+  color: var(--color-text-secondary);
+}
+
+.chart-tooltip__value {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
 app-area-chart[data-variant='spark'] .area-chart-frame,
 deml-area-chart[data-variant='spark'] .area-chart-frame,
-:host([data-variant='spark']) .area-chart-frame {
+:host([data-variant='spark']) .area-chart-frame,
+.area-chart-frame[data-variant='spark'] {
   width: 100%;
   max-width: none;
   height: var(--chart-height-spark);
   aspect-ratio: auto;
   max-height: none;
   margin-inline: 0;
-  padding: 0;
-  border: 0;
-  background-color: transparent;
-}
-
-app-area-chart[data-variant='spark'] .area-chart,
-:host([data-variant='spark']) .area-chart {
-  min-height: 0;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-plot-border);
+  background-color: var(--color-surface);
 }
 
 app-area-chart[data-variant='spark'] .area-chart-line,
-:host([data-variant='spark']) .area-chart-line {
+:host([data-variant='spark']) .area-chart-line,
+.area-chart-frame[data-variant='spark'] .area-chart-line {
   stroke-width: 2.75;
 }
 
 app-area-chart[data-variant='spark'] .area-chart-node,
-:host([data-variant='spark']) .area-chart-node {
+:host([data-variant='spark']) .area-chart-node,
+.area-chart-frame[data-variant='spark'] .area-chart-node {
   fill: var(--chart-node);
-  stroke: var(--color-card);
+  stroke: var(--color-surface);
 }
 
 /* inlined: components/bar-chart/bar-chart.css */
-/* Component: bar-chart — peer width + equal inset; content-tall rows */
+/* CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE */
+/* Component: bar-chart — column SVG (soft column bars) + optional list rows */
 
 .component--bar-chart .demo {
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.component--bar-chart .chart-board {
   display: grid;
-  gap: var(--tile-gap);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 app-bar-chart,
@@ -7011,11 +7153,24 @@ app-bar-chart[data-accent='primary'],
   --chart-accent: var(--color-primary);
 }
 
-/*
- * Plot well — same max-inline + equal inset as area charts.
- * Height grows with rows (no aspect lock); peer tiles letterbox around it.
- */
-.bar-chart {
+.bar-chart-frame.area-chart-frame {
+  height: var(--chart-height-panel);
+}
+
+.bar-chart-frame.area-chart-frame[data-variant='spark'] {
+  height: var(--chart-height-spark);
+}
+
+.bar-chart-col {
+  fill: var(--chart-accent);
+  opacity: 0.92;
+}
+
+.bar-chart-col:hover {
+  opacity: 1;
+}
+
+.bar-chart:not([data-chart]):not(.bar-chart-svg) {
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
@@ -7027,13 +7182,13 @@ app-bar-chart[data-accent='primary'],
   max-width: var(--chart-stage-max-inline);
   min-height: var(--chart-min-block);
   height: auto;
-  margin-inline: 0;
-  margin-block: 0;
+  margin: 0;
   padding: var(--chart-inset);
   overflow: visible;
   list-style: none;
-  background-color: var(--chart-plot);
+  background-color: var(--color-surface);
   border: var(--border-width) solid var(--color-plot-border);
+  border-radius: var(--radius-md);
 }
 
 .bar-chart-row {
@@ -7043,7 +7198,6 @@ app-bar-chart[data-accent='primary'],
   flex: 0 0 auto;
   margin: 0;
   padding: 0;
-  background-color: transparent;
 }
 
 .bar-chart-meta {
@@ -7074,38 +7228,183 @@ app-bar-chart[data-accent='primary'],
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-intro);
   color: var(--chart-label);
+  font-variant-numeric: tabular-nums;
 }
 
 .bar-chart-track {
   width: 100%;
   height: var(--space-1);
-  background-color: color-mix(in srgb, var(--color-plot-muted) 16%, var(--chart-plot));
+  background-color: color-mix(in srgb, var(--color-plot-muted) 16%, var(--color-surface));
   overflow: hidden;
+  border-radius: var(--radius-pill);
 }
 
 .bar-chart-fill {
   height: 100%;
   background-color: var(--chart-accent);
-  background-image: linear-gradient(
-    90deg,
-    var(--chart-accent) 0%,
-    color-mix(in srgb, var(--chart-accent) 55%, var(--color-on-primary)) 100%
-  );
+  border-radius: var(--radius-pill);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .bar-chart-fill {
-    transition: none;
-  }
+/* inlined: components/donut-chart/donut-chart.css */
+/* CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE */
+/* Component: donut-chart — ring + legend; NFTS series tones */
+
+.component--donut-chart .demo {
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.component--donut-chart .chart-board--donut {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+app-donut-chart,
+deml-donut-chart,
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  background-color: transparent;
+}
+
+.donut-chart-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--chart-height-spark);
+  padding: var(--space-1);
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-plot-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.donut-chart {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.donut-chart-plot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-2);
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.donut-chart-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  justify-self: center;
+}
+
+.donut-chart-slice[data-tone='primary'] {
+  fill: var(--color-primary);
+}
+
+.donut-chart-slice[data-tone='gold'] {
+  fill: var(--color-accent-gold);
+}
+
+.donut-chart-slice[data-tone='red'] {
+  fill: var(--color-accent-red);
+}
+
+.donut-chart-slice[data-tone='muted'] {
+  fill: var(--color-text-secondary);
+}
+
+.donut-chart-hole {
+  fill: var(--color-surface);
+}
+
+.donut-chart-total {
+  fill: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.donut-chart-legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.donut-chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  line-height: 1.2;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.donut-chart-swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  flex: 0 0 auto;
+}
+
+.donut-chart-swatch[data-tone='primary'] {
+  background-color: var(--color-primary);
+}
+
+.donut-chart-swatch[data-tone='gold'] {
+  background-color: var(--color-accent-gold);
+}
+
+.donut-chart-swatch[data-tone='red'] {
+  background-color: var(--color-accent-red);
+}
+
+.donut-chart-swatch[data-tone='muted'] {
+  background-color: var(--color-text-secondary);
 }
 
 /* inlined: components/chart/chart.css */
 /* CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE */
-/* Component: chart — fixed 280px native SVG plot shell */
+/* Component: chart — line (no fill); reuses area-chart stage chrome */
 
 .component--chart .demo {
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.component--chart .chart-board {
   display: grid;
-  gap: var(--tile-gap);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 .chart-figure {
@@ -7150,11 +7449,22 @@ app-bar-chart[data-accent='primary'],
 
 /* inlined: components/chart-panel/chart-panel.css */
 /* CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE */
-/* Component: chart-panel — titled shell with fixed 280px plot stage */
+/* Component: chart-panel — titled shell with fixed plot stage (spark demos / 280 panel) */
 
 .component--chart-panel .demo {
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.component--chart-panel .chart-board--panel {
   display: grid;
-  gap: var(--tile-gap);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 app-chart-panel,
@@ -7169,16 +7479,24 @@ deml-chart-panel,
   background-color: transparent;
 }
 
+.chart-panel[data-accent='gold'] {
+  --chart-accent: var(--color-accent-gold);
+}
+
+.chart-panel[data-accent='red'] {
+  --chart-accent: var(--color-accent-red);
+}
+
 .chart-panel {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  min-height: 100%;
+  min-height: 0;
   margin: 0;
-  padding: var(--module-pad);
-  overflow: visible;
+  padding: var(--space-2);
+  overflow: hidden;
   --chart-stage-max-inline: 100%;
   color: var(--color-card-text);
   background-color: var(--color-card);
@@ -7188,22 +7506,30 @@ deml-chart-panel,
     var(--color-card) 48%
   );
   border: var(--border-width) solid var(--color-card-border);
-  border-top: calc(var(--border-width) * 4) solid var(--chart-accent);
+  border-block-start: calc(var(--border-width) * 3) solid var(--chart-accent);
   box-shadow: var(--shadow-card);
+  border-radius: var(--radius-lg);
 }
 
 .chart-panel__header {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  margin: 0 0 var(--space-3);
+  margin: 0 0 var(--space-2);
   flex: 0 0 auto;
+}
+
+.chart-panel__header-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
 }
 
 .chart-panel__header h3,
 .chart-panel__title {
   margin: 0;
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
@@ -7214,55 +7540,82 @@ deml-chart-panel,
 .chart-panel__value {
   margin: 0;
   font-family: var(--font-sans);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-card-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-panel__unit {
+  margin-inline-start: 0.15em;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
-  letter-spacing: var(--tracking-eyebrow);
+  color: var(--color-card-text-secondary);
+}
+
+.chart-panel__meta {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-mark);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-mark);
+  letter-spacing: var(--tracking-mark);
   text-transform: uppercase;
-  color: var(--chart-accent);
+  color: var(--color-card-text-secondary);
 }
 
 .chart-panel__body {
   display: flex;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
   box-sizing: border-box;
   width: 100%;
-  max-width: none;
-  height: var(--chart-height-panel);
-  aspect-ratio: auto;
-  max-height: none;
+  min-height: 0;
   margin: 0;
-  padding: var(--chart-inset);
-  overflow: visible;
-  background-color: var(--chart-stage-ink);
-  border: var(--border-width) solid var(--color-plot-border);
-  color: var(--color-plot-ink);
+  padding: 0;
+  overflow: hidden;
 }
 
-.chart-panel__body > .chart,
-.chart-panel__body > svg {
-  display: block;
+.chart-panel__body .area-chart-frame {
   width: 100%;
-  height: 100%;
-  min-width: 0;
-  min-height: 0;
+  height: var(--chart-height-spark);
+}
+
+.chart-panel__body .area-chart-frame:not([data-variant='spark']) {
+  height: var(--chart-height-panel);
+  background-color: var(--chart-stage-ink);
 }
 
 @media screen and (min-width: 800px) {
   .chart-panel {
-    padding: var(--module-pad-lg);
+    padding: var(--space-3);
   }
 }
 
 /* inlined: components/chart-empty-state/chart-empty-state.css */
 /* CHART RULES LOCKED: height fixed, width 100%, shared global scale – DO NOT CHANGE */
-/* Component: chart-empty-state — fixed 280px empty plot band */
+/* Component: chart-empty-state — fill / inline / loading empty plot bands */
 
 .component--chart-empty-state .demo {
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.component--chart-empty-state .chart-board--empty {
   display: grid;
-  gap: var(--tile-gap);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 app-chart-empty-state,
@@ -7271,25 +7624,61 @@ deml-chart-empty-state,
 :host {
   display: grid;
   place-items: center;
+  align-content: center;
   gap: var(--space-2);
   box-sizing: border-box;
   width: 100%;
   max-width: none;
-  height: var(--chart-height-panel);
+  height: var(--chart-height-spark);
   aspect-ratio: auto;
   max-height: none;
-  margin-inline: 0;
-  margin-block: 0;
+  margin: 0;
   padding: var(--chart-inset);
   text-align: center;
   color: var(--color-plot-muted);
   background-color: var(--chart-stage-ink);
   border: var(--border-width) dashed var(--color-plot-border);
+  border-radius: var(--radius-md);
+}
+
+.chart-empty-state[data-layout='fill'] {
+  height: var(--chart-height-spark);
+}
+
+.chart-empty-state[data-layout='inline'] {
+  height: var(--chart-height-spark);
+  background-color: var(--color-surface);
+}
+
+.chart-empty-state[data-layout='loading'] {
+  border-style: solid;
+}
+
+.chart-empty-state__badge {
+  width: var(--space-3);
+  height: var(--space-3);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-primary) 55%, var(--color-plot-muted));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+
+.chart-empty-state__skeleton {
+  width: min(100%, 10rem);
+  height: var(--space-2);
+  border-radius: var(--radius-pill);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-plot-muted) 18%, transparent) 0%,
+    color-mix(in srgb, var(--color-plot-ink) 22%, transparent) 50%,
+    color-mix(in srgb, var(--color-plot-muted) 18%, transparent) 100%
+  );
+  background-size: 200% 100%;
+  animation: chart-empty-shimmer 1.2s ease-in-out infinite;
 }
 
 .chart-empty-state__title {
   margin: 0;
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
@@ -7303,7 +7692,22 @@ deml-chart-empty-state,
   font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-intro);
   color: var(--color-plot-muted);
-  max-width: var(--reading-width);
+  max-width: 18rem;
+}
+
+@keyframes chart-empty-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-empty-state__skeleton {
+    animation: none;
+  }
 }
 
 /* inlined: components/property-filter/property-filter.css */
