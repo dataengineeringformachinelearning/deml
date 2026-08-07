@@ -8,13 +8,17 @@ import { FormPanel } from '../../components/form-panel/form-panel';
 import { PageSection } from '../../components/page-section/page-section';
 import { TextField } from '../../components/text-field/text-field';
 import { navigateAfterLogin } from '../../core/utils/return-url.utils';
+import { ensureFieldVisible } from '../../shared/focus-field';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
   imports: [PageSection, FormPanel, TextField, CheckboxField, Button, ButtonGroup, RouterLink],
   templateUrl: './login.html',
-  host: { class: 'page page--auth' },
+  host: {
+    class: 'page page--auth',
+    '(focusin)': 'onFocusIn($event)',
+  },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Login {
@@ -29,6 +33,10 @@ export class Login {
   readonly passwordError = signal('');
   readonly formError = signal('');
   readonly busy = signal(false);
+
+  onFocusIn(event: FocusEvent): void {
+    ensureFieldVisible(event.target);
+  }
 
   async submit(event: Event): Promise<void> {
     event.preventDefault();

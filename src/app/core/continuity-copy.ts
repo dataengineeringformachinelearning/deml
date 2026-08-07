@@ -1,30 +1,22 @@
 /**
- * Shared user-facing continuity copy across DEML status surfaces.
- * Keep tone identical: calm, actionable, one Retry affordance.
- * Never claim "Live" for the SSE-over-polled projections lane.
+ * Shared continuity copy for status surfaces.
+ * Calm, actionable, one Retry affordance.
  */
-
-// --- Status / explore / isolated-status network failures ---
-export const STATUS_CONNECT_HEADING = 'Unable to connect';
-export const STATUS_CONNECT_BODY =
-  "We couldn't reach the status service. Check your connection, then retry.";
-export const STATUS_RETRY_LABEL = 'Retry';
-
-// --- Auth / FORJD control-plane soft failure (dashboard + analytics + status) ---
-export const FORJD_UPDATES_DELAYED_HEADING = 'Updates delayed';
-export const FORJD_FALLBACK_BODY =
-  'FORJD data is temporarily unavailable. Showing the last successful view when possible.';
-export const FORJD_UNAVAILABLE_BODY =
-  'FORJD data is unavailable for this account. Check tenant mapping, then retry.';
-
-// --- Generic load failure (dashboard / analytics) ---
-export const LOAD_FAILED_BODY = "We couldn't load this view. Check your connection, then retry.";
 
 // --- Offline ---
 export const OFFLINE_HEADING = 'You are offline';
 export const OFFLINE_BODY =
   'Reconnect to the internet, then retry. Cached views may be incomplete.';
+export const OFFLINE_WRITES =
+  'You are offline. Site changes are paused until you reconnect.';
 
-// --- Analytics page subtitle (honest about near-real-time, not "Live") ---
-export const ANALYTICS_PAGE_SUBTITLE =
-  'Performance, reliability, and risk signals for every monitored service.';
+// --- Stale cache honesty ---
+export const STALE_DIRECTORY =
+  'Showing cached directory — reconnect or retry for live data.';
+export const STALE_SITES =
+  'Showing cached sites — reconnect or retry for live data.';
+export const STALE_STATUS =
+  'Showing a cached snapshot — reconnect or retry for live data.';
+
+// --- Actions ---
+export const RETRY = 'Retry';

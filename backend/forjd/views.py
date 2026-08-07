@@ -6,11 +6,10 @@ import asyncio
 import json
 import logging
 import re
-from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Final, Literal
-from urllib.parse import quote, urlsplit
-from uuid import UUID, uuid4
+from urllib.parse import quote
+from uuid import UUID
 
 logger = logging.getLogger(__name__)
 
@@ -22,33 +21,14 @@ from pydantic import ValidationError
 
 from config.csrf_header_auth import (
   authorization_header_required,
-  csrf_exempt_require_header_auth,
 )
 from forjd.angular_compat import (
-  deml_analytics_overview,
-  deml_discovered_endpoints,
-  deml_export_job,
-  deml_export_jobs,
-  deml_incident_case,
-  deml_incident_cases,
-  deml_playbook,
-  deml_playbook_execution,
-  deml_playbook_runs,
-  deml_playbooks,
-  deml_siem_signals,
-  deml_sla_latest,
   deml_status_incident,
   deml_status_incidents,
   deml_status_page,
   deml_status_pages,
   deml_status_service,
   deml_status_services,
-  deml_temporal_forecast,
-  deml_threat_report,
-  deml_vulnerabilities,
-  deml_vulnerability,
-  empty_analytics_overview,
-  empty_capability_envelope,
   match_published_status_page,
   public_status_slug_candidates,
 )
@@ -79,7 +59,6 @@ from forjd.policy import (
   ForjdActorContext,
   ForjdPolicyError,
   action_for_native_request,
-  actor_for_request,
   authorize_forjd_action,
   is_privileged_action,
   policy_error_response,
@@ -141,14 +120,14 @@ async def _read_credential_or_none(request: HttpRequest) -> ForjdTenantCredentia
 
 
 def _client_for_credential(credential: ForjdTenantCredential) -> ForjdClient:
-  return ForjdClient(
-    tenant_id=credential.tenant_id,
-    service_token=credential.service_token,
-  )
+  """Product-account client — never the platform dogfood credential."""
+  from forjd.clients import product_forjd_client
+
+  return product_forjd_client(credential)
 
 
 # Platform / tenant0 status page — public directory only, never account "My Sites".
-from forjd.isolation import is_platform_status_slug
+from forjd.isolation import is_platform_status_page, is_platform_status_slug
 
 # --- Status page write boundary ---
 _STATUS_SLUG_RE: Final[re.Pattern[str]] = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
@@ -190,17 +169,75 @@ def _request_has_end_user_auth(request: HttpRequest) -> bool:
   )
 
 
-def _is_platform_status_page(page: dict[str, Any] | str | None) -> bool:
-  if isinstance(page, str):
-    return is_platform_status_slug(page)
-  if not isinstance(page, dict):
-    return False
-  return is_platform_status_slug(str(page.get("slug") or ""))
-
-
 def _owned_status_pages(pages: list[dict[str, Any]]) -> list[dict[str, Any]]:
   """Account-scoped list: never include DEML platform / tenant0 status."""
-  return [page for page in pages if not _is_platform_status_page(page)]
+  return [page for page in pages if not is_platform_status_page(page)]
+
+
+async def _require_owned_status_page(
+  client: ForjdClient,
+  *,
+  page_id: str,
+  tenant_id: object,
+  request_id: str | None,
+) -> dict[str, Any] | JsonResponse:
+  """Re-validate client-supplied page_id against the product tenant list.
+
+  Fail closed: unknown IDs → 404 (not proxied); platform-status → 403;
+  list unavailable → 503. Never trust the client ID alone.
+  """
+  existing = await client.proxy(
+    "GET",
+    "/api/v1/status/pages",
+    body=None,
+    query_string=f"tenant_id={tenant_id}",
+    content_type="application/json",
+    request_id=request_id,
+  )
+  if existing.status >= 400:
+    logger.warning(
+      "forjd_owned_page_preflight_failed page_id=%s status=%s",
+      page_id,
+      existing.status,
+    )
+    return _upstream_error_response(existing)
+  try:
+    listed = json.loads(existing.body)
+    pages = listed.get("pages") if isinstance(listed, dict) else None
+    if not isinstance(pages, list):
+      raise TypeError("pages envelope missing")
+  except (TypeError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+    logger.warning(
+      "forjd_owned_page_preflight_malformed page_id=%s error=%s",
+      page_id,
+      type(exc).__name__,
+    )
+    return _adapter_error_response(
+      AdapterError(503, "Unable to verify status page ownership")
+    )
+
+  match: dict[str, Any] | None = None
+  for page in pages:
+    if isinstance(page, dict) and str(page.get("id") or "") == str(page_id):
+      match = page
+      break
+  if match is None:
+    return JsonResponse(
+      {
+        "detail": "Status page not found in this account",
+        "code": "status_page_not_owned",
+      },
+      status=404,
+    )
+  if is_platform_status_page(match):
+    return JsonResponse(
+      {
+        "detail": "Platform status page is immutable",
+        "code": "platform_status_immutable",
+      },
+      status=403,
+    )
+  return match
 
 
 async def _status_directory_read_client(
@@ -208,27 +245,31 @@ async def _status_directory_read_client(
 ) -> tuple[ForjdClient | None, int | None, bool]:
   """Resolve a FORJD client for status directory GETs.
 
-  Authenticated product users use their mapped tenant credential (all pages).
-  Anonymous explore uses the platform ``FORJD_*`` service credential and must
-  filter to published pages only.
+  Authenticated product users use their mapped tenant credential.
+  Anonymous explore uses an **unauthenticated** public client (published
+  directory only) — never the platform credential + foreign page_id.
   """
+  from forjd.clients import public_forjd_client
+
   if _request_has_end_user_auth(request):
     deml_user_id = await sync_to_async(lambda: getattr(request.user, "id", None))()
-    credential = await _read_credential_or_none(request)
-    if credential is None or not reads_from_forjd():
+    if not reads_from_forjd():
       return None, deml_user_id, False
+    # Owned-list path must never mask credential/provision 503 as empty [].
+    # Raise AdapterError → caller returns forjd_degraded (not “no sites”).
+    credential = await _credential_for_request(request)
     return _client_for_credential(credential), deml_user_id, False
 
   if not reads_from_forjd():
     return None, None, True
   try:
-    return ForjdClient(), None, True
+    return public_forjd_client(), None, True
   except ForjdError:
     return None, None, True
 
 
 def _published_directory_pages(pages: list[dict[str, Any]]) -> list[dict[str, Any]]:
-  return [page for page in pages if page.get("is_published") or _is_platform_status_page(page)]
+  return [page for page in pages if page.get("is_published") or is_platform_status_page(page)]
 
 
 async def _fetch_published_directory(
@@ -236,7 +277,9 @@ async def _fetch_published_directory(
   request_id: str | None,
 ) -> list[dict[str, Any]]:
   """Cross-tenant published status directory (each page keeps its own tenant KPIs)."""
-  client = ForjdClient(use_service_auth=False)
+  from forjd.clients import public_forjd_client
+
+  client = public_forjd_client()
   response = await client.proxy(
     "GET",
     "/api/v1/status/pages/published",
@@ -312,49 +355,6 @@ def _uuid_path(value: str, field_name: str) -> str:
     return str(UUID(value))
   except (AttributeError, TypeError, ValueError) as exc:
     raise AdapterError(400, f"{field_name} must be a valid UUID") from exc
-
-
-def _playbook_ack_payload(request: HttpRequest) -> dict[str, object]:
-  inbound = _json_object(request)
-  allowed = {"succeeded", "external_reference", "metadata"}
-  unsupported = sorted(set(inbound) - allowed)
-  if unsupported:
-    raise AdapterError(422, f"Unsupported acknowledgement fields: {', '.join(unsupported)}")
-
-  succeeded = inbound.get("succeeded")
-  if "succeeded" not in inbound or not isinstance(succeeded, bool):
-    raise AdapterError(422, "succeeded must be a boolean")
-
-  external_reference = inbound.get("external_reference")
-  if external_reference is not None and not isinstance(external_reference, str):
-    raise AdapterError(422, "external_reference must be a string or null")
-  if isinstance(external_reference, str):
-    external_reference = external_reference.strip()
-    if len(external_reference) > 255:
-      raise AdapterError(422, "external_reference must contain at most 255 characters")
-
-  metadata = inbound.get("metadata", {})
-  if not isinstance(metadata, dict):
-    raise AdapterError(422, "metadata must be an object")
-  try:
-    encoded_metadata = json.dumps(metadata, separators=(",", ":"), allow_nan=False)
-  except (TypeError, ValueError) as exc:
-    raise AdapterError(422, "metadata must contain finite JSON values") from exc
-  if len(metadata) > 32 or len(encoded_metadata) > 16_384:
-    raise AdapterError(422, "metadata exceeds the acknowledgement limits")
-
-  return {
-    "succeeded": succeeded,
-    "external_reference": external_reference,
-    "metadata": metadata,
-  }
-
-
-def _empty_control_payload(request: HttpRequest) -> dict[str, object]:
-  inbound = _json_object(request)
-  if inbound:
-    raise AdapterError(422, "Retry request body must be an empty JSON object")
-  return {}
 
 
 def _bind_body(request: HttpRequest, tenant_id: UUID) -> bytes:
@@ -518,78 +518,6 @@ def _copy_safe_upstream_headers(response: ForjdResponse, target: HttpResponse) -
     target["X-FORJD-Request-ID" if name.lower() == "x-request-id" else name] = value
 
 
-def _provider_enum(value: object, default: str) -> str:
-  return str(value or default).strip().lower().replace(" ", "_").replace("-", "_")
-
-
-async def _typed_json_call(
-  request: HttpRequest,
-  target_path: str,
-  *,
-  payload: dict[str, object] | None = None,
-  tenant_binding: TenantBinding = "method",
-) -> dict[str, object] | JsonResponse | None:
-  """Execute one typed adapter call.
-
-  ``None`` is reserved for explicit off/dual read fallback.  In steady FORJD
-  mode, mapping failures and upstream failures always produce a typed error.
-  """
-  is_get = request.method == "GET"
-  if not is_get and not writes_enabled():
-    return JsonResponse(
-      {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
-      status=503,
-    )
-  try:
-    credential = (
-      await _read_credential_or_none(request) if is_get else await _credential_for_request(request)
-    )
-    if is_get and (credential is None or not reads_from_forjd()):
-      return None
-    if credential is None:
-      raise AdapterError(503, "FORJD tenant service credential is unavailable")
-
-    if payload is None:
-      body, query_string = _bound_request(request, credential.tenant_id, tenant_binding)
-    else:
-      supplied_tenant = payload.get("tenant_id")
-      if supplied_tenant is not None and str(supplied_tenant) != str(credential.tenant_id):
-        raise AdapterError(403, "Request tenant does not match the account's FORJD tenant")
-      outbound = {**payload, "tenant_id": str(credential.tenant_id)}
-      rewrite_forjd_workflow_body(outbound)
-      body = json.dumps(outbound, separators=(",", ":")).encode()
-      query_string = rewrite_forjd_workflow_query(request.META.get("QUERY_STRING", ""))
-
-    response = await _client_for_credential(credential).proxy(
-      request.method,
-      target_path,
-      body=body,
-      query_string=query_string,
-      content_type="application/json",
-      request_id=request_id_from(request),
-    )
-    request._forjd_upstream_request_id = response.headers.get("X-Request-ID", "")
-    if response.status >= 400:
-      if is_get and response.status >= 500 and empty_read_fallback_enabled():
-        log_forjd_mode_event("read_fallback", path=target_path, status=response.status)
-        return None
-      return _upstream_error_response(response)
-    try:
-      upstream = json.loads(response.body or b"{}")
-    except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
-      raise AdapterError(502, "FORJD returned invalid JSON") from None
-    if not isinstance(upstream, dict):
-      raise AdapterError(502, "FORJD returned an invalid response")
-    return upstream
-  except AdapterError as exc:
-    return _adapter_error_response(exc)
-  except ForjdError as exc:
-    if is_get and exc.status >= 500 and empty_read_fallback_enabled():
-      log_forjd_mode_event("read_fallback", path=target_path, status=exc.status)
-      return None
-    return _forjd_error_response(exc)
-
-
 async def _maybe_shadow_sealed(
   *,
   request: HttpRequest,
@@ -658,7 +586,9 @@ async def native_forjd_proxy(
 
   try:
     if public:
-      client = ForjdClient(use_service_auth=False)
+      from forjd.clients import public_forjd_client
+
+      client = public_forjd_client()
       body = request.body or None
       query_string = request.META.get("QUERY_STRING", "")
     else:
@@ -809,6 +739,8 @@ def _reshape_public_status_page(page: dict[str, Any], *, status_code: int = 200)
   page["incidents"] = incidents
   # Normalize KPI / history / intelligence fields Angular binds on IsolatedStatus.
   compat = deml_status_page(page, deml_user_id=None)
+  # Explicit SoT fields — never rely on leftover FORJD keys after reshape.
+  page["overall_status"] = compat["overall_status"]
   page["overall_uptime"] = compat["overall_uptime"]
   page["cumulative_sla"] = compat["cumulative_sla"]
   page["uptime_history"] = compat["uptime_history"]
@@ -880,8 +812,15 @@ async def native_status_page_proxy(request: HttpRequest, slug: str) -> HttpRespo
             )
           if isinstance(page, dict):
             return _reshape_public_status_page(page, status_code=response.status_code)
-    except (TypeError, UnicodeDecodeError, json.JSONDecodeError, AdapterError, ForjdError):
-      pass
+    except (TypeError, UnicodeDecodeError, json.JSONDecodeError, AdapterError, ForjdError) as exc:
+      logger.warning(
+        "forjd_status_slug_self_heal_failed slug=%s error=%s",
+        slug,
+        type(exc).__name__,
+      )
+      return _adapter_error_response(
+        AdapterError(503, "Status directory unavailable while resolving slug")
+      )
 
   return last_error or _adapter_error_response(AdapterError(404, "status page not found"))
 
@@ -891,7 +830,9 @@ async def forjd_capabilities_proxy(request: HttpRequest) -> HttpResponse:
   if request.method != "GET":
     return JsonResponse({"detail": "Method not allowed"}, status=405)
   try:
-    client = ForjdClient(use_service_auth=False)
+    from forjd.clients import public_forjd_client
+
+    client = public_forjd_client()
     request_id = request_id_from(request)
     response, readiness = await asyncio.gather(
       client.proxy("GET", "/api/v1/capabilities", request_id=request_id),
@@ -947,105 +888,6 @@ async def forjd_capabilities_proxy(request: HttpRequest) -> HttpResponse:
   return result
 
 
-# --- DEML control-plane metrics merged into FORJD analytics overview ---
-@sync_to_async
-def _deml_control_plane_metrics(account_id: UUID | None) -> dict[str, Any]:
-  """Cookie consents, linked analytics providers, and API-key usage (DEML-local)."""
-  if account_id is None:
-    return {}
-  from django.contrib.auth.models import User
-  from monitor.models import AnalyticsIntegration, APIKey, CookieConsent
-
-  user_ids = list(User.objects.filter(profile__account_id=account_id).values_list("id", flat=True))
-  consent_qs = CookieConsent.objects.filter(user_id__in=user_ids)
-  analytical = consent_qs.filter(analytical=True).count()
-  marketing = consent_qs.filter(marketing=True).count()
-
-  providers = list(
-    AnalyticsIntegration.objects.filter(account_id=account_id)
-    .values_list("provider", flat=True)
-    .distinct()
-  )
-  key_count = APIKey.objects.filter(user_id__in=user_ids, is_active=True).count()
-  return {
-    "widget_interactions": int(analytical + marketing),
-    "cookie_consents": {"analytical": int(analytical), "marketing": int(marketing)},
-    "active_providers": [str(p) for p in providers if p],
-    "api_usage": {
-      "usage_current_minute": 0,
-      "quota_per_minute": 60 * max(1, key_count),
-    },
-    "benchmarking": {"current_scope": None},
-  }
-
-
-async def _honeypot_score_for(credential: ForjdTenantCredential, request: HttpRequest) -> float:
-  try:
-    client = _client_for_credential(credential)
-    response = await client.proxy(
-      "GET",
-      "/api/v1/honeypots/analyze",
-      query_string=f"tenant_id={credential.tenant_id}",
-      request_id=request_id_from(request),
-    )
-    if response.status >= 400:
-      return 0.0
-    body = json.loads(response.body or b"{}")
-    if isinstance(body, dict):
-      return float(body.get("honeypot_score") or 0)
-  except (ForjdError, TypeError, ValueError, json.JSONDecodeError):
-    return 0.0
-  return 0.0
-
-
-# --- Angular-shaped adapters (FORJD native → deml.app contracts) ---
-@require_forjd_action("read")
-async def analytics_overview_proxy(request: HttpRequest) -> HttpResponse:
-  """Proxy FORJD analytics overview into the Angular CES envelope."""
-  if request.method != "GET":
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  try:
-    credential = await _read_credential_or_none(request)
-    if credential is None or not reads_from_forjd():
-      return JsonResponse(empty_analytics_overview(), status=200)
-    client = _client_for_credential(credential)
-    _body, query_string = _bound_request(request, credential.tenant_id, "query")
-    response = await client.proxy(
-      "GET",
-      "/api/v1/analytics/overview",
-      body=None,
-      query_string=query_string,
-      content_type="application/json",
-      request_id=request_id_from(request),
-    )
-    if response.status >= 400:
-      if empty_read_fallback_enabled() and response.status >= 500:
-        return JsonResponse(empty_analytics_overview(), status=200)
-      return _upstream_error_response(response)
-    upstream = json.loads(response.body)
-    if not isinstance(upstream, dict):
-      raise AdapterError(502, "FORJD returned an invalid analytics overview")
-    actor = await actor_for_request(request)
-    deml_metrics = await _deml_control_plane_metrics(actor.account_id)
-    honeypot = await _honeypot_score_for(credential, request)
-    deml_metrics["honeypot_score"] = honeypot
-    upstream["deml_control_plane"] = deml_metrics
-    upstream["honeypot_score"] = honeypot
-    return JsonResponse(deml_analytics_overview(upstream), status=200)
-  except AdapterError as exc:
-    return _adapter_error_response(exc)
-  except ForjdPolicyError as exc:
-    return policy_error_response(exc)
-  except ForjdError as exc:
-    if empty_read_fallback_enabled() and exc.status >= 500:
-      return JsonResponse(empty_analytics_overview(), status=200)
-    return _forjd_error_response(exc)
-  except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
-    return _adapter_error_response(
-      AdapterError(502, "FORJD returned an invalid analytics overview")
-    )
-
-
 @csrf_exempt  # nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-exempt
 @require_forjd_action({"GET": "public", "POST": "status.admin"})
 async def status_pages_list_proxy(request: HttpRequest) -> HttpResponse:
@@ -1063,16 +905,15 @@ async def status_pages_list_proxy(request: HttpRequest) -> HttpResponse:
       if _request_has_end_user_auth(request) and not published_only:
         # Settings owned-list must stay honest: never mask FORJD outages as [].
         if client is None:
-          if not reads_from_forjd():
-            return JsonResponse(
-              {
-                "detail": "FORJD reads are disabled",
-                "code": ErrorCode.FORJD_READS_DISABLED.value,
-              },
-              status=503,
-            )
-          # No tenant credential yet — genuinely empty owned sites.
-          return JsonResponse([], status=200, safe=False)
+          # Authed owned-list: None only means reads disabled (credential
+          # failures raise above). Never return [] for an outage.
+          return JsonResponse(
+            {
+              "detail": "FORJD reads are disabled",
+              "code": ErrorCode.FORJD_READS_DISABLED.value,
+            },
+            status=503,
+          )
         try:
           query_string = f"tenant_id={client.tenant_id}"
           response = await client.proxy(
@@ -1216,35 +1057,15 @@ async def status_page_detail_proxy(request: HttpRequest, page_id: str) -> HttpRe
     credential = await _credential_for_request(request)
     deml_user_id = await sync_to_async(lambda: getattr(request.user, "id", None))()
     client = _client_for_credential(credential)
-    # --- Re-validate: refuse mutate of platform-status by UUID (not only by slug rename) ---
-    existing = await client.proxy(
-      "GET",
-      "/api/v1/status/pages",
-      body=None,
-      query_string=f"tenant_id={credential.tenant_id}",
-      content_type="application/json",
+    # --- Never trust client page_id — must belong to this product tenant ---
+    owned = await _require_owned_status_page(
+      client,
+      page_id=page_id,
+      tenant_id=credential.tenant_id,
       request_id=request_id_from(request),
     )
-    if existing.status < 400:
-      try:
-        listed = json.loads(existing.body)
-        pages = listed.get("pages") if isinstance(listed, dict) else None
-        if isinstance(pages, list):
-          for page in pages:
-            if (
-              isinstance(page, dict)
-              and str(page.get("id") or "") == str(page_id)
-              and _is_platform_status_page(page)
-            ):
-              return JsonResponse(
-                {
-                  "detail": "Platform status page is immutable",
-                  "code": "platform_status_immutable",
-                },
-                status=403,
-              )
-      except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
-        pass
+    if isinstance(owned, JsonResponse):
+      return owned
 
     if request.method == "DELETE":
       response = await client.proxy(
@@ -1324,6 +1145,14 @@ async def status_page_services_proxy(request: HttpRequest, page_id: str) -> Http
           },
           status=503,
         )
+      owned = await _require_owned_status_page(
+        client,
+        page_id=page_id,
+        tenant_id=client.tenant_id,
+        request_id=request_id_from(request),
+      )
+      if isinstance(owned, JsonResponse):
+        return owned
       response = await client.proxy(
         "GET",
         f"/api/v1/status/pages/{quote(page_id, safe='')}/services",
@@ -1352,19 +1181,29 @@ async def status_page_services_proxy(request: HttpRequest, page_id: str) -> Http
       )
     credential = await _credential_for_request(request)
     client = _client_for_credential(credential)
+    owned = await _require_owned_status_page(
+      client,
+      page_id=page_id,
+      tenant_id=credential.tenant_id,
+      request_id=request_id_from(request),
+    )
+    if isinstance(owned, JsonResponse):
+      return owned
     payload = _json_object(request)
     # Angular sends {name, url}; map url → description + probe_url so the
     # FORJD health pinger can accumulate uptime history. FORJD requires
     # lowercase status enums, so normalize legacy Title Case inputs.
-    service_status = str(payload.get("status") or "operational").strip().lower().replace(" ", "_")
+    # Default unknown — never invent Operational before a probe exists.
+    service_status = str(payload.get("status") or "unknown").strip().lower().replace(" ", "_")
     if service_status not in {
       "operational",
       "degraded",
       "partial_outage",
       "major_outage",
       "maintenance",
+      "unknown",
     }:
-      service_status = "operational"
+      raise AdapterError(400, f"Invalid service status: {service_status}")
     service_url = str(payload.get("url") or payload.get("description") or "").strip()
     probe_url = None
     if service_url:
@@ -1460,6 +1299,14 @@ async def status_page_incidents_proxy(request: HttpRequest, page_id: str) -> Htt
           },
           status=503,
         )
+      owned = await _require_owned_status_page(
+        client,
+        page_id=page_id,
+        tenant_id=client.tenant_id,
+        request_id=request_id_from(request),
+      )
+      if isinstance(owned, JsonResponse):
+        return owned
       response = await client.proxy(
         "GET",
         f"/api/v1/status/pages/{quote(page_id, safe='')}/incidents",
@@ -1488,6 +1335,14 @@ async def status_page_incidents_proxy(request: HttpRequest, page_id: str) -> Htt
       )
     credential = await _credential_for_request(request)
     client = _client_for_credential(credential)
+    owned = await _require_owned_status_page(
+      client,
+      page_id=page_id,
+      tenant_id=credential.tenant_id,
+      request_id=request_id_from(request),
+    )
+    if isinstance(owned, JsonResponse):
+      return owned
     payload = _json_object(request)
     # Angular sends {title, message, status} with legacy Title Case statuses.
     status_val = str(payload.get("status") or "investigating").strip().lower()
@@ -1577,678 +1432,6 @@ async def session_revoke_proxy(request: HttpRequest, session_id: str) -> HttpRes
   )
 
 
-@csrf_exempt  # nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-exempt
-async def dlq_retry_proxy(request: HttpRequest, dlq_id: str) -> HttpResponse:
-  """POST /api/v1/replay/dlq/{dlq_id}/retry with tenant-bound query."""
-  return await native_forjd_proxy(
-    request,
-    target_path=f"/api/v1/replay/dlq/{quote(dlq_id, safe='')}/retry",
-    allowed_methods=("POST",),
-    tenant_binding="query",
-  )
-
-
-# --- Headless SIEM/SOAR and Angular compatibility adapters ---
-@require_forjd_action("read")
-async def analytics_tenants_proxy(request: HttpRequest) -> HttpResponse:
-  if request.method != "GET":
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  try:
-    credential = await _read_credential_or_none(request)
-    if credential is None or not reads_from_forjd():
-      return JsonResponse(
-        {
-          "status": "success",
-          "data": [],
-          "source": "deml_forjd_fallback",
-          "degraded": True,
-          "code": "forjd_read_fallback",
-        },
-        status=200,
-      )
-    return JsonResponse(
-      {
-        "status": "success",
-        "data": [
-          {
-            "id": str(credential.tenant_id),
-            "name": "DEML account",
-            "is_platform": False,
-          }
-        ],
-        "source": "forjd",
-      },
-      status=200,
-    )
-  except AdapterError as exc:
-    return _adapter_error_response(exc)
-
-
-@csrf_exempt  # nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-exempt
-@require_forjd_action({"GET": "read", "POST": "case.write"})
-async def incident_cases_proxy(request: HttpRequest) -> HttpResponse:
-  if request.method not in {"GET", "POST"}:
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  payload: dict[str, object] | None = None
-  if request.method == "POST":
-    inbound = _json_object(request)
-    payload = {
-      "title": str(inbound.get("title") or ""),
-      "description": str(inbound.get("description") or ""),
-      "severity": _provider_enum(inbound.get("severity"), "medium"),
-      "metadata": inbound.get("metadata") if isinstance(inbound.get("metadata"), dict) else {},
-    }
-  result = await _typed_json_call(
-    request,
-    "/api/v1/soc/cases",
-    payload=payload,
-    tenant_binding="query" if request.method == "GET" else "body",
-  )
-  if isinstance(result, HttpResponse):
-    return result
-  if result is None:
-    return JsonResponse([], status=200, safe=False)
-  if request.method == "GET":
-    return JsonResponse(deml_incident_cases(result), status=200, safe=False)
-  return JsonResponse(deml_incident_case(result), status=200)
-
-
-@csrf_exempt  # nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-exempt
-@require_forjd_action({"GET": "read", "PATCH": "case.write"})
-async def incident_case_detail_proxy(request: HttpRequest, case_id: str) -> HttpResponse:
-  if request.method not in {"GET", "PATCH"}:
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  if request.method == "GET":
-    result = await _typed_json_call(request, "/api/v1/soc/cases", tenant_binding="query")
-    if isinstance(result, HttpResponse):
-      return result
-    if result is None:
-      return JsonResponse(
-        {"detail": "Case unavailable during FORJD read fallback", "code": "forjd_read_fallback"},
-        status=503,
-      )
-    row = next((item for item in deml_incident_cases(result) if item["id"] == case_id), None)
-    if row is None:
-      return JsonResponse({"detail": "Case not found"}, status=404)
-    return JsonResponse(row, status=200)
-
-  inbound = _json_object(request)
-  payload = {
-    key: (
-      _provider_enum(value, "open")
-      if key == "status"
-      else _provider_enum(value, "medium")
-      if key == "severity"
-      else value
-    )
-    for key, value in inbound.items()
-    if key in {"title", "description", "status", "severity", "assigned_actor_id", "metadata"}
-  }
-  result = await _typed_json_call(
-    request,
-    f"/api/v1/soc/cases/{quote(case_id, safe='')}",
-    payload=payload,
-    tenant_binding="body",
-  )
-  if isinstance(result, HttpResponse):
-    return result
-  if result is None:
-    return _adapter_error_response(AdapterError(503, "FORJD case update is unavailable"))
-  return JsonResponse(deml_incident_case(result), status=200)
-
-
-@csrf_exempt  # nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-exempt
-@require_forjd_action({"GET": "read", "POST": "playbook.admin"})
-async def playbooks_proxy(request: HttpRequest) -> HttpResponse:
-  if request.method not in {"GET", "POST"}:
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  payload: dict[str, object] | None = None
-  if request.method == "POST":
-    inbound = _json_object(request)
-    payload = {
-      "name": str(inbound.get("name") or ""),
-      "description": str(inbound.get("description") or ""),
-      "trigger_conditions": inbound.get("trigger_conditions")
-      if isinstance(inbound.get("trigger_conditions"), dict)
-      else {},
-      "actions": inbound.get("actions") if isinstance(inbound.get("actions"), list) else [],
-    }
-  result = await _typed_json_call(request, "/api/v1/playbooks", payload=payload)
-  if isinstance(result, HttpResponse):
-    return result
-  if result is None:
-    return JsonResponse([], status=200, safe=False)
-  if request.method == "GET":
-    return JsonResponse(deml_playbooks(result), status=200, safe=False)
-  return JsonResponse(deml_playbook(result), status=200)
-
-
-@csrf_exempt  # nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-exempt
-@require_forjd_action({"GET": "read", "PATCH": "playbook.admin", "DELETE": "domain.destructive"})
-async def playbook_detail_proxy(request: HttpRequest, playbook_id: str) -> HttpResponse:
-  if request.method not in {"GET", "PATCH", "DELETE"}:
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  payload: dict[str, object] | None = None
-  if request.method == "GET":
-    result = await _typed_json_call(request, "/api/v1/playbooks", tenant_binding="query")
-    if isinstance(result, HttpResponse):
-      return result
-    if result is None:
-      return JsonResponse(
-        {
-          "detail": "Playbook unavailable during FORJD read fallback",
-          "code": "forjd_read_fallback",
-        },
-        status=503,
-      )
-    row = next((item for item in deml_playbooks(result) if item["id"] == playbook_id), None)
-    if row is None:
-      return JsonResponse({"detail": "Playbook not found"}, status=404)
-    return JsonResponse(row, status=200)
-  if request.method == "DELETE":
-    return JsonResponse(
-      {
-        "detail": "FORJD does not expose playbook deletion in contract 1.0",
-        "code": "forjd_capability_unavailable",
-      },
-      status=501,
-    )
-  if request.method == "PATCH":
-    inbound = _json_object(request)
-    payload = {
-      key: value
-      for key, value in inbound.items()
-      if key in {"name", "description", "is_active", "trigger_conditions", "actions"}
-    }
-  result = await _typed_json_call(
-    request,
-    f"/api/v1/playbooks/{quote(playbook_id, safe='')}",
-    payload=payload,
-    tenant_binding="query" if request.method in {"GET", "DELETE"} else "body",
-  )
-  if isinstance(result, HttpResponse):
-    return result
-  if result is None:
-    return _adapter_error_response(AdapterError(503, "FORJD playbook is unavailable"))
-  if request.method == "DELETE":
-    return JsonResponse({"ok": True}, status=200)
-  return JsonResponse(deml_playbook(result), status=200)
-
-
-@csrf_exempt  # nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-exempt
-@require_forjd_action("playbook.execute")
-async def playbook_execute_proxy(request: HttpRequest, playbook_id: str) -> HttpResponse:
-  if request.method != "POST":
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  inbound = _json_object(request)
-  payload = {
-    "idempotency_key": str(inbound.get("idempotency_key") or request_id_from(request) or uuid4()),
-    "context": inbound.get("context") if isinstance(inbound.get("context"), dict) else {},
-  }
-  result = await _typed_json_call(
-    request,
-    f"/api/v1/playbooks/{quote(playbook_id, safe='')}/execute",
-    payload=payload,
-    tenant_binding="body",
-  )
-  if isinstance(result, HttpResponse):
-    return result
-  if result is None:
-    return _adapter_error_response(AdapterError(503, "FORJD playbook execution is unavailable"))
-  return JsonResponse(deml_playbook_execution(result), status=200)
-
-
-@require_forjd_action("read")
-async def playbook_runs_proxy(request: HttpRequest) -> HttpResponse:
-  if request.method != "GET":
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  result = await _typed_json_call(request, "/api/v1/playbooks/runs", tenant_binding="query")
-  if isinstance(result, HttpResponse):
-    return result
-  if result is None:
-    return JsonResponse([], status=200, safe=False)
-  return JsonResponse(deml_playbook_runs(result), status=200, safe=False)
-
-
-@csrf_exempt_require_header_auth
-@require_forjd_action("playbook.execute")
-async def playbook_action_ack_proxy(
-  request: HttpRequest,
-  run_id: str,
-  action_result_id: str,
-) -> HttpResponse:
-  if request.method != "POST":
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  if request.META.get("QUERY_STRING"):
-    return JsonResponse({"detail": "Query parameters are not supported"}, status=400)
-  try:
-    normalized_run_id = _uuid_path(run_id, "run_id")
-    normalized_action_id = _uuid_path(action_result_id, "action_result_id")
-    payload = _playbook_ack_payload(request)
-  except AdapterError as exc:
-    return _adapter_error_response(exc)
-
-  result = await _typed_json_call(
-    request,
-    (
-      f"/api/v1/playbooks/runs/{quote(normalized_run_id, safe='')}"
-      f"/actions/{quote(normalized_action_id, safe='')}/ack"
-    ),
-    payload=payload,
-    tenant_binding="body",
-  )
-  if isinstance(result, HttpResponse):
-    return result
-  if result is None:
-    return _adapter_error_response(AdapterError(503, "FORJD action acknowledgement is unavailable"))
-  return JsonResponse(deml_playbook_execution(result), status=200)
-
-
-@csrf_exempt_require_header_auth
-@require_forjd_action("playbook.execute")
-async def playbook_action_retry_proxy(
-  request: HttpRequest,
-  run_id: str,
-  action_result_id: str,
-) -> HttpResponse:
-  if request.method != "POST":
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  if request.META.get("QUERY_STRING"):
-    return JsonResponse({"detail": "Query parameters are not supported"}, status=400)
-  try:
-    normalized_run_id = _uuid_path(run_id, "run_id")
-    normalized_action_id = _uuid_path(action_result_id, "action_result_id")
-    payload = _empty_control_payload(request)
-  except AdapterError as exc:
-    return _adapter_error_response(exc)
-
-  result = await _typed_json_call(
-    request,
-    (
-      f"/api/v1/playbooks/runs/{quote(normalized_run_id, safe='')}"
-      f"/actions/{quote(normalized_action_id, safe='')}/retry"
-    ),
-    payload=payload,
-    tenant_binding="body",
-  )
-  if isinstance(result, HttpResponse):
-    return result
-  if result is None:
-    return _adapter_error_response(AdapterError(503, "FORJD action retry is unavailable"))
-  response = deml_playbook_execution(result)
-  response["queued"] = bool(result.get("queued", True))
-  return JsonResponse(response, status=202)
-
-
-@csrf_exempt  # nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-exempt
-@require_forjd_action({"GET": "read", "POST": "siem.signal.write"})
-async def siem_signals_proxy(request: HttpRequest) -> HttpResponse:
-  if request.method not in {"GET", "POST"}:
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  payload = _json_object(request) if request.method == "POST" else None
-  result = await _typed_json_call(request, "/api/v1/siem/signals", payload=payload)
-  if isinstance(result, HttpResponse):
-    return result
-  if result is None:
-    return JsonResponse([], status=200, safe=False)
-  if request.method == "GET":
-    return JsonResponse(deml_siem_signals(result), status=200, safe=False)
-  signal = result.get("signal") if isinstance(result.get("signal"), dict) else result
-  return JsonResponse(signal, status=200)
-
-
-async def compliance_soc_proxy(request: HttpRequest) -> HttpResponse:
-  return await native_forjd_proxy(
-    request,
-    target_path="/api/v1/compliance/soc",
-    allowed_methods=("GET",),
-    tenant_binding="none",
-  )
-
-
-# --- Product-domain Angular adapters (ML / exports / vulns / integrations) ---
-@csrf_exempt  # nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-exempt
-@require_forjd_action({"GET": "read", "POST": "vulnerability.write"})
-async def vulnerabilities_list_proxy(request: HttpRequest) -> HttpResponse:
-  if request.method not in {"GET", "POST"}:
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  payload: dict[str, object] | None = None
-  if request.method == "POST":
-    inbound = _json_object(request)
-    payload = {
-      "title": str(inbound.get("title") or ""),
-      "description": str(inbound.get("description") or ""),
-      "severity": _provider_enum(inbound.get("severity"), "medium"),
-      "status": _provider_enum(inbound.get("status"), "triage"),
-      "cve_id": inbound.get("cve_id") or None,
-      "asset_id": inbound.get("asset_id") or None,
-    }
-  result = await _typed_json_call(request, "/api/v1/vulnerabilities", payload=payload)
-  if isinstance(result, HttpResponse):
-    return result
-  if result is None:
-    return JsonResponse([], status=200, safe=False)
-  if request.method == "GET":
-    return JsonResponse(deml_vulnerabilities(result), status=200, safe=False)
-  return JsonResponse(deml_vulnerability(result), status=200)
-
-
-@csrf_exempt  # nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-exempt
-@require_forjd_action({"GET": "read", "PATCH": "vulnerability.write"})
-async def vulnerability_detail_proxy(request: HttpRequest, vulnerability_id: str) -> HttpResponse:
-  if request.method not in {"GET", "PATCH"}:
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  if request.method == "GET":
-    result = await _typed_json_call(request, "/api/v1/vulnerabilities", tenant_binding="query")
-    if isinstance(result, HttpResponse):
-      return result
-    if result is None:
-      return JsonResponse(
-        {
-          "detail": "Vulnerability unavailable during FORJD read fallback",
-          "code": "forjd_read_fallback",
-        },
-        status=503,
-      )
-    row = next(
-      (item for item in deml_vulnerabilities(result) if item["id"] == vulnerability_id),
-      None,
-    )
-    if row is None:
-      return JsonResponse({"detail": "Vulnerability not found"}, status=404)
-    return JsonResponse(row, status=200)
-
-  inbound = _json_object(request)
-  payload = {
-    key: (
-      _provider_enum(value, "triage")
-      if key == "status"
-      else _provider_enum(value, "medium")
-      if key == "severity"
-      else value
-    )
-    for key, value in inbound.items()
-    if key
-    in {
-      "asset_id",
-      "title",
-      "description",
-      "status",
-      "severity",
-      "impact",
-      "likelihood",
-      "cve_id",
-      "telemetry_context",
-    }
-  }
-  result = await _typed_json_call(
-    request,
-    f"/api/v1/vulnerabilities/{quote(vulnerability_id, safe='')}",
-    payload=payload,
-    tenant_binding="body",
-  )
-  if isinstance(result, HttpResponse):
-    return result
-  if result is None:
-    return _adapter_error_response(AdapterError(503, "FORJD vulnerability is unavailable"))
-  return JsonResponse(deml_vulnerability(result), status=200)
-
-
-@csrf_exempt  # nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-exempt
-@require_forjd_action({"GET": "read", "POST": "export.write"})
-async def exports_collection_proxy(request: HttpRequest) -> HttpResponse:
-  """GET list / POST create — Angular ``/api/v1/exports/``."""
-  if request.method == "GET":
-    try:
-      credential = await _read_credential_or_none(request)
-      if credential is None or not reads_from_forjd():
-        return JsonResponse([], status=200, safe=False)
-      client = _client_for_credential(credential)
-      _body, query_string = _bound_request(request, credential.tenant_id, "query")
-      response = await client.proxy(
-        "GET",
-        "/api/v1/exports",
-        query_string=query_string,
-        request_id=request_id_from(request),
-      )
-      if response.status >= 400:
-        if empty_read_fallback_enabled() and response.status >= 500:
-          return JsonResponse([], status=200, safe=False)
-        return _upstream_error_response(response)
-      upstream = json.loads(response.body)
-      if not isinstance(upstream, dict):
-        raise AdapterError(502, "FORJD returned invalid exports")
-      return JsonResponse(deml_export_jobs(upstream), status=200, safe=False)
-    except AdapterError as exc:
-      return _adapter_error_response(exc)
-    except ForjdError as exc:
-      if empty_read_fallback_enabled() and exc.status >= 500:
-        return JsonResponse([], status=200, safe=False)
-      return _forjd_error_response(exc)
-    except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
-      return _adapter_error_response(AdapterError(502, "FORJD returned invalid exports"))
-
-  if request.method != "POST":
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  try:
-    if not writes_enabled():
-      return JsonResponse(
-        {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
-        status=503,
-      )
-    credential = await _credential_for_request(request)
-    payload = _json_object(request)
-    # Angular sends kind/format/days — map to FORJD CreateExportRequest.
-    kind = str(payload.get("kind") or payload.get("source_kind") or "stream_results")
-    fmt = str(payload.get("format") or "csv")
-    idempotency_key = str(
-      payload.get("idempotency_key")
-      or request.META.get("HTTP_IDEMPOTENCY_KEY")
-      or request_id_from(request)
-    )
-    try:
-      days = max(1, min(int(payload.get("days") or 7), 90))
-    except (TypeError, ValueError) as exc:
-      raise AdapterError(400, "Export days must be an integer from 1 to 90") from exc
-    raw_site_url = str(payload.get("site_url") or "").strip()
-    site_url = None
-    if raw_site_url:
-      from forjd.public_url import validate_public_https_url
-
-      try:
-        site_url = validate_public_https_url(raw_site_url)
-      except ValueError as exc:
-        raise AdapterError(400, f"Invalid site URL: {exc}") from exc
-    body = json.dumps(
-      {
-        "tenant_id": str(credential.tenant_id),
-        "idempotency_key": idempotency_key,
-        "format": fmt,
-        "source_kind": kind,
-        "limit": 1_000 if fmt == "pdf" else 10_000,
-        "days": days,
-        "site_url": site_url,
-      }
-    ).encode()
-    client = _client_for_credential(credential)
-    response = await client.proxy(
-      "POST",
-      "/api/v1/exports",
-      body=body,
-      content_type="application/json",
-      request_id=request_id_from(request),
-    )
-    if response.status >= 400:
-      return _upstream_error_response(response)
-    upstream = json.loads(response.body)
-    if not isinstance(upstream, dict):
-      raise AdapterError(502, "FORJD returned invalid export job")
-    return JsonResponse(deml_export_job(upstream), status=response.status)
-  except AdapterError as exc:
-    return _adapter_error_response(exc)
-  except ForjdError as exc:
-    return _forjd_error_response(exc)
-  except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
-    return _adapter_error_response(AdapterError(502, "FORJD returned invalid export job"))
-
-
-@csrf_exempt  # nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-exempt
-@require_forjd_action({"GET": "read", "DELETE": "export.write"})
-async def export_detail_proxy(
-  request: HttpRequest,
-  export_id: str,
-) -> HttpResponse:
-  """GET status / DELETE job — Angular ``/api/v1/exports/{id}``."""
-  if request.method not in {"GET", "DELETE"}:
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  result = await _typed_json_call(
-    request,
-    f"/api/v1/exports/{quote(export_id, safe='')}",
-    tenant_binding="query",
-  )
-  if isinstance(result, HttpResponse):
-    return result
-  if result is None:
-    return _adapter_error_response(AdapterError(503, "FORJD export status is unavailable"))
-  if request.method == "DELETE":
-    return JsonResponse({"ok": True}, status=200)
-  return JsonResponse(deml_export_job(result), status=200)
-
-
-@require_forjd_action("export.download")
-async def export_download_proxy(request: HttpRequest, export_id: str) -> HttpResponse:
-  if request.method != "GET":
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  result = await _typed_json_call(
-    request,
-    f"/api/v1/exports/{quote(export_id, safe='')}/download",
-    tenant_binding="query",
-  )
-  if isinstance(result, HttpResponse):
-    return result
-  if result is None:
-    return _adapter_error_response(AdapterError(503, "FORJD export download is unavailable"))
-  raw_url = str(result.get("url") or "")
-  parsed = urlsplit(raw_url)
-  if parsed.scheme != "https" or not parsed.netloc or parsed.username or parsed.password:
-    return _adapter_error_response(AdapterError(502, "FORJD returned an invalid download URL"))
-  return JsonResponse(
-    {
-      "url": raw_url,
-      "filename_hint": str(result.get("filename_hint") or "")[:255],
-      "expires_in": int(result.get("expires_in") or 0),
-      "checksum_sha256": str(result.get("checksum_sha256") or ""),
-      "byte_size": int(result.get("byte_size") or 0),
-    },
-    status=200,
-  )
-
-
-async def _overview_shaped_read(
-  request: HttpRequest,
-  shape: Callable[[dict[str, Any]], dict[str, Any]],
-  *,
-  invalid_detail: str,
-) -> HttpResponse:
-  """Fetch FORJD analytics overview and shape it for an Angular ML endpoint."""
-  if request.method != "GET":
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  try:
-    credential = await _read_credential_or_none(request)
-    if credential is None or not reads_from_forjd():
-      return JsonResponse(shape({}), status=200)
-    client = _client_for_credential(credential)
-    # Angular passes status_page_id; the overview is tenant-wide, so bind the
-    # tenant and drop page-local params FORJD does not accept.
-    response = await client.proxy(
-      "GET",
-      "/api/v1/analytics/overview",
-      query_string=f"tenant_id={credential.tenant_id}",
-      request_id=request_id_from(request),
-    )
-    if response.status >= 400:
-      if empty_read_fallback_enabled() and response.status >= 500:
-        return JsonResponse(shape({}), status=200)
-      return _upstream_error_response(response)
-    upstream = json.loads(response.body)
-    if not isinstance(upstream, dict):
-      raise AdapterError(502, invalid_detail)
-    return JsonResponse(shape(upstream), status=200)
-  except AdapterError as exc:
-    return _adapter_error_response(exc)
-  except ForjdError as exc:
-    if empty_read_fallback_enabled() and exc.status >= 500:
-      return JsonResponse(shape({}), status=200)
-    return _forjd_error_response(exc)
-  except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
-    return _adapter_error_response(AdapterError(502, invalid_detail))
-
-
-@require_forjd_action("read")
-async def ml_latest_proxy(request: HttpRequest) -> HttpResponse:
-  """GET /api/v1/ml/latest — SLA stat (Angular ``TrainingResponse``)."""
-  return await _overview_shaped_read(
-    request,
-    deml_sla_latest,
-    invalid_detail="FORJD returned an invalid analytics overview",
-  )
-
-
-@require_forjd_action("read")
-async def ml_temporal_forecast_proxy(request: HttpRequest) -> HttpResponse:
-  """GET /api/v1/ml/temporal-forecast — spike gauge (``TemporalForecastResponse``)."""
-  return await _overview_shaped_read(
-    request,
-    deml_temporal_forecast,
-    invalid_detail="FORJD returned an invalid analytics overview",
-  )
-
-
-@require_forjd_action("read")
-async def ml_threat_report_proxy(request: HttpRequest) -> HttpResponse:
-  """GET /api/v1/ml/threat-intel/report — anomaly stats (``ThreatReportResponse``)."""
-  if request.method != "GET":
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  try:
-    credential = await _read_credential_or_none(request)
-    if credential is None or not reads_from_forjd():
-      return JsonResponse(deml_threat_report({}), status=200)
-    client = _client_for_credential(credential)
-    response = await client.proxy(
-      "GET",
-      "/api/v1/ml/scores",
-      query_string=(f"tenant_id={credential.tenant_id}&family=classical_anomaly&limit=50"),
-      request_id=request_id_from(request),
-    )
-    if response.status >= 400:
-      if empty_read_fallback_enabled() and response.status >= 500:
-        return JsonResponse(deml_threat_report({}), status=200)
-      return _upstream_error_response(response)
-    upstream = json.loads(response.body)
-    if not isinstance(upstream, dict):
-      raise AdapterError(502, "FORJD returned invalid ml scores")
-    return JsonResponse(deml_threat_report(upstream), status=200)
-  except AdapterError as exc:
-    return _adapter_error_response(exc)
-  except ForjdError as exc:
-    if empty_read_fallback_enabled() and exc.status >= 500:
-      return JsonResponse(deml_threat_report({}), status=200)
-    return _forjd_error_response(exc)
-  except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
-    return _adapter_error_response(AdapterError(502, "FORJD returned invalid ml scores"))
-
-
-@csrf_exempt  # nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-exempt
-async def integrations_security_alert_proxy(request: HttpRequest) -> HttpResponse:
-  """POST /api/v1/integrations/security-alert → FORJD native."""
-  return await native_forjd_proxy(
-    request,
-    target_path="/api/v1/integrations/security-alert",
-    allowed_methods=("POST",),
-    tenant_binding="body",
-  )
-
-
 @require_forjd_action("read")
 async def forjd_tenant_proxy(request: HttpRequest) -> HttpResponse:
   """GET /api/v1/forjd/tenant — mapped FORJD tenant for browser seal clients."""
@@ -2264,214 +1447,12 @@ async def forjd_tenant_proxy(request: HttpRequest) -> HttpResponse:
   )
 
 
-@require_forjd_action("read")
-async def endpoints_list_proxy(request: HttpRequest) -> HttpResponse:
-  """GET /api/v1/system-status/endpoints → FORJD discovered-endpoints."""
-  if request.method != "GET":
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  try:
-    credential = await _read_credential_or_none(request)
-    if credential is None or not reads_from_forjd():
-      return JsonResponse([], status=200, safe=False)
-    client = _client_for_credential(credential)
-    response = await client.proxy(
-      "GET",
-      "/api/v1/discovered-endpoints",
-      query_string=f"tenant_id={credential.tenant_id}&limit=100",
-      request_id=request_id_from(request),
-    )
-    if response.status >= 400:
-      if empty_read_fallback_enabled() and response.status >= 500:
-        return JsonResponse([], status=200, safe=False)
-      return _upstream_error_response(response)
-    upstream = json.loads(response.body or b"{}")
-    if not isinstance(upstream, dict):
-      raise AdapterError(502, "FORJD returned invalid discovered endpoints")
-    return JsonResponse(deml_discovered_endpoints(upstream), status=200, safe=False)
-  except AdapterError as exc:
-    return _adapter_error_response(exc)
-  except ForjdError as exc:
-    if empty_read_fallback_enabled() and exc.status >= 500:
-      return JsonResponse([], status=200, safe=False)
-    return _forjd_error_response(exc)
-  except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
-    return _adapter_error_response(AdapterError(502, "FORJD returned invalid discovered endpoints"))
-
-
-@csrf_exempt  # nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-exempt
-@require_forjd_action("ml.train")
-async def ml_train_proxy(request: HttpRequest) -> HttpResponse:
-  """POST /api/v1/ml/train → FORJD classical_anomaly / forecasting fit."""
-  if request.method != "POST":
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  if not writes_enabled():
-    return JsonResponse(
-      {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
-      status=503,
-    )
-  try:
-    credential = await _credential_for_request(request)
-    client = _client_for_credential(credential)
-    # Prefer SLA/forecasting family; fall back to classical anomaly.
-    for model_id in ("forecasting", "classical_anomaly"):
-      response = await client.proxy(
-        "POST",
-        f"/api/v1/ml/{model_id}/fit",
-        body=json.dumps({"tenant_id": str(credential.tenant_id)}, separators=(",", ":")).encode(),
-        content_type="application/json",
-        request_id=request_id_from(request),
-      )
-      if response.status < 400:
-        upstream = json.loads(response.body or b"{}")
-        overview = await client.proxy(
-          "GET",
-          "/api/v1/analytics/overview",
-          query_string=f"tenant_id={credential.tenant_id}",
-          request_id=request_id_from(request),
-        )
-        overview_body: dict[str, Any] = {}
-        if overview.status < 400:
-          try:
-            loaded = json.loads(overview.body or b"{}")
-            if isinstance(loaded, dict):
-              overview_body = loaded
-          except (TypeError, json.JSONDecodeError):
-            overview_body = {}
-        shaped = deml_sla_latest(overview_body)
-        shaped["message"] = f"Training accepted for {model_id}"
-        shaped["run_id"] = str(
-          (upstream.get("run") or {}).get("id")
-          if isinstance(upstream.get("run"), dict)
-          else upstream.get("id") or model_id
-        )
-        return JsonResponse(shaped, status=200)
-    return _upstream_error_response(response)
-  except AdapterError as exc:
-    return _adapter_error_response(exc)
-  except ForjdError as exc:
-    return _forjd_error_response(exc)
-  except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
-    return _adapter_error_response(AdapterError(502, "FORJD returned an invalid train response"))
-
-
-@csrf_exempt  # nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-exempt
-@require_forjd_action("ml.train")
-async def ml_threat_train_proxy(request: HttpRequest) -> HttpResponse:
-  """POST /api/v1/ml/threat-intel/train → FORJD threat_ensemble fit."""
-  if request.method != "POST":
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  if not writes_enabled():
-    return JsonResponse(
-      {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
-      status=503,
-    )
-  try:
-    credential = await _credential_for_request(request)
-    client = _client_for_credential(credential)
-    response = await client.proxy(
-      "POST",
-      "/api/v1/ml/threat_ensemble/fit",
-      body=json.dumps({"tenant_id": str(credential.tenant_id)}, separators=(",", ":")).encode(),
-      content_type="application/json",
-      request_id=request_id_from(request),
-    )
-    if response.status >= 400:
-      return _upstream_error_response(response)
-    scores = await client.proxy(
-      "GET",
-      "/api/v1/ml/scores",
-      query_string=f"tenant_id={credential.tenant_id}&family=threat_ensemble&limit=50",
-      request_id=request_id_from(request),
-    )
-    body: dict[str, Any] = {}
-    if scores.status < 400:
-      try:
-        loaded = json.loads(scores.body or b"{}")
-        if isinstance(loaded, dict):
-          body = loaded
-      except (TypeError, json.JSONDecodeError):
-        body = {}
-    shaped = deml_threat_report(body)
-    shaped["message"] = "Threat model training accepted"
-    return JsonResponse(shaped, status=200)
-  except AdapterError as exc:
-    return _adapter_error_response(exc)
-  except ForjdError as exc:
-    return _forjd_error_response(exc)
-  except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
-    return _adapter_error_response(AdapterError(502, "FORJD returned an invalid train response"))
-
-
-@csrf_exempt  # nosemgrep: python.django.security.audit.csrf-exempt.no-csrf-exempt
-@require_forjd_action("ml.score")
-async def predict_proxy(request: HttpRequest) -> HttpResponse:
-  """POST /api/v1/predict → FORJD classical_anomaly score (enterprise integrators)."""
-  if request.method != "POST":
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
-  if not writes_enabled():
-    return JsonResponse(
-      {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
-      status=503,
-    )
-  try:
-    credential = await _credential_for_request(request)
-    client = _client_for_credential(credential)
-    try:
-      inbound = json.loads(request.body or b"{}")
-    except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
-      inbound = {}
-    if not isinstance(inbound, dict):
-      inbound = {}
-    outbound: dict[str, Any] = {"tenant_id": str(credential.tenant_id)}
-    if isinstance(inbound.get("features"), list):
-      outbound["features"] = inbound["features"]
-    if isinstance(inbound.get("series"), list):
-      outbound["series"] = inbound["series"]
-    model_id = str(inbound.get("model_id") or inbound.get("model") or "classical_anomaly")
-    if model_id not in {
-      "classical_anomaly",
-      "threat_ensemble",
-      "lstm_autoencoder",
-      "transformer_anomaly",
-      "forecasting",
-      "norse_ssn",
-    }:
-      model_id = "classical_anomaly"
-    response = await client.proxy(
-      "POST",
-      f"/api/v1/ml/{model_id}/score",
-      body=json.dumps(outbound, separators=(",", ":")).encode(),
-      content_type="application/json",
-      request_id=request_id_from(request),
-    )
-    if response.status >= 400:
-      return _upstream_error_response(response)
-    upstream = json.loads(response.body or b"{}")
-    if not isinstance(upstream, dict):
-      raise AdapterError(502, "FORJD returned an invalid predict response")
-    return JsonResponse(
-      {
-        "status": "success",
-        "model_id": model_id,
-        "prediction": upstream.get("result") or upstream.get("score") or upstream,
-        "source": "forjd",
-      },
-      status=200,
-    )
-  except AdapterError as exc:
-    return _adapter_error_response(exc)
-  except ForjdError as exc:
-    return _forjd_error_response(exc)
-  except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
-    return _adapter_error_response(AdapterError(502, "FORJD returned an invalid predict response"))
-
-
 async def unsupported_forjd_proxy(
   request: HttpRequest,
   capability: str,
   **_path_parameters: str,
 ) -> HttpResponse:
-  """Fail closed; empty GETs exist only in explicit migration fallback modes."""
+  """Retired BFF facades always fail closed (501) — never empty-200 SoT lies."""
   actor: ForjdActorContext | None = None
   action = action_for_native_request(request.method, request.path)
   if capability != "system-status":
@@ -2501,16 +1482,11 @@ async def unsupported_forjd_proxy(
       {"detail": "FORJD writes are disabled", "code": ErrorCode.FORJD_WRITES_DISABLED.value},
       status=503,
     )
-  if request.method == "GET" and empty_read_fallback_enabled():
-    envelope = empty_capability_envelope(capability, request.path)
-    if isinstance(envelope, list):
-      return JsonResponse(envelope, status=200, safe=False)
-    return JsonResponse(envelope, status=200)
   response = JsonResponse(
     {
       "detail": (
-        f"The {capability} capability is blocked until FORJD ships a supported "
-        "service-principal contract"
+        f"The {capability} capability is not mounted on the DEML control plane; "
+        "call FORJD directly with a tenant-bound service token"
       ),
       "code": "forjd_capability_unavailable",
     },

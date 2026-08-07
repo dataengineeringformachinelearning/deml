@@ -1,0 +1,21 @@
+# DEML (deml.app)
+
+DEML helps teams publish public status pages, keep customers informed, and manage account security.
+
+## Homepage
+/
+
+## Surfaces
+- /explore — browse public status pages
+- /status/:slug — public status page
+- /settings — account, security, integrations, and sites (authenticated)
+- /login · /signup · /mfa — auth
+
+## Repository
+https://github.com/dataengineeringformachinelearning/deml
+
+## Notes
+- Blog lives on the community site: https://dataengineeringformachinelearning.com/blog (`/blog` on deml.app redirects there)
+- Developer docs: https://dataengineeringformachinelearning.com/documentation
+- Design system: https://ui.deml.app
+- Community book and whitepaper: https://dataengineeringformachinelearning.com

@@ -1,4 +1,10 @@
-import type { UptimeHistoryDataPoint } from '../../shared/deml-chart/types';
+export type UptimeHistoryStatus = 'up' | 'partial' | 'down' | 'no_data';
+
+export type UptimeHistoryDataPoint = {
+  date: string;
+  status: UptimeHistoryStatus;
+  uptime?: number;
+};
 
 export interface UptimeHistorySourcePoint {
   date: string;
@@ -49,4 +55,18 @@ export const resolveUptimeHistory = (
     return toUptimeHistoryDataPoints(source);
   }
   return emptyUptimeHistory(days);
+};
+
+/**
+ * Phone-friendly track — keep the newest N points so segments stay readable
+ * at ~320 CSS px (avoid hairline bars from a 30-day grid).
+ */
+export const compactUptimeHistory = (
+  history: readonly UptimeHistoryDataPoint[],
+  maxPoints = 14,
+): UptimeHistoryDataPoint[] => {
+  if (history.length <= maxPoints) {
+    return [...history];
+  }
+  return history.slice(history.length - maxPoints);
 };

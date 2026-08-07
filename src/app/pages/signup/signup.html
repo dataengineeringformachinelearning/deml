@@ -49,20 +49,25 @@
         [error]="confirmError()"
       />
 
-      <app-checkbox-field
-        label="I agree to the terms of use"
-        name="terms"
-        [required]="true"
-        [checked]="acceptTerms()"
-        (checkedChange)="acceptTerms.set($event)"
-      />
+      <p class="form-panel__note">
+        By creating an account you agree to the
+        <a
+          href="https://dataengineeringformachinelearning.com/terms/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Terms
+        </a>.
+      </p>
 
       @if (formError()) {
         <p class="form-panel__error" role="alert">{{ formError() }}</p>
       }
 
       <app-button-group align="start" layout="column">
-        <app-button variant="primary" shape="pill" type="submit">Sign up</app-button>
+        <app-button variant="primary" shape="pill" type="submit" [busy]="busy()">
+          Sign up
+        </app-button>
       </app-button-group>
     </form>
 

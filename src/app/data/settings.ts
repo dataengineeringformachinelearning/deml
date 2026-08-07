@@ -1,19 +1,47 @@
-export type SettingsSectionId = 'account' | 'sites';
+export type SettingsSectionId =
+  | 'account'
+  | 'security'
+  | 'connected'
+  | 'integrations'
+  | 'sessions'
+  | 'sites'
+  | 'danger';
 
 export interface SettingsSectionLink {
   readonly id: SettingsSectionId;
   readonly label: string;
 }
 
-/** In-page anchors — account identity + status sites only. */
+/** In-page anchors for account, security, credentials, and sites. */
 export const SETTINGS_SECTION_LINKS: readonly SettingsSectionLink[] = [
   { id: 'account', label: 'Account' },
+  { id: 'security', label: 'Security' },
+  { id: 'connected', label: 'Connected accounts' },
+  { id: 'integrations', label: 'Integrations' },
+  { id: 'sessions', label: 'Sessions' },
   { id: 'sites', label: 'Sites' },
+  { id: 'danger', label: 'Delete account' },
 ];
 
 const SECTION_IDS = new Set<string>(SETTINGS_SECTION_LINKS.map((link) => link.id));
 
-/** Map legacy `?tab=` / fragment values onto a settings section id. */
+const SECTION_ALIASES: Readonly<Record<string, SettingsSectionId>> = {
+  profile: 'account',
+  password: 'account',
+  mfa: 'security',
+  'two-factor': 'security',
+  providers: 'connected',
+  google: 'connected',
+  apple: 'connected',
+  'api-keys': 'integrations',
+  keys: 'integrations',
+  credentials: 'integrations',
+  session: 'sessions',
+  delete: 'danger',
+  'delete-account': 'danger',
+};
+
+/** Resolve fragment / `?section=` onto a settings section id. */
 export const resolveSettingsSection = (raw: string | null | undefined): SettingsSectionId | null => {
   if (!raw) {
     return null;
@@ -22,17 +50,5 @@ export const resolveSettingsSection = (raw: string | null | undefined): Settings
   if (SECTION_IDS.has(key)) {
     return key as SettingsSectionId;
   }
-  if (
-    key === 'profile' ||
-    key === 'security' ||
-    key === 'billing' ||
-    key === 'preferences' ||
-    key === 'appearance' ||
-    key === 'notifications' ||
-    key === 'theme' ||
-    key === 'delivery'
-  ) {
-    return 'account';
-  }
-  return null;
+  return SECTION_ALIASES[key] ?? null;
 };

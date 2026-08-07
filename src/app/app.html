@@ -1,11 +1,17 @@
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
-<app-navbar />
+@if (!bareShell()) {
+  <app-navbar />
+}
 
 <main id="main-content" class="main" tabindex="-1">
   <router-outlet />
 </main>
 
-<app-site-footer />
+@if (!bareShell()) {
+  <app-site-footer />
+}
 
-<app-confirm-sheet />
+@if (!bareShell()) {
+  <app-confirm-sheet />
+}

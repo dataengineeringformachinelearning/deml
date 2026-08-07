@@ -14,21 +14,12 @@ from config.headless_rate_limit import consume_many, hashed_scope
 logger = logging.getLogger(__name__)
 
 _DEML_KEY_RE = re.compile(r"\Ademl_([A-Za-z0-9]{8})_([A-Za-z0-9_-]{16,})\Z")
+# Headless deml_ keys — status + sealed ingest only (SIEM/ML/exports → FORJD).
 _API_KEY_ALLOWED_PREFIXES = (
   "/api/v1/forjd/",
   "/api/v1/system-status",
-  "/api/v1/analytics",
-  "/api/v1/siem",
   "/api/v1/ingest",
   "/api/v1/sessions",
-  "/api/v1/projections",
-  "/api/v1/workflows",
-  "/api/v1/replay",
-  "/api/v1/agent/vulnerabilities",
-  "/api/v1/exports",
-  "/api/v1/ml",
-  "/api/v1/model",
-  "/api/v1/integrations/security-alert",
 )
 
 
@@ -42,7 +33,7 @@ def _headless_limit_bucket(request) -> tuple[str, int] | None:
   canonical = normalized
   if canonical == "/api/v1/forjd" or canonical.startswith("/api/v1/forjd/"):
     canonical = f"/api/v1{canonical.removeprefix('/api/v1/forjd')}"
-  if request.method == "POST" and canonical.startswith(("/api/v1/ingest", "/api/v1/siem")):
+  if request.method == "POST" and canonical.startswith("/api/v1/ingest"):
     return "ingest", int(settings.DEML_HEADLESS_INGEST_RPM)
   if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
     return "write", int(settings.DEML_HEADLESS_WRITE_RPM)
@@ -184,7 +175,10 @@ class FirebaseAuthenticationMiddleware(MiddlewareMixin):
 
     except Exception as e:
       logger.exception("Firebase auth verification failed (type=%s)", type(e).__name__)
-      # If token verification fails, request.user remains AnonymousUser
+      # Credentialed request with a bad/expired token must fail closed as 401.
+      # Never downgrade to AnonymousUser — that poisons owned-status reads with
+      # the public directory and can be cached under the authed SWR key.
+      return JsonResponse({"detail": "Invalid or expired credentials"}, status=401)
 
     return None
 

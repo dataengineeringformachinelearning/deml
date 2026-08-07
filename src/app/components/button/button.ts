@@ -33,6 +33,9 @@ export class Button {
   /** Native button type when rendered as a `<button>`. */
   readonly type = input<'button' | 'submit' | 'reset'>('button');
 
+  /** Associates a submit control with a form by id (footer actions outside `<form>`). */
+  readonly form = input<string>();
+
   /** When set, renders an `<a href>` instead of a `<button>`. */
   readonly href = input<string>();
 
@@ -40,6 +43,9 @@ export class Button {
   readonly routerLink = input<string | readonly string[]>();
 
   readonly disabled = input(false);
+
+  /** Quiet in-button progress — spinner replaces label. */
+  readonly busy = input(false);
 
   /** Emits when the control is activated and not disabled. */
   readonly pressed = output<Event>();
@@ -69,11 +75,14 @@ export class Button {
     if (this.disabled()) {
       classes.push('is-disabled');
     }
+    if (this.busy()) {
+      classes.push('is-busy');
+    }
     return classes.join(' ');
   });
 
   onActivate(event: Event): void {
-    if (this.disabled()) {
+    if (this.disabled() || this.busy()) {
       event.preventDefault();
       event.stopPropagation();
       return;

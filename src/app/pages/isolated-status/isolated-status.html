@@ -1,66 +1,67 @@
 <app-banner
   [heading]="page()?.title || 'Status'"
-  [lede]="page()?.description || statusDescription()"
->
-  <app-button variant="secondary" shape="pill" routerLink="/explore">Directory</app-button>
-</app-banner>
+  [lede]="page()?.description || ''"
+/>
 
 <app-page-section variant="catalog" ariaLabel="Status page">
   <div class="explore-directory">
     @if (!online()) {
-      <p class="form-panel__error" role="status">
-        {{ offlineHeading }} — {{ offlineBody }}
-      </p>
+      <app-callout
+        tone="warning"
+        [heading]="offlineHeading"
+        [text]="offlineBody"
+      />
+      @if (servingStale()) {
+        <app-callout tone="info" [text]="staleStatus" />
+      }
     } @else if (servingStale()) {
-      <p class="form-panel__note" role="status">
-        Showing a cached snapshot — couldn’t refresh from the status service.
-      </p>
+      <app-callout tone="info" [text]="staleStatus" />
     }
 
     @if (loadFailed()) {
-      <div class="explore-card__error" role="alert">
-        @if (loadErrorKind() === 'not_found') {
-          <h2 class="explore-card__error-title">Not found</h2>
-          <p class="explore-card__error-lede">
-            This page does not exist or is not published.
-          </p>
-          <app-button variant="primary" shape="pill" routerLink="/explore">Directory</app-button>
-        } @else if (loadErrorKind() === 'forbidden') {
-          <h2 class="explore-card__error-title">Private</h2>
-          <p class="explore-card__error-lede">Sign in with an authorized account to view it.</p>
-          <app-button variant="primary" shape="pill" routerLink="/login">Sign in</app-button>
-        } @else {
-          <h2 class="explore-card__error-title">Can’t connect</h2>
-          <p class="explore-card__error-lede">Status service is unreachable. Try again shortly.</p>
+      @if (loadErrorKind() === 'not_found') {
+        <app-error-state title="Not found" description="This page isn’t published.">
+          <app-button variant="primary" shape="pill" routerLink="/explore">Explore</app-button>
+        </app-error-state>
+      } @else if (loadErrorKind() === 'forbidden') {
+        <app-error-state title="Private" description="Log in with an authorized account.">
+          <app-button variant="primary" shape="pill" routerLink="/login">Log in</app-button>
+        </app-error-state>
+      } @else {
+        <app-error-state
+          title="Unable to load"
+          description="Check your connection, then try again."
+        >
           <app-button
             variant="primary"
             shape="pill"
-            [disabled]="isRetrying()"
+            [busy]="isRetrying()"
             (pressed)="retryLoad()"
           >
-            {{ isRetrying() ? 'Retrying…' : 'Retry' }}
+            {{ retryLabel }}
           </app-button>
-        }
-      </div>
+        </app-error-state>
+      }
     } @else if (isLoading()) {
       <div class="explore-card explore-card--loading" aria-busy="true" aria-live="polite">
-        <div class="skeleton" aria-hidden="true">
-          <div class="skeleton__line skeleton__line--short"></div>
-          <div class="skeleton__line skeleton__line--long"></div>
-          <div class="skeleton__line skeleton__line--medium"></div>
-          <div class="skeleton__block"></div>
-        </div>
+        <app-skeleton [block]="true" />
       </div>
     } @else if (page(); as current) {
       <app-explore-card
         layout="detail"
         [title]="current.title"
+        [description]="current.description || ''"
+        [tag]="pageTag()"
+        [proVerified]="!!current.is_pro_verified"
         [status]="globalStatus()"
         [statusLabel]="statusLabel()"
+        [metricGroups]="metricGroups()"
         [services]="services()"
         [incidents]="incidents()"
         [uptimeHistory]="uptimeHistory()"
         [uptimePercentage]="uptimePercentage()"
+        [uptimeSummary]="uptimeSummary()"
+        uptimeLabel="Platform uptime"
       />
     }
   </div>

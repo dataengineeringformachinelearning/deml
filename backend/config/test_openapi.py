@@ -38,51 +38,27 @@ def test_openapi_exposes_forjd_handoff_and_no_local_processing(client: Client) -
 
 
 @pytest.mark.django_db
-def test_viking_swagger_shell_is_served(client: Client) -> None:
-  response = client.get("/api/v1/docs")
-  assert response.status_code == 200
-  body = response.content.decode()
-  assert "swagger-ui" in body
-  assert "backend-swagger" in body
-  assert "backend-docs-topbar" in body
-  assert 'href="/api/v1/redoc"' in body
-  assert "vendor/swagger-ui-dist/swagger-ui.css" in body
-  assert "vendor/swagger-ui-dist/swagger-ui-bundle.js" in body
-  assert "suite-apidocs.css" in body
-  assert "docs-swagger-init.js" in body
-  assert "cdn.jsdelivr.net" not in body
-  assert "<style>" not in body
+def test_html_docs_shells_redirect_to_community(client: Client) -> None:
+  community = "https://dataengineeringformachinelearning.com/documentation"
+  for path in ("/api/v1/docs", "/api/v1/redoc", "/documentation"):
+    response = client.get(path)
+    assert response.status_code == 301
+    assert response["Location"] == community
 
 
 @pytest.mark.django_db
-def test_redoc_shell_is_served(client: Client) -> None:
-  response = client.get("/api/v1/redoc")
-  assert response.status_code == 200
-  body = response.content.decode()
-  assert "redoc" in body.lower()
-  assert "backend-docs-topbar" in body
-  assert 'data-openapi-url="/api/v1/openapi.json"' in body
-  assert "vendor/redoc/redoc.standalone.js" in body
-  assert "suite-apidocs.css" in body
-  assert "cdn.jsdelivr.net" not in body
-
-
-@pytest.mark.django_db
-def test_home_splash_and_documentation_copy(client: Client) -> None:
+def test_home_splash_points_to_community_docs(client: Client) -> None:
   home = client.get("/")
   assert home.status_code == 200
   home_body = home.content.decode()
   assert "backend-splash" in home_body
   assert "suite-backend-shell" in home_body
   assert "suite-backend-logo" in home_body
+  assert "suite-backend-nav" in home_body
+  assert "banner banner--hero" in home_body
   assert "dataengineeringformachinelearning.svg" in home_body
+  assert "Accounts and status for your services." in home_body
+  assert "/documentation" in home_body
+  assert "/api/v1/docs" not in home_body
   assert "Swagger UI" not in home_body
   assert "Control plane, not data plane" not in home_body
-
-  docs = client.get("/documentation")
-  assert docs.status_code == 200
-  docs_body = docs.content.decode()
-  assert "/api/v1/forjd/ingest" in docs_body
-  assert "/api/v1/forjd/capabilities" in docs_body
-  assert "/api/v1/predict" not in docs_body
-  assert "Blog" in docs_body

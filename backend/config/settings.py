@@ -188,12 +188,6 @@ FORJD_RESPONSE_MAX_BYTES = get_int("FORJD_RESPONSE_MAX_BYTES", 2 * 1024 * 1024)
 FORJD_READ_RETRY_ATTEMPTS = get_int("FORJD_READ_RETRY_ATTEMPTS", 3)
 FORJD_RETRY_BASE_SECONDS = get_float("FORJD_RETRY_BASE_SECONDS", 0.1)
 FORJD_RETRY_MAX_SECONDS = get_float("FORJD_RETRY_MAX_SECONDS", 2.0)
-# Live updates lane — SSE bridge over FORJD's projection cursor feed
-# (Supabase Realtime publishes stream_results upstream; browsers never hold
-# Supabase or fjsvc_ credentials, so Django holds the tenant-bound poll).
-DEML_LIVE_UPDATES_ENABLED = get_bool("DEML_LIVE_UPDATES_ENABLED", True)
-DEML_LIVE_POLL_SECONDS = get_float("DEML_LIVE_POLL_SECONDS", 10.0)
-DEML_LIVE_STREAM_MAX_SECONDS = get_float("DEML_LIVE_STREAM_MAX_SECONDS", 300.0)
 
 
 # Application definition

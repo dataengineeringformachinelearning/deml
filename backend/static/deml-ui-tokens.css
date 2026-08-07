@@ -1,13 +1,24 @@
 /* =========================================================
-   deml-ui — one tight system
-   Neutrals + one accent. Geist. 8pt grid. Sharp modules.
+   deml-ui — design tokens (new-from-the-start / warm ash)
+
+   ONE HAND. Neutrals + one accent. Geist. 8pt grid. Sharp.
    Import: deml-ui/tokens.css  or  deml-ui/styles.css
+
+   Core scales only:
+     color · type · space · radius · elevation · motion · opacity
+   Everything else is composition on top of those scales.
    ========================================================= */
 
-:root {
+/* --- Dark (default) + light theme --- */
+:root,
+[data-theme="dark"],
+.dark {
   color-scheme: dark;
 
-  /* --- Color: neutrals --- */
+  /* ========== COLOR ==========
+     Neutrals: ash ground, ink surface, cream modules
+     Accent: primary only (CTAs, links, focus, hairline)
+     Status: success / error (never decorative) */
   --color-bg: #35312d;
   --color-surface: #1c1916;
   --color-card: #f3f0ea;
@@ -20,23 +31,19 @@
   --color-focus: #f3f0ea;
   --color-on-primary: #ffffff;
 
-  /* --- Color: one accent --- */
   --color-primary: #2f5f8f;
   --color-primary-hover: color-mix(in srgb, #2f5f8f 78%, #ffffff);
-  --color-highlight: #9bb8d4;
-  --color-highlight-hover: #c2d4e6;
   --color-selection: color-mix(in srgb, var(--color-primary) 28%, transparent);
 
-  /* --- Color: semantic (status only) --- */
   --color-success: #3f6b54;
   --color-success-hover: color-mix(in srgb, #3f6b54 78%, #ffffff);
   --color-error: #9e3d47;
   --color-error-hover: color-mix(in srgb, #9e3d47 78%, #ffffff);
   --color-success-ink: #9bc4a8;
   --color-error-ink: #e8a0a6;
-  --color-warning-ink: var(--color-highlight);
+  --color-warning-ink: var(--color-text-secondary);
 
-  /* --- Color: chart plot (locked) --- */
+  /* Chart plot stage (LOCKED — activity graphs only) */
   --color-plot: #1c1916;
   --color-plot-stage: #121212;
   --color-plot-ink: #f3f0ea;
@@ -45,19 +52,24 @@
   --color-plot-baseline: color-mix(in srgb, #c6c0b7 35%, transparent);
   --color-plot-border: color-mix(in srgb, #c6c0b7 24%, #1c1916);
 
-  /* --- Opacity --- */
+  /* ========== OPACITY ========== */
   --opacity-disabled: 0.72;
   --opacity-muted: 0.64;
   --opacity-subtle: 0.12;
   --opacity-overlay: 0.48;
+  --press-opacity: 0.92;
 
-  /* --- Elevation (2 levels only) --- */
-  --elevation-1: 0 0 0 1px color-mix(in srgb, #1c1916 28%, transparent);
-  --elevation-2: 0 8px 24px color-mix(in srgb, #1c1916 22%, transparent),
-    0 0 0 1px color-mix(in srgb, #1c1916 10%, transparent);
+  /* ========== ELEVATION ==========
+     0 = flat modules · 1 = hairline · 2 = overlay lift */
+  --elevation-0: none;
+  --elevation-1: 0 0 0 1px color-mix(in srgb, #1c1916 22%, transparent);
+  --elevation-2: 0 12px 32px color-mix(in srgb, #1c1916 28%, transparent);
 
-  /* --- Space: 8pt grid (4pt half-step) --- */
+  /* ========== SPACE (8pt grid · 4pt half) ==========
+     Core: half · 1–8 · 12 · 16 · 28 · 36
+     Prefer 1–4 for UI rhythm; larger steps for layout only. */
   --grid: 8px;
+  --hairline: 2px;
   --space-half: calc(var(--grid) * 0.5);
   --space-1: calc(var(--grid) * 1);
   --space-2: calc(var(--grid) * 2);
@@ -67,25 +79,88 @@
   --space-6: calc(var(--grid) * 6);
   --space-7: calc(var(--grid) * 7);
   --space-8: calc(var(--grid) * 8);
-  --space-10: calc(var(--grid) * 10);
   --space-12: calc(var(--grid) * 12);
   --space-16: calc(var(--grid) * 16);
-  --space-22: calc(var(--grid) * 22);
-  --space-26: calc(var(--grid) * 26);
   --space-28: calc(var(--grid) * 28);
   --space-36: calc(var(--grid) * 36);
-  --space-52: calc(var(--grid) * 52);
 
-  /* --- Layout rhythm --- */
+  /* ========== RADIUS ==========
+     Sharp modules; pill only for controls */
+  --radius-none: 0;
+  --radius-pill: 9999px;
+  --border-width: 1px;
+
+  /* ========== TYPE (Geist · mobile floor 16px) ==========
+     Roles: mark · body · title · display */
+  --font-family: "Geist Variable", "Geist", system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-family);
+  --font-display: var(--font-sans);
+  --font-mark: var(--font-sans);
+  --font-body: var(--font-sans);
+
+  --font-size-mark: 0.9375rem;
+  --font-size-body: var(--space-2);
+  --font-size-title: var(--space-3);
+  --font-size-display: var(--space-7);
+
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-display: 800;
+  --font-weight-mark: 600;
+
+  --leading-display: 1.05;
+  --leading-tight: 1.15;
+  --leading-ui: 1.35;
+  --leading-body: 1.55;
+
+  --tracking-mark: 0.24em;
+  --tracking-intro: 0.08em;
+  --tracking-display: -0.04em;
+  --tracking-tight: -0.025em;
+  --tracking-body: 0.01em;
+
+  /* ========== MOTION ==========
+     Short decelerate · no bounce · transform/opacity only */
+  --duration-fast: 140ms;
+  --duration-normal: 220ms;
+  --duration-slow: 320ms;
+  --duration-skeleton: 720ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-enter: var(--ease-out);
+  --press-scale: 0.985;
+  --enter-distance: var(--space-half);
+  --stagger-step: 40ms;
+  --motion-fade: opacity var(--duration-fast) var(--ease-out);
+  --motion-transform: transform var(--duration-fast) var(--ease-out);
+  --motion-enter: opacity var(--duration-normal) var(--ease-enter),
+    transform var(--duration-normal) var(--ease-enter);
+  --motion-exit: opacity var(--duration-fast) var(--ease-exit),
+    transform var(--duration-fast) var(--ease-exit);
+  --motion-ui: color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+
+  /* ========== SAFE AREA ========== */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  /* ========== COMPOSITION (built from core only) ========== */
   --page-pad-inline: max(var(--space-3), var(--safe-left), var(--safe-right));
   --page-pad-block: var(--space-4);
   --page-pad-block-end: max(var(--space-8), calc(var(--space-6) + var(--safe-bottom)));
   --module-pad: var(--space-3);
+  --module-pad-sm: var(--space-2);
   --module-pad-lg: var(--space-4);
   --module-gap: var(--space-2);
   --tile-gap: var(--space-2);
   --tile-row-unit: var(--space-16);
-  --tile-row-micro: var(--space-22);
   --tile-row-card: var(--space-36);
   --tile-cols: 6;
   --dash-row: var(--tile-row-unit);
@@ -96,100 +171,51 @@
   --reading-width: 65ch;
   --bp-md: 800px;
   --bp-lg: 1200px;
+  --uptime-seg-min: var(--space-half);
 
-  /* --- Module surface (ONE cream recipe) --- */
   --module-bg: var(--color-card);
   --module-fg: var(--color-card-text);
   --module-fg-muted: var(--color-card-text-secondary);
   --module-border: var(--color-card-border);
   --module-accent: var(--color-primary);
-  --module-accent-width: calc(var(--border-width) * 4);
-  --module-wash: 8%;
-  --module-wash-hover: 12%;
-  --module-wash-stop: 44%;
-  --module-elevation: var(--elevation-1);
-  --module-elevation-hover: var(--elevation-2);
+  --module-accent-width: calc(var(--border-width) * 3);
+  --module-wash: 5%;
+  --module-wash-hover: 8%;
+  --module-wash-stop: 36%;
+  --module-elevation: var(--elevation-0);
+  --module-elevation-hover: var(--elevation-1);
   --module-radius: var(--radius-none);
-  --tint-subtle: 8%;
-  --tint-soft: 12%;
-  --control-fill: color-mix(in srgb, var(--color-card) 88%, var(--color-surface));
+  --tint-subtle: 5%;
+  --control-fill: color-mix(in srgb, var(--color-card) 90%, var(--color-surface));
   --control-hover-border: color-mix(
     in srgb,
-    var(--color-primary) 55%,
+    var(--color-primary) 40%,
     var(--color-card-border)
   );
 
-  /* --- Control geometry --- */
   --hit-target: var(--space-6);
   --hit-target-lg: var(--space-7);
   --icon-size: var(--space-4);
   --icon-size-sm: var(--space-3);
-  --focus-ring-width: 2px;
-  --focus-ring-offset: 2px;
+  --focus-ring-width: var(--hairline);
+  --focus-ring-offset: var(--hairline);
   --focus-ring: 0 0 0 var(--focus-ring-width) var(--color-focus);
-  --border-width: 1px;
-  --radius-none: 0;
-  --radius-pill: 9999px;
 
-  /* --- Safe areas --- */
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-right: env(safe-area-inset-right, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left: env(safe-area-inset-left, 0px);
+  --navbar-inset: var(--space-2);
+  --navbar-hit: var(--hit-target);
+  --navbar-icon-size: var(--space-3);
+  --navbar-bg: var(--color-surface);
+  --navbar-fg: var(--color-text);
+  --navbar-muted: var(--color-text-secondary);
+  --navbar-accent: var(--color-primary);
+  --navbar-accent-hover: var(--color-primary-hover);
+  --navbar-surface: var(--color-surface);
+  --navbar-focus: var(--color-focus);
+  --button-pad-block: var(--space-2);
+  --button-pad-inline: var(--space-4);
+  --button-pad-inline-lg: var(--space-5);
 
-  /* --- Motion --- */
-  --duration-instant: 90ms;
-  --duration-fast: 140ms;
-  --duration-normal: 220ms;
-  --duration-slow: 320ms;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-enter: var(--ease-out);
-  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
-  --press-scale: 0.985;
-  --hover-lift: -1px;
-  --motion-fade: opacity var(--duration-fast) var(--ease-out);
-  --motion-transform: transform var(--duration-fast) var(--ease-out);
-  --motion-enter: opacity var(--duration-normal) var(--ease-enter),
-    transform var(--duration-normal) var(--ease-enter);
-  --motion-ui: color var(--duration-fast) var(--ease-out),
-    background-color var(--duration-fast) var(--ease-out),
-    border-color var(--duration-fast) var(--ease-out),
-    box-shadow var(--duration-fast) var(--ease-out),
-    opacity var(--duration-fast) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
-
-  /* --- Type (Geist; mobile body floor 16px) --- */
-  --font-family: "Geist Variable", "Geist", system-ui, -apple-system, sans-serif;
-  --font-sans: var(--font-family);
-  --font-display: var(--font-sans);
-  --font-mark: var(--font-sans);
-  --font-body: var(--font-sans);
-  --font-size-mark: 0.875rem;
-  --font-size-sm: var(--space-2);
-  --font-size-md: var(--space-3);
-  --font-size-lg: var(--space-4);
-  --font-size-xl: var(--space-6);
-  --font-size-2xl: var(--space-8);
-  --font-size-body: var(--font-size-sm);
-  --font-weight-regular: 400;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --font-weight-display: 800;
-  --font-weight-mark: 600;
-  --leading-display: 1.02;
-  --leading-tight: 1.12;
-  --leading-snug: 1.35;
-  --leading-ui: 1.3;
-  --leading-body: 1.55;
-  --leading-relaxed: 1.65;
-  --tracking-mark: 0.24em;
-  --tracking-intro: 0.08em;
-  --tracking-display: -0.045em;
-  --tracking-tight: -0.03em;
-  --tracking-body: 0.01em;
-
-  /* --- Charts (LOCKED) --- */
+  /* Charts (LOCKED) */
   --chart-height-spark: 140px;
   --chart-height-panel: 280px;
   --chart-aspect: 2.4;
@@ -216,106 +242,51 @@
   --chart-series-3: var(--color-success);
   --chart-series-4: var(--color-error);
 
-  /* --- Shell --- */
-  --navbar-inset: var(--space-2);
-  --navbar-hit: var(--hit-target);
-  --navbar-icon-size: var(--space-3);
-  --navbar-bg: var(--color-surface);
-  --navbar-fg: var(--color-text);
-  --navbar-muted: var(--color-text-secondary);
-  --navbar-accent: var(--color-highlight);
-  --navbar-accent-hover: var(--color-highlight-hover);
-  --navbar-surface: var(--color-surface);
-  --navbar-focus: var(--color-focus);
-  --button-pad-block: var(--space-2);
-  --button-pad-inline: var(--space-4);
-  --button-pad-inline-lg: var(--space-6);
-
-  /* --- Compat aliases (thin; do not invent values here) --- */
-  --color-on-accent: var(--color-on-primary);
-  --color-on-dark: var(--color-text);
-  --color-accent: var(--color-primary);
-  --color-accent-hover: var(--color-primary-hover);
-  --color-accent-strong: var(--color-primary-hover);
-  --color-accent-gold: var(--color-success);
-  --color-accent-gold-hover: var(--color-success-hover);
-  --color-accent-red: var(--color-error);
-  --color-accent-red-hover: var(--color-error-hover);
-  --color-olive: var(--color-plot);
-  --color-background: var(--color-bg);
-  --color-text-primary: var(--color-text);
-  --color-text-muted: var(--color-text-secondary);
-  --color-dark: var(--color-surface);
-  --shadow-card: var(--elevation-2);
-  --shadow-sm: var(--elevation-1);
-  --shadow-md: var(--elevation-2);
-  --radius-sm: var(--radius-none);
-  --radius-md: var(--radius-none);
-  --radius-lg: var(--radius-none);
+  /* ========== ALIASES (map only → core; do not invent values) ========== */
+  --font-size-xs: var(--font-size-mark);
+  --font-size-sm: var(--font-size-body);
+  --font-size-md: var(--font-size-title);
+  --font-size-lg: var(--space-4);
+  --font-size-xl: var(--space-5);
+  --font-size-2xl: var(--font-size-display);
+  --font-weight-medium: var(--font-weight-semibold);
+  --tracking-eyebrow: var(--tracking-mark);
+  --leading-snug: var(--leading-ui);
+  --leading-relaxed: var(--leading-body);
   --space-sm: var(--space-2);
   --space-md: var(--space-3);
   --space-lg: var(--space-6);
   --space-xl: var(--space-8);
-  --font-size-xs: var(--font-size-mark);
-  --font-weight-medium: var(--font-weight-semibold);
-  --font-serif: var(--font-sans);
-  --font-secondary: var(--font-sans);
-  --tracking-eyebrow: var(--tracking-mark);
+  --space-10: var(--space-12);
+  --space-22: var(--space-16);
+  --space-26: var(--space-28);
+  --space-52: calc(var(--grid) * 52);
+  --tile-row-micro: var(--space-16);
+  --radius-sm: var(--radius-none);
+  --radius-md: var(--radius-none);
+  --radius-lg: var(--radius-none);
+  --shadow-sm: var(--elevation-1);
+  --shadow-md: var(--elevation-2);
+  --shadow-card: var(--elevation-1);
+  --color-on-accent: var(--color-on-primary);
+  --color-accent: var(--color-primary);
+  --color-accent-hover: var(--color-primary-hover);
+  --color-accent-gold: var(--color-success);
+  --color-accent-gold-hover: var(--color-success-hover);
+  --color-accent-red: var(--color-error);
+  --color-accent-red-hover: var(--color-error-hover);
+  --color-highlight: var(--color-primary);
+  --color-highlight-hover: var(--color-primary-hover);
+  --duration-instant: var(--duration-fast);
+  --ease-in-out: var(--ease-out);
   --ease-spring: var(--ease-out);
+  --hover-lift: 0px;
+  --tint-soft: var(--tint-subtle);
   --opacity-faint: var(--opacity-subtle);
-  --bg-primary: var(--color-bg);
-  --bg-secondary: var(--color-surface);
-  --text-primary: var(--color-text);
-  --text-secondary: var(--color-text-secondary);
-  --accent: var(--color-primary);
-  --accent-hover: var(--color-primary-hover);
-  --border: var(--color-border);
-  --bg: var(--color-bg);
-  --ink: var(--color-text);
-  --muted: var(--color-text-secondary);
-  --line: var(--color-border);
-  --surface: var(--color-surface);
   --content-width-xl: var(--content-width-lg);
 }
 
-[data-theme="dark"],
-.dark {
-  color-scheme: dark;
-  --color-bg: #35312d;
-  --color-surface: #1c1916;
-  --color-card: #f3f0ea;
-  --color-card-text: #1c1916;
-  --color-card-text-secondary: #4a453f;
-  --color-card-border: color-mix(in srgb, #8a847c 38%, #f3f0ea);
-  --color-primary: #2f5f8f;
-  --color-primary-hover: color-mix(in srgb, #2f5f8f 78%, #ffffff);
-  --color-success: #3f6b54;
-  --color-success-hover: color-mix(in srgb, #3f6b54 78%, #ffffff);
-  --color-error: #9e3d47;
-  --color-error-hover: color-mix(in srgb, #9e3d47 78%, #ffffff);
-  --color-text: #f3f0ea;
-  --color-text-secondary: #c6c0b7;
-  --color-plot: #1c1916;
-  --color-plot-stage: #121212;
-  --color-plot-ink: #f3f0ea;
-  --color-plot-muted: #c6c0b7;
-  --color-plot-grid: color-mix(in srgb, #c6c0b7 22%, transparent);
-  --color-plot-baseline: color-mix(in srgb, #c6c0b7 35%, transparent);
-  --color-plot-border: color-mix(in srgb, #c6c0b7 24%, #1c1916);
-  --color-border: color-mix(in srgb, #c6c0b7 30%, #35312d);
-  --color-focus: #f3f0ea;
-  --color-success-ink: #9bc4a8;
-  --color-error-ink: #e8a0a6;
-  --color-warning-ink: #9bb8d4;
-  --color-highlight: #9bb8d4;
-  --color-highlight-hover: #c2d4e6;
-  --color-on-primary: #ffffff;
-  --color-selection: color-mix(in srgb, var(--color-primary) 28%, transparent);
-  --elevation-1: 0 0 0 1px color-mix(in srgb, #1c1916 28%, transparent);
-  --elevation-2: 0 8px 24px color-mix(in srgb, #1c1916 22%, transparent),
-    0 0 0 1px color-mix(in srgb, #1c1916 10%, transparent);
-}
-
+/* --- Light theme (same system · flipped grounds) --- */
 [data-theme="light"],
 .light {
   color-scheme: light;
@@ -333,23 +304,16 @@
   --color-error-hover: color-mix(in srgb, #7a3038 78%, #1c1916);
   --color-text: #1c1916;
   --color-text-secondary: #4a453f;
-  --color-plot: #1c1916;
-  --color-plot-stage: #121212;
-  --color-plot-ink: #f3f0ea;
-  --color-plot-muted: #c6c0b7;
-  --color-plot-grid: color-mix(in srgb, #c6c0b7 22%, transparent);
-  --color-plot-baseline: color-mix(in srgb, #c6c0b7 35%, transparent);
-  --color-plot-border: color-mix(in srgb, #c6c0b7 24%, #1c1916);
   --color-border: color-mix(in srgb, #4a453f 30%, #d4cec5);
   --color-focus: #23486d;
   --color-success-ink: var(--color-success);
   --color-error-ink: var(--color-error);
-  --color-warning-ink: var(--color-primary);
-  --color-highlight: #23486d;
-  --color-highlight-hover: color-mix(in srgb, #23486d 78%, #1c1916);
-  --color-on-primary: #ffffff;
+  --color-warning-ink: var(--color-text-secondary);
   --color-selection: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  --color-highlight: var(--color-primary);
+  --color-highlight-hover: var(--color-primary-hover);
   --elevation-1: 0 0 0 1px color-mix(in srgb, #4a453f 14%, transparent);
-  --elevation-2: 0 8px 24px color-mix(in srgb, #1c1916 8%, transparent),
-    0 0 0 1px color-mix(in srgb, #4a453f 12%, transparent);
+  --elevation-2: 0 12px 32px color-mix(in srgb, #1c1916 10%, transparent);
+  --navbar-accent: var(--color-primary);
+  --navbar-accent-hover: var(--color-primary-hover);
 }

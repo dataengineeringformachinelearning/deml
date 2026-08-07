@@ -22,10 +22,10 @@ export function apiErrorMessage(err: unknown, fallback: string): string {
         return 'This action requires an active Pro subscription.';
       }
       if (code === 'authentication_required') {
-        return 'Your session expired. Sign in again and retry.';
+        return 'Your session expired. Log in again and retry.';
       }
       if (code === 'account_required') {
-        return 'Your account is not fully provisioned yet. Finish sign-in and try again.';
+        return 'Your account is not fully provisioned yet. Finish logging in and try again.';
       }
 
       const detail = record['detail'];
@@ -53,7 +53,7 @@ export function apiErrorMessage(err: unknown, fallback: string): string {
       return 'Status page not found. Refresh Settings and try again.';
     }
     if (err.status === 401) {
-      return 'Your session expired. Sign in again and retry.';
+      return 'Your session expired. Log in again and retry.';
     }
     if (err.status === 0 || err.status === 504) {
       return 'Network timeout or offline. Check your connection, then retry.';

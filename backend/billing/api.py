@@ -146,10 +146,10 @@ def create_checkout_session(request):
 
   if not _PRO_CHECKOUT_ENABLED:
     log_usecase(logger, "UC-BILL-001", "checkout_disabled")
-    return JsonResponse(BillingErrorOut(error=_PRO_CHECKOUT_DISABLED_MSG).model_dump(), status=403)
+    return JsonResponse(BillingErrorOut(detail=_PRO_CHECKOUT_DISABLED_MSG, code="pro_checkout_disabled").model_dump(), status=403)
 
   if not request.user.is_authenticated or not request.user.is_active:
-    return JsonResponse({"error": "Authentication required"}, status=401)
+    return JsonResponse({"detail": "Authentication required", "code": "authentication_required"}, status=401)
 
   try:
     # --- Optional JSON body (empty / non-JSON posts are treated as {}) ---
@@ -162,7 +162,7 @@ def create_checkout_session(request):
       except json.JSONDecodeError:
         from django.http import JsonResponse
 
-        return JsonResponse({"error": "Invalid request body"}, status=400)
+        return JsonResponse({"detail": "Invalid request body", "code": "validation_error"}, status=400)
       data = parsed if isinstance(parsed, dict) else {}
     account_id = data.get("account_id")
 
@@ -170,7 +170,7 @@ def create_checkout_session(request):
     if not profile:
       from django.http import JsonResponse
 
-      return JsonResponse({"error": "Account profile not provisioned"}, status=400)
+      return JsonResponse({"detail": "Account profile not provisioned", "code": "account_required"}, status=400)
 
     if UserLifecycleJob.objects.filter(
       account_id=profile.account_id,
@@ -178,25 +178,25 @@ def create_checkout_session(request):
     ).exists():
       from django.http import JsonResponse
 
-      return JsonResponse({"error": "Account deletion is in progress"}, status=409)
+      return JsonResponse({"detail": "Account deletion is in progress", "code": "account_deletion_in_progress"}, status=409)
 
     if profile.tier == "Pro" and profile.subscription_active:
       from django.http import JsonResponse
 
-      return JsonResponse({"error": "Pro subscription already active"}, status=409)
+      return JsonResponse({"detail": "Pro subscription already active", "code": "subscription_already_active"}, status=409)
 
     if account_id:
       try:
         valid_id = uuid.UUID(account_id)
         if valid_id != profile.account_id:
-          return 400, {"error": "Invalid account ID"}
+          return 400, {"detail": "Invalid account ID", "code": "validation_error"}
       except (ValueError, TypeError):
-        return 400, {"error": "Invalid account ID"}
+        return 400, {"detail": "Invalid account ID", "code": "validation_error"}
 
     if profile.role == "Viewer":
       from django.http import JsonResponse
 
-      return JsonResponse({"error": "Viewers cannot manage subscriptions"}, status=403)
+      return JsonResponse({"detail": "Viewers cannot manage subscriptions", "code": "forjd_action_forbidden"}, status=403)
 
     account_key = str(profile.account_id)
     session_kwargs: dict[str, Any] = {
@@ -226,7 +226,7 @@ def create_checkout_session(request):
     logger.error("Error creating checkout session: %s", type(e).__name__)
     from django.http import JsonResponse
 
-    return JsonResponse({"error": "Unable to create checkout session"}, status=500)
+    return JsonResponse({"detail": "Unable to create checkout session", "code": "billing_upstream_error"}, status=500)
 
 
 @router.post("/webhook", auth=None)
@@ -381,7 +381,7 @@ def sync_subscription(request: Any) -> Any:
   if not request.user.is_authenticated:
     from django.http import JsonResponse
 
-    return JsonResponse({"error": "Authentication required"}, status=401)
+    return JsonResponse({"detail": "Authentication required", "code": "authentication_required"}, status=401)
 
   profile = _get_profile(request)
   if not profile:
@@ -464,7 +464,7 @@ def sync_subscription(request: Any) -> Any:
     logger.error("Error syncing subscription: %s", type(e).__name__, exc_info=True)
     from django.http import JsonResponse
 
-    return JsonResponse({"error": "Unable to sync subscription"}, status=500)
+    return JsonResponse({"detail": "Unable to sync subscription", "code": "billing_upstream_error"}, status=500)
 
 
 @router.post("/cancel-subscription")
@@ -472,23 +472,23 @@ def cancel_subscription(request):
   if not request.user.is_authenticated:
     from django.http import JsonResponse
 
-    return JsonResponse({"error": "Authentication required"}, status=401)
+    return JsonResponse({"detail": "Authentication required", "code": "authentication_required"}, status=401)
 
   profile = _get_profile(request)
   if not profile:
     from django.http import JsonResponse
 
-    return JsonResponse({"error": "Account profile not provisioned"}, status=400)
+    return JsonResponse({"detail": "Account profile not provisioned", "code": "account_required"}, status=400)
 
   if profile.role == "Viewer":
     from django.http import JsonResponse
 
-    return JsonResponse({"error": "Viewers cannot manage subscriptions"}, status=403)
+    return JsonResponse({"detail": "Viewers cannot manage subscriptions", "code": "forjd_action_forbidden"}, status=403)
 
   if not profile.stripe_subscription_id:
     from django.http import JsonResponse
 
-    return JsonResponse({"error": "No active subscription found"}, status=400)
+    return JsonResponse({"detail": "No active subscription found", "code": "subscription_not_found"}, status=400)
 
   try:
     sub = stripe.Subscription.modify(profile.stripe_subscription_id, cancel_at_period_end=True)
@@ -505,7 +505,7 @@ def cancel_subscription(request):
     logger.error("Error cancelling subscription: %s", type(e).__name__)
     from django.http import JsonResponse
 
-    return JsonResponse({"error": "Unable to cancel subscription"}, status=500)
+    return JsonResponse({"detail": "Unable to cancel subscription", "code": "billing_upstream_error"}, status=500)
 
 
 @router.post("/resume-subscription")
@@ -513,23 +513,23 @@ def resume_subscription(request):
   if not request.user.is_authenticated:
     from django.http import JsonResponse
 
-    return JsonResponse({"error": "Authentication required"}, status=401)
+    return JsonResponse({"detail": "Authentication required", "code": "authentication_required"}, status=401)
 
   profile = _get_profile(request)
   if not profile:
     from django.http import JsonResponse
 
-    return JsonResponse({"error": "Account profile not provisioned"}, status=400)
+    return JsonResponse({"detail": "Account profile not provisioned", "code": "account_required"}, status=400)
 
   if profile.role == "Viewer":
     from django.http import JsonResponse
 
-    return JsonResponse({"error": "Viewers cannot manage subscriptions"}, status=403)
+    return JsonResponse({"detail": "Viewers cannot manage subscriptions", "code": "forjd_action_forbidden"}, status=403)
 
   if not profile.stripe_subscription_id:
     from django.http import JsonResponse
 
-    return JsonResponse({"error": "No active subscription found"}, status=400)
+    return JsonResponse({"detail": "No active subscription found", "code": "subscription_not_found"}, status=400)
 
   try:
     sub = stripe.Subscription.modify(profile.stripe_subscription_id, cancel_at_period_end=False)
@@ -546,4 +546,4 @@ def resume_subscription(request):
     logger.error("Error resuming subscription: %s", type(e).__name__)
     from django.http import JsonResponse
 
-    return JsonResponse({"error": "Unable to resume subscription"}, status=500)
+    return JsonResponse({"detail": "Unable to resume subscription", "code": "billing_upstream_error"}, status=500)

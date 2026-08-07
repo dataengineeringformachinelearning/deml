@@ -14,13 +14,17 @@ import { FormPanel } from '../../components/form-panel/form-panel';
 import { PageSection } from '../../components/page-section/page-section';
 import { TextField } from '../../components/text-field/text-field';
 import { navigateAfterLogin } from '../../core/utils/return-url.utils';
+import { ensureFieldVisible } from '../../shared/focus-field';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-mfa',
   imports: [PageSection, FormPanel, TextField, Button, ButtonGroup, RouterLink],
   templateUrl: './mfa.html',
-  host: { class: 'page page--auth' },
+  host: {
+    class: 'page page--auth',
+    '(focusin)': 'onFocusIn($event)',
+  },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Mfa implements OnInit {
@@ -34,6 +38,10 @@ export class Mfa implements OnInit {
   readonly busy = signal(false);
   readonly codeSent = signal(false);
   readonly sending = signal(false);
+
+  onFocusIn(event: FocusEvent): void {
+    ensureFieldVisible(event.target);
+  }
 
   readonly phoneHint = this.auth.mfaPhoneHint;
 

@@ -6,8 +6,11 @@ system only. See [THEME.md](../THEME.md).
 
 ## App consumption
 
-- Dependency: `"deml-ui": "^1.1.0"` from the npm registry (published package).
-  Local DS iteration may temporarily use `file:../deml-ui`, then restore the npm pin.
+- Dependency: git pin on
+  `github:dataengineeringformachinelearning/deml-ui#<sha>` (see root
+  `package.json`). Local DS iteration: build deml-ui, then
+  `DEML_UI_DIST=../deml-ui/dist/styles/deml-ui.css ./scripts/sync_deml_ui_static.sh`
+  (and mirror `dist/` into `node_modules/deml-ui` until the pin is bumped).
 - Global styles: `node_modules/deml-ui/dist/styles/deml-ui.css` in `angular.json`
   (Geist via `@fontsource-variable/geist` — not Google Fonts CDN).
 - Behavioral Angular components live in `src/app/components` with

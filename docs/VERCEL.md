@@ -1,63 +1,41 @@
-# DEML static web on Vercel
+# DEML Angular on Vercel
 
-This **control-plane** repo deploys the Angular product UI on Vercel. Django BFF remains on **Fly** (`deml-backend`). FORJD (Fly) + Supabase own the streaming engine. Firebase is **Auth-only** (no Firebase Hosting).
-
-| Project | GitHub repo | Root directory | Public hostname | Role |
-| ------- | ----------- | -------------- | --------------- | ---- |
-| `deml` | `dataengineeringformachinelearning/deml` | `.` (repo root; legacy shim under `frontend/` may still be configured) | `https://deml.app` | Product Angular app on **deml-ui** |
-| `deml-ui` | `dataengineeringformachinelearning/deml-ui` | `.` | `https://ui.deml.app` | deml-ui Storybook |
-| `marketing` | `dataengineeringformachinelearning/dataengineeringformachinelearning` | `marketing` | `https://dataengineeringformachinelearning.com` | Community Astro site (**other repo**) |
-
-Design system: **deml-ui** ([THEME.md](../THEME.md)). Viking-UI / `packages/viking-ui` is retired.
+| Project | Repo | Root | Host |
+|---------|------|------|------|
+| `deml` | this repo | `.` | `https://deml.app` |
+| `deml-ui` | deml-ui | `.` | `https://ui.deml.app` |
+| marketing | community repo | `marketing` | community apex |
 
 ```text
-Browser (Vercel deml.app)
-  → DEML Django Fly (backend.deml.app)  Firebase JWT
-    → FORJD (backend.forjd.co)          fjsvc_ service token
-      → Supabase Postgres / Auth (FORJD platform)
+Browser (deml.app) → Django Fly (backend.deml.app) → FORJD (fjsvc_)
 ```
 
-## Project: `deml` (Angular product UI)
+## Project `deml`
 
 | Setting | Value |
 |---------|-------|
-| Framework Preset | Other |
-| Root Directory | Prefer repo root (`.`). If Root Directory is still `frontend`, the shim runs `scripts/vercel-frontend-build.mjs`. |
-| Build Command | `node set-env.js && npm run build:contracts && NG_BUILD_MAX_WORKERS=1 GOMAXPROCS=1 NODE_OPTIONS=--max-old-space-size=1536 npx ng build --configuration vercel` |
-| Output Directory | `dist/deml/browser` (or `frontend/dist/deml/browser` via shim) |
-| Install Command | `npm install --include=dev` |
-| Node.js | **24.x** |
-| Git | `dataengineeringformachinelearning/deml` (`main`) |
+| Build | `node set-env.js && npm run build:contracts && npx ng build --configuration vercel` |
+| Output | `dist/deml/browser` |
+| Node | 24.x |
+| Dependency | `deml-ui` git SHA pin (see `package.json`) |
 
-Dependency: `"deml-ui": "^1.1.0"` (npm registry).
+## Env (Production)
 
-## Project: `deml-ui` (Storybook)
+| Variable | Example |
+|----------|---------|
+| `FRONTEND_URL` | `https://deml.app` |
+| `BACKEND_URL` | `https://backend.deml.app` |
+| `MARKETING_URL` | `https://dataengineeringformachinelearning.com` |
+| Firebase web config | from Firebase console |
 
-| Setting | Value |
-|---------|-------|
-| Build | `npm run build-storybook` (see deml-ui `vercel.json`) |
-| Output | `storybook-static` |
-| Hostname | `https://ui.deml.app` |
+Never point `BACKEND_URL` at `backend.forjd.co`. Theme: [`THEME.md`](../THEME.md). Config: [`CONFIGURATION.md`](CONFIGURATION.md).
 
-## Environment variables (Production)
+## Redirects (`vercel.json`)
 
-Set in Vercel → Project `deml` → Settings → Environment Variables:
+Permanent (301) to the community site:
 
-| Variable | Example | Required |
-|----------|---------|----------|
-| `FRONTEND_URL` | `https://deml.app` | yes |
-| `BACKEND_URL` | `https://backend.deml.app` | yes |
-| `MARKETING_URL` | `https://dataengineeringformachinelearning.com` | yes |
-| Firebase web config keys | (from Firebase console) | yes |
+- `/docs`, `/redoc`, `/swagger` → `…/documentation`
+- `/blog`, `/blog/`, `/blog/:slug`, `/blog/rss.xml` → community blog URLs
+- `/learn`, `/learn/`, `/learn/:slug` → community blog URLs
 
-See also [docs/CONFIGURATION.md](CONFIGURATION.md) and [docs/PRODUCTION_DEPLOY.md](PRODUCTION_DEPLOY.md).
-
-## Local verify
-
-```bash
-npm install
-node set-env.js
-npx ng build --configuration vercel
-# or shim path:
-node scripts/vercel-frontend-build.mjs
-```
+Product SEO assets in `public/`: `robots.txt`, `sitemap.xml` (no blog URLs — blog is community-owned).

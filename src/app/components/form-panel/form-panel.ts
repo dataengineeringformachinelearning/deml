@@ -19,7 +19,6 @@ let formPanelIdSeq = 0;
 export class FormPanel {
   private readonly autoId = `form-panel-title-${++formPanelIdSeq}`;
 
-  readonly eyebrow = input('');
   readonly title = input.required<string>();
   readonly description = input('');
   readonly titleId = input<string>();

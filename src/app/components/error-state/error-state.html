@@ -1,0 +1,12 @@
+<div class="error-state" role="alert">
+  @if (eyebrow()) {
+    <p class="error-state__eyebrow">{{ eyebrow() }}</p>
+  }
+  <p class="error-state__title">{{ title() }}</p>
+  @if (description()) {
+    <p class="error-state__description">{{ description() }}</p>
+  }
+  <div class="error-state__actions">
+    <ng-content />
+  </div>
+</div>

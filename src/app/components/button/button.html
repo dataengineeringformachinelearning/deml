@@ -1,14 +1,20 @@
 <!-- ng-template keeps a single projection slot across @if branches -->
 <ng-template #content>
-  <ng-content />
+  <span class="button__label">
+    <ng-content />
+  </span>
+  @if (busy()) {
+    <span class="button__spinner" aria-hidden="true"></span>
+  }
 </ng-template>
 
 @if (isRouterLink()) {
   <a
     [class]="controlClass()"
     [routerLink]="routerLink()!"
-    [attr.aria-disabled]="disabled() ? true : null"
-    [attr.tabindex]="disabled() ? -1 : null"
+    [attr.aria-disabled]="disabled() || busy() ? true : null"
+    [attr.aria-busy]="busy() ? true : null"
+    [attr.tabindex]="disabled() || busy() ? -1 : null"
     (click)="onActivate($event)"
   >
     <ng-container [ngTemplateOutlet]="content" />
@@ -17,8 +23,9 @@
   <a
     [class]="controlClass()"
     [href]="href()"
-    [attr.aria-disabled]="disabled() ? true : null"
-    [attr.tabindex]="disabled() ? -1 : null"
+    [attr.aria-disabled]="disabled() || busy() ? true : null"
+    [attr.aria-busy]="busy() ? true : null"
+    [attr.tabindex]="disabled() || busy() ? -1 : null"
     (click)="onActivate($event)"
   >
     <ng-container [ngTemplateOutlet]="content" />
@@ -27,7 +34,9 @@
   <button
     [class]="controlClass()"
     [type]="type()"
-    [disabled]="disabled()"
+    [attr.form]="form() || null"
+    [disabled]="disabled() || busy()"
+    [attr.aria-busy]="busy() ? true : null"
     (click)="onActivate($event)"
   >
     <ng-container [ngTemplateOutlet]="content" />

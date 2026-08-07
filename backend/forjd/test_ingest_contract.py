@@ -47,7 +47,7 @@ def _sealed_event(tenant_id: UUID, index: int, ciphertext: bytes = b"sealed-even
   FORJD_READ_MODE="forjd",
   FORJD_CUTOVER_PHASE="",
 )
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
 def test_processing_status_is_tenant_bound_through_deml(
   mock_proxy: AsyncMock,
   client: Client,
@@ -87,7 +87,7 @@ def test_processing_status_is_tenant_bound_through_deml(
 
 @pytest.mark.django_db
 @override_settings(FORJD_SERVICE_TOKEN=SERVICE_TOKEN, FORJD_READ_MODE="forjd")
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
 def test_processing_status_rejects_tenant_override(
   mock_proxy: AsyncMock,
   client: Client,
@@ -111,7 +111,7 @@ def test_processing_status_rejects_tenant_override(
   FORJD_WRITE_MODE="forjd",
   FORJD_CUTOVER_PHASE="",
 )
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
 def test_native_batch_rejects_more_than_forjd_event_limit(
   mock_proxy: AsyncMock,
   client: Client,
@@ -140,7 +140,7 @@ def test_native_batch_rejects_more_than_forjd_event_limit(
   FORJD_WRITE_MODE="forjd",
   FORJD_CUTOVER_PHASE="",
 )
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
 def test_native_ingest_accepts_valid_body_above_django_global_limit(
   mock_proxy: AsyncMock,
   client: Client,
@@ -214,7 +214,7 @@ def test_generated_ingest_alias_accepts_same_endpoint_scoped_body_limit(
   FORJD_WRITE_MODE="forjd",
   FORJD_CUTOVER_PHASE="",
 )
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
 def test_native_ingest_rejects_body_above_forjd_hard_limit(
   mock_proxy: AsyncMock,
   client: Client,

@@ -72,14 +72,13 @@ def test_rejects_unsafe_secret_reference_at_save(secret_ref: str) -> None:
   FORJD_TENANT_ID="00000000-0000-0000-0000-000000000001",
 )
 def test_rejects_platform_default_service_token_for_product_accounts() -> None:
-  account_id = uuid4()
-  ForjdTenantMapping.objects.create(
-    deml_account_id=account_id,
-    forjd_tenant_id=UUID("00000000-0000-0000-0000-000000000001"),
-  )
-
-  with pytest.raises(ForjdTenantConfigurationError, match="platform credential"):
-    resolve_forjd_tenant_credential(account_id)
+  """ORM rejects platform env token + platform tenant on product mappings."""
+  with pytest.raises(ValidationError, match="platform"):
+    ForjdTenantMapping.objects.create(
+      deml_account_id=uuid4(),
+      forjd_tenant_id=UUID("00000000-0000-0000-0000-000000000001"),
+      service_token_secret_ref="env:FORJD_SERVICE_TOKEN",  # pragma: allowlist secret
+    )
 
 
 @pytest.mark.django_db
@@ -89,12 +88,11 @@ def test_rejects_platform_default_service_token_for_product_accounts() -> None:
   SECRET_KEY="test-secret-key-for-sealed-tokens",  # pragma: allowlist secret
 )
 def test_rejects_product_mapping_onto_platform_tenant_even_with_sealed_token() -> None:
+  """Sealed product credentials still cannot bind to the platform tenant."""
   account_id = uuid4()
   platform = UUID("00000000-0000-0000-0000-000000000001")
-  create_product_forjd_mapping(deml_account_id=account_id, forjd_tenant_id=platform)
-
-  with pytest.raises(ForjdTenantConfigurationError, match="platform FORJD tenant"):
-    resolve_forjd_tenant_credential(account_id)
+  with pytest.raises(ValidationError, match="platform FORJD tenant"):
+    create_product_forjd_mapping(deml_account_id=account_id, forjd_tenant_id=platform)
 
 
 @pytest.mark.django_db

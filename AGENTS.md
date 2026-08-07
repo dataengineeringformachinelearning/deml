@@ -1,213 +1,32 @@
-# AGENTS.md — DEML Platform
+# AGENTS.md — DEML
 
-**Mission:** Build DEML as a zero-compromise, user-focused learning platform.
-DEML owns identity, profiles, roles, subscriptions, consent, account lifecycle,
-and user interactions. FORJD is the universal secure streaming engine for intake,
-processing, analytics, projections, replay, and machine learning.
-Integration contract: [docs/FORJD_INTEGRATION.md](docs/FORJD_INTEGRATION.md).
-Scale guidance: [docs/SCALE.md](docs/SCALE.md).
-
-## Repo map
+Control plane for identity, public status, and site settings. FORJD is the sealed data plane.
 
 | Repo | Role |
 |------|------|
-| **This repo (`deml`)** | Control plane — Angular product (`src/`) + Django BFF + **deml-ui** |
-| [`deml-ui`](https://github.com/dataengineeringformachinelearning/deml-ui) | Design system SoT — tokens, HTML/CSS components, WC + Angular, Storybook (`ui.deml.app`) |
-| [`forjd`](https://github.com/dataengineeringformachinelearning/forjd) | Data plane — sealed streaming engine |
-| [`dataengineeringformachinelearning`](https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning) | Community / marketing site + public BOOK |
+| **deml** (this) | Angular `src/` + Django BFF |
+| [deml-ui](https://github.com/dataengineeringformachinelearning/deml-ui) | Design system (warm ash NFTS) |
+| [forjd](https://github.com/dataengineeringformachinelearning/forjd) | Sealed streaming / status SoT |
+| [community](https://github.com/dataengineeringformachinelearning/dataengineeringformachinelearning) | Marketing + BOOK + blog |
 
-## DEML ↔ FORJD Boundary
+## Boundary
 
-- Keep the thin Angular product surface intact: home (hero only), auth, explore,
-  status, and settings (account + sites). `/blog` may stay addressable but must
-  not compete in primary nav. Long-form learning lives on the marketing
-  book/whitepaper; FORJD stays headless. No dashboard, demo boards, or secondary
-  product navigation. Contract: [`docs/SIMPLIFIED_SURFACE.md`](docs/SIMPLIFIED_SURFACE.md).
-- Django is the Firebase-authenticated user control plane and backend-for-frontend.
-  Identity, profiles, roles, billing, consent, API credentials, issue reports,
-  learning/library content, and account lifecycle remain local.
-- FORJD owns sealed intake, streaming, transformation, projections, analytics, ML,
-  threat processing, replay, and DLQ. FORJD is the exclusive data plane; do not
-  introduce DEML-local stream brokers, OLAP warehouses, or parallel projection workers.
-- DEML calls FORJD with a tenant-bound opaque `fjsvc_` service token. It never calls
-  an OAuth token endpoint, uses Supabase `service_role`, or forwards Firebase
-  end-user tokens.
-- DEML stores an explicit account-to-FORJD-tenant mapping and a secret reference,
-  never a plaintext service token. Body/query tenant IDs must match the mapped
-  tenant or fail closed.
-- Missing FORJD capabilities are explicit dependencies — never filled with DEML
-  stream workers or direct FORJD database access.
+- Product routes: `/`, `/explore`, `/status/:slug`, auth, `/settings` — [`docs/SIMPLIFIED_SURFACE.md`](docs/SIMPLIFIED_SURFACE.md). Blog is on the community site (`/blog` on deml.app redirects there).
+- DEML owns Firebase auth, profiles, billing, consent, account→FORJD tenant map.
+- FORJD owns sealed ingest, status pages, probes. Call with tenant-bound `fjsvc_` only — never end-user tokens.
+- Missing FORJD capabilities stay unavailable (501) — do not rebuild them in DEML.
 
-**Operations:** [docs/FORJD_INTEGRATION.md](docs/FORJD_INTEGRATION.md),
-[docs/CONNECTION_MAP.md](docs/CONNECTION_MAP.md),
-[docs/PRODUCTION_DEPLOY.md](docs/PRODUCTION_DEPLOY.md),
-[docs/PRODUCTION_CHECKLIST.md](docs/PRODUCTION_CHECKLIST.md).
+## Visual law
 
-**Steady-state flags (`deml-backend`):** `FORJD_WRITE_MODE=forjd` and
-`FORJD_READ_MODE=forjd` are the production defaults (`FORJD_CUTOVER_PHASE=2`
-is an equivalent legacy alias).
+Warm ash NFTS only — [THEME.md](THEME.md), [.cursorrules](.cursorrules), [`docs/DEML_UI.md`](docs/DEML_UI.md). Geist only. No Viking, no app-level DS CSS (`npm run check:nfts`).
 
-## Core Philosophy
+## Gates
 
-- **Zero-Compromise Standards:** Quality is non-negotiable. Automate enforcement.
-- **Precision Engineering:** Focus on architectural logic, not trivia.
-- **Path of Least Resistance:** Tooling guides developers to the right thing.
-- **Symmetrical Multi-Account Control Plane:** Account-scoped Django paths treat
-  every mapped account identically. Stream processing and ML are FORJD’s job.
-- **FORJD Data Plane:** Sealed ingest, projections, replay/DLQ, analytics, and
-  threat/ML execute exclusively in FORJD via tenant-bound `fjsvc_` tokens.
-- **Defense-in-Depth Security:** Firebase at DEML; Supabase Auth + service
-  principals at FORJD; least privilege; automated scanning.
-- **Observability as First-Class:** Product UI observability stays DEML-owned;
-  sealed telemetry and analytics live in FORJD.
-- **Automation Over Vigilance:** Pre-commit hooks, CI enforcement, doc sync.
-- **Pragmatic & Sovereign:** Own identity, billing, consent, and learning content
-  locally.
-- **Inclusive & Accessible:** WCAG 2.0 Level AA (or greater) / Section 508.
-- **Future-Proof:** Plan for PQC and FORJD-backed ML. Use `state_dict` only
-  (no pickle) if any local model artifacts remain.
+| Gate | Command |
+|------|---------|
+| NFTS | `npm run check:nfts` |
+| Frontend | `npm test -- --watch=false` · `npx ng build` |
+| Backend | `cd backend && .venv/bin/pytest` |
+| Contracts | `npm run validate:contracts` · `npm run validate:usecase-coverage` |
 
-## Quality gates
-
-| Layer | Command |
-|-------|---------|
-| NFTS style (mandatory) | Root `npm run check:nfts` — fails on DS chrome CSS, hex drift, Viking, missing deml-ui CSS, static sync skew |
-| Frontend | Root `npm test` · `npx ng build` · axe / a11y via deml-ui Storybook |
-| Design system | In deml-ui: `npm run check:nfts` · `npm run build` · `npm run storybook` · a11y addon |
-| Backend | `cd backend && pytest` (touched modules) · Ruff via pre-commit |
-| Full | `uvx pre-commit run --all-files` (includes NFTS gate) |
-| CI | `.github/workflows/ci.yml` (quality + frontend jobs run `check:nfts`), `production-smoke.yml`, `publish-*.yml` |
-
-- **Frontend:** Prettier + ESLint; WCAG AA; **deml-ui only**
-  ([THEME.md](THEME.md), [.cursorrules](.cursorrules), [docs/DEML_UI.md](docs/DEML_UI.md)).
-  **No escape hatches:** `scripts/check_nfts_style.mjs` rejects app-level DS chrome.
-- **Backend (Python/Django):** Ruff; `uv` / `uvx pre-commit`; Postgres UUID PKs;
-  AES-256-GCM + GCP KMS for secrets; no pickle for models.
-- **Security:** Semgrep/Trivy/gitleaks in pre-push; Firebase Auth at DEML edge;
-  sealed E2EE + tenant-bound `fjsvc_` to FORJD.
-
-## Architecture & Data Principles
-
-- **Decoupling:** Client (Angular) ↔ Server (Django) via REST + CORS.
-  Streaming/processing ↔ FORJD via sealed envelopes + `fjsvc_` tokens.
-- **Storage (DEML-owned):** Postgres (accounts, billing, consent, credentials,
-  FORJD tenant mapping, learning progress); sessions in Postgres.
-  Firebase is Auth-only — no Firestore, Storage, or Cloud Functions.
-- **Storage (FORJD-owned):** Sealed events, projections, replay/DLQ, analytics, ML.
-- **Multi-Tenancy:** Absolute isolation. Explicit
-  `company_account → forjd_tenant_id` mapping. UUIDs everywhere.
-- **UI/Frontend:** Angular 22+ at repo-root `src/`; Signals; **deml-ui** design
-  system (not FORJD `forjd-ui`, not retired Viking-UI); Django SSE live updates;
-  Headless Sanity for learning content. Browser never holds `fjsvc_`.
-- **Deployment:** Django on Fly (`deml-backend`, `docs/FLY.md`); Angular on
-  Vercel (`deml`, `docs/VERCEL.md`); deml-ui Storybook on Vercel (`ui.deml.app`).
-
-## Workflows & Automation
-
-- Pre-commit: `uvx pre-commit run --all-files`
-- Docs start in BOOK.md/README; `scripts/sync_content.py` propagates
-- Design changes land in **deml-ui** first, then bump deml’s `deml-ui` dependency
-
-## What Agents Must Do
-
-- Follow automated rules (lint, theme, a11y).
-- Align features with symmetrical tenancy, zero-compromise security, and the
-  DEML control plane / FORJD data plane boundary.
-- Update BOOK.md first if architectural.
-- Never introduce: hardcoded tenants, sequential IDs, pickle for models,
-  inaccessible UI, DEML-local stream processing, or **Viking-UI / `packages/viking-ui`**.
-- Treat [THEME.md](THEME.md) as the **locked, mandatory** visual contract for all
-  product UI — **any deviation is forbidden**.
-
-## Key Tools & Scripts
-
-- `scripts/git_flow.py` — versioning, PR automation
-- `scripts/run_axe.js` — a11y enforcement (when present)
-- `scripts/sync_content.py` — doc sync
-- `scripts/sync_deml_ui_static.sh` — copy deml-ui CSS into Django static
-- `scripts/check_nfts_style.mjs` — fail closed on NFTS drift (`npm run check:nfts`)
-- `.cursorrules` — deml-ui + THEME.md enforcement
-- Pre-commit, ruff, eslint, prettier, uv, Docker (unprivileged)
-
-## Project-Specific Agent Rules
-
-### CORS and Dynamic Domains
-
-- **NEVER** hardcode customer or tenant domains into `CORS_ALLOWED_ORIGINS`.
-- Origin validation uses `monitor.cors_utils.is_domain_registered` against Postgres.
-
-### Core Architectural Invariants
-
-- **FORJD Exclusive Data Plane:** All sealed ingest, projections, analytics, and
-  ML execute in FORJD. Contract: [docs/FORJD_INTEGRATION.md](docs/FORJD_INTEGRATION.md).
-- **Tenant UUID Normalization:** Never use string literals like `"platform"` as
-  foreign keys.
-- **Account → FORJD Tenant Binding:** Every authenticated FORJD call resolves
-  `deml_account_id → forjd_tenant_id → secret_ref` and fails closed on mismatch.
-- **Angular Surface Intact:** Django adapters keep established Angular paths stable.
-
-### deml-ui Uniformity Law (new-from-the-start) — MANDATORY
-
-> **LOCKED:** The **new-from-the-start (warm ash)** look is the **only** allowed
-> style for all DEML product chrome. **Any deviation is forbidden.**
-
-All DEML product chrome uses **deml-ui** — the **new-from-the-start (warm ash)**
-look. Expand from that system only. Do **not** mix cold seven-color locks,
-Syne/Fraunces display stacks, or Viking chrome on top of NFTS (frankenstein UI).
-
-Canonical docs: [.cursorrules](.cursorrules), [THEME.md](THEME.md),
-[docs/DEML_UI.md](docs/DEML_UI.md), deml-ui [AGENTS.md](https://github.com/dataengineeringformachinelearning/deml-ui/blob/main/AGENTS.md).
-
-**Warm ash palette:** `#35312D` `#1C1916` `#F3F0EA` `#D4CEC5` `#2F5F8F`
-`#3F6B54` `#9E3D47` (+ muted `#C6C0B7` / `#4A453F`; highlight `#9BB8D4`).
-`theme-color`: `#35312D` / `#D4CEC5`.
-
-- **SoT:** published npm package `deml-ui` owns tokens (`styles/tokens.css`),
-  component HTML/CSS (`components/<name>/`), Web Components, and Angular markup.
-- **App shape:** Product UI lives at repo-root `src/`. Depend on
-  published npm package `deml-ui` (`^1.1.0`+). Load
-  `node_modules/deml-ui/dist/styles/deml-ui.css` via `angular.json`.
-- **Behavioral wrappers:** `src/app/components/*` use `ViewEncapsulation.None`
-  and deml-ui class contracts — **zero app-level DS chrome CSS**.
-- **Compose pages** with `app-banner` → `app-page-section` → `app-section-header`
-  → `app-tile-board` / `app-dashboard-grid` / `app-card-grid` (+ `app-site-footer`,
-  `app-navbar`, `app-theme-toggle`).
-- **Charts (LOCKED):** `app-area-chart` / `app-bar-chart` inside `app-chart-card`
-  only. Fixed heights `--chart-height-spark: 140px` /
-  `--chart-height-panel: 280px`; width `100%`; shared board y-domain via
-  `computeSharedDomain` — **never** per-chart auto-scale or data-driven size.
-  Equal `--chart-inset`; fluid `minmax(--tile-row-unit, auto)` rows; never
-  theme-invert plot series. Do not change height/width/scale logic unless
-  explicitly asked.
-- **Shell:** solid opaque navbar; no page horizontal overflow; dynamic boards
-  grow within scaffolding.
-- **Theme:** `data-theme="light"|"dark"`; deml-ui warm-ash tokens only.
-- **Typography:** **Geist only** for display, marks, intro, and body.
-- **A11y:** WCAG 2.0 AA — focus-visible, contrast, ≥44px `--hit-target`,
-  reduced motion.
-- **Retired — do not use:** Viking-UI, void-black / `#2176ff`, cold seven-color
-  frankenstein palettes, Syne/Fraunces product stacks, `frontend/` product tree.
-- After deml-ui changes: build deml-ui, bump deml’s dependency, run
-  `scripts/sync_deml_ui_static.sh` for Django static mirrors.
-
-### Critical Code Styling & Theming Law
-
-Before editing HTML/CSS, conform to **THEME.md** and **.cursorrules**.
-Use deml-ui warm-ash tokens. Angular product components must not add `styleUrl` /
-`styleUrls` / inline `styles` for DS chrome. **Deviating from NFTS is forbidden.**
-
-### Code Style & Modernization
-
-- Prefer `const`; arrow functions; `async`/`await` with proper error handling.
-- Python: type annotations on all args/returns; `typing.Final` for constants.
-- Tests must follow the same style rules.
-
-### Documentation Rules
-
-- **BOOK.md** — authoritative architecture and operations narrative.
-- **WHITEPAPER.md** — concise value proposition and diagrams.
-- Architectural changes start in BOOK.md; sync via `scripts/sync_content.py`.
-- Design-system contribution docs live primarily in the **deml-ui** repo;
-  consumer contract is locked in [THEME.md](THEME.md).
-
-Update this file whenever BOOK.md evolves core principles.
+Architecture: [`docs/MINIMAL_ARCHITECTURE.md`](docs/MINIMAL_ARCHITECTURE.md) · FORJD: [`docs/FORJD_INTEGRATION.md`](docs/FORJD_INTEGRATION.md).

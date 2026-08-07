@@ -41,7 +41,6 @@ export type { NavLink };
   templateUrl: './navbar.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    '[style.--navbar-icon-color]': 'iconColor() || null',
     '(document:keydown.escape)': 'onEscape()',
     '(keydown)': 'onKeydown($event)',
   },
@@ -56,28 +55,17 @@ export class Navbar {
   private readonly menuToggle = viewChild.required<ElementRef<HTMLButtonElement>>('menuToggle');
   private readonly menuPanel = viewChild.required<ElementRef<HTMLElement>>('menuPanel');
 
-  /** Override the navbar logo stroke color (any CSS color). */
-  readonly iconColor = input<string>();
-
   /** Accessible name for the brand home control. */
   readonly brandLabel = input('DEML home');
 
   /** Brand destination (router path). */
   readonly brandHref = input('/');
 
-  /** Optional full override of primary navigation links. */
-  readonly links = input<NavLink[]>();
-
   readonly loggedIn = this.auth.isAuthenticated;
 
-  /** Guest vs auth link set, unless `links` is provided. */
-  readonly navLinks = computed(() => {
-    const override = this.links();
-    if (override) {
-      return override;
-    }
-    return this.loggedIn() ? AUTH_NAV_LINKS : GUEST_NAV_LINKS;
-  });
+  readonly navLinks = computed(() =>
+    this.loggedIn() ? AUTH_NAV_LINKS : GUEST_NAV_LINKS,
+  );
 
   readonly menuOpen = signal(false);
 
@@ -96,7 +84,10 @@ export class Navbar {
       };
 
       media.addEventListener('change', onBreakpoint);
-      this.destroyRef.onDestroy(() => media.removeEventListener('change', onBreakpoint));
+      this.destroyRef.onDestroy(() => {
+        media.removeEventListener('change', onBreakpoint);
+        this.setBodyScrollLocked(false);
+      });
     });
   }
 
@@ -115,6 +106,7 @@ export class Navbar {
   openMenu(): void {
     this.menuOpen.set(true);
     this.setMainInert(true);
+    this.setBodyScrollLocked(true);
     this.afterView(() => this.focusFirstInMenu());
   }
 
@@ -124,6 +116,7 @@ export class Navbar {
     }
     this.menuOpen.set(false);
     this.setMainInert(false);
+    this.setBodyScrollLocked(false);
     if (returnFocus) {
       this.afterView(() => this.menuToggle().nativeElement.focus());
     }
@@ -201,5 +194,9 @@ export class Navbar {
     } else {
       main.removeAttribute('inert');
     }
+  }
+
+  private setBodyScrollLocked(locked: boolean): void {
+    this.document.body.style.overflow = locked ? 'hidden' : '';
   }
 }

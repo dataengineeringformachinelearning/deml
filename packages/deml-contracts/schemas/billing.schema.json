@@ -35,9 +35,10 @@
     "BillingErrorOut": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["error"],
+      "required": ["detail", "code"],
       "properties": {
-        "error": { "type": "string", "minLength": 1 }
+        "detail": { "type": "string", "minLength": 1 },
+        "code": { "type": "string", "minLength": 1, "default": "billing_error" }
       }
     }
   }

@@ -1,10 +1,13 @@
-<app-banner heading="Settings" lede="Account and status sites." />
+<app-banner
+  heading="Settings"
+  lede="Manage your profile, security, connections, and public status pages."
+/>
 
 <app-page-section variant="catalog" ariaLabel="Settings">
   <section id="account" class="catalog-group" tabindex="-1" aria-labelledby="account-heading">
     <app-form-panel
       title="Account"
-      description="Display name for this workspace."
+      description="Display name, email, and password for this workspace."
       titleId="account-heading"
       [headingLevel]="2"
     >
@@ -19,7 +22,7 @@
           (valueChange)="displayName.set($event)"
         />
 
-        <p class="form-panel__note">{{ email() }}</p>
+        <p class="form-panel__note">Signed in as {{ email() }}</p>
 
         @if (profileError()) {
           <p class="form-panel__error" role="alert">{{ profileError() }}</p>
@@ -29,11 +32,411 @@
         }
 
         <app-button-group align="start" layout="column">
-          <app-button variant="primary" shape="pill" type="submit" [disabled]="profileBusy()">
-            {{ profileBusy() ? 'Saving…' : 'Save profile' }}
+          <app-button variant="primary" shape="pill" type="submit" [busy]="profileBusy()">
+            Save profile
           </app-button>
         </app-button-group>
       </form>
+
+      <form class="form-panel__form" (submit)="saveEmail($event)" novalidate>
+        <app-text-field
+          label="New email"
+          name="newEmail"
+          type="email"
+          autocomplete="email"
+          placeholder="you@example.com"
+          [value]="newEmail()"
+          (valueChange)="newEmail.set($event)"
+          [error]="emailError()"
+        />
+        @if (emailMessage()) {
+          <p class="form-panel__empty" role="status">{{ emailMessage() }}</p>
+        }
+        <app-button-group align="start" layout="column">
+          <app-button
+            variant="secondary"
+            shape="pill"
+            type="submit"
+            [busy]="emailBusy()"
+            [disabled]="!online()"
+          >
+            Update email
+          </app-button>
+        </app-button-group>
+      </form>
+
+      <form class="form-panel__form" (submit)="savePassword($event)" novalidate>
+        <app-text-field
+          label="New password"
+          name="newPassword"
+          type="password"
+          autocomplete="new-password"
+          placeholder="At least 6 characters"
+          [value]="newPassword()"
+          (valueChange)="newPassword.set($event)"
+        />
+        <app-text-field
+          label="Confirm password"
+          name="confirmPassword"
+          type="password"
+          autocomplete="new-password"
+          placeholder="Repeat new password"
+          [value]="confirmPassword()"
+          (valueChange)="confirmPassword.set($event)"
+        />
+
+        @if (passwordError()) {
+          <p class="form-panel__error" role="alert">{{ passwordError() }}</p>
+        }
+        @if (passwordMessage()) {
+          <p class="form-panel__empty" role="status">{{ passwordMessage() }}</p>
+        }
+
+        <app-button-group align="start" layout="column">
+          <app-button
+            variant="secondary"
+            shape="pill"
+            type="submit"
+            [busy]="passwordBusy()"
+            [disabled]="!online()"
+          >
+            Update password
+          </app-button>
+        </app-button-group>
+      </form>
+    </app-form-panel>
+  </section>
+
+  <section id="security" class="catalog-group" tabindex="-1" aria-labelledby="security-heading">
+    <app-form-panel
+      title="Security"
+      description="SMS multi-factor authentication for sign-in."
+      titleId="security-heading"
+      [headingLevel]="2"
+    >
+      @if (mfaEnrolled()) {
+        <app-callout
+          tone="info"
+          text="SMS multi-factor authentication is enabled on this account."
+        />
+        @if (mfaFactors().length) {
+          <ul class="form-panel__list" aria-label="Enrolled MFA factors">
+            @for (factor of mfaFactors(); track factor.uid) {
+              <li class="form-panel__item">
+                <div class="form-panel__item-header">
+                  <h3 class="form-panel__item-title">{{ factor.displayName || 'SMS Phone MFA' }}</h3>
+                  <p class="form-panel__item-meta">
+                    {{
+                      'phoneNumber' in factor && typeof factor.phoneNumber === 'string'
+                        ? factor.phoneNumber
+                        : 'Enrolled phone factor'
+                    }}
+                  </p>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+        <app-button-group align="start" layout="column">
+          <app-button
+            variant="accent"
+            shape="pill"
+            type="button"
+            [busy]="mfaBusy()"
+            [disabled]="!online()"
+            (pressed)="disableMfa()"
+          >
+            Disable MFA
+          </app-button>
+        </app-button-group>
+      } @else {
+        <form class="form-panel__form" (submit)="confirmMfaEnrollment($event)" novalidate>
+          <app-text-field
+            label="Phone number"
+            name="mfaPhone"
+            type="tel"
+            autocomplete="tel"
+            placeholder="+14155552671"
+            [hint]="phoneHint"
+            [value]="mfaPhone()"
+            (valueChange)="mfaPhone.set($event)"
+            [error]="mfaPhoneError()"
+          />
+
+          <app-button-group align="start" layout="column">
+            <app-button
+              variant="secondary"
+              shape="pill"
+              type="button"
+              [busy]="mfaBusy() && !mfaCodeSent()"
+              [disabled]="!online() || mfaBusy()"
+              (pressed)="sendMfaEnrollmentCode()"
+            >
+              {{ mfaCodeSent() ? 'Resend code' : 'Send verification code' }}
+            </app-button>
+          </app-button-group>
+
+          @if (mfaCodeSent()) {
+            <app-text-field
+              label="Verification code"
+              name="mfaCode"
+              autocomplete="one-time-code"
+              placeholder="6-digit code"
+              [value]="mfaCode()"
+              (valueChange)="mfaCode.set($event)"
+              [error]="mfaCodeError()"
+            />
+            <app-button-group align="start" layout="column">
+              <app-button
+                variant="primary"
+                shape="pill"
+                type="submit"
+                [busy]="mfaBusy()"
+                [disabled]="!online()"
+              >
+                Enable MFA
+              </app-button>
+            </app-button-group>
+          }
+        </form>
+      }
+
+      @if (mfaError()) {
+        <p class="form-panel__error" role="alert">{{ mfaError() }}</p>
+      }
+      @if (mfaMessage()) {
+        <p class="form-panel__empty" role="status">{{ mfaMessage() }}</p>
+      }
+      <div id="settings-mfa-recaptcha" aria-hidden="true"></div>
+    </app-form-panel>
+  </section>
+
+  <section id="connected" class="catalog-group" tabindex="-1" aria-labelledby="connected-heading">
+    <app-form-panel
+      title="Connected accounts"
+      description="Link Google or Apple for sign-in."
+      titleId="connected-heading"
+      [headingLevel]="2"
+    >
+      @if (linkedProviders().length) {
+        <ul class="form-panel__list" aria-label="Linked sign-in providers">
+          @for (provider of linkedProviders(); track provider.providerId) {
+            <li class="form-panel__item">
+              <div class="form-panel__item-header">
+                <h3 class="form-panel__item-title">{{ providerLabel(provider.providerId) }}</h3>
+                @if (provider.email) {
+                  <p class="form-panel__item-meta">{{ provider.email }}</p>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="form-panel__empty" role="status">No linked providers yet.</p>
+      }
+
+      <app-button-group align="start" layout="row">
+        @if (hasProvider('google.com')) {
+          <app-button
+            variant="secondary"
+            shape="pill"
+            type="button"
+            [busy]="providerBusy()"
+            [disabled]="!online()"
+            (pressed)="unlinkGoogle()"
+          >
+            Unlink Google
+          </app-button>
+        } @else {
+          <app-button
+            variant="primary"
+            shape="pill"
+            type="button"
+            [busy]="providerBusy()"
+            [disabled]="!online()"
+            (pressed)="linkGoogle()"
+          >
+            Link Google
+          </app-button>
+        }
+        @if (hasProvider('apple.com')) {
+          <app-button
+            variant="secondary"
+            shape="pill"
+            type="button"
+            [busy]="providerBusy()"
+            [disabled]="!online()"
+            (pressed)="unlinkApple()"
+          >
+            Unlink Apple
+          </app-button>
+        } @else {
+          <app-button
+            variant="primary"
+            shape="pill"
+            type="button"
+            [busy]="providerBusy()"
+            [disabled]="!online()"
+            (pressed)="linkApple()"
+          >
+            Link Apple
+          </app-button>
+        }
+      </app-button-group>
+
+      @if (providerError()) {
+        <p class="form-panel__error" role="alert">{{ providerError() }}</p>
+      }
+      @if (providerMessage()) {
+        <p class="form-panel__empty" role="status">{{ providerMessage() }}</p>
+      }
+    </app-form-panel>
+  </section>
+
+  <section
+    id="integrations"
+    class="catalog-group"
+    tabindex="-1"
+    aria-labelledby="integrations-heading"
+  >
+    <app-form-panel
+      title="Integrations"
+      description="Create API keys so external apps and pipelines can connect to your DEML account."
+      titleId="integrations-heading"
+      [headingLevel]="2"
+    >
+      <app-callout
+        tone="info"
+        text="Use these keys for your own integrations. Browser analytics OAuth (Google Analytics, Clarity, Cloudflare) is not configured from this page."
+      />
+
+      <form class="form-panel__form" (submit)="generateApiKey($event)" novalidate>
+        <app-text-field
+          label="Key name"
+          name="apiKeyName"
+          placeholder="CI pipeline"
+          [value]="apiKeyName()"
+          (valueChange)="apiKeyName.set($event)"
+        />
+        <app-button-group align="start" layout="column">
+          <app-button
+            variant="primary"
+            shape="pill"
+            type="submit"
+            [busy]="apiKeyBusy()"
+            [disabled]="!online()"
+          >
+            Generate API key
+          </app-button>
+        </app-button-group>
+      </form>
+
+      @if (newlyGeneratedKey()) {
+        <app-callout
+          tone="warning"
+          [text]="'Copy this key now — it is shown only once: ' + newlyGeneratedKey()"
+        />
+        <app-button-group align="start" layout="column">
+          <app-button variant="secondary" shape="pill" type="button" (pressed)="copyApiKey()">
+            {{ copiedApiKey() ? 'Copied' : 'Copy key' }}
+          </app-button>
+        </app-button-group>
+      }
+
+      @if (apiKeysLoading() && apiKeys().length === 0) {
+        <div class="form-panel__status" role="status" aria-busy="true" aria-live="polite">
+          <app-skeleton />
+        </div>
+      } @else if (apiKeys().length === 0) {
+        <p class="form-panel__empty" role="status">No active API keys.</p>
+      } @else {
+        <ul class="form-panel__list" aria-label="API keys">
+          @for (key of apiKeys(); track key.id) {
+            <li class="form-panel__item">
+              <div class="form-panel__item-header">
+                <h3 class="form-panel__item-title">{{ key.name }}</h3>
+                <p class="form-panel__item-meta">
+                  deml_{{ key.prefix }}_… · {{ key.created_at }}
+                </p>
+              </div>
+              <div class="form-panel__item-actions">
+                <app-button-group align="start" layout="row">
+                  <app-button
+                    variant="accent"
+                    shape="pill"
+                    type="button"
+                    [disabled]="apiKeyBusy() || !online()"
+                    (pressed)="revokeApiKey(key)"
+                  >
+                    Revoke
+                  </app-button>
+                </app-button-group>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (apiKeysError()) {
+        <p class="form-panel__error" role="alert">{{ apiKeysError() }}</p>
+      }
+    </app-form-panel>
+  </section>
+
+  <section id="sessions" class="catalog-group" tabindex="-1" aria-labelledby="sessions-heading">
+    <app-form-panel
+      title="Sessions"
+      description="Active browser sessions for this account."
+      titleId="sessions-heading"
+      [headingLevel]="2"
+    >
+      @if (sessionsLoading() && sessions().length === 0) {
+        <div class="form-panel__status" role="status" aria-busy="true" aria-live="polite">
+          <app-skeleton />
+        </div>
+      } @else if (sessions().length === 0) {
+        <p class="form-panel__empty" role="status">No registered sessions.</p>
+      } @else {
+        <ul class="form-panel__list" aria-label="Active sessions">
+          @for (session of sessions(); track session.session_id) {
+            <li class="form-panel__item">
+              <div class="form-panel__item-header">
+                <h3 class="form-panel__item-title">
+                  {{
+                    session.session_id === currentSessionId()
+                      ? 'This device'
+                      : 'Other session'
+                  }}
+                </h3>
+                <p class="form-panel__item-meta">
+                  {{ session.user_agent || 'Unknown client' }}
+                  @if (session.ip) {
+                    · {{ session.ip }}
+                  }
+                  · Last seen {{ formatSessionTime(session.last_seen) }}
+                </p>
+              </div>
+              <div class="form-panel__item-actions">
+                <app-button-group align="start" layout="row">
+                  <app-button
+                    variant="accent"
+                    shape="pill"
+                    type="button"
+                    [disabled]="sessionBusy() || !online()"
+                    (pressed)="revokeSession(session)"
+                  >
+                    {{ session.session_id === currentSessionId() ? 'Sign out' : 'Revoke' }}
+                  </app-button>
+                </app-button-group>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (sessionsError()) {
+        <p class="form-panel__error" role="alert">{{ sessionsError() }}</p>
+      }
     </app-form-panel>
   </section>
 
@@ -45,40 +448,38 @@
       [headingLevel]="2"
     >
       @if (!online()) {
-        <p class="form-panel__error" role="status">
-          You are offline. Site changes are paused until you reconnect.
-        </p>
+        <app-callout tone="warning" [text]="offlineWrites" />
+        @if (sitesStale() && sites().length > 0) {
+          <app-callout tone="info" [text]="staleSites" />
+        }
       } @else if (sitesStale()) {
-        <p class="form-panel__note" role="status">
-          Showing cached sites — couldn’t refresh from the status service.
-        </p>
+        <app-callout tone="info" [text]="staleSites" />
       }
 
       @if (sitesLoadFailed()) {
-        <div class="form-panel__status" role="alert">
-          <p class="form-panel__error">
-            {{ sitesError() || 'Unable to load sites. Try again.' }}
-          </p>
+        <app-error-state
+          title="Unable to load sites"
+          [description]="sitesError() || 'Check your connection, then try again.'"
+        >
           <app-button
             variant="primary"
             shape="pill"
             type="button"
-            [disabled]="sitesRetrying() || !online()"
+            [busy]="sitesRetrying()"
+            [disabled]="!online()"
             (pressed)="retryLoadSites()"
           >
-            {{ sitesRetrying() ? 'Retrying…' : 'Retry' }}
+            {{ retryLabel }}
           </app-button>
-        </div>
+        </app-error-state>
       } @else if (sitesLoading() && sites().length === 0) {
         <div class="form-panel__status" role="status" aria-busy="true" aria-live="polite">
-          <div class="skeleton" aria-hidden="true">
-            <div class="skeleton__line skeleton__line--short"></div>
-            <div class="skeleton__line skeleton__line--long"></div>
-            <div class="skeleton__line skeleton__line--medium"></div>
-          </div>
+          <app-skeleton />
         </div>
       } @else if (sites().length === 0) {
-        <p class="form-panel__empty">No sites yet. Add one below to publish a status page.</p>
+        <p class="form-panel__empty" role="status">
+          Nothing published yet. Add a site to create a public status page.
+        </p>
       } @else {
         <ul class="form-panel__list" aria-label="Your sites">
           @for (site of sites(); track site.id) {
@@ -116,78 +517,123 @@
         </ul>
       }
 
-      <form class="form-panel__form" (submit)="saveSite($event)" novalidate>
-        <app-text-field
-          label="Title"
-          name="siteTitle"
-          placeholder="Studio status"
-          [required]="true"
-          [value]="siteTitle()"
-          (valueChange)="siteTitle.set($event)"
-          [error]="siteTitleError()"
-        />
-
-        <app-text-field
-          label="Slug"
-          name="siteSlug"
-          placeholder="studio-status"
-          [required]="true"
-          [value]="siteSlug()"
-          (valueChange)="siteSlug.set($event)"
-          [error]="siteSlugError()"
-          hint="Lowercase letters, numbers, and hyphens."
-        />
-
-        <app-text-field
-          label="Description"
-          name="siteDescription"
-          placeholder="Public status for core services"
-          [value]="siteDescription()"
-          (valueChange)="siteDescription.set($event)"
-        />
-
-        <app-checkbox-field
-          label="Publish publicly"
-          name="sitePublished"
-          [checked]="sitePublished()"
-          (checkedChange)="sitePublished.set($event)"
-        />
-
-        @if (sitesError() && !sitesLoadFailed()) {
-          <p class="form-panel__error" role="alert">{{ sitesError() }}</p>
-        }
-        @if (sitesMessage()) {
-          <p class="form-panel__empty" role="status">{{ sitesMessage() }}</p>
-        }
-
+      @if (!sitesLoadFailed()) {
         <app-button-group align="start" layout="column">
           <app-button
             variant="primary"
             shape="pill"
-            type="submit"
-            [disabled]="siteBusy() || !online() || sitesLoadFailed()"
+            type="button"
+            [disabled]="!online() || siteEditorOpen()"
+            (pressed)="openCreateSite()"
           >
-            {{
-              siteBusy()
-                ? 'Saving…'
-                : editingSiteId()
-                  ? 'Save site'
-                  : 'Create site'
-            }}
+            Add site
           </app-button>
-          @if (editingSiteId()) {
-            <app-button
-              variant="secondary"
-              shape="pill"
-              type="button"
-              [disabled]="siteBusy()"
-              (pressed)="startCreateSite()"
-            >
-              Cancel
-            </app-button>
-          }
         </app-button-group>
-      </form>
+      }
+
+      @if (sitesMessage() && !siteEditorOpen()) {
+        <p class="form-panel__empty" role="status">{{ sitesMessage() }}</p>
+      }
+    </app-form-panel>
+  </section>
+
+  <section id="danger" class="catalog-group" tabindex="-1" aria-labelledby="danger-heading">
+    <app-form-panel
+      title="Delete account"
+      description="Permanently erase this account and its associated data."
+      titleId="danger-heading"
+      [headingLevel]="2"
+    >
+      <app-callout
+        tone="warning"
+        text="Deletion removes your profile, sites, and credentials. It cannot be undone."
+      />
+      <app-button-group align="start" layout="column">
+        <app-button
+          variant="accent"
+          shape="pill"
+          type="button"
+          [busy]="deleteBusy()"
+          [disabled]="!online()"
+          (pressed)="deleteAccount()"
+        >
+          Delete account
+        </app-button>
+      </app-button-group>
+      @if (deleteError()) {
+        <p class="form-panel__error" role="alert">{{ deleteError() }}</p>
+      }
     </app-form-panel>
   </section>
 </app-page-section>
+
+<app-sheet
+  [open]="siteEditorOpen()"
+  [leaving]="siteEditorLeaving()"
+  [title]="editingSiteId() ? 'Edit site' : 'Add site'"
+  titleId="site-editor-title"
+  (dismissed)="closeSiteEditor()"
+>
+  <form id="site-editor-form" class="form-panel__form" (submit)="saveSite($event)" novalidate>
+    <app-text-field
+      label="Title"
+      name="siteTitle"
+      placeholder="Studio status"
+      [required]="true"
+      [value]="siteTitle()"
+      (valueChange)="siteTitle.set($event)"
+      [error]="siteTitleError()"
+    />
+
+    <app-text-field
+      label="Slug"
+      name="siteSlug"
+      placeholder="studio-status"
+      [required]="true"
+      [value]="siteSlug()"
+      (valueChange)="siteSlug.set($event)"
+      [error]="siteSlugError()"
+      hint="Lowercase letters, numbers, and hyphens."
+    />
+
+    <app-text-field
+      label="Description"
+      name="siteDescription"
+      placeholder="Public status for core services"
+      [value]="siteDescription()"
+      (valueChange)="siteDescription.set($event)"
+    />
+
+    <app-checkbox-field
+      label="Publish publicly"
+      name="sitePublished"
+      [checked]="sitePublished()"
+      (checkedChange)="sitePublished.set($event)"
+    />
+
+    @if (sitesError() && !sitesLoadFailed()) {
+      <p class="form-panel__error" role="alert">{{ sitesError() }}</p>
+    }
+  </form>
+  <app-button-group sheetFooter align="end" layout="column">
+    <app-button
+      variant="secondary"
+      shape="pill"
+      type="button"
+      [disabled]="siteBusy() || siteEditorLeaving()"
+      (pressed)="closeSiteEditor()"
+    >
+      Cancel
+    </app-button>
+    <app-button
+      variant="primary"
+      shape="pill"
+      type="submit"
+      [form]="'site-editor-form'"
+      [busy]="siteBusy()"
+      [disabled]="!online() || siteEditorLeaving()"
+    >
+      {{ editingSiteId() ? 'Save site' : 'Create site' }}
+    </app-button>
+  </app-button-group>
+</app-sheet>

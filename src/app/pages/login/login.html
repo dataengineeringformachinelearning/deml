@@ -37,8 +37,8 @@
       }
 
       <app-button-group align="start" layout="column">
-        <app-button variant="primary" shape="pill" type="submit" [disabled]="busy()">
-          {{ busy() ? 'Signing in…' : 'Log in' }}
+        <app-button variant="primary" shape="pill" type="submit" [busy]="busy()">
+          Log in
         </app-button>
       </app-button-group>
     </form>

@@ -1,19 +1,16 @@
 import { Injectable, signal } from '@angular/core';
 
-export type DialogKind = 'confirm' | 'alert';
-
 export type ConfirmDialogData = {
   title: string;
   message?: string;
   confirmBtnText?: string;
   cancelBtnText?: string;
-  type?: string;
   /** Danger confirms use accent (destructive) primary action. */
   tone?: 'default' | 'danger';
 };
 
 export type ActiveDialog = {
-  kind: DialogKind;
+  kind: 'confirm';
   data?: ConfirmDialogData;
 };
 
@@ -30,19 +27,17 @@ export class DialogService {
     cancelLabel?: string;
     tone?: 'default' | 'danger';
   }): Promise<boolean> {
-    return this.openConfirm({
-      title: options.title,
-      message: options.body,
-      confirmBtnText: options.confirmLabel ?? 'Confirm',
-      cancelBtnText: options.cancelLabel ?? 'Cancel',
-      type: 'confirm',
-      tone: options.tone ?? 'default',
-    });
-  }
-
-  openConfirm(data: ConfirmDialogData): Promise<boolean> {
     this.resolveConfirm(false);
-    this.active.set({ kind: 'confirm', data });
+    this.active.set({
+      kind: 'confirm',
+      data: {
+        title: options.title,
+        message: options.body,
+        confirmBtnText: options.confirmLabel ?? 'Confirm',
+        cancelBtnText: options.cancelLabel ?? 'Cancel',
+        tone: options.tone ?? 'default',
+      },
+    });
     return new Promise<boolean>((resolve) => {
       this.confirmResolver = resolve;
     });

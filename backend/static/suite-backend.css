@@ -7,6 +7,84 @@
  */
 
 /* =============================================================================
+   Suite aliases → deml-ui NFTS tokens (load deml-ui.css before this file)
+   ============================================================================= */
+:root,
+[data-theme="dark"] {
+  --suite-bg: var(--color-bg);
+  --suite-bg-subtle: color-mix(in srgb, var(--color-bg) 92%, var(--color-surface));
+  --suite-surface: var(--color-surface);
+  --suite-surface-2: color-mix(in srgb, var(--color-surface) 88%, var(--color-text));
+  --suite-ink: var(--color-text);
+  --suite-ink-muted: var(--color-text-secondary);
+  --suite-ink-subtle: color-mix(in srgb, var(--color-text-secondary) 72%, transparent);
+  --suite-ink-on-primary: var(--color-on-primary);
+  --suite-primary: var(--color-primary);
+  --suite-primary-strong: var(--color-primary-hover);
+  --suite-border: var(--color-border);
+  --suite-border-strong: color-mix(in srgb, var(--color-border) 70%, var(--color-text));
+  --suite-success-fill: color-mix(in srgb, var(--color-success) 22%, transparent);
+  --suite-success-text: var(--color-success-ink);
+  --suite-warning-text: var(--color-warning-ink);
+  --suite-danger-text: var(--color-error-ink);
+  --suite-font-sans: var(--font-sans);
+  --suite-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --suite-text-xs: var(--font-size-xs);
+  --suite-text-sm: var(--font-size-sm);
+  --suite-weight-regular: var(--font-weight-regular);
+  --suite-weight-semibold: var(--font-weight-semibold);
+  --suite-tracking-brand: var(--tracking-mark);
+  --suite-tracking-caps: var(--tracking-mark);
+  --suite-tracking-tight: var(--tracking-tight);
+  --suite-leading-tight: var(--leading-tight);
+  --suite-leading-relaxed: var(--leading-relaxed);
+  --suite-space-1: var(--space-1);
+  --suite-space-2: var(--space-2);
+  --suite-space-3: var(--space-3);
+  --suite-space-4: var(--space-4);
+  --suite-space-5: var(--space-5);
+  --suite-space-6: var(--space-6);
+  --suite-space-8: var(--space-8);
+  --suite-radius: var(--radius-none);
+  --suite-radius-control: var(--radius-none);
+  --suite-radius-surface: var(--radius-none);
+  --suite-duration-fast: var(--duration-fast);
+  --suite-ease: var(--ease-out);
+  --suite-transition: var(--motion-ui);
+  --suite-hover-lift: var(--hover-lift);
+  --suite-ring: var(--color-focus);
+  --suite-ring-width: var(--focus-ring-width);
+  --suite-ring-offset: var(--focus-ring-offset);
+  --suite-highlight: var(--elevation-1);
+  --suite-elevation-4: var(--elevation-2);
+  --suite-touch: var(--hit-target);
+  --suite-control-height: var(--hit-target);
+  --suite-control-height-lg: var(--hit-target-lg);
+  --suite-content-max: var(--content-width);
+  --suite-page-gutter: var(--page-pad-inline);
+  --suite-z-sticky: 40;
+}
+
+[data-theme="light"] {
+  --suite-bg: var(--color-bg);
+  --suite-bg-subtle: color-mix(in srgb, var(--color-bg) 92%, var(--color-surface));
+  --suite-surface: var(--color-surface);
+  --suite-surface-2: color-mix(in srgb, var(--color-surface) 92%, var(--color-text));
+  --suite-ink: var(--color-text);
+  --suite-ink-muted: var(--color-text-secondary);
+  --suite-ink-subtle: color-mix(in srgb, var(--color-text-secondary) 72%, transparent);
+  --suite-ink-on-primary: var(--color-on-primary);
+  --suite-primary: var(--color-primary);
+  --suite-primary-strong: var(--color-primary-hover);
+  --suite-border: var(--color-border);
+  --suite-border-strong: color-mix(in srgb, var(--color-border) 70%, var(--color-text));
+  --suite-success-fill: color-mix(in srgb, var(--color-success) 22%, transparent);
+  --suite-success-text: var(--color-success-ink);
+  --suite-warning-text: var(--color-warning-ink);
+  --suite-danger-text: var(--color-error-ink);
+}
+
+/* =============================================================================
    Document base — NFTS warm ash / Geist via deml-ui tokens
    ============================================================================= */
 :is(
@@ -28,19 +106,15 @@
   text-rendering: optimizeLegibility;
 }
 
-/* Splash: single soft electric bloom — quieter than product landing */
+/* Splash: community-style shell (nav + hero + footer) */
 :is(body.suite-backend-splash, body.backend-splash) {
   margin: 0;
   min-height: 100%;
   min-height: 100dvh;
-  background:
-    radial-gradient(
-      55% 42% at 50% 48%,
-      color-mix(in srgb, var(--suite-primary) 7%, transparent),
-      transparent 68%
-    ),
-    var(--suite-bg);
-  color-scheme: dark;
+  display: flex;
+  flex-direction: column;
+  background: var(--suite-bg);
+  color-scheme: dark light;
 }
 
 :is(body.suite-backend-docs, body.backend-swagger, body.backend-redoc) {
@@ -51,51 +125,85 @@
 }
 
 /* =============================================================================
-   Splash — perfectly centered logo only
+   Splash — simple community twin (logo + hero + links)
    ============================================================================= */
+.suite-backend-nav {
+  position: sticky;
+  top: 0;
+  z-index: var(--suite-z-sticky);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--suite-space-3);
+  padding: var(--suite-space-2) max(var(--suite-page-gutter), env(safe-area-inset-left))
+    var(--suite-space-2) max(var(--suite-page-gutter), env(safe-area-inset-right));
+  background: var(--suite-surface);
+  border-bottom: 1px solid var(--suite-border);
+}
+
+.suite-backend-nav__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--suite-space-2);
+  min-height: var(--suite-touch);
+  color: var(--suite-ink);
+  text-decoration: none;
+  font-weight: var(--suite-weight-semibold);
+  letter-spacing: var(--suite-tracking-brand);
+  text-transform: uppercase;
+  font-size: var(--suite-text-sm);
+}
+
+.suite-backend-nav__brand img {
+  display: block;
+  width: 28px;
+  height: 28px;
+}
+
+.suite-backend-nav__brand:hover {
+  color: var(--suite-primary);
+}
+
+.suite-backend-nav__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--suite-space-1) var(--suite-space-3);
+}
+
+.suite-backend-nav__links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--suite-touch);
+  color: var(--suite-ink-muted);
+  text-decoration: none;
+  font-size: var(--suite-text-sm);
+}
+
+.suite-backend-nav__links a:hover {
+  color: var(--suite-ink);
+}
+
 :is(.suite-backend-shell, .backend-splash-shell) {
   box-sizing: border-box;
-  min-height: 100dvh;
-  min-height: 100vh;
+  flex: 1 1 auto;
   width: 100%;
   margin: 0;
-  padding: var(--suite-space-6);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  /* Explicit dual-axis center for all engines */
-  place-content: center;
-  place-items: center;
-  text-align: center;
+}
+
+:is(.suite-backend-shell, .backend-splash-shell) .page {
+  min-height: 100%;
 }
 
 :is(.suite-backend-logo, .backend-splash-logo) {
   display: block;
-  width: min(7.5rem, 36vw);
+  width: fit-content;
   max-width: 100%;
-  height: auto;
-  margin-inline: auto;
-  margin-block: 0;
+  margin: 0;
   border: 0;
   padding: 0;
   text-decoration: none;
   line-height: 0;
-  /* Optical center: logo mark sits dead-center of the viewport */
-  transform: translateZ(0);
-  filter: drop-shadow(
-    0 0 20px color-mix(in srgb, var(--suite-primary) 12%, transparent)
-  );
-  transition:
-    transform var(--suite-duration-fast) var(--suite-ease),
-    filter var(--suite-duration-fast) var(--suite-ease);
-}
-
-:is(.suite-backend-logo, .backend-splash-logo):hover {
-  transform: translateY(var(--suite-hover-lift));
-  filter: drop-shadow(
-    0 0 26px color-mix(in srgb, var(--suite-primary) 18%, transparent)
-  );
 }
 
 :is(.suite-backend-logo, .backend-splash-logo):focus-visible {
@@ -106,33 +214,37 @@
 
 :is(.suite-backend-logo, .backend-splash-logo) img {
   display: block;
-  width: 100%;
+  width: min(7.5rem, 32vw);
   height: auto;
-  margin: 0 auto;
+  margin: 0;
   border: 0;
-  vertical-align: middle;
 }
 
-/* Optional quiet product wordmark under mark (when present) */
-:is(.suite-backend-wordmark, .backend-splash-wordmark) {
-  margin: var(--suite-space-4) 0 0;
-  font-family: var(--suite-font-sans);
-  font-size: var(--suite-text-sm);
-  font-weight: var(--suite-weight-semibold);
-  letter-spacing: var(--suite-tracking-brand);
-  text-transform: uppercase;
+.suite-backend-footer {
+  padding: var(--suite-space-3) max(var(--suite-page-gutter), env(safe-area-inset-left))
+    max(var(--suite-space-4), env(safe-area-inset-bottom))
+    max(var(--suite-page-gutter), env(safe-area-inset-right));
+  border-top: 1px solid var(--suite-border);
+  background: var(--suite-surface);
+}
+
+.suite-backend-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--suite-space-2) var(--suite-space-4);
+}
+
+.suite-backend-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--suite-touch);
   color: var(--suite-ink-muted);
   text-decoration: none;
+  font-size: var(--suite-text-sm);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  :is(.suite-backend-logo, .backend-splash-logo) {
-    transition: none;
-  }
-
-  :is(.suite-backend-logo, .backend-splash-logo):hover {
-    transform: none;
-  }
+.suite-backend-footer a:hover {
+  color: var(--suite-ink);
 }
 
 /* =============================================================================

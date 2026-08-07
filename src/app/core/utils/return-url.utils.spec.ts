@@ -67,7 +67,7 @@ describe('resolvePostLoginTarget', () => {
     });
   });
 
-  it('sends auth loops and unknown hosts to the dashboard', () => {
+  it('sends auth loops and unknown hosts to settings', () => {
     expect(resolvePostLoginTarget('/login', options)).toEqual({
       kind: 'app',
       url: DEFAULT_POST_LOGIN_PATH,

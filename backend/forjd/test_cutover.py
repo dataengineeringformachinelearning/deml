@@ -69,17 +69,16 @@ def test_explicit_modes_when_phase_unset() -> None:
 
 
 def test_empty_read_envelope_shapes() -> None:
-  projections = empty_read_envelope("/api/v1/projections")
-  assert "items" in projections
-  assert projections["degraded"] is True
-  assert projections["code"] == "forjd_read_fallback"
-  checkpoints = empty_read_envelope("/api/v1/projections/checkpoints")
-  assert "checkpoints" in checkpoints
-  assert checkpoints["degraded"] is True
-  workflows = empty_read_envelope("/api/v1/workflows")
-  assert workflows["workflows"] == []
-  assert workflows["count"] == 0
-  assert workflows["degraded"] is True
+  sessions = empty_read_envelope("/api/v1/sessions")
+  assert sessions["sessions"] == []
+  assert sessions["degraded"] is True
+  assert sessions["code"] == "forjd_read_fallback"
+  results = empty_read_envelope("/api/v1/ingest/results")
+  assert "results" in results
+  assert results["degraded"] is True
+  pages = empty_read_envelope("/api/v1/status/pages")
+  assert pages["pages"] == []
+  assert pages["degraded"] is True
 
 
 @pytest.mark.django_db
@@ -87,15 +86,15 @@ def test_empty_read_envelope_shapes() -> None:
   FORJD_CUTOVER_PHASE="0",
   FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
 )
-def test_phase_zero_projections_return_empty_without_forjd_call(client: Client) -> None:
-  _user, tenant_id = _mapped_user()
+def test_phase_zero_sessions_return_empty_without_forjd_call(client: Client) -> None:
+  _user, _tenant_id = _mapped_user()
 
   with (
     override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"),
-    patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock) as mock_proxy,
+    patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock) as mock_proxy,
   ):
     response = client.get(
-      "/api/v1/projections",
+      "/api/v1/sessions",
       HTTP_AUTHORIZATION="Bearer mock-token-cutover-cutover@example.com",
     )
 
@@ -103,7 +102,7 @@ def test_phase_zero_projections_return_empty_without_forjd_call(client: Client) 
   body = response.json()
   assert body["code"] == "forjd_read_fallback"
   assert body["degraded"] is True
-  assert body["items"] == []
+  assert body["sessions"] == []
   mock_proxy.assert_not_awaited()
 
 
@@ -114,18 +113,18 @@ def test_phase_zero_projections_return_empty_without_forjd_call(client: Client) 
 )
 def test_dual_read_falls_back_on_forjd_outage(client: Client) -> None:
   # mock-token-<uid>-<email> — uid must be a single hyphen segment (see middleware).
-  _user, tenant_id = _mapped_user("dualread")
+  _user, _tenant_id = _mapped_user("dualread")
 
   with (
     override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"),
     patch(
-      "forjd.views.ForjdClient.proxy",
+      "forjd.clients.ForjdClient.proxy",
       new_callable=AsyncMock,
       side_effect=ForjdError(502, "FORJD is unavailable"),
     ),
   ):
     response = client.get(
-      "/api/v1/projections",
+      "/api/v1/sessions",
       HTTP_AUTHORIZATION="Bearer mock-token-dualread-dualread@example.com",
     )
 
@@ -143,7 +142,7 @@ def test_dual_write_records_shadow_receipt(client: Client) -> None:
 
   with (
     override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"),
-    patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock) as mock_proxy,
+    patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock) as mock_proxy,
   ):
     mock_proxy.return_value = ForjdResponse(
       status=200,
@@ -177,7 +176,7 @@ def test_writes_disabled_returns_503(client: Client) -> None:
 
   with (
     override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"),
-    patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock) as mock_proxy,
+    patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock) as mock_proxy,
   ):
     response = client.post(
       "/api/v1/ingest",

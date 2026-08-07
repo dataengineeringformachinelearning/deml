@@ -46,40 +46,53 @@ _SAFE_RESPONSE_HEADERS: Final[dict[str, str]] = {
 }
 REQUEST_ID_PATTERN: Final[re.Pattern[str]] = re.compile(r"\A[A-Za-z0-9._-]{8,128}\Z")
 _CONNECTOR_ATTRIBUTE: Final[str] = "_deml_forjd_connector"
-# Simple host-level breaker — trip after consecutive transport/5xx failures.
+# Per-route-class breaker — status traffic must not share fate with ML/exports.
 _BREAKER_FAILURE_THRESHOLD: Final[int] = 5
 _BREAKER_COOLDOWN_SECONDS: Final[float] = 20.0
-_breaker_failures: int = 0
-_breaker_open_until: float = 0.0
+_breaker_failures: dict[str, int] = {}
+_breaker_open_until: dict[str, float] = {}
 
 
-def _breaker_is_open() -> bool:
-  return time.monotonic() < _breaker_open_until
+def _breaker_class(path: str) -> str:
+  """Isolate status/partner paths from heavy analytics/ML storms."""
+  if path.startswith("/api/v1/status"):
+    return "status"
+  if path.startswith("/api/v1/partner") or path.startswith("/api/v1/tenants"):
+    return "partner"
+  if path in {"/ready", "/health"} or path.startswith("/api/v1/capabilities"):
+    return "probe"
+  return "default"
 
 
-def _breaker_record_success() -> None:
-  global _breaker_failures, _breaker_open_until
-  _breaker_failures = 0
-  _breaker_open_until = 0.0
+def _breaker_is_open(path: str) -> bool:
+  route_class = _breaker_class(path)
+  return time.monotonic() < _breaker_open_until.get(route_class, 0.0)
 
 
-def _breaker_record_failure() -> None:
-  global _breaker_failures, _breaker_open_until
-  _breaker_failures += 1
-  if _breaker_failures >= _BREAKER_FAILURE_THRESHOLD:
-    _breaker_open_until = time.monotonic() + _BREAKER_COOLDOWN_SECONDS
+def _breaker_record_success(path: str) -> None:
+  route_class = _breaker_class(path)
+  _breaker_failures[route_class] = 0
+  _breaker_open_until[route_class] = 0.0
+
+
+def _breaker_record_failure(path: str) -> None:
+  route_class = _breaker_class(path)
+  failures = _breaker_failures.get(route_class, 0) + 1
+  _breaker_failures[route_class] = failures
+  if failures >= _BREAKER_FAILURE_THRESHOLD:
+    _breaker_open_until[route_class] = time.monotonic() + _BREAKER_COOLDOWN_SECONDS
     logger.warning(
-      "forjd_circuit_open failures=%s cooldown_seconds=%s",
-      _breaker_failures,
+      "forjd_circuit_open class=%s failures=%s cooldown_seconds=%s",
+      route_class,
+      failures,
       _BREAKER_COOLDOWN_SECONDS,
     )
 
 
 def reset_forjd_circuit_breaker() -> None:
   """Test helper — clear breaker state between cases."""
-  global _breaker_failures, _breaker_open_until
-  _breaker_failures = 0
-  _breaker_open_until = 0.0
+  _breaker_failures.clear()
+  _breaker_open_until.clear()
 
 
 def is_forjd_service_token(token: str) -> bool:
@@ -370,7 +383,7 @@ class ForjdClient:
       raise ForjdError(400, "FORJD request path must be an absolute API path")
     if query_string.startswith("?"):
       raise ForjdError(400, "FORJD query_string must not include a leading question mark")
-    if _breaker_is_open():
+    if _breaker_is_open(path):
       raise ForjdError(503, "FORJD circuit open — retry shortly")
     if self.use_service_auth:
       self._validate_request_tenants(
@@ -460,9 +473,9 @@ class ForjdClient:
             result.headers.get("X-Request-ID", ""),
           )
           if attempt >= attempts or verb not in _RETRYABLE_METHODS:
-            _breaker_record_failure()
+            _breaker_record_failure(path)
           return result
-        _breaker_record_success()
+        _breaker_record_success(path)
         return result
       except ForjdError:
         raise
@@ -481,10 +494,10 @@ class ForjdClient:
           if delay > 0:
             await asyncio.sleep(delay)
           continue
-        _breaker_record_failure()
+        _breaker_record_failure(path)
         raise ForjdError(503, "FORJD is unavailable") from exc
 
-    _breaker_record_failure()
+    _breaker_record_failure(path)
     raise ForjdError(503, "FORJD is unavailable") from last_error
 
   async def request_json(

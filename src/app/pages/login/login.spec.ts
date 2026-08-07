@@ -45,7 +45,6 @@ describe('Login', () => {
       imports: [Login],
       providers: [
         provideRouter([
-          { path: 'dashboard', children: [] },
           { path: 'settings', children: [] },
           { path: 'mfa', children: [] },
         ]),
@@ -89,7 +88,7 @@ describe('Login', () => {
     expect(authMock.login).not.toHaveBeenCalled();
   });
 
-  it('should log in and navigate to the dashboard by default', async () => {
+  it('should log in and navigate to settings by default', async () => {
     const navigateSpy = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
     const component = fixture.componentInstance;
 
@@ -122,7 +121,7 @@ describe('Login', () => {
     expect(navigateSpy).toHaveBeenCalledWith('/settings?tab=billing');
   });
 
-  it('should reject unsafe returnUrl values and land on the dashboard', async () => {
+  it('should reject unsafe returnUrl values and land on settings', async () => {
     queryParams = { returnUrl: 'https://evil.example/phish' };
     const navigateSpy = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
     const component = fixture.componentInstance;

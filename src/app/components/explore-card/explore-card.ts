@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import type { UptimeHistoryDataPoint } from '../../shared/deml-chart/types';
+import type { UptimeHistoryDataPoint } from '../../core/utils/uptime.utils';
 
 export type ExploreCardStatus =
   | 'operational'
@@ -18,12 +18,28 @@ export type ExploreCardStatus =
 
 export type ExploreCardLayout = 'directory' | 'detail';
 
+export type ExploreCardMetric = {
+  readonly label: string;
+  readonly value: string;
+  readonly meta?: string;
+};
+
+export type ExploreCardMetricGroup = {
+  readonly id: string;
+  readonly heading: string;
+  readonly metrics: readonly ExploreCardMetric[];
+};
+
 export type ExploreCardService = {
   readonly id: string;
   readonly name: string;
   readonly url: string;
   readonly status: string;
   readonly statusLabel: string;
+  readonly metrics?: readonly ExploreCardMetric[];
+  readonly uptimeHistory?: readonly UptimeHistoryDataPoint[];
+  readonly uptimePercentage?: number | null;
+  readonly uptimeSummary?: string;
 };
 
 export type ExploreCardIncident = {
@@ -34,7 +50,7 @@ export type ExploreCardIncident = {
   readonly updatedAt: string;
 };
 
-/** Calm status card — pill, title, uptime; detail adds services + incidents. */
+/** Status mega-card — pill, title, selling-point stats, uptime; detail adds groups/services. */
 @Component({
   encapsulation: ViewEncapsulation.None,
   selector: 'app-explore-card',
@@ -49,10 +65,15 @@ export class ExploreCard {
   readonly layout = input<ExploreCardLayout>('directory');
   readonly status = input<ExploreCardStatus>('operational');
   readonly statusLabel = input('Operational');
+  readonly tag = input('Public Status Page');
+  readonly proVerified = input(false);
+  readonly metrics = input<readonly ExploreCardMetric[]>([]);
+  readonly metricGroups = input<readonly ExploreCardMetricGroup[]>([]);
   readonly services = input<readonly ExploreCardService[]>([]);
   readonly incidents = input<readonly ExploreCardIncident[]>([]);
   readonly uptimeHistory = input<readonly UptimeHistoryDataPoint[]>([]);
   readonly uptimePercentage = input<number | null>(null);
+  readonly uptimeSummary = input('');
   readonly uptimeLabel = input('Uptime');
 
   pillStatus(): 'up' | 'down' | 'degraded' | 'maintenance' {

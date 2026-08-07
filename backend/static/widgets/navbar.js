@@ -9,7 +9,7 @@
   window.__DEML_AUTH_BRIDGE_READY__ = true;
 
   const AUTH_CACHE_TTL_MS = 60 * 60 * 1000;
-  const AUTH_BRIDGE_ID = 'deml-auth-status-bridge';
+  const AUTH_BRIDGE_ID = 'deml-auth-bridge';
 
   const iconPaths = () => window.__DEML_ICON_PATHS ?? {};
   const filledIconPaths = () => window.__DEML_ICON_FILLED_PATHS ?? {};
@@ -208,26 +208,6 @@
     closeMobileMenu();
   };
 
-  const initSearchTrigger = () => {
-    const trigger = document.getElementById('navbar-search-trigger');
-    if (!trigger || trigger.dataset.searchBound === 'true') return;
-    trigger.dataset.searchBound = 'true';
-
-    const openSearch = () => {
-      if (window.DemlWidgets?.openSearch) {
-        window.DemlWidgets.openSearch();
-        return;
-      }
-      const host = document.getElementById('autocomplete');
-      if (host) {
-        host.classList.add('algolia-autocomplete-open');
-        host.setAttribute('aria-hidden', 'false');
-      }
-      window.DemlWidgets?.openSearch?.();
-    };
-    trigger.addEventListener('click', openSearch);
-  };
-
   const initAuth = () => {
     const config = window.__DEML ?? {};
     const BACKEND_URL = config.BACKEND_URL ?? config.API_BASE ?? '';
@@ -416,10 +396,10 @@
         setAuthButtonVisible(true);
         setSignOutVisible(true);
         setAuthNavLinksVisible(true);
-        setAuthButtonHref('auth-btn-desktop', `${FRONTEND_URL}/dashboard`);
-        setAuthButtonHref('auth-btn-mobile', `${FRONTEND_URL}/dashboard`);
-        setAuthButtonLabel('auth-text-desktop', 'auth-icon-desktop', 'Dashboard', 'home');
-        setAuthButtonLabel('auth-text-mobile', 'auth-icon-mobile', 'Dashboard', 'home');
+        setAuthButtonHref('auth-btn-desktop', `${FRONTEND_URL}/settings`);
+        setAuthButtonHref('auth-btn-mobile', `${FRONTEND_URL}/settings`);
+        setAuthButtonLabel('auth-text-desktop', 'auth-icon-desktop', 'Settings', 'home');
+        setAuthButtonLabel('auth-text-mobile', 'auth-icon-mobile', 'Settings', 'home');
       } else {
         clearAuthStorage();
         setAuthButtonVisible(true);
@@ -428,8 +408,8 @@
         const loginHref = `${FRONTEND_URL}/login?returnUrl=${encodeURIComponent(window.location.href)}`;
         setAuthButtonHref('auth-btn-desktop', loginHref);
         setAuthButtonHref('auth-btn-mobile', loginHref);
-        setAuthButtonLabel('auth-text-desktop', 'auth-icon-desktop', 'Sign In', 'arrow-right');
-        setAuthButtonLabel('auth-text-mobile', 'auth-icon-mobile', 'Sign In', 'arrow-right');
+        setAuthButtonLabel('auth-text-desktop', 'auth-icon-desktop', 'Log in', 'arrow-right');
+        setAuthButtonLabel('auth-text-mobile', 'auth-icon-mobile', 'Log in', 'arrow-right');
       }
       updateAuthAwareControls(status);
     };
@@ -445,7 +425,7 @@
       iframe.setAttribute('aria-hidden', 'true');
       iframe.tabIndex = -1;
       iframe.title = 'DEML sign-out bridge';
-      iframe.src = `${FRONTEND_URL}/auth-status?action=signout&parent_origin=${encodeURIComponent(parentOrigin)}`;
+      iframe.src = `${FRONTEND_URL}/auth-bridge?action=signout&parent_origin=${encodeURIComponent(parentOrigin)}`;
       document.body.appendChild(iframe);
       window.setTimeout(() => iframe.remove(), 5000);
       window.setTimeout(() => setSignOutBusy(false), 500);
@@ -537,7 +517,7 @@
       iframe.tabIndex = -1;
       iframe.title = 'DEML authentication status bridge';
       if (!existingBridge) {
-        iframe.src = `${FRONTEND_URL}/auth-status?parent_origin=${encodeURIComponent(parentOrigin)}`;
+        iframe.src = `${FRONTEND_URL}/auth-bridge?parent_origin=${encodeURIComponent(parentOrigin)}`;
         document.body.appendChild(iframe);
       }
       bridgeIframe = iframe;
@@ -641,7 +621,6 @@
       recoverNavIcons();
     }
     initThemeToggle();
-    initSearchTrigger();
     initMobileMenu();
     initAuth();
   };

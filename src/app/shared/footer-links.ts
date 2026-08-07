@@ -5,31 +5,20 @@ export interface FooterLink {
   readonly routerLink?: string;
 }
 
-export interface FooterColumn {
-  readonly title: string;
-  readonly links: readonly FooterLink[];
-}
+const COMMUNITY = 'https://dataengineeringformachinelearning.com';
 
-/** Flat legal + status links — no column chrome. */
-export const SITE_FOOTER_COLUMNS: readonly FooterColumn[] = [
+/** Flat suite + legal + status links (credit lives in site-footer bottom). */
+export const SITE_FOOTER_LINKS: readonly FooterLink[] = [
+  { label: 'Book', href: `${COMMUNITY}/book`, external: true },
+  { label: 'Whitepaper', href: `${COMMUNITY}/whitepaper`, external: true },
+  { label: 'Docs', href: `${COMMUNITY}/documentation`, external: true },
+  { label: 'Blog', href: `${COMMUNITY}/blog`, external: true },
+  { label: 'Compliance', href: `${COMMUNITY}/compliance`, external: true },
+  { label: 'Privacy', href: `${COMMUNITY}/privacy/`, external: true },
+  { label: 'Terms', href: `${COMMUNITY}/terms/`, external: true },
   {
-    title: '',
-    links: [
-      {
-        label: 'Privacy',
-        href: 'https://dataengineeringformachinelearning.com/privacy/',
-        external: true,
-      },
-      {
-        label: 'Terms',
-        href: 'https://dataengineeringformachinelearning.com/terms/',
-        external: true,
-      },
-      {
-        label: 'Status',
-        routerLink: '/status/platform-status',
-        href: '/status/platform-status',
-      },
-    ],
+    label: 'Status',
+    routerLink: '/status/platform-status',
+    href: '/status/platform-status',
   },
 ] as const;

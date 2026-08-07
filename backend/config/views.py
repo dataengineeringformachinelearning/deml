@@ -9,37 +9,11 @@ logger = logging.getLogger(__name__)
 
 
 def home(request: HttpRequest) -> HttpResponse:
-  """Minimal brand splash — Swagger/ReDoc links live on deml.app."""
-  frontend_url = settings.FRONTEND_URL.rstrip("/")
+  """Community-style brand splash with API and product links."""
   return render(
     request,
     "home.html",
     {
-      "frontend_url": frontend_url,
-    },
-  )
-
-
-def api_redoc(request: HttpRequest) -> HttpResponse:
-  """ReDoc shell for the Ninja OpenAPI schema."""
-  return render(
-    request,
-    "redoc.html",
-    {
-      "api_title": "DEML Learning Platform API",
-      "openapi_url": "/api/v1/openapi.json",
-      "frontend_url": settings.FRONTEND_URL.rstrip("/"),
-    },
-  )
-
-
-def documentation(request: HttpRequest) -> HttpResponse:
-  """Single Documentation page — API reference plus blog field log."""
-  return render(
-    request,
-    "documentation.html",
-    {
-      "debug": settings.DEBUG,
       "frontend_url": settings.FRONTEND_URL.rstrip("/"),
       "marketing_url": settings.MARKETING_URL.rstrip("/"),
     },
@@ -94,10 +68,7 @@ def robots_txt(request: HttpRequest) -> HttpResponse:
   lines = [
     "User-agent: *",
     "Allow: /",
-    "Allow: /documentation",
     "Disallow: /api/",
-    "Disallow: /api/v1/docs",
-    "Disallow: /api/v1/redoc",
     "Disallow: /api/v1/openapi.json",
     "",
     f"Sitemap: {sitemap_url}",

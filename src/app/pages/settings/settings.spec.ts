@@ -5,6 +5,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
+import { AccountApiService } from '../../services/account-api.service';
 import { AuthService } from '../../services/auth.service';
 import { MonitorService } from '../../services/monitor.service';
 import { Settings } from './settings';
@@ -24,6 +25,7 @@ describe('Settings', () => {
           useValue: {
             peekOwnedStatusPages: () => undefined,
             ownedSitesServingStale: signal(false),
+            invalidateStatusReads: () => undefined,
             getOwnedStatusPages: () =>
               of([
                 {
@@ -51,12 +53,40 @@ describe('Settings', () => {
           },
         },
         {
+          provide: AccountApiService,
+          useValue: {
+            listApiKeys: async () => [],
+            generateApiKey: async () => ({
+              status: 'success',
+              name: 'test',
+              key: 'deml_abcd_secret',
+              prefix: 'abcd',
+            }),
+            revokeApiKey: async () => undefined,
+            listSessions: async () => [],
+            revokeSession: async () => undefined,
+          },
+        },
+        {
           provide: AuthService,
           useValue: {
+            auth: { currentUser: null },
             currentUserRole: signal('Operator'),
             mfaEnrolled: signal(false),
+            sessionId: signal('sess-1'),
             getAccountProfile: () => ({ displayName: 'Ada', email: 'ada@example.com' }),
             updateDisplayName: async () => ({ success: true }),
+            updateUserEmail: async () => ({ status: 'success' }),
+            updateUserPassword: async () => ({ status: 'success' }),
+            refreshMfaState: async () => undefined,
+            sendMfaEnrollmentCode: async () => 'vid',
+            confirmMfaEnrollment: async () => undefined,
+            unenrollMfa: async () => undefined,
+            linkGoogleAccount: async () => ({ success: true }),
+            linkAppleAccount: async () => ({ success: true }),
+            unlinkProvider: async () => ({ success: true }),
+            deleteAccount: async () => ({ status: 'completed' }),
+            logout: async () => undefined,
             isAuthenticated: signal(true),
           },
         },
@@ -73,14 +103,19 @@ describe('Settings', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render account and sites only', async () => {
+  it('should render account settings sections', async () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
     const host = fixture.nativeElement as HTMLElement;
     expect(host.querySelector('h1.banner-heading')?.textContent).toContain('Settings');
     expect(host.querySelector('#account')).toBeTruthy();
+    expect(host.querySelector('#security')).toBeTruthy();
+    expect(host.querySelector('#connected')).toBeTruthy();
+    expect(host.querySelector('#integrations')).toBeTruthy();
+    expect(host.querySelector('#sessions')).toBeTruthy();
     expect(host.querySelector('#sites')).toBeTruthy();
+    expect(host.querySelector('#danger')).toBeTruthy();
     expect(host.querySelector('#appearance')).toBeNull();
     expect(host.querySelector('#preferences')).toBeNull();
     expect(host.querySelector('app-card-grid')).toBeNull();

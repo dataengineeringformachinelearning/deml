@@ -48,12 +48,15 @@ def ensure_user_from_firebase(decoded_token: dict[str, Any]) -> tuple[User, User
   with transaction.atomic():
     user, created = User.objects.get_or_create(
       username=uid,
-      defaults={"email": email, "first_name": name},
+      defaults={"email": email, "first_name": name.strip()},
     )
     if created:
       user.set_unusable_password()
     user.email = email
-    user.first_name = name
+    # Display-name SoT: only advance when Firebase sends a non-empty name.
+    # Never wipe a stored first_name with an empty claim (UID would leak to UI).
+    if name.strip():
+      user.first_name = name.strip()
     user.save()
 
     profile, profile_created = UserProfile.objects.get_or_create(user=user)

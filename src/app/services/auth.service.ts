@@ -40,13 +40,13 @@ import { logFirebaseAuthError, mapFirebaseMfaError } from '../core/utils/phone.u
 
 type AuthUserResponse = {
   status: string;
-  /** Django display name SoT (`first_name` or `username`). */
+  /** Django display name SoT (`first_name` only — never UID). */
   user: string | null;
+  display_name?: string | null;
   user_id: number | null;
   role: string | null;
 };
 
-type HandoffResponse = { status: string; token?: string };
 type LoginCredentials = { username: string; password: string };
 type RegistrationCredentials = LoginCredentials & { email: string };
 type ResetPasswordPayload = { token: string; new_password: string };
@@ -207,9 +207,51 @@ export class AuthService {
   public auth: Auth | MockAuth | null = null;
   private pendingMfaResolver: MultiFactorResolver | null = null;
   private pendingMfaVerificationId: string | null = null;
+  /** Resolvers waiting for Postgres session bind after Firebase sign-in. */
+  private readonly sessionBindWaiters = new Set<(ok: boolean) => void>();
 
   private useMock =
     typeof window !== 'undefined' && environment.firebase.apiKey === 'PLACEHOLDER_API_KEY'; // pragma: allowlist secret
+
+  private notifySessionBindResult(ok: boolean): void {
+    if (this.sessionBindWaiters.size === 0) {
+      return;
+    }
+    const waiters = [...this.sessionBindWaiters];
+    this.sessionBindWaiters.clear();
+    for (const waiter of waiters) {
+      waiter(ok);
+    }
+  }
+
+  /**
+   * Wait until session bind finishes after Firebase sign-in.
+   * Login/signup/MFA/OAuth must await this before navigating — never half-auth.
+   */
+  async waitForSessionReady(timeoutMs = 25_000): Promise<boolean> {
+    if (this.useMock) {
+      return this.isAuthenticated();
+    }
+    if (this.isAuthenticated() && this.sessionId()) {
+      return true;
+    }
+    return new Promise<boolean>((resolve) => {
+      const timer = setTimeout(() => {
+        this.sessionBindWaiters.delete(onResult);
+        resolve(this.isAuthenticated());
+      }, timeoutMs);
+      const onResult = (ok: boolean): void => {
+        clearTimeout(timer);
+        this.sessionBindWaiters.delete(onResult);
+        resolve(ok);
+      };
+      this.sessionBindWaiters.add(onResult);
+      // Bind may have completed between the early check and subscribe.
+      if (this.isAuthenticated() && this.sessionId()) {
+        onResult(true);
+      }
+    });
+  }
 
   private requireFirebaseAuth(): Auth {
     const auth = this.auth;
@@ -285,6 +327,7 @@ export class AuthService {
                 if (sessionOk) {
                   this.isAuthenticated.set(true);
                   this.applyAuthUserResponse(res, user);
+                  this.notifySessionBindResult(true);
                 } else {
                   console.error(
                     JSON.stringify({
@@ -292,10 +335,12 @@ export class AuthService {
                       detail: 'Postgres session registry unavailable',
                     }),
                   );
-                  // Fail closed: clear Firebase session so UI cannot look signed-in
-                  // while product APIs would 401 on missing Postgres session.
+                  // Fail closed atomically: drop auth before clearing sessionId so
+                  // interceptors never see authenticated + missing X-DEML-Session-Id.
                   this.isAuthenticated.set(false);
+                  this.dropLocalSessionId();
                   this.clearAccountIdentity();
+                  this.notifySessionBindResult(false);
                   try {
                     await signOut(auth);
                   } catch {
@@ -305,13 +350,20 @@ export class AuthService {
               } else {
                 this.isAuthenticated.set(false);
                 this.clearAccountIdentity();
+                this.notifySessionBindResult(false);
               }
             } catch (e: unknown) {
-              console.error('Failed to sync auth with backend', e);
+              console.error(
+                JSON.stringify({
+                  event: 'auth_backend_sync_failed',
+                  detail: e instanceof Error ? e.message : 'unknown',
+                }),
+              );
               this.isAuthenticated.set(false);
               this.clearAccountIdentity();
               this.mfaEnrolled.set(false);
               this.mfaVerifiedInSession.set(false);
+              this.notifySessionBindResult(false);
             }
           } else {
             this.isAuthenticated.set(false);
@@ -320,6 +372,7 @@ export class AuthService {
             this.mfaVerifiedInSession.set(false);
             this.clearMfaSessionFlag();
             this.sessionId.set(null);
+            this.notifySessionBindResult(false);
           }
           this.isInitialized.set(true);
           this.isProcessing.set(false);
@@ -388,13 +441,20 @@ export class AuthService {
             this.applyAuthUserResponse(res, user);
           } else {
             this.isAuthenticated.set(false);
+            this.dropLocalSessionId();
             this.clearAccountIdentity();
           }
         } else {
           this.isAuthenticated.set(false);
           this.clearAccountIdentity();
         }
-      } catch {
+      } catch (e: unknown) {
+        console.error(
+          JSON.stringify({
+            event: 'auth_check_failed',
+            detail: e instanceof Error ? e.message : 'unknown',
+          }),
+        );
         this.isAuthenticated.set(false);
         this.clearAccountIdentity();
       }
@@ -442,7 +502,14 @@ export class AuthService {
       const auth = this.requireFirebaseAuth();
       // Treat credentials.username as the login email
       await signInWithEmailAndPassword(auth, credentials.username, credentials.password);
+      const ready = await this.waitForSessionReady();
       this.isProcessing.set(false);
+      if (!ready) {
+        return {
+          success: false,
+          error: 'Unable to establish a session. Try again.',
+        };
+      }
       return { success: true };
     } catch (e: unknown) {
       this.isProcessing.set(false);
@@ -467,10 +534,10 @@ export class AuthService {
         } else if (code === 'auth/wrong-password') {
           errorMsg = 'Incorrect password.';
         } else {
-          errorMsg = 'An error occurred during sign in. Please try again.';
+          errorMsg = 'An error occurred during log in. Try again.';
         }
       } else {
-        errorMsg = 'An error occurred during sign in. Please try again.';
+        errorMsg = 'An error occurred during log in. Try again.';
       }
       return { success: false, error: errorMsg };
     }
@@ -501,7 +568,14 @@ export class AuthService {
           }),
         );
       }
+      const ready = await this.waitForSessionReady();
       this.isProcessing.set(false);
+      if (!ready) {
+        return {
+          success: false,
+          error: 'Unable to establish a session. Try again.',
+        };
+      }
       return { success: true };
     } catch (e: unknown) {
       this.isProcessing.set(false);
@@ -516,10 +590,10 @@ export class AuthService {
         } else if (code === 'auth/invalid-email') {
           errorMsg = 'Invalid email address format.';
         } else {
-          errorMsg = 'An error occurred during registration. Please try again.';
+          errorMsg = 'An error occurred during registration. Try again.';
         }
       } else {
-        errorMsg = 'An error occurred during registration. Please try again.';
+        errorMsg = 'An error occurred during registration. Try again.';
       }
       return { success: false, error: errorMsg };
     }
@@ -538,6 +612,12 @@ export class AuthService {
     };
   }
 
+  /** True when a string looks like a Firebase UID, not a human display name. */
+  private isUidShapedDisplayName(value: string): boolean {
+    // Firebase UIDs are opaque alphanumerics; never promote them to display SoT.
+    return /^[A-Za-z0-9_-]{20,}$/.test(value) && !/\s/.test(value);
+  }
+
   /** Apply Django auth/user identity (single write path for account signals). */
   private applyAuthUserResponse(
     res: AuthUserResponse,
@@ -545,11 +625,14 @@ export class AuthService {
   ): void {
     this.currentUserId.set(res.user_id);
     this.currentUserRole.set(res.role);
-    const djangoName = (res.user || '').trim();
-    if (djangoName) {
+    const djangoName = (res.display_name || res.user || '').trim();
+    if (djangoName && !this.isUidShapedDisplayName(djangoName)) {
       this.accountDisplayName.set(djangoName);
-    } else if (firebaseUser?.displayName?.trim()) {
-      this.accountDisplayName.set(firebaseUser.displayName.trim());
+    } else {
+      const firebaseName = (firebaseUser?.displayName || '').trim();
+      if (firebaseName && !this.isUidShapedDisplayName(firebaseName)) {
+        this.accountDisplayName.set(firebaseName);
+      }
     }
     const email = firebaseUser?.email?.trim();
     if (email) {
@@ -571,7 +654,7 @@ export class AuthService {
       return { success: false, error: 'Enter a display name.' };
     }
     if (!this.isAuthenticated() || !this.auth?.currentUser) {
-      return { success: false, error: 'Sign in to update your profile.' };
+      return { success: false, error: 'Log in to update your profile.' };
     }
 
     try {
@@ -661,7 +744,7 @@ export class AuthService {
         return {
           status: 'blocked',
           message:
-            'Account deletion is blocked until FORJD confirms durable tenant erasure. Your identities and account data remain intact.',
+            'Account deletion is blocked until data erasure finishes across connected services. Your account and data remain intact.',
         };
       }
       this.isAuthenticated.set(false);
@@ -681,7 +764,7 @@ export class AuthService {
       return {
         status: 'failed',
         message:
-          'Account deletion could not be requested. Your identities and account data remain intact. Please try again.',
+          'Account deletion could not be requested. Your account and data remain intact. Try again.',
       };
     }
   }
@@ -1009,7 +1092,7 @@ export class AuthService {
     if (!resolver) {
       return {
         success: false,
-        error: 'Your sign-in session expired. Sign in again to continue MFA verification.',
+        error: 'Your log-in session expired. Log in again to continue MFA verification.',
       };
     }
 
@@ -1061,7 +1144,7 @@ export class AuthService {
     if (!resolver || !verificationId) {
       return {
         success: false,
-        error: 'Your sign-in session expired. Sign in again to continue MFA verification.',
+        error: 'Your log-in session expired. Log in again to continue MFA verification.',
       };
     }
     if (!code) {
@@ -1075,6 +1158,13 @@ export class AuthService {
       this.markMfaSessionVerified();
       await this.refreshMfaState(true);
       this.clearMfaChallenge();
+      const ready = await this.waitForSessionReady();
+      if (!ready) {
+        return {
+          success: false,
+          error: 'Unable to establish a session. Try again.',
+        };
+      }
       return { success: true };
     } catch (e: unknown) {
       logFirebaseAuthError('MFA sign-in resolve', e);
@@ -1151,7 +1241,14 @@ export class AuthService {
         }
       }
 
+      const ready = await this.waitForSessionReady();
       this.isProcessing.set(false);
+      if (!ready) {
+        return {
+          success: false,
+          error: 'Unable to establish a session. Try again.',
+        };
+      }
       return { success: true };
     } catch (e: unknown) {
       this.isProcessing.set(false);
@@ -1167,7 +1264,7 @@ export class AuthService {
           resolver: getMultiFactorResolver(auth, e),
         };
       }
-      return { success: false, error: 'Apple Sign-In failed. Please try again.' };
+      return { success: false, error: 'Apple Sign-In failed. Try again.' };
     }
   }
 
@@ -1192,7 +1289,14 @@ export class AuthService {
         }
       }
 
+      const ready = await this.waitForSessionReady();
       this.isProcessing.set(false);
+      if (!ready) {
+        return {
+          success: false,
+          error: 'Unable to establish a session. Try again.',
+        };
+      }
       return { success: true };
     } catch (e: unknown) {
       this.isProcessing.set(false);
@@ -1208,7 +1312,7 @@ export class AuthService {
           resolver: getMultiFactorResolver(auth, e),
         };
       }
-      return { success: false, error: 'Google Sign-In failed. Please try again.' };
+      return { success: false, error: 'Google Sign-In failed. Try again.' };
     }
   }
 
@@ -1226,7 +1330,7 @@ export class AuthService {
             'This Google account is already associated with another user profile. To connect it, log in to that account first, unlink it, or delete it, and try again.',
         };
       }
-      return { success: false, error: 'Google account linking failed. Please try again.' };
+      return { success: false, error: 'Google account linking failed. Try again.' };
     }
   }
 
@@ -1244,7 +1348,7 @@ export class AuthService {
             'This Apple ID is already associated with another user profile. To connect it, log in to that account first, unlink it, or delete it, and try again.',
         };
       }
-      return { success: false, error: 'Apple account linking failed. Please try again.' };
+      return { success: false, error: 'Apple account linking failed. Try again.' };
     }
   }
 
@@ -1254,45 +1358,15 @@ export class AuthService {
       return { success: true };
     } catch (e: unknown) {
       console.error(e);
-      return { success: false, error: `Failed to unlink ${providerId}. Please try again.` };
+      return { success: false, error: `Failed to unlink ${providerId}. Try again.` };
     }
   }
 
-  /** Cross-site navigate to the suite marketing URL (build-time env, not free-form user input). */
-  async navigateToMarketingSite(marketingUrl: string = environment.marketingUrl) {
-    const targetUrl = marketingUrl ?? '';
-    if (!this.isAuthenticated() || !this.auth?.currentUser) {
-      // nosemgrep: javascript.browser.tainted-redirect.tainted-redirect
-      window.location.href = targetUrl;
-      return;
-    }
-    this.isProcessing.set(true);
-    try {
-      const fbToken = await this.auth.currentUser.getIdToken();
-      const res = await firstValueFrom(
-        this.http.post<HandoffResponse>(
-          `${environment.backendUrl}/api/v1/auth/handoff/generate`,
-          {},
-          {
-            headers: { Authorization: `Bearer ${fbToken}` },
-          },
-        ),
-      );
-      if (res.status === 'success' && res.token) {
-        const handoffUrl = new URL(targetUrl, window.location.origin);
-        handoffUrl.searchParams.set('session_handoff', res.token);
-        // nosemgrep: javascript.browser.tainted-redirect.tainted-redirect
-        window.location.href = handoffUrl.href;
-      } else {
-        // nosemgrep: javascript.browser.tainted-redirect.tainted-redirect
-        window.location.href = targetUrl;
-      }
-    } catch (e: unknown) {
-      console.error('Failed to generate handoff token', e);
-      // nosemgrep: javascript.browser.tainted-redirect.tainted-redirect
-      window.location.href = targetUrl;
-    } finally {
-      this.isProcessing.set(false);
+  /** Clear local session id only after isAuthenticated is false. */
+  private dropLocalSessionId(): void {
+    this.sessionId.set(null);
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('deml_session_id');
     }
   }
 
@@ -1325,8 +1399,8 @@ export class AuthService {
           detail: error instanceof Error ? error.message : 'unknown',
         }),
       );
-      this.sessionId.set(null);
-      sessionStorage.removeItem('deml_session_id');
+      // Leave sessionId alone while isAuthenticated may still be true (re-bind).
+      // Callers clear sessionId only after flipping isAuthenticated false.
       return false;
     }
   }

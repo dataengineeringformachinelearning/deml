@@ -4,9 +4,13 @@ import { Observable, map, tap, timeout } from 'rxjs';
 import { API_ENDPOINTS } from '../core/constants/api.constants';
 import { SwrCacheService } from '../core/cache/swr-cache.service';
 import { SKIP_AUTH } from '../core/interceptors/credentials.interceptor';
+import { HTTP_TIMEOUT_MS } from '../core/interceptors/http-timeout.interceptor';
 
-/** Align with BFF/FORJD read budget (client retries included). */
-const STATUS_READ_TIMEOUT_MS = 25_000;
+/**
+ * Status reads must cover BFF FORJD GET retries (up to 3 × ~20s).
+ * Interceptor default is 20s — override via HTTP_TIMEOUT_MS.
+ */
+const STATUS_READ_TIMEOUT_MS = 55_000;
 const STATUS_WRITE_TIMEOUT_MS = 20_000;
 
 export interface StatusPageData {
@@ -18,10 +22,28 @@ export interface StatusPageData {
   created_at: string;
   user_id: number | null;
   overall_uptime?: number;
+  /** Deprecated alias of overall_uptime — prefer overall_uptime. */
+  cumulative_sla?: number | null;
   uptime_history?: { date: string; status: string; uptime: number | null }[];
   /** Embedded on the public slug / directory payload (SoT for product UI). */
   services?: MonitoredServiceData[];
   incidents?: IncidentData[];
+  /** Honest aggregate when FORJD has no probe samples yet. */
+  overall_status?: string;
+  /** Public analytics / intelligence gauges (ciphertext-free FORJD embed). */
+  p99_latency?: number | null;
+  total_requests?: number | null;
+  threats_detected_24h?: number | null;
+  predicted_sla?: number | null;
+  spiking_temporal_forecast?: number | null;
+  temporal_status?: string | null;
+  temporal_backend?: string | null;
+  temporal_sample_count?: number | null;
+  temporal_scored_at?: string | null;
+  uses_norse?: boolean | null;
+  threat_anomaly_score?: number | null;
+  threat_suspicious_ratio?: number | null;
+  is_pro_verified?: boolean;
 }
 
 export interface MonitoredServiceData {
@@ -59,12 +81,12 @@ export const isPlatformStatusPage = (
 /** Drop platform/tenant0 pages from account-scoped site lists. */
 export const filterOwnedStatusPages = <T extends Pick<StatusPageData, 'slug'>>(
   pages: readonly T[] | null | undefined,
-): T[] => (Array.isArray(pages) ? pages.filter(page => !isPlatformStatusPage(page)) : []);
+): T[] => (Array.isArray(pages) ? pages.filter((page) => !isPlatformStatusPage(page)) : []);
 
-export const publicStatusPageTag = (slug: string): string => {
-  if (slug === 'loading') return 'Loading';
-  return isPlatformStatusPage(slug) ? 'Platform Status' : 'Public Status Page';
-};
+const newIdempotencyKey = (prefix: string): string =>
+  typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : `${prefix}-${Date.now()}`;
 
 /**
  * Status data plane client — directory, slug embed, owned CRUD only.
@@ -93,7 +115,9 @@ export class MonitorService {
         this.http
           .get<StatusPageData[]>(API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES, {
             withCredentials: true,
-            context: new HttpContext().set(SKIP_AUTH, true),
+            context: new HttpContext()
+              .set(SKIP_AUTH, true)
+              .set(HTTP_TIMEOUT_MS, STATUS_READ_TIMEOUT_MS),
           })
           .pipe(
             timeout({ first: STATUS_READ_TIMEOUT_MS }),
@@ -117,10 +141,11 @@ export class MonitorService {
         this.http
           .get<StatusPageData[]>(API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES, {
             withCredentials: true,
+            context: new HttpContext().set(HTTP_TIMEOUT_MS, STATUS_READ_TIMEOUT_MS),
           })
           .pipe(
             timeout({ first: STATUS_READ_TIMEOUT_MS }),
-            map(pages => filterOwnedStatusPages(pages)),
+            map((pages) => filterOwnedStatusPages(pages)),
             tap(() => this.ownedSitesServingStale.set(false)),
           ),
       {
@@ -157,7 +182,9 @@ export class MonitorService {
             `${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES}/slug/${encodeURIComponent(slug)}`,
             {
               withCredentials: true,
-              context: new HttpContext().set(SKIP_AUTH, true),
+              context: new HttpContext()
+                .set(SKIP_AUTH, true)
+                .set(HTTP_TIMEOUT_MS, STATUS_READ_TIMEOUT_MS),
             },
           )
           .pipe(
@@ -173,7 +200,8 @@ export class MonitorService {
     );
   }
 
-  private invalidateStatusReads(): void {
+  /** Drop status SWR so the next observe hits the network (reconnect / retry). */
+  invalidateStatusReads(): void {
     this.swr.invalidate('status:pages');
     this.swr.invalidate('status:slug');
   }
@@ -184,14 +212,11 @@ export class MonitorService {
     description?: string;
     is_published?: boolean;
   }) {
-    const idempotencyKey =
-      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-        ? crypto.randomUUID()
-        : `create-${Date.now()}`;
     return this.http
       .post<StatusPageData>(API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES, data, {
         withCredentials: true,
-        headers: new HttpHeaders({ 'Idempotency-Key': idempotencyKey }),
+        headers: new HttpHeaders({ 'Idempotency-Key': newIdempotencyKey('create') }),
+        context: new HttpContext().set(HTTP_TIMEOUT_MS, STATUS_WRITE_TIMEOUT_MS),
       })
       .pipe(
         timeout({ first: STATUS_WRITE_TIMEOUT_MS }),
@@ -211,6 +236,8 @@ export class MonitorService {
     return this.http
       .put<StatusPageData>(`${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES}/${pageId}`, data, {
         withCredentials: true,
+        headers: new HttpHeaders({ 'Idempotency-Key': newIdempotencyKey('update') }),
+        context: new HttpContext().set(HTTP_TIMEOUT_MS, STATUS_WRITE_TIMEOUT_MS),
       })
       .pipe(
         timeout({ first: STATUS_WRITE_TIMEOUT_MS }),
@@ -222,6 +249,8 @@ export class MonitorService {
     return this.http
       .delete(`${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES}/${pageId}`, {
         withCredentials: true,
+        headers: new HttpHeaders({ 'Idempotency-Key': newIdempotencyKey('delete') }),
+        context: new HttpContext().set(HTTP_TIMEOUT_MS, STATUS_WRITE_TIMEOUT_MS),
       })
       .pipe(
         timeout({ first: STATUS_WRITE_TIMEOUT_MS }),

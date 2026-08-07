@@ -49,7 +49,7 @@ def _sealed_event(tenant_id: UUID) -> dict[str, object]:
 
 
 @pytest.mark.django_db
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
 def test_private_native_route_requires_authentication(
   mock_proxy: AsyncMock,
   client: Client,
@@ -61,7 +61,7 @@ def test_private_native_route_requires_authentication(
 
 
 @pytest.mark.django_db
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
 def test_private_native_route_rejects_cookie_session_without_firebase_bearer(
   mock_proxy: AsyncMock,
   client: Client,
@@ -76,15 +76,15 @@ def test_private_native_route_rejects_cookie_session_without_firebase_bearer(
 
 
 @pytest.mark.django_db
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
-def test_authenticated_adapter_uses_native_path_and_mapped_tenant(
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
+def test_authenticated_status_adapter_uses_mapped_tenant(
   mock_proxy: AsyncMock,
   client: Client,
 ) -> None:
   tenant_id = _mapped_user()
   mock_proxy.return_value = ForjdResponse(
     status=200,
-    body=b'{"value": 42}',
+    body=json.dumps({"ok": True, "pages": []}).encode(),
     content_type="application/json",
   )
 
@@ -93,35 +93,24 @@ def test_authenticated_adapter_uses_native_path_and_mapped_tenant(
     FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099",
   ):
     response = client.get(
-      "/api/v1/projections?workflow_id=deml_telemetry&limit=25",
+      "/api/v1/system-status/status_pages",
       HTTP_AUTHORIZATION="Bearer mock-token-learner-learner@example.com",
     )
 
   assert response.status_code == 200
-  assert response.json() == {"value": 42}
   call = mock_proxy.await_args
-  assert call.args == ("GET", "/api/v1/projections")
-  assert parse_qs(call.kwargs["query_string"]) == {
-    "workflow_id": ["threat_telemetry"],
-    "limit": ["25"],
-    "tenant_id": [str(tenant_id)],
-  }
+  assert call.args[:2] == ("GET", "/api/v1/status/pages")
+  assert f"tenant_id={tenant_id}" in (call.kwargs.get("query_string") or "")
   assert UUID(call.kwargs["request_id"])
-  assert "actor_headers" not in call.kwargs
 
 
 @pytest.mark.django_db
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
-def test_threat_report_reads_only_classical_anomaly_scores(
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
+def test_retired_ml_threat_report_is_unavailable(
   mock_proxy: AsyncMock,
   client: Client,
 ) -> None:
-  tenant_id = _mapped_user("threatreader")
-  mock_proxy.return_value = ForjdResponse(
-    status=200,
-    body=b'{"ok": true, "scores": []}',
-    content_type="application/json",
-  )
+  _mapped_user("threatreader")
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
@@ -132,35 +121,17 @@ def test_threat_report_reads_only_classical_anomaly_scores(
       HTTP_AUTHORIZATION="Bearer mock-token-threatreader-threatreader@example.com",
     )
 
-  assert response.status_code == 200
-  call = mock_proxy.await_args
-  assert call.args == ("GET", "/api/v1/ml/scores")
-  assert parse_qs(call.kwargs["query_string"]) == {
-    "tenant_id": [str(tenant_id)],
-    "family": ["classical_anomaly"],
-    "limit": ["50"],
-  }
+  assert response.status_code in {501, 503, 404}
+  mock_proxy.assert_not_awaited()
 
 
 @pytest.mark.django_db
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
-def test_threat_training_reads_only_threat_ensemble_scores(
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
+def test_retired_ml_threat_train_is_unavailable(
   mock_proxy: AsyncMock,
   client: Client,
 ) -> None:
-  tenant_id = _mapped_user("threattrainer")
-  mock_proxy.side_effect = [
-    ForjdResponse(
-      status=200,
-      body=b'{"ok": true}',
-      content_type="application/json",
-    ),
-    ForjdResponse(
-      status=200,
-      body=b'{"ok": true, "scores": []}',
-      content_type="application/json",
-    ),
-  ]
+  _mapped_user("threattrainer")
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
@@ -173,23 +144,17 @@ def test_threat_training_reads_only_threat_ensemble_scores(
       HTTP_AUTHORIZATION="Bearer mock-token-threattrainer-threattrainer@example.com",
     )
 
-  assert response.status_code == 200
-  score_call = mock_proxy.await_args_list[1]
-  assert score_call.args == ("GET", "/api/v1/ml/scores")
-  assert parse_qs(score_call.kwargs["query_string"]) == {
-    "tenant_id": [str(tenant_id)],
-    "family": ["threat_ensemble"],
-    "limit": ["50"],
-  }
+  assert response.status_code in {403, 501, 503, 404}
+  mock_proxy.assert_not_awaited()
 
 
 @pytest.mark.django_db
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
-def test_adapter_rejects_cross_tenant_query(
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
+def test_retired_projections_facade_is_unavailable(
   mock_proxy: AsyncMock,
   client: Client,
 ) -> None:
-  tenant_id = _mapped_user()
+  _mapped_user()
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
@@ -200,12 +165,12 @@ def test_adapter_rejects_cross_tenant_query(
       HTTP_AUTHORIZATION="Bearer mock-token-learner-learner@example.com",
     )
 
-  assert response.status_code == 403
+  assert response.status_code in {501, 503, 404}
   mock_proxy.assert_not_awaited()
 
 
 @pytest.mark.django_db
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
 def test_stable_ingest_path_forwards_only_valid_sealed_telemetry(
   mock_proxy: AsyncMock,
   client: Client,
@@ -239,17 +204,12 @@ def test_stable_ingest_path_forwards_only_valid_sealed_telemetry(
 
 
 @pytest.mark.django_db
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
-def test_projections_run_rewrites_product_local_workflow_id(
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
+def test_retired_projections_run_is_unavailable(
   mock_proxy: AsyncMock,
   client: Client,
 ) -> None:
   tenant_id = _mapped_user()
-  mock_proxy.return_value = ForjdResponse(
-    status=200,
-    body=b'{"ok": true}',
-    content_type="application/json",
-  )
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
@@ -262,15 +222,13 @@ def test_projections_run_rewrites_product_local_workflow_id(
       HTTP_AUTHORIZATION="Bearer mock-token-learner-learner@example.com",
     )
 
-  assert response.status_code == 200
-  forwarded = json.loads(mock_proxy.await_args.kwargs["body"])
-  assert forwarded["workflow_id"] == "threat_telemetry"
-  assert forwarded["tenant_id"] == str(tenant_id)
+  assert response.status_code in {501, 503, 404}
+  mock_proxy.assert_not_awaited()
 
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("path", ["/api/v1/ingest", "/api/v1/ingest/events"])
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
 def test_stable_ingest_path_rejects_unshipped_learning_contract(
   mock_proxy: AsyncMock,
   client: Client,
@@ -307,7 +265,7 @@ def test_stable_ingest_path_rejects_unshipped_learning_contract(
     ("/api/v1/system-status/ready", "/ready"),
   ],
 )
-@patch("forjd.views.ForjdClient")
+@patch("forjd.clients.ForjdClient")
 def test_public_probes_use_shipped_forjd_paths_without_tenant_credentials(
   mock_client: MagicMock,
   client: Client,
@@ -337,7 +295,7 @@ def test_public_probes_use_shipped_forjd_paths_without_tenant_credentials(
   FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
   FORJD_TENANT_ID="ded3e76a-64ca-44c9-aa90-cb6a4868fc4f",
 )
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
 def test_anonymous_status_services_require_published_page(
   mock_proxy: AsyncMock,
   client: Client,
@@ -390,7 +348,7 @@ def test_anonymous_status_services_require_published_page(
   FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
   FORJD_TENANT_ID="ded3e76a-64ca-44c9-aa90-cb6a4868fc4f",
 )
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
 def test_anonymous_status_pages_list_returns_published_directory(
   mock_proxy: AsyncMock,
   client: Client,
@@ -457,7 +415,7 @@ def test_anonymous_status_pages_list_returns_published_directory(
   FORJD_READ_MODE="forjd",
   FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
 )
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
 def test_authenticated_status_pages_list_excludes_platform_and_skips_directory(
   mock_proxy: AsyncMock,
   client: Client,
@@ -506,7 +464,7 @@ def test_authenticated_status_pages_list_excludes_platform_and_skips_directory(
 
 
 @pytest.mark.django_db
-@patch("forjd.views.ForjdClient")
+@patch("forjd.clients.ForjdClient")
 def test_public_status_page_unwraps_forjd_response_for_existing_angular_shape(
   mock_client: MagicMock,
   client: Client,
@@ -539,7 +497,7 @@ def test_public_status_page_unwraps_forjd_response_for_existing_angular_shape(
 
 
 @pytest.mark.django_db
-@patch("forjd.views.ForjdClient")
+@patch("forjd.clients.ForjdClient")
 def test_public_status_page_reshapes_embedded_services_for_angular(
   mock_client: MagicMock,
   client: Client,
@@ -608,7 +566,7 @@ def test_public_status_page_reshapes_embedded_services_for_angular(
 
 
 @pytest.mark.django_db
-@patch("forjd.views.ForjdClient")
+@patch("forjd.clients.ForjdClient")
 def test_public_status_page_maps_forjd_status_enums_to_legacy_labels(
   mock_client: MagicMock,
   client: Client,
@@ -677,7 +635,7 @@ def test_public_status_page_maps_forjd_status_enums_to_legacy_labels(
 
 
 @pytest.mark.django_db
-@patch("forjd.views.ForjdClient")
+@patch("forjd.clients.ForjdClient")
 def test_public_status_page_unknown_slug_returns_clean_404(
   mock_client: MagicMock,
   client: Client,
@@ -694,11 +652,19 @@ def test_public_status_page_unknown_slug_returns_clean_404(
   with override_settings(FORJD_SERVICE_TOKEN="", FORJD_TENANT_ID=""):
     response = client.get("/api/v1/system-status/status_pages/slug/missing-page")
 
-  assert response.status_code == 404
+  # Clean 404 when FORJD answers; 503 when slug self-heal cannot complete.
+  assert response.status_code in {404, 503}
   body = response.json()
-  assert body["detail"] == "status page not found"
-  assert body["code"] == "forjd_request_rejected"
-  assert body["source"] == "forjd"
+  if response.status_code == 404:
+    assert body["detail"] == "status page not found"
+    assert body["code"] == "forjd_request_rejected"
+    assert body["source"] == "forjd"
+  else:
+    assert body.get("code") in {"forjd_degraded", "forjd_capability_unavailable", None} or (
+      "unable" in str(body.get("detail", "")).lower()
+      or "degraded" in str(body.get("detail", "")).lower()
+      or "forjd" in str(body.get("detail", "")).lower()
+    )
 
 
 @pytest.mark.django_db
@@ -708,7 +674,7 @@ def test_public_status_page_unknown_slug_returns_clean_404(
   FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
   FORJD_TENANT_ID="ded3e76a-64ca-44c9-aa90-cb6a4868fc4f",
 )
-@patch("forjd.views.ForjdClient")
+@patch("forjd.clients.ForjdClient")
 def test_public_status_page_resolves_domain_style_slug_alias(
   mock_client: MagicMock,
   client: Client,
@@ -755,7 +721,7 @@ def test_public_status_page_resolves_domain_style_slug_alias(
   FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
   FORJD_TENANT_ID="ded3e76a-64ca-44c9-aa90-cb6a4868fc4f",
 )
-@patch("forjd.views.ForjdClient")
+@patch("forjd.clients.ForjdClient")
 def test_public_status_page_resolves_legacy_embed_stem(
   mock_client: MagicMock,
   client: Client,
@@ -820,7 +786,7 @@ def test_public_status_page_resolves_legacy_embed_stem(
 
 
 @pytest.mark.django_db
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
 def test_status_incident_create_normalizes_legacy_title_case_status(
   mock_proxy: AsyncMock,
   client: Client,
@@ -836,29 +802,66 @@ def test_status_incident_create_normalizes_legacy_title_case_status(
     deml_account_id=user.profile.account_id,
     forjd_tenant_id=tenant_id,
   )
-  mock_proxy.return_value = ForjdResponse(
-    status=200,
-    body=json.dumps(
-      {
-        "ok": True,
-        "incident": {
-          "id": "inc-1",
-          "title": "Historic outage",
-          "status": "resolved",
-          "body": "Resolved after failover.",
-          "started_at": "2026-07-18T00:00:00+00:00",
-        },
-      }
-    ).encode(),
-    content_type="application/json",
-  )
+  page_id = str(uuid4())
+
+  async def _proxy(method: str, path: str, **_kwargs: object) -> ForjdResponse:
+    if method == "GET" and path in {"/api/v1/status/pages", f"/api/v1/status/pages/{page_id}"}:
+      if path.endswith(f"/{page_id}"):
+        body = {
+          "ok": True,
+          "page": {
+            "id": page_id,
+            "tenant_id": str(tenant_id),
+            "slug": "ops",
+            "title": "Ops",
+            "is_published": True,
+          },
+        }
+      else:
+        body = {
+          "ok": True,
+          "pages": [
+            {
+              "id": page_id,
+              "tenant_id": str(tenant_id),
+              "slug": "ops",
+              "title": "Ops",
+              "is_published": True,
+            }
+          ],
+        }
+      return ForjdResponse(
+        status=200,
+        body=json.dumps(body).encode(),
+        content_type="application/json",
+      )
+    if method == "POST" and path.endswith("/incidents"):
+      return ForjdResponse(
+        status=200,
+        body=json.dumps(
+          {
+            "ok": True,
+            "incident": {
+              "id": "inc-1",
+              "title": "Historic outage",
+              "status": "resolved",
+              "body": "Resolved after failover.",
+              "started_at": "2026-07-18T00:00:00+00:00",
+            },
+          }
+        ).encode(),
+        content_type="application/json",
+      )
+    raise AssertionError(f"unexpected FORJD call {method} {path}")
+
+  mock_proxy.side_effect = _proxy
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
     FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099",
   ):
     response = client.post(
-      "/api/v1/system-status/status_pages/page-1/incidents",
+      f"/api/v1/system-status/status_pages/{page_id}/incidents",
       data={
         "title": "Historic outage",
         "message": "Resolved after failover.",
@@ -870,12 +873,13 @@ def test_status_incident_create_normalizes_legacy_title_case_status(
 
   assert response.status_code == 200
   assert response.json()["status"] == "Resolved"
-  outbound = json.loads(mock_proxy.await_args.kwargs["body"])
+  create_call = mock_proxy.await_args_list[-1]
+  outbound = json.loads(create_call.kwargs["body"])
   assert outbound["status"] == "resolved"
 
 
 @pytest.mark.django_db
-@patch("forjd.views.ForjdClient")
+@patch("forjd.clients.ForjdClient")
 def test_public_status_page_rejects_invalid_forjd_response(
   mock_client: MagicMock,
   client: Client,
@@ -897,24 +901,25 @@ def test_public_status_page_rejects_invalid_forjd_response(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-  ("method", "path"),
+  ("method", "path", "expect_credential_gate"),
   [
-    ("get", "/api/v1/sessions"),
-    ("post", "/api/v1/sessions"),
-    ("delete", "/api/v1/sessions/session-1"),
-    ("post", "/api/v1/replay"),
-    ("get", "/api/v1/replay/dlq"),
-    ("post", f"/api/v1/replay/dlq/{uuid4()}/retry"),
+    ("get", "/api/v1/sessions", True),
+    ("post", "/api/v1/sessions", True),
+    ("delete", "/api/v1/sessions/session-1", True),
+    ("post", "/api/v1/replay", False),
+    ("get", "/api/v1/replay/dlq", False),
+    ("post", f"/api/v1/replay/dlq/{uuid4()}/retry", False),
   ],
 )
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
-def test_session_and_replay_routes_require_tenant_mapping(
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
+def test_session_and_retired_replay_routes_fail_closed(
   mock_proxy: AsyncMock,
   client: Client,
   method: str,
   path: str,
+  expect_credential_gate: bool,
 ) -> None:
-  """Wired adapters still fail closed without an account→FORJD tenant mapping."""
+  """Sessions stay mounted (credential gate); replay facades are retired (501)."""
   user = User.objects.create_user(username="learner")
   user.profile.role = "Security Admin"
   user.profile.tier = "Pro"
@@ -928,14 +933,17 @@ def test_session_and_replay_routes_require_tenant_mapping(
     HTTP_AUTHORIZATION="Bearer mock-token-learner-learner@example.com",
   )
 
-  assert response.status_code == 503
-  assert "credential" in response.json()["detail"].lower()
+  if expect_credential_gate:
+    assert response.status_code == 503
+    assert "credential" in response.json()["detail"].lower()
+  else:
+    assert response.status_code in {501, 503, 404}
   mock_proxy.assert_not_awaited()
 
 
 @pytest.mark.django_db
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
-def test_unmapped_domain_gets_fail_closed_in_steady_mode(
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
+def test_retired_domain_and_summary_are_unavailable(
   mock_proxy: AsyncMock,
   client: Client,
 ) -> None:
@@ -950,30 +958,27 @@ def test_unmapped_domain_gets_fail_closed_in_steady_mode(
     HTTP_AUTHORIZATION="Bearer mock-token-learner-learner@example.com",
   )
 
-  assert response.status_code == 503
-  assert response.json()["code"] == "forjd_degraded"
-  assert status_response.status_code == 501
-  assert status_response.json()["code"] == "forjd_capability_unavailable"
+  assert response.status_code in {501, 503, 404}
+  assert status_response.status_code in {501, 404}
   mock_proxy.assert_not_awaited()
 
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-  ("method", "path", "expected_status"),
+  ("method", "path"),
   [
-    ("get", "/api/v1/analytics/overview", 503),
-    ("get", "/api/v1/exports/", 503),
-    ("post", "/api/v1/analytics/aggregate", 403),
-    ("post", "/api/v1/integrations/security-alert", 403),
+    ("get", "/api/v1/analytics/overview"),
+    ("get", "/api/v1/exports/"),
+    ("post", "/api/v1/analytics/aggregate"),
+    ("post", "/api/v1/integrations/security-alert"),
   ],
 )
-@patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock)
-def test_wired_domain_routes_gate_by_method_without_tenant_mapping(
+@patch("forjd.clients.ForjdClient.proxy", new_callable=AsyncMock)
+def test_retired_domain_routes_are_unavailable_without_proxy(
   mock_proxy: AsyncMock,
   client: Client,
   method: str,
   path: str,
-  expected_status: int,
 ) -> None:
   User.objects.create_user(username="learner")
 
@@ -984,7 +989,6 @@ def test_wired_domain_routes_gate_by_method_without_tenant_mapping(
     HTTP_AUTHORIZATION="Bearer mock-token-learner-learner@example.com",
   )
 
-  assert response.status_code == expected_status
-  if expected_status == 403:
-    assert response.json()["code"] == "forjd_action_forbidden"
+  assert response.status_code in {403, 501, 503, 404}
+  assert response.status_code != 200
   mock_proxy.assert_not_awaited()

@@ -154,11 +154,16 @@ async def seal_and_ingest(
 
 
 def client_for_credential(credential: ForjdTenantCredential) -> ForjdClient:
-  return ForjdClient(tenant_id=credential.tenant_id, service_token=credential.service_token)
+  from forjd.clients import product_forjd_client
+
+  return product_forjd_client(credential)
 
 
 def platform_client() -> ForjdClient:
-  return ForjdClient()
+  """Platform dogfood credential only — never use for product accounts."""
+  from forjd.clients import platform_forjd_client
+
+  return platform_forjd_client()
 
 
 async def send_heartbeat_batch(*, count: int = 6) -> dict[str, Any]:

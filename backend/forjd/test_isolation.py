@@ -7,7 +7,11 @@ from uuid import UUID, uuid4
 import pytest
 from django.test import override_settings
 
-from forjd.isolation import assert_product_tenant_isolation, is_platform_status_slug
+from forjd.isolation import (
+  assert_product_tenant_isolation,
+  is_platform_status_page,
+  is_platform_status_slug,
+)
 from forjd.tenancy import DEFAULT_SERVICE_TOKEN_SECRET_REF, ForjdTenantConfigurationError
 
 
@@ -15,6 +19,8 @@ def test_platform_status_slug_helper() -> None:
   assert is_platform_status_slug("platform-status")
   assert is_platform_status_slug(" Platform-Status ")
   assert not is_platform_status_slug("joealongi-dev")
+  assert is_platform_status_page({"slug": "platform-status"})
+  assert not is_platform_status_page({"slug": "acme"})
 
 
 @override_settings(

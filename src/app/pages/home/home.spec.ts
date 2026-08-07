@@ -29,11 +29,10 @@ describe('Home', () => {
     const host = fixture.nativeElement as HTMLElement;
     expect(host.querySelector('app-banner')?.getAttribute('data-variant')).toBe('hero');
     expect(host.querySelector('h1.banner-heading')?.textContent).toContain(
-      'Control plane for ML data',
+      'Status your customers can trust',
     );
     expect(host.querySelector('app-card-grid')).toBeNull();
     expect(host.querySelector('app-page-section')).toBeNull();
-    expect(host.textContent).not.toContain('Jump in');
   });
 
   it('should show explore and login when logged out', () => {

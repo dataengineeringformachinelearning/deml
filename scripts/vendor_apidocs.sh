@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Pin and download self-hosted Swagger UI + ReDoc into backend/static/vendor/.
-# Durable alternative to jsDelivr CDN (docs/SUITE_UI_UNIFICATION.md G1).
+# Vendored OpenAPI/ReDoc assets for the Django HTML shell.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

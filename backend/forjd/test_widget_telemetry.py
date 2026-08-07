@@ -1,4 +1,4 @@
-"""Widget telemetry and new BFF adapters (endpoints / train / predict)."""
+"""Widget telemetry adapters."""
 
 from __future__ import annotations
 
@@ -74,65 +74,3 @@ def test_widget_telemetry_seals_when_mapped() -> None:
   body = response.json()
   assert body["accepted"] is True
   send.assert_awaited_once()
-
-
-def test_deml_discovered_endpoints_shape() -> None:
-  from forjd.angular_compat import deml_discovered_endpoints
-
-  rows = deml_discovered_endpoints(
-    {
-      "endpoints": [
-        {
-          "id": "e1",
-          "url": "https://example.com/health",
-          "is_active": True,
-          "created_at": "2026-07-21T00:00:00Z",
-        }
-      ]
-    }
-  )
-  assert len(rows) == 1
-  assert rows[0]["url"] == "https://example.com/health"
-  assert rows[0]["is_active"] is True
-
-
-def test_analytics_overview_merges_control_plane() -> None:
-  from forjd.angular_compat import deml_analytics_overview
-
-  body = deml_analytics_overview(
-    {
-      "total_requests": 10,
-      "active_incidents": 0,
-      "threats_detected": 1,
-      "unique_visitors": 3,
-      "p99_latency_ms": 12.5,
-      "uptime_pct": 99.9,
-      "data_available": True,
-      "origin_distribution": [{"region": "iad", "count": 4}],
-      "http_statuses": [{"status": "2xx", "count": 8}],
-      "endpoint_counts": [{"endpoint": "status.widget", "count": 5}],
-      "honeypot_score": 12.5,
-      "deml_control_plane": {
-        "cookie_consents": {"analytical": 2, "marketing": 1},
-        "active_providers": ["google"],
-        "widget_interactions": 3,
-        "api_usage": {"usage_current_minute": 0, "quota_per_minute": 60},
-      },
-      "ces": {
-        "ces_level": 80,
-        "ces_threat": 10,
-        "ces_sla": 99,
-        "ces_stability": 90,
-        "spiking_temporal_forecast": 5,
-      },
-      "time_series": [],
-      "uptime_series": [],
-      "threat_series": [],
-      "threat_severity": [],
-    }
-  )
-  metrics = body["data"]["user_metrics"]
-  assert metrics["origin_distribution"][0]["region"] == "iad"
-  assert metrics["cookie_consents"]["analytical"] == 2
-  assert metrics["active_providers"] == ["google"]
-  assert body["data"]["honeypot_score"] == 12.5

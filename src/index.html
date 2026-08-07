@@ -2,22 +2,68 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8">
-  <title>DEML — Control Plane for FORJD</title>
+  <title>DEML — Public status your customers can trust</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#35312D" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#D4CEC5" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#35312D">
   <meta
     name="description"
-    content="DEML is the Firebase-authenticated control plane for FORJD — identity, public status, and site management. Sealed streams stay in FORJD."
+    content="DEML helps teams publish public status pages, keep customers informed during incidents, and manage account security in one place."
   >
+  <meta name="author" content="Joe Alongi">
+  <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="apple-mobile-web-app-title" content="DEML">
+  <link rel="canonical" href="https://deml.app/">
+  <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="shortcut icon" href="/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://deml.app/">
+  <meta property="og:title" content="DEML — Public status your customers can trust">
+  <meta property="og:description" content="DEML helps teams publish public status pages, keep customers informed during incidents, and manage account security in one place.">
+  <meta property="og:image" content="https://deml.app/dataengineeringformachinelearning-social.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="720">
+  <meta property="og:image:alt" content="DEML ship mark">
+  <meta property="og:site_name" content="DEML">
+  <meta property="og:locale" content="en_US">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://deml.app/">
+  <meta name="twitter:title" content="DEML — Public status your customers can trust">
+  <meta name="twitter:description" content="DEML helps teams publish public status pages, keep customers informed during incidents, and manage account security in one place.">
+  <meta name="twitter:image" content="https://deml.app/dataengineeringformachinelearning-social.png">
+  <meta name="twitter:image:alt" content="DEML ship mark">
+  <meta name="twitter:site" content="@joealongi">
+  <meta name="twitter:creator" content="@joealongi">
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "DEML",
+      "url": "https://deml.app/",
+      "description": "Publish public status pages and manage account security with DEML.",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Data Engineering for Machine Learning",
+        "url": "https://dataengineeringformachinelearning.com/"
+      }
+    }
+  </script>
+
   <script>
     (function () {
       try {
@@ -29,7 +75,7 @@
         }
         document.documentElement.setAttribute('data-theme', theme);
         document.documentElement.style.colorScheme = theme;
-        var meta = document.querySelector('meta[name="theme-color"]');
+        var meta = document.querySelector('meta[name="theme-color"]:not([media])');
         if (meta) {
           /* new-from-the-start warm ash */
           meta.setAttribute('content', theme === 'dark' ? '#35312D' : '#D4CEC5');

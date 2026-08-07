@@ -3,18 +3,21 @@ import { Router, RouterLink } from '@angular/router';
 
 import { Button } from '../../components/button/button';
 import { ButtonGroup } from '../../components/button-group/button-group';
-import { CheckboxField } from '../../components/checkbox-field/checkbox-field';
 import { FormPanel } from '../../components/form-panel/form-panel';
 import { PageSection } from '../../components/page-section/page-section';
 import { TextField } from '../../components/text-field/text-field';
 import { DEFAULT_POST_LOGIN_PATH } from '../../core/utils/return-url.utils';
+import { ensureFieldVisible } from '../../shared/focus-field';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-signup',
-  imports: [PageSection, FormPanel, TextField, CheckboxField, Button, ButtonGroup, RouterLink],
+  imports: [PageSection, FormPanel, TextField, Button, ButtonGroup, RouterLink],
   templateUrl: './signup.html',
-  host: { class: 'page page--auth' },
+  host: {
+    class: 'page page--auth',
+    '(focusin)': 'onFocusIn($event)',
+  },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Signup {
@@ -25,7 +28,6 @@ export class Signup {
   readonly email = signal('');
   readonly password = signal('');
   readonly confirmPassword = signal('');
-  readonly acceptTerms = signal(false);
 
   readonly nameError = signal('');
   readonly emailError = signal('');
@@ -33,6 +35,10 @@ export class Signup {
   readonly confirmError = signal('');
   readonly formError = signal('');
   readonly busy = signal(false);
+
+  onFocusIn(event: FocusEvent): void {
+    ensureFieldVisible(event.target);
+  }
 
   async submit(event: Event): Promise<void> {
     event.preventDefault();
@@ -75,11 +81,6 @@ export class Signup {
       valid = false;
     } else if (password !== confirmPassword) {
       this.confirmError.set('Passwords do not match.');
-      valid = false;
-    }
-
-    if (!this.acceptTerms()) {
-      this.formError.set('Accept the terms to continue.');
       valid = false;
     }
 

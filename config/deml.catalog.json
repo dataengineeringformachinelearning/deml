@@ -291,14 +291,6 @@
       "group": "observability"
     },
     {
-      "name": "DEML_LIVE_UPDATES_ENABLED",
-      "layers": ["backend"],
-      "secret": false,
-      "required_on": [],
-      "example": "backend/.env.example",
-      "group": "live"
-    },
-    {
       "name": "ENABLE_LEGACY_PLAINTEXT_TELEMETRY",
       "layers": ["frontend", "backend"],
       "secret": false,

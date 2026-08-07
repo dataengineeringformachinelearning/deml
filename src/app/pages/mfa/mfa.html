@@ -32,18 +32,20 @@
           variant="primary"
           shape="pill"
           type="submit"
-          [disabled]="busy() || sending() || !codeSent()"
+          [busy]="busy()"
+          [disabled]="sending() || !codeSent()"
         >
-          {{ busy() ? 'Verifying…' : 'Verify' }}
+          Verify
         </app-button>
         <app-button
           variant="secondary"
           shape="pill"
           type="button"
-          [disabled]="busy() || sending()"
+          [busy]="sending()"
+          [disabled]="busy()"
           (pressed)="resend()"
         >
-          {{ sending() ? 'Sending…' : 'Resend code' }}
+          Resend code
         </app-button>
       </app-button-group>
     </form>

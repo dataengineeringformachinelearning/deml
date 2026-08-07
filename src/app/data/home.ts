@@ -1,6 +1,6 @@
 /** Home hero — brand-first; no destination card grid. */
 export const HOME_HERO = {
   preheader: 'DEML',
-  heading: 'Control plane for ML data.',
-  lede: 'Identity and public status. Sealed streams stay in FORJD.',
+  heading: 'Status your customers can trust.',
+  lede: 'Publish public status pages, share clear uptime, and manage your account in one place.',
 } as const;

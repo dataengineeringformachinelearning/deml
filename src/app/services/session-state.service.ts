@@ -17,7 +17,7 @@ type SessionMessage =
 
 /**
  * Cross-tab session coordination via BroadcastChannel + localStorage.
- * Keeps Sign In/Sign Out state aligned and propagates idle timeout sign-out.
+ * Keeps Log in/Log out state aligned and propagates idle timeout sign-out.
  */
 @Injectable({ providedIn: 'root' })
 export class SessionStateService implements OnDestroy {

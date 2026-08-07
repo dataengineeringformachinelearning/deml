@@ -1,46 +1,35 @@
-@if (active(); as dialog) {
+@if (visible(); as dialog) {
   @if (dialog.kind === 'confirm' && dialog.data) {
-    <div
-      class="sheet-overlay"
-      role="presentation"
-      (click)="onBackdropClick($event)"
+    <app-sheet
+      [open]="true"
+      [leaving]="leaving()"
+      [title]="dialog.data.title"
+      titleId="confirm-sheet-title"
+      (dismissed)="cancel()"
     >
-      <div
-        class="sheet"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="confirm-sheet-title"
-      >
-        <div class="sheet__handle" aria-hidden="true"></div>
-        <header class="sheet__header">
-          <h2 class="sheet__title" id="confirm-sheet-title">{{ dialog.data.title }}</h2>
-        </header>
-        @if (dialog.data.message) {
-          <div class="sheet__body">
-            <p>{{ dialog.data.message }}</p>
-          </div>
-        }
-        <footer class="sheet__footer">
-          <app-button-group align="end" layout="column">
-            <app-button
-              variant="secondary"
-              shape="pill"
-              type="button"
-              (pressed)="cancel()"
-            >
-              {{ dialog.data.cancelBtnText || 'Cancel' }}
-            </app-button>
-            <app-button
-              [variant]="dialog.data.tone === 'danger' ? 'accent' : 'primary'"
-              shape="pill"
-              type="button"
-              (pressed)="confirm()"
-            >
-              {{ dialog.data.confirmBtnText || 'Confirm' }}
-            </app-button>
-          </app-button-group>
-        </footer>
-      </div>
-    </div>
+      @if (dialog.data.message) {
+        <p>{{ dialog.data.message }}</p>
+      }
+      <app-button-group sheetFooter align="end" layout="column">
+        <app-button
+          variant="secondary"
+          shape="pill"
+          type="button"
+          [disabled]="leaving()"
+          (pressed)="cancel()"
+        >
+          {{ dialog.data.cancelBtnText || 'Cancel' }}
+        </app-button>
+        <app-button
+          [variant]="dialog.data.tone === 'danger' ? 'accent' : 'primary'"
+          shape="pill"
+          type="button"
+          [disabled]="leaving()"
+          (pressed)="confirm()"
+        >
+          {{ dialog.data.confirmBtnText || 'Confirm' }}
+        </app-button>
+      </app-button-group>
+    </app-sheet>
   }
 }

@@ -65,7 +65,9 @@ def _credential_for_tenant(tenant_id: UUID) -> ForjdTenantCredential | None:
         return None
   # Fall back to platform env credential when the page lives on that tenant.
   try:
-    platform = ForjdClient()
+    from forjd.clients import platform_forjd_client
+
+    platform = platform_forjd_client()
     if platform.tenant_id and str(platform.tenant_id) == str(tenant_id):
       return ForjdTenantCredential(
         tenant_id=tenant_id,
@@ -79,16 +81,18 @@ def _credential_for_tenant(tenant_id: UUID) -> ForjdTenantCredential | None:
 async def _resolve_page_tenant(slug: str) -> UUID | None:
   """Resolve the FORJD tenant that owns a published status-page slug.
 
-  Prefer service auth so FORJD includes ``tenant_id`` for BFF routing. Fall back
-  to the unauthenticated public slug (no tenant_id) only when platform env is
-  unset — in that case widget ingest cannot seal to a customer tenant.
+  Uses the platform credential (``status:tenant-resolve`` / ``*``) so FORJD
+  may include ``tenant_id`` for BFF widget routing. Product fjsvc_ tokens
+  never receive foreign tenant UUIDs from the public slug endpoint.
   """
+  from forjd.clients import platform_forjd_client, public_forjd_client
+
   clients: list[ForjdClient] = []
   try:
-    clients.append(ForjdClient())  # platform service principal when configured
+    clients.append(platform_forjd_client())
   except Exception:  # — platform env optional for pure customer deploys
     pass
-  clients.append(ForjdClient(use_service_auth=False))
+  clients.append(public_forjd_client())
 
   last_status: int | None = None
   for client in clients:

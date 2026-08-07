@@ -104,13 +104,16 @@ describe('AuthService', () => {
   });
 
   it('should login and set signals on success', async () => {
-    // Manually trigger authenticated state for the test
+    // Session bind already settled — waitForSessionReady must not hang the unit test.
     service.isAuthenticated.set(true);
     service.currentUserId.set(100);
+    service.sessionId.set('sess-test');
 
     const dummyPassword = `dummy-pwd-${Math.random()}`;
-    const loginPromise = service.login({ username: 'user@example.com', password: dummyPassword });
-    const result = await loginPromise;
+    const result = await service.login({
+      username: 'user@example.com',
+      password: dummyPassword,
+    });
 
     expect(result.success).toBe(true);
     expect(service.isAuthenticated()).toBe(true);
@@ -164,7 +167,7 @@ describe('AuthService', () => {
     expect(await deletionPromise).toEqual({
       status: 'failed',
       message:
-        'Account deletion could not be requested. Your identities and account data remain intact. Please try again.',
+        'Account deletion could not be requested. Your account and data remain intact. Try again.',
     });
     expect(service.isAuthenticated()).toBe(true);
     expect(service.currentUserId()).toBe(42);

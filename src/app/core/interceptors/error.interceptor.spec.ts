@@ -54,13 +54,13 @@ describe('errorInterceptor', () => {
   it('logs out when an authorized request returns 401', async () => {
     const failure = new Promise<unknown>((resolve, reject) => {
       http
-        .get('/api/v1/analytics/overview', {
+        .get('/api/v1/system-status/status_pages', {
           headers: { Authorization: 'Bearer expired' },
         })
         .subscribe({ next: resolve, error: reject });
     });
 
-    const req = httpMock.expectOne('/api/v1/analytics/overview');
+    const req = httpMock.expectOne('/api/v1/system-status/status_pages');
     req.flush({ detail: 'expired' }, { status: 401, statusText: 'Unauthorized' });
     await expect(failure).rejects.toBeTruthy();
     expect(logout).toHaveBeenCalledTimes(1);

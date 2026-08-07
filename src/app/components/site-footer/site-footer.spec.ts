@@ -21,15 +21,36 @@ describe('SiteFooter', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render compact legal footer', () => {
+  it('should render suite, legal links, and Joe Alongi credit', () => {
     const host = fixture.nativeElement as HTMLElement;
     const text = host.textContent ?? '';
+    const labels = Array.from(host.querySelectorAll('.site-footer__list a')).map((el) =>
+      el.textContent?.trim(),
+    );
 
     expect(host.querySelector('footer.site-footer')).toBeTruthy();
     expect(host.querySelector('nav[aria-label="Footer"]')).toBeTruthy();
-    expect(text).toContain('Privacy');
-    expect(text).toContain('Terms');
-    expect(text).toContain('Status');
-    expect(text).toContain(`© ${new Date().getFullYear()} DEML`);
+    expect(labels).toEqual([
+      'Book',
+      'Whitepaper',
+      'Docs',
+      'Blog',
+      'Compliance',
+      'Privacy',
+      'Terms',
+      'Status',
+    ]);
+    expect(
+      host
+        .querySelector('a[href="https://dataengineeringformachinelearning.com/blog"]')
+        ?.textContent?.trim(),
+    ).toBe('Blog');
+    expect(text).toContain('Made in the U.S.A.');
+    expect(text).toContain('Joe Alongi');
+    expect(text).toContain(`Copyright © ${new Date().getFullYear()}`);
+    expect(
+      host.querySelector('a[href="https://joealongi.dev/"]')?.getAttribute('rel'),
+    ).toContain('noopener');
   });
 });
+

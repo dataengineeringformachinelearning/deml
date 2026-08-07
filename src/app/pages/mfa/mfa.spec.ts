@@ -32,7 +32,6 @@ describe('Mfa', () => {
       providers: [
         provideRouter([
           { path: 'login', children: [] },
-          { path: 'dashboard', children: [] },
           { path: 'settings', children: [] },
         ]),
         { provide: AuthService, useValue: authMock },
@@ -93,7 +92,7 @@ describe('Mfa', () => {
     expect(authMock.resolveMfaSignIn).not.toHaveBeenCalled();
   });
 
-  it('should verify the code and navigate to the dashboard by default', async () => {
+  it('should verify the code and navigate to settings by default', async () => {
     const navigateSpy = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
     const component = fixture.componentInstance;
 

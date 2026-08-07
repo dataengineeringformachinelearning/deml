@@ -34,26 +34,14 @@ _PHASE_PRESETS: Final[dict[str, tuple[WriteMode, ReadMode]]] = {
 _VALID_WRITE: Final[frozenset[str]] = frozenset({"off", "forjd", "dual"})
 _VALID_READ: Final[frozenset[str]] = frozenset({"off", "forjd", "dual"})
 
-# GET adapters that may return empty envelopes only in explicit off/dual modes.
+# Mounted GET adapters that may return empty envelopes only in off/dual modes.
+# Retired facades (analytics/SIEM/ML/…) are unmounted → always 501, never listed here.
 _READ_FALLBACK_PATHS: Final[frozenset[str]] = frozenset(
   {
-    "/api/v1/projections",
-    "/api/v1/projections/checkpoints",
     "/api/v1/ingest/events",
     "/api/v1/ingest/results",
     "/api/v1/sessions",
-    "/api/v1/replay/dlq",
     "/api/v1/status/pages",
-    "/api/v1/analytics/overview",
-    "/api/v1/soc/cases",
-    "/api/v1/playbooks",
-    "/api/v1/playbooks/runs",
-    "/api/v1/siem/signals",
-    "/api/v1/vulnerabilities",
-    "/api/v1/exports",
-    "/api/v1/ml/scores",
-    "/api/v1/compliance/soc",
-    "/api/v1/workflows",
   }
 )
 
@@ -105,10 +93,10 @@ def is_read_fallback_path(target_path: str) -> bool:
 
 
 def empty_read_envelope(target_path: str) -> dict[str, Any]:
-  """Stable JSON shapes for Angular list adapters when FORJD is skipped/down.
+  """Stable JSON shapes for mounted adapters when FORJD is skipped/down.
 
   ``degraded=True`` marks fallback empties so clients never treat an outage
-  as a successful empty dataset.
+  as a successful empty dataset. Retired facades must not use this helper.
   """
   path = target_path.rstrip("/")
   base = {
@@ -117,38 +105,14 @@ def empty_read_envelope(target_path: str) -> dict[str, Any]:
     "path": path,
     "degraded": True,
   }
-  if path.endswith("/checkpoints"):
-    return {**base, "checkpoints": [], "items": []}
   if path.endswith("/results"):
     return {**base, "results": [], "items": []}
   if path.endswith("/events"):
     return {**base, "events": [], "items": []}
   if path.endswith("/sessions"):
     return {**base, "ok": True, "sessions": [], "items": []}
-  if path.endswith("/dlq"):
-    return {**base, "ok": True, "items": []}
   if path.endswith("/pages"):
     return {**base, "ok": True, "pages": [], "items": []}
-  if path.endswith("/overview"):
-    return {**base, "ok": True, "items": []}
-  if path.endswith("/cases"):
-    return {**base, "ok": True, "cases": [], "items": []}
-  if path.endswith("/playbooks"):
-    return {**base, "ok": True, "playbooks": [], "items": []}
-  if path.endswith("/playbooks/runs"):
-    return {**base, "ok": True, "runs": [], "items": []}
-  if path.endswith("/signals"):
-    return {**base, "ok": True, "signals": [], "items": []}
-  if path.endswith("/vulnerabilities"):
-    return {**base, "ok": True, "vulnerabilities": [], "items": []}
-  if path.endswith("/exports"):
-    return {**base, "ok": True, "jobs": [], "items": []}
-  if path.endswith("/scores"):
-    return {**base, "ok": True, "scores": [], "items": []}
-  if path.endswith("/soc"):
-    return {**base, "ok": False, "status": "unavailable", "items": []}
-  if path.endswith("/workflows"):
-    return {**base, "ok": True, "count": 0, "workflows": [], "items": []}
   return {**base, "items": [], "results": []}
 
 

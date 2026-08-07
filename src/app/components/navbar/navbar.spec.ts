@@ -27,17 +27,6 @@ describe('Navbar', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should apply iconColor to the navbar icon CSS variable', async () => {
-    fixture.componentRef.setInput('iconColor', 'var(--color-accent-gold)');
-    fixture.detectChanges();
-    await fixture.whenStable();
-
-    const host = fixture.nativeElement as HTMLElement;
-    expect(host.style.getPropertyValue('--navbar-icon-color').trim()).toBe(
-      'var(--color-accent-gold)',
-    );
-  });
-
   it('should render the Lucide ship brand mark with home aria-label', () => {
     const host = fixture.nativeElement as HTMLElement;
     const brand = host.querySelector('.site-navbar-icon') as HTMLAnchorElement | null;
@@ -53,7 +42,14 @@ describe('Navbar', () => {
     const host = fixture.nativeElement as HTMLElement;
     const links = Array.from(host.querySelectorAll('#site-navbar-menu a'));
 
-    expect(links.map((el) => el.textContent?.trim())).toEqual(['Explore']);
+    expect(links.map((el) => el.textContent?.trim())).toEqual([
+      'Explore',
+      'Book',
+      'Whitepaper',
+      'Docs',
+      'Blog',
+      'Compliance',
+    ]);
     for (const link of links) {
       expect(link.hasAttribute('aria-label')).toBe(false);
     }
@@ -67,17 +63,47 @@ describe('Navbar', () => {
     const host = fixture.nativeElement as HTMLElement;
     const links = Array.from(host.querySelectorAll('#site-navbar-menu a'));
 
-    expect(links.map((el) => el.textContent?.trim())).toEqual(['Explore', 'Settings']);
+    expect(links.map((el) => el.textContent?.trim())).toEqual([
+      'Explore',
+      'Settings',
+      'Book',
+      'Whitepaper',
+      'Docs',
+      'Blog',
+      'Compliance',
+    ]);
   });
 
-  it('should show Log in and Sign up when logged out', () => {
+  it('should keep Log in / Log out chrome and link community Blog externally', async () => {
+    const host = fixture.nativeElement as HTMLElement;
+    const blog = Array.from(host.querySelectorAll('#site-navbar-menu a')).find(
+      (el) => el.textContent?.trim() === 'Blog',
+    ) as HTMLAnchorElement | undefined;
+
+    expect(blog?.getAttribute('href')).toBe(
+      'https://dataengineeringformachinelearning.com/blog',
+    );
+    expect(host.textContent).toContain('Log in');
+
+    auth.isAuthenticated.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const labels = Array.from(host.querySelectorAll('app-button')).map((el) =>
+      (el as HTMLElement).textContent?.trim(),
+    );
+    expect(labels).toContain('Log out');
+    expect(labels).not.toContain('Log in');
+  });
+
+  it('should show Log in when logged out', () => {
     const host = fixture.nativeElement as HTMLElement;
     const labels = Array.from(host.querySelectorAll('app-button')).map((el) =>
       (el as HTMLElement).textContent?.trim(),
     );
 
     expect(labels).toContain('Log in');
-    expect(labels).toContain('Sign up');
+    expect(labels).not.toContain('Sign up');
   });
 
   it('should show Log out when logged in', async () => {

@@ -1,11 +1,12 @@
 {
   "navLinks": [
     {
-      "id": "blue-notes",
-      "label": "Blue Notes",
-      "icon": "file",
-      "appHref": "https://dataengineeringformachinelearning.com/blog/",
-      "marketingHref": "/blog/"
+      "id": "explore",
+      "label": "Explore",
+      "icon": "search",
+      "appHref": "/explore",
+      "marketingHref": "https://deml.app/explore",
+      "platform": true
     },
     {
       "id": "book",
@@ -15,36 +16,18 @@
       "marketingHref": "/book"
     },
     {
-      "id": "dashboard",
-      "label": "Dashboard",
-      "icon": "home",
-      "appHref": "/dashboard",
-      "marketingHref": "/dashboard",
-      "requireAuth": true,
-      "platform": true
-    },
-    {
-      "id": "sites",
-      "label": "Sites",
-      "icon": "building",
-      "appHref": "/settings",
-      "marketingHref": "/settings",
-      "requireAuth": true,
-      "platform": true
-    },
-    {
-      "id": "account",
-      "label": "Account",
+      "id": "settings",
+      "label": "Settings",
       "icon": "user",
-      "appHref": "/account",
-      "marketingHref": "/account",
+      "appHref": "/settings",
+      "marketingHref": "https://deml.app/settings",
       "requireAuth": true,
       "platform": true
     }
   ],
   "footerColumns": [
     {
-      "title": "Platforms",
+      "title": "Product",
       "links": [
         {
           "label": "DEML",
@@ -53,114 +36,46 @@
           "platform": true
         },
         {
+          "label": "Explore",
+          "appHref": "/explore",
+          "marketingHref": "https://deml.app/explore",
+          "platform": true
+        },
+        {
           "label": "FORJD",
           "appHref": "https://backend.forjd.co/",
           "marketingHref": "https://backend.forjd.co/",
           "external": true
-        },
-        {
-          "label": "Explore",
-          "appHref": "/explore",
-          "marketingHref": "/explore",
-          "platform": true
-        },
-        {
-          "label": "Dashboard",
-          "appHref": "/dashboard",
-          "marketingHref": "/dashboard",
-          "platform": true,
-          "requireAuth": true
         }
       ]
     },
     {
-      "title": "Resources",
+      "title": "Learn",
       "links": [
-        {
-          "label": "Community",
-          "appHref": "https://dataengineeringformachinelearning.com/",
-          "marketingHref": "/"
-        },
-        {
-          "label": "Whitepaper",
-          "appHref": "https://dataengineeringformachinelearning.com/whitepaper/",
-          "marketingHref": "/whitepaper"
-        },
         {
           "label": "Book",
           "appHref": "https://dataengineeringformachinelearning.com/book/",
           "marketingHref": "/book"
         },
         {
-          "label": "Blue Notes",
-          "appHref": "https://dataengineeringformachinelearning.com/blog/",
-          "marketingHref": "/blog/"
-        },
-        {
-          "label": "DEML Swagger",
-          "appHref": "https://backend.deml.app/api/v1/docs",
-          "marketingHref": "https://backend.deml.app/api/v1/docs",
-          "external": true
-        },
-        {
-          "label": "DEML ReDoc",
-          "appHref": "https://backend.deml.app/api/v1/redoc",
-          "marketingHref": "https://backend.deml.app/api/v1/redoc",
-          "external": true
-        },
-        {
-          "label": "FORJD capabilities",
-          "appHref": "https://backend.forjd.co/api/v1/capabilities",
-          "marketingHref": "https://backend.forjd.co/api/v1/capabilities",
-          "external": true
+          "label": "Whitepaper",
+          "appHref": "https://dataengineeringformachinelearning.com/whitepaper/",
+          "marketingHref": "/whitepaper"
         }
       ]
     },
     {
-      "title": "Support",
+      "title": "Legal",
       "links": [
         {
-          "label": "Platform Status",
-          "appHref": "/status/platform-status",
-          "marketingHref": "/status/platform-status",
-          "platform": true
-        },
-        {
-          "label": "Report a Bug",
-          "appHref": "#",
-          "marketingHref": "#",
-          "action": "bug-report"
-        }
-      ]
-    },
-    {
-      "title": "Legal & Compliance",
-      "links": [
-        {
-          "label": "Privacy Policy",
+          "label": "Privacy",
           "appHref": "https://dataengineeringformachinelearning.com/privacy/",
           "marketingHref": "/privacy"
         },
         {
-          "label": "Terms of Service",
+          "label": "Terms",
           "appHref": "https://dataengineeringformachinelearning.com/terms/",
           "marketingHref": "/terms"
-        },
-        {
-          "label": "SOC2 Compliance",
-          "appHref": "https://dataengineeringformachinelearning.com/compliance/",
-          "marketingHref": "/compliance"
-        },
-        {
-          "label": "GDPR Compliance",
-          "appHref": "https://dataengineeringformachinelearning.com/privacy/#gdpr",
-          "marketingHref": "/privacy#gdpr"
-        },
-        {
-          "label": "Cookie Settings",
-          "appHref": "#",
-          "marketingHref": "#",
-          "action": "cookie-settings"
         }
       ]
     }

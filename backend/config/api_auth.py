@@ -52,9 +52,13 @@ def api_user(request):
       user_id=request.user.id,
       role=role,
     )
+    # `user` / `display_name` = human name only. Never fall back to Firebase UID
+    # (username) — that would invent a display string from an opaque identifier.
+    display_name = (request.user.first_name or "").strip()
     return {
       "status": "success",
-      "user": request.user.first_name or request.user.username,
+      "user": display_name or None,
+      "display_name": display_name or None,
       "user_id": request.user.id,
       "role": role,
     }
@@ -236,9 +240,11 @@ def verify_handoff_token(request, payload: HandoffVerifyIn):
     desktop_token = None
     if expected_challenge:
       desktop_token = signing.dumps({"user_id": user.id}, salt=_DESKTOP_SESSION_SALT, compress=True)
+    display_name = (user.first_name or "").strip()
     return {
       "status": "success",
-      "user": user.first_name or user.username,
+      "user": display_name or None,
+      "display_name": display_name or None,
       "email": user.email,
       "user_id": user.id,
       "role": role,
@@ -273,9 +279,11 @@ def validate_desktop_session(request, payload: DesktopSessionIn):
   except User.DoesNotExist:
     raise HttpError(401, "Desktop session user is unavailable") from None
   role = user.profile.role if hasattr(user, "profile") else "Viewer"
+  display_name = (user.first_name or "").strip()
   return {
     "status": "success",
-    "user": user.first_name or user.username,
+    "user": display_name or None,
+    "display_name": display_name or None,
     "email": user.email,
     "user_id": user.id,
     "role": role,

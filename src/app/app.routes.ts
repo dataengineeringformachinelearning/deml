@@ -1,12 +1,9 @@
 import { Routes } from '@angular/router';
 
-import { getBlogPost } from './data/blog-posts';
 import { authGuard } from './guards/auth.guard';
-import { settingsSectionRedirect } from './shared/settings-redirect';
 
 /**
- * Core product: identity + public status + site management.
- * Writing (/blog) stays addressable; it is not primary chrome.
+ * Core product only: identity + public status + site management.
  */
 export const routes: Routes = [
   {
@@ -14,20 +11,6 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/home/home').then((m) => m.Home),
     title: 'DEML',
     data: { preload: 'guest' },
-  },
-  {
-    path: 'blog',
-    loadComponent: () => import('./pages/blog/blog').then((m) => m.Blog),
-    title: 'Blog · DEML',
-    data: { preload: 'guest' },
-  },
-  {
-    path: 'blog/:slug',
-    loadComponent: () => import('./pages/blog-post/blog-post').then((m) => m.BlogPostPage),
-    title: (route) => {
-      const post = getBlogPost(String(route.params['slug'] ?? ''));
-      return post ? `${post.title} · Blog · DEML` : 'Post not found · DEML';
-    },
   },
   {
     path: 'login',
@@ -48,21 +31,16 @@ export const routes: Routes = [
     data: { preload: 'guest' },
   },
   {
-    path: 'status',
-    pathMatch: 'full',
-    redirectTo: 'explore',
+    path: 'explore',
+    loadComponent: () => import('./pages/explore/explore').then((m) => m.Explore),
+    title: 'Explore · DEML',
+    data: { preload: 'guest' },
   },
   {
     path: 'status/:slug',
     loadComponent: () =>
       import('./pages/isolated-status/isolated-status').then((m) => m.IsolatedStatus),
     title: 'Status · DEML',
-  },
-  {
-    path: 'explore',
-    loadComponent: () => import('./pages/explore/explore').then((m) => m.Explore),
-    title: 'Explore · DEML',
-    data: { preload: 'guest' },
   },
   {
     path: 'settings',
@@ -72,28 +50,13 @@ export const routes: Routes = [
     data: { preload: 'auth' },
   },
   {
-    path: 'sites',
-    canActivate: [authGuard, settingsSectionRedirect('sites')],
-    loadComponent: () => import('./pages/settings/settings').then((m) => m.Settings),
-    title: 'Settings · DEML',
+    // Headless iframe bridge for Django chrome — not product navigation.
+    path: 'auth-bridge',
+    loadComponent: () => import('./pages/auth-bridge/auth-bridge').then((m) => m.AuthBridge),
+    title: 'DEML',
+    data: { bareShell: true },
   },
-  {
-    path: 'account',
-    canActivate: [authGuard, settingsSectionRedirect('account')],
-    loadComponent: () => import('./pages/settings/settings').then((m) => m.Settings),
-    title: 'Settings · DEML',
-  },
-  // --- Retired → core ---
-  { path: 'dashboard', redirectTo: 'settings', pathMatch: 'full' },
-  { path: 'learn', redirectTo: 'blog', pathMatch: 'full' },
-  { path: 'learn/:slug', redirectTo: 'blog' },
-  { path: 'about', redirectTo: 'explore', pathMatch: 'full' },
-  { path: 'analytics', redirectTo: 'settings', pathMatch: 'full' },
-  { path: 'vulnerabilities', redirectTo: 'settings', pathMatch: 'full' },
-  { path: 'pipeline', redirectTo: 'settings', pathMatch: 'full' },
-  { path: 'success', redirectTo: 'settings', pathMatch: 'full' },
-  { path: 'auth-status', redirectTo: 'login', pathMatch: 'full' },
-  { path: 'home', redirectTo: '', pathMatch: 'full' },
+  { path: 'status', pathMatch: 'full', redirectTo: 'explore' },
   {
     path: '**',
     loadComponent: () => import('./pages/not-found/not-found').then((m) => m.NotFound),

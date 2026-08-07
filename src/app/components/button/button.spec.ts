@@ -9,8 +9,8 @@ import { Button } from './button';
   imports: [Button],
   template: `
     <app-button variant="primary" shape="pill">Sign up</app-button>
-    <app-button variant="secondary" shape="pill" href="/blog/">Read</app-button>
-    <app-button variant="accent" shape="pill" routerLink="/blog">Router</app-button>
+    <app-button variant="secondary" shape="pill" href="/explore/">Explore</app-button>
+    <app-button variant="accent" shape="pill" routerLink="/explore">Router</app-button>
   `,
 })
 class Host {}
@@ -37,9 +37,11 @@ describe('Button', () => {
   });
 
   it('should render as a link when href is provided', () => {
-    const link = fixture.nativeElement.querySelector('a.button[href="/blog/"]') as HTMLAnchorElement;
+    const link = fixture.nativeElement.querySelector(
+      'a.button[href="/explore/"]',
+    ) as HTMLAnchorElement;
     expect(link).toBeTruthy();
-    expect(link.textContent?.trim()).toBe('Read');
+    expect(link.textContent?.trim()).toBe('Explore');
     expect(link.classList.contains('button--secondary')).toBe(true);
   });
 

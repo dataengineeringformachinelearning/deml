@@ -94,51 +94,51 @@
       }
     },
     "UC-DASH-001": {
-      "unit": ["backend/forjd/test_angular_compat.py::test_deml_analytics_overview_maps_ces_fields"],
-      "integration": ["backend/forjd/test_angular_compat.py::test_analytics_overview_proxy_maps_forjd"],
+      "unit": ["backend/forjd/test_angular_compat.py::test_retired_analytics_overview_is_unavailable"],
+      "integration": ["backend/forjd/test_headless_contract.py::test_retired_headless_facades_are_unavailable"],
       "observability": {
         "sources": ["backend/forjd/views.py"],
-        "deferred_observability": "Shared FORJD adapter warnings; page latency metric deferred"
+        "deferred_observability": "Retired analytics facade returns 501 forjd_capability_unavailable"
       }
     },
     "UC-ANALYTICS-001": {
-      "unit": ["src/app/services/live-updates.service.spec.ts"],
-      "integration": ["backend/forjd/test_live.py::test_live_stream_emits_ready_and_projection_events"],
+      "unit": ["backend/forjd/test_headless_contract.py::test_retired_headless_facades_are_unavailable"],
+      "integration": ["backend/forjd/test_headless_contract.py::test_retired_headless_facades_are_unavailable"],
       "observability": {
-        "sources": ["backend/forjd/live.py"],
-        "deferred_observability": "forjd_live_degraded warning with request_id already emitted"
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "SSE live lane retired; analytics/live fails closed"
       }
     },
     "UC-ANALYTICS-002": {
-      "unit": ["backend/forjd/test_policy.py::test_action_policy_matrix"],
-      "integration": ["backend/forjd/test_headless_contract.py::test_headless_route_contracts_are_tenant_bound_and_typed"],
+      "unit": ["backend/forjd/test_headless_contract.py::test_retired_headless_facades_are_unavailable"],
+      "integration": ["backend/forjd/test_headless_contract.py::test_retired_headless_facades_are_unavailable"],
       "observability": {
-        "sources": ["backend/forjd/policy.py"],
-        "deferred_observability": "Mutations audited via record_forjd_audit"
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "Incident/SOC facades retired; partners call FORJD with fjsvc_"
       }
     },
     "UC-ANALYTICS-003": {
-      "unit": ["backend/config/test_csrf_header_auth.py::test_authorization_header_required_rejects_cookie_only_session"],
-      "integration": ["backend/forjd/test_headless_contract.py::test_playbook_action_controls_are_tenant_bound_and_csrf_exempt"],
+      "unit": ["backend/forjd/test_headless_contract.py::test_retired_headless_facades_are_unavailable"],
+      "integration": ["backend/forjd/test_headless_contract.py::test_retired_headless_facades_are_unavailable"],
       "observability": {
-        "sources": ["backend/forjd/policy.py"],
-        "deferred_observability": "Playbook actions audited via policy decorator"
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "Playbook facades retired; partners call FORJD with fjsvc_"
       }
     },
     "UC-SIEM-001": {
-      "unit": ["backend/forjd/test_policy.py::test_action_policy_matrix"],
-      "integration": ["backend/forjd/test_usecase_proxies.py::test_siem_signals_require_tenant_mapping"],
+      "unit": ["backend/forjd/test_usecase_proxies.py::test_retired_siem_facade_is_unavailable"],
+      "integration": ["backend/forjd/test_usecase_proxies.py::test_retired_siem_facade_is_unavailable"],
       "observability": {
-        "sources": ["backend/forjd/policy.py"],
-        "deferred_observability": "SIEM writes audited via shared FORJD policy path"
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "SIEM facade retired; partners call FORJD with fjsvc_"
       }
     },
     "UC-VULN-001": {
-      "unit": ["src/app/services/vulnerability.service.spec.ts"],
-      "integration": ["backend/forjd/test_angular_compat.py::test_vulnerabilities_proxy_maps_forjd"],
+      "unit": ["backend/forjd/test_angular_compat.py::test_retired_vulnerabilities_facade_is_unavailable"],
+      "integration": ["backend/forjd/test_angular_compat.py::test_retired_vulnerabilities_facade_is_unavailable"],
       "observability": {
         "sources": ["backend/forjd/views.py"],
-        "deferred_observability": "Adapter 5xx warnings"
+        "deferred_observability": "Vulnerabilities facade retired; partners call FORJD with fjsvc_"
       }
     },
     "UC-STATUS-001": {
@@ -178,50 +178,50 @@
     },
     "UC-INGEST-003": {
       "unit": ["backend/forjd/test_usecase_proxies.py::test_crypto_sessions_list_requires_mapping"],
-      "integration": ["backend/forjd/test_compatibility.py::test_session_and_replay_routes_require_tenant_mapping"],
+      "integration": ["backend/forjd/test_compatibility.py::test_session_and_retired_replay_routes_fail_closed"],
       "observability": {
         "sources": ["backend/forjd/views.py"],
-        "deferred_observability": "Crypto session proxy uses shared adapter logging"
+        "deferred_observability": "Crypto session proxy uses shared adapter logging; replay facade retired"
       }
     },
     "UC-PIPE-001": {
-      "unit": ["src/app/core/workflow-yaml.spec.ts"],
-      "integration": ["backend/forjd/test_usecase_proxies.py::test_workflows_list_proxy"],
+      "unit": ["backend/forjd/test_usecase_proxies.py::test_retired_workflows_facade_is_unavailable"],
+      "integration": ["backend/forjd/test_usecase_proxies.py::test_retired_workflows_facade_is_unavailable"],
       "observability": {
         "sources": ["backend/forjd/views.py"],
-        "deferred_observability": "Workflows GET uses shared adapter logging"
+        "deferred_observability": "Workflows facade retired; partners call FORJD with fjsvc_"
       }
     },
     "UC-PROJ-001": {
-      "unit": ["backend/forjd/test_client.py::test_list_projections_binds_tenant_query"],
-      "integration": ["backend/forjd/test_compatibility.py::test_authenticated_adapter_uses_native_path_and_mapped_tenant"],
+      "unit": ["backend/forjd/test_compatibility.py::test_retired_projections_facade_is_unavailable"],
+      "integration": ["backend/forjd/test_compatibility.py::test_retired_projections_facade_is_unavailable"],
       "observability": {
-        "sources": ["backend/forjd/client.py"],
-        "deferred_observability": "Client warnings on projection list failures"
+        "sources": ["backend/forjd/views.py"],
+        "deferred_observability": "Projections/replay facades retired; partners call FORJD with fjsvc_"
       }
     },
     "UC-EXPORT-001": {
       "unit": ["src/app/pages/settings/settings.spec.ts"],
-      "integration": ["backend/forjd/test_headless_contract.py::test_export_create_detail_and_signed_download_are_tenant_bound"],
+      "integration": ["backend/forjd/test_headless_contract.py::test_retired_headless_facades_are_unavailable"],
       "observability": {
         "sources": ["backend/forjd/views.py"],
-        "deferred_observability": "Must never log signed download URLs"
+        "deferred_observability": "Exports facade retired; partners call FORJD with fjsvc_"
       }
     },
     "UC-ML-001": {
-      "unit": ["src/app/services/ml.service.spec.ts"],
-      "integration": ["backend/forjd/test_angular_compat.py::test_deml_export_jobs_and_ml_latest"],
+      "unit": ["backend/forjd/test_compatibility.py::test_retired_ml_threat_report_is_unavailable"],
+      "integration": ["backend/forjd/test_headless_contract.py::test_retired_headless_facades_are_unavailable"],
       "observability": {
         "sources": ["backend/forjd/views.py"],
-        "deferred_observability": "ML proxy uses shared adapter logging"
+        "deferred_observability": "ML facade retired; partners call FORJD with fjsvc_"
       }
     },
     "UC-COMPLY-001": {
-      "unit": ["backend/forjd/test_usecase_proxies.py::test_soc_status_requires_mapping"],
-      "integration": ["backend/forjd/test_usecase_proxies.py::test_soc_status_requires_mapping"],
+      "unit": ["backend/forjd/test_usecase_proxies.py::test_retired_siem_facade_is_unavailable"],
+      "integration": ["backend/forjd/test_usecase_proxies.py::test_retired_siem_facade_is_unavailable"],
       "observability": {
         "sources": ["backend/forjd/views.py"],
-        "deferred_observability": "Compliance proxy uses shared adapter logging"
+        "deferred_observability": "SOC/compliance facades retired; partners call FORJD with fjsvc_"
       }
     },
     "UC-REPORT-001": {
@@ -234,18 +234,18 @@
     },
     "UC-INTEG-001": {
       "unit": ["backend/monitor/test_analytics_sync.py::test_fetch_google_missing_token"],
-      "integration": ["backend/monitor/test_integrations.py::test_list_and_delete_scoped_to_account"],
+      "integration": ["backend/monitor/test_integrations.py::test_analytics_integrations_are_unmounted"],
       "observability": {
-        "sources": ["backend/monitor/integrations.py"],
-        "deferred_observability": "OAuth/connect/disconnect audit logs present"
+        "sources": ["backend/monitor/analytics_sync.py"],
+        "deferred_observability": "Sync logs provider + account id only"
       }
     },
     "UC-INTEG-002": {
       "unit": ["backend/forjd/test_policy.py::test_core_product_actions_do_not_require_pro"],
-      "integration": ["backend/forjd/test_usecase_proxies.py::test_security_alert_requires_tenant_mapping"],
+      "integration": ["backend/forjd/test_usecase_proxies.py::test_retired_siem_facade_is_unavailable"],
       "observability": {
         "sources": ["backend/forjd/views.py"],
-        "deferred_observability": "Security-alert writes use shared adapter/audit"
+        "deferred_observability": "Security-alert facade retired with other headless proxies"
       }
     },
     "UC-WIDGET-001": {
@@ -257,7 +257,7 @@
       }
     },
     "UC-HEALTH-001": {
-      "unit": ["src/app/core/continuity-health.spec.ts"],
+      "unit": ["backend/config/test_ready_contract.py::test_ready_soft_degrades_when_forjd_not_ready"],
       "integration": ["backend/config/test_ready_contract.py::test_ready_exposes_forjd_health_and_mode"],
       "observability": {
         "sources": ["backend/config/api.py"],
@@ -279,10 +279,10 @@
       }
     },
     "UC-ONBOARD-001": {
-      "unit": ["src/app/services/onboarding.service.spec.ts"],
-      "integration": ["src/app/services/onboarding.service.spec.ts"],
+      "unit": ["src/app/pages/settings/settings.spec.ts"],
+      "integration": ["src/app/services/auth.service.spec.ts"],
       "observability": {
-        "deferred_observability": "Client-only checklist; no server boundary"
+        "deferred_observability": "Onboarding service removed with minimal surface; settings/auth specs cover remaining account entry"
       }
     },
     "UC-CORS-001": {

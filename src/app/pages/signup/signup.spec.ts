@@ -34,7 +34,7 @@ describe('Signup', () => {
     await TestBed.configureTestingModule({
       imports: [Signup],
       providers: [
-        provideRouter([{ path: 'dashboard', children: [] }]),
+        provideRouter([{ path: 'settings', children: [] }]),
         { provide: AuthService, useValue: authMock },
       ],
     }).compileComponents();
@@ -53,19 +53,17 @@ describe('Signup', () => {
     expect(host.querySelector('h1')?.textContent).toContain('Create account');
   });
 
-  it('should require terms acceptance', async () => {
+  it('should require matching passwords', async () => {
     const component = fixture.componentInstance;
     component.name.set('Ada');
     component.email.set('ada@example.com');
     component.password.set('secret123');
-    component.confirmPassword.set('secret123');
-    component.acceptTerms.set(false);
+    component.confirmPassword.set('different');
     await component.submit(new Event('submit'));
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(component.formError()).toContain('terms');
-    expect(authMock.isAuthenticated()).toBe(false);
+    expect(component.confirmError()).toContain('match');
     expect(authMock.register).not.toHaveBeenCalled();
   });
 
@@ -77,7 +75,6 @@ describe('Signup', () => {
     component.email.set('ada@example.com');
     component.password.set('secret123');
     component.confirmPassword.set('secret123');
-    component.acceptTerms.set(true);
     await component.submit(new Event('submit'));
     fixture.detectChanges();
     await fixture.whenStable();

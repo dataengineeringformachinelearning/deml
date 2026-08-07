@@ -70,7 +70,7 @@ def test_middleware_limits_credential_and_account(mock_consume_many) -> None:
     RateLimitDecision(True, 2, 1, 0),
     RateLimitDecision(False, 2, 0, 30),
   )
-  request = RequestFactory().post("/api/v1/siem/signals")
+  request = RequestFactory().post("/api/v1/ingest/events:batch")
   request.user = SimpleNamespace(
     is_authenticated=True,
     pk=7,

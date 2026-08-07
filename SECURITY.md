@@ -7,19 +7,18 @@ public issues with exploit PoCs, credentials, or sealed plaintext.
 
 ## Control-plane / data-plane boundary
 
-| Surface                       | Rule                                                                                  |
-| ----------------------------- | ------------------------------------------------------------------------------------- |
-| Firebase / `deml_` tokens     | Terminate at Django — never forward to FORJD                                          |
-| FORJD calls                   | Tenant-bound `fjsvc_` only; secret refs in DB, never plaintext in browser             |
-| Pipeline Studio (`/pipeline`) | Compose/export YAML only — no browser persist; deploy on FORJD + `validate:workflows` |
-| Ciphertext                    | Sealed envelopes only on the wire to FORJD                                            |
+| Surface | Rule |
+|---------|------|
+| Firebase / `deml_` tokens | Terminate at Django — never forward to FORJD |
+| FORJD calls | Tenant-bound `fjsvc_` only; secret refs in DB; never in browser |
+| Ciphertext | Sealed envelopes only on the wire to FORJD |
+| Retired BFF facades | Return **501** — partners call FORJD directly |
 
-Contract: [`docs/FORJD_INTEGRATION.md`](docs/FORJD_INTEGRATION.md).
-FORJD invariants: FORJD [`SECURITY.md`](https://github.com/dataengineeringformachinelearning/forjd/blob/main/SECURITY.md)
-· [`docs/EXTENDING.md`](https://github.com/dataengineeringformachinelearning/forjd/blob/main/docs/EXTENDING.md).
+Contract: [`docs/FORJD_INTEGRATION.md`](docs/FORJD_INTEGRATION.md).  
+Browser XSS/CSRF: [`docs/SECURITY_BROWSER.md`](docs/SECURITY_BROWSER.md).
 
 ## Automated gates
 
-- Theme / a11y / mobile-first: `node scripts/enforce-theme.js`, `run_axe.js`, `check_mobile_first.js`
-- Pre-commit + CI Semgrep / Trivy / gitleaks (see `AGENTS.md` quality gates)
-- Frontend tests include Pipeline compose helpers (`workflow-yaml.spec.ts`)
+- NFTS: `npm run check:nfts`
+- Pre-commit + CI Semgrep / Trivy / gitleaks
+- Use-case coverage: `npm run validate:usecase-coverage`

@@ -23,15 +23,10 @@ EMBED_FILES = (
 )
 
 # Shared chrome widgets (backend templates + optional marketing)
-SHARED_WIDGET_FILES = (
-  "algolia-search.js",
-  "command-palette.js",
-  "navbar.js",
-)
+SHARED_WIDGET_FILES = ("navbar.js",)
 
 MARKETING_ONLY = ("cookie-consent.js",)
 
-ALGOLIA_CONFIG = "algolia-config.js"
 PRETTIER_VERSION = "prettier@3.8.2"
 
 
@@ -106,9 +101,7 @@ def sync_widgets() -> None:
 
 
 def format_synced_assets(paths: list[str]) -> None:
-  files = [
-    path for path in paths if path.endswith(".css") or os.path.basename(path) == ALGOLIA_CONFIG
-  ]
+  files = [path for path in paths if path.endswith(".css")]
   if not files:
     return
   subprocess.run(
@@ -117,38 +110,5 @@ def format_synced_assets(paths: list[str]) -> None:
   )
 
 
-def sync_algolia_config() -> None:
-  root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-  candidates = [
-    os.path.join(root, "backend", "static", ALGOLIA_CONFIG),
-    os.path.join(root, "frontend", "public", "assets", ALGOLIA_CONFIG),
-    os.path.join(root, "frontend", "src", "assets", ALGOLIA_CONFIG),
-  ]
-  src = next((path for path in candidates if os.path.isfile(path)), None)
-  if src is None:
-    print(f"Skip missing Algolia config: {ALGOLIA_CONFIG}", file=sys.stderr)
-    return
-
-  marketing_alive = os.path.isfile(
-    os.path.join(root, "marketing", "src", "layouts", "Layout.astro")
-  )
-  targets = [
-    os.path.join(root, "backend", "static"),
-    os.path.join(root, "public", "assets"),
-  ]
-  if marketing_alive:
-    targets.append(os.path.join(root, "marketing", "public", "assets"))
-
-  for dst_dir in targets:
-    os.makedirs(dst_dir, exist_ok=True)
-    dst = os.path.join(dst_dir, ALGOLIA_CONFIG)
-    if os.path.abspath(src) == os.path.abspath(dst):
-      continue
-    shutil.copy2(src, dst)
-    format_synced_assets([dst])
-    print(f"Synced {ALGOLIA_CONFIG} -> {dst_dir}")
-
-
 if __name__ == "__main__":
   sync_widgets()
-  sync_algolia_config()

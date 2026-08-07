@@ -183,9 +183,11 @@ class ForjdTenantMapping(models.Model):
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   deml_account_id = models.UUIDField(unique=True)
   forjd_tenant_id = models.UUIDField(unique=True)
+  # Never default to the platform credential — product mappings must be
+  # sealed: or env:FORJD_SERVICE_TOKEN_<CUSTOMER> (enforced in clean()).
   service_token_secret_ref = models.CharField(
     max_length=255,
-    default="env:FORJD_SERVICE_TOKEN",
+    default="",
   )
   is_active = models.BooleanField(default=True)
   created_at = models.DateTimeField(auto_now_add=True)
@@ -206,12 +208,9 @@ class ForjdTenantMapping(models.Model):
     ]
 
   def clean(self) -> None:
-    """Reject plaintext tokens — only env: or sealed: refs.
-
-    Platform/product isolation is enforced at resolve/provision/map time
-    (``forjd.isolation.assert_product_tenant_isolation``), not only at save.
-    """
+    """Reject plaintext tokens and platform/product mixing at the ORM boundary."""
     from django.core.exceptions import ValidationError
+    from forjd.isolation import assert_product_tenant_isolation
     from forjd.tenancy import ForjdTenantConfigurationError, validate_service_token_secret_ref
 
     try:
@@ -230,6 +229,16 @@ class ForjdTenantMapping(models.Model):
           )
         }
       )
+    # --- Product ≠ platform (ORM boundary) ---
+    try:
+      assert_product_tenant_isolation(self.forjd_tenant_id, self.service_token_secret_ref)
+    except ForjdTenantConfigurationError as exc:
+      raise ValidationError(
+        {
+          "forjd_tenant_id": str(exc),
+          "service_token_secret_ref": str(exc),
+        }
+      ) from exc
 
   def save(self, *args: object, **kwargs: object) -> None:
     previous = type(self).objects.filter(pk=self.pk).first() if self.pk else None

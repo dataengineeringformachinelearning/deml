@@ -39,41 +39,55 @@
     [attr.aria-modal]="menuOpen() ? true : null"
     [attr.aria-label]="menuOpen() ? 'Site menu' : null"
   >
-    <nav
-      id="site-navigation"
-      class="main-navigation place-center"
-      aria-label="Primary"
-    >
-      <ul id="site-navbar-menu" class="row wrap items-center justify-center gap-4" role="list">
-        @for (link of navLinks(); track link.path) {
-          <li class="item-fixed">
-            <a
-              [routerLink]="link.path"
-              routerLinkActive="is-active"
-              [routerLinkActiveOptions]="{ exact: link.path === '/' }"
-              ariaCurrentWhenActive="page"
-              (click)="closeMenu()"
-            >
-              {{ link.label }}
-            </a>
-          </li>
+    <div class="site-navbar-panel__inner">
+      <nav
+        id="site-navigation"
+        class="main-navigation place-center"
+        aria-label="Primary"
+      >
+        <ul id="site-navbar-menu" class="row wrap items-center justify-center gap-4" role="list">
+          @for (link of navLinks(); track link.label) {
+            <li class="item-fixed">
+              @if (link.href) {
+                <a
+                  [href]="link.href"
+                  [attr.rel]="link.external ? 'noopener noreferrer' : null"
+                  (click)="closeMenu()"
+                >
+                  {{ link.label }}
+                </a>
+              } @else if (link.path) {
+                <a
+                  [routerLink]="link.path"
+                  routerLinkActive="is-active"
+                  [routerLinkActiveOptions]="{ exact: link.path === '/' }"
+                  ariaCurrentWhenActive="page"
+                  (click)="closeMenu()"
+                >
+                  {{ link.label }}
+                </a>
+              }
+            </li>
+          }
+        </ul>
+      </nav>
+
+      <app-button-group id="site-button-group" align="end">
+        <app-theme-toggle />
+
+        @if (!loggedIn()) {
+          <app-button
+            variant="primary"
+            shape="pill"
+            routerLink="/login"
+            (pressed)="closeMenu(true)"
+          >
+            Log in
+          </app-button>
+        } @else {
+          <app-button variant="secondary" shape="pill" (pressed)="logout()">Log out</app-button>
         }
-      </ul>
-    </nav>
-
-    <app-button-group id="site-button-group" align="end">
-      <app-theme-toggle />
-
-      @if (!loggedIn()) {
-        <app-button variant="secondary" shape="pill" routerLink="/login" (pressed)="closeMenu(true)">
-          Log in
-        </app-button>
-        <app-button variant="primary" shape="pill" routerLink="/signup" (pressed)="closeMenu(true)">
-          Sign up
-        </app-button>
-      } @else {
-        <app-button variant="secondary" shape="pill" (pressed)="logout()">Log out</app-button>
-      }
-    </app-button-group>
+      </app-button-group>
+    </div>
   </div>
 </header>

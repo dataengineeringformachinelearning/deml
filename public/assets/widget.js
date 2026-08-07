@@ -55,7 +55,7 @@
   const PLATFORM_WIDGET_STYLES = `
     :host {
       color-scheme: dark;
-      --deml-widget-font-family: "Geist Variable", Geist, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --deml-widget-font-family: "Geist Variable", "Geist", system-ui, -apple-system, sans-serif;
       --deml-widget-font-size: 16px;
       --deml-widget-font-size-sm: 14px;
       --deml-widget-font-size-md: 18px;
@@ -1159,7 +1159,7 @@
               throw new Error('Server returned error status');
             }
           } catch {
-            statusMsg.innerText = 'Failed to report threat. Please try again.';
+            statusMsg.innerText = 'Failed to report threat. Try again.';
             statusMsg.className = 'status-msg error';
             statusMsg.classList.remove('is-hidden');
             btnSubmit.disabled = false;

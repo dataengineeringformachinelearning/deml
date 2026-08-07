@@ -1,8 +1,5 @@
 <section class="form-panel" [attr.aria-labelledby]="resolvedTitleId()">
   <header class="form-panel__header">
-    @if (eyebrow()) {
-      <p class="form-panel__eyebrow">{{ eyebrow() }}</p>
-    }
     @switch (headingLevel()) {
       @case (2) {
         <h2 class="form-panel__title" [id]="resolvedTitleId()">{{ title() }}</h2>

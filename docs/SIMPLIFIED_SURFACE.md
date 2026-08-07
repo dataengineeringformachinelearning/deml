@@ -1,45 +1,36 @@
 # Simplified product surface
 
-Core job only: **identity + public status + site management**.
+Core job: **identity + public status + site management**.
 
-Architecture + reliability: [`MINIMAL_ARCHITECTURE.md`](./MINIMAL_ARCHITECTURE.md).
+Architecture: [`MINIMAL_ARCHITECTURE.md`](./MINIMAL_ARCHITECTURE.md).
 
-## Structure
-
-### deml.app
+## deml.app
 
 ```
 /                 Hero — Explore / Log in (or Settings)
-/explore          Status directory (title · pill · uptime · click)
-/status/:slug     Status detail (services · uptime · incidents)
+/explore          Status directory
+/status/:slug     Status detail
 /login · /signup · /mfa
-/settings         Account (name) + Sites
-/blog · /blog/:slug   Addressable notes (not in primary nav)
+/settings         Account · Security (MFA) · Connected accounts · API keys · Sessions · Sites · Delete
+/auth-bridge      Headless iframe bridge for Django chrome (not nav)
 ```
 
-**Primary nav**
+Thin alias: `/status` → explore. Post-login default: `/settings`.
 
-- Guest: Explore
-- Auth: Explore · Settings
-- Chrome: brand, theme, log in/sign up or log out
+**Nav:** Guest → Explore · Book · Whitepaper · Docs · Blog · Compliance · Auth → + Settings · Chrome: brand, theme, Log in / Log out.  
+Community writing links open on `dataengineeringformachinelearning.com`.  
+**Footer:** Book · Whitepaper · Docs · Blog · Compliance · Privacy · Terms · Status · © DEML.
 
-**Footer:** Privacy · Terms · Status · © DEML
+`/blog` and `/learn` redirect permanently to the community blog.
 
-**Post-login default:** `/settings`
+## Marketing (community repo)
 
-### Pruned (SPA)
+`/book` · `/whitepaper` · `/documentation` · `/blog` · `/privacy` · `/terms` · `/compliance`. Writing and blog live here — not on deml.app.
 
-| Removed | Why |
-|---------|-----|
-| Dashboard / analytics / vulns / pipeline / learn pages | Redirects only; modules deleted |
-| ML / SSE / sealed telemetry clients | Not on critical path |
-| Chart / tile-board chrome | Dashboard-only |
-| Monitor enrichment + integrations CRUD | Racey / unused by Settings |
-| Sealed heartbeat + analytics sync workers | Opt-in via env |
+## FORJD / deml-ui
 
-### Hierarchy rules
+FORJD is API-only (`backend.forjd.co`). deml-ui owns warm-ash NFTS (Storybook: ui.deml.app).
 
-1. Hero alone may use brand preheader.
-2. Other pages: H1 + one lede (+ one CTA group).
-3. Body = the job. No parallel chrome sections.
-4. Writing stays addressable; never competes in primary nav.
+## Removed from product
+
+In-app Blog / Blue Notes · dashboard / analytics / SIEM / ML / exports / vulns / playbooks / pipeline · toast chrome · GA/Clarity/Cloudflare OAuth sync UI. Settings keeps API keys + linked providers; partners call FORJD with `fjsvc_`; retired BFF analytics-integration paths return **501**.

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /settings
+Disallow: /auth-bridge
+Disallow: /mfa
+
+Sitemap: https://deml.app/sitemap.xml

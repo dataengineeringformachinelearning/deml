@@ -1,232 +1,61 @@
 # DEML Design System — deml-ui (new-from-the-start)
 
-> **LOCKED LAW — MANDATORY EVERYWHERE.**  
-> The **new-from-the-start (warm ash)** look is the **only** allowed visual style for
-> every DEML product surface. **Any deviation is forbidden.** Do not invent parallel
-> palettes, type stacks, chart contracts, or app-local chrome. Expand from this
-> system inside **deml-ui** only.
+> **LOCKED.** Warm ash NFTS is the **only** allowed product look. Expand in
+> **deml-ui** only. No parallel palettes, type stacks, or chart contracts.
 
-**Look:** **new-from-the-start (warm ash)** — expand from this system only.  
-**Canonical package:** [`deml-ui`](https://github.com/dataengineeringformachinelearning/deml-ui)  
-**Token SoT:** `deml-ui/styles/tokens.css` · `deml-ui/styles/base.css` · `deml-ui/components/*`  
+**Package:** [`deml-ui`](https://github.com/dataengineeringformachinelearning/deml-ui)  
+**Tokens:** `styles/tokens.css` · `styles/base.css` · `components/*`  
 **Storybook:** [ui.deml.app](https://ui.deml.app)  
-**App integration:** [docs/DEML_UI.md](docs/DEML_UI.md) · [.cursorrules](.cursorrules) · [AGENTS.md](AGENTS.md)
+**App:** [docs/DEML_UI.md](docs/DEML_UI.md) · [.cursorrules](.cursorrules)
 
-`deml-ui` is the **single source of truth** for product visuals. Viking-UI is **retired**.
-Do **not** layer cold seven-color locks, Syne/Fraunces display stacks, or void-black /
-electric `#2176ff` chrome on top of NFTS — that creates a frankenstein UI and is **forbidden**.
-
----
-
-## Mandate (non-negotiable)
+## Mandate
 
 | Rule | Requirement |
 |------|-------------|
-| Style | **new-from-the-start (warm ash)** only |
-| Ownership | All visual values originate in **deml-ui** |
-| Product tree | Angular at repo-root `src/` (not `frontend/`) |
-| Type | **Geist only** — bold display (weight 800, tight tracking); wide-tracked mark caps; open intro tracking |
-| Charts | Fixed `140` / `280` heights; width `100%`; shared y-scale; never theme-invert (**golden rule**) |
-| Layout | 8px grid; equal `--module-pad` / `--module-pad-lg` on elevated modules; peer rows stretch equally |
-| Theme | Dual `data-theme="light"\|"dark"` via deml-ui tokens |
-| A11y | WCAG 2.0 Level AA / §508 — focus-visible, contrast, ≥44px hit targets, reduced motion, skip link |
-| Composition | Product pages compose deml-ui / `app-*` components only — no parallel chrome CSS |
+| Style | Warm ash NFTS only |
+| Product tree | Angular at repo-root `src/` |
+| Type | **Geist only** (display 800 / tight tracking; mark caps 0.24em; intro 0.08em) |
+| Charts | Fixed `140` / `280` heights; width `100%`; shared y-scale; never theme-invert |
+| Layout | 8px grid; fluid `minmax(--tile-row-unit, auto)`; solid opaque navbar |
+| Theme | `data-theme="light"|"dark"` |
+| A11y | WCAG 2.0 AA — focus-visible, contrast, ≥44px hits, reduced motion |
 
-**Forbidden:** Viking-UI / `packages/viking-ui` / `viking-*` / `--viking-*`; void-black + `#2176ff`;
-cold seven-color frankenstein palettes; Syne/Fraunces; Material / Bootstrap / Tailwind utility
-styling; app-level DS chrome CSS; hand-edited `backend/static/deml-ui.css`; fixed-only
-`grid-auto-rows` that squash tiles/charts; see-through navbar shells; overflow that breaks
-page scaffolding.
+**Forbidden:** Viking-UI / `viking-*` / `--viking-*`; void-black + `#2176ff`;
+Syne/Fraunces; Material/Bootstrap/Tailwind utilities; app-level DS CSS;
+hand-edited `backend/static/deml-ui.css`; frosted navbar.
 
----
-
-## Surfaces
-
-| Surface | Stack | Theme entry |
-|---------|-------|-------------|
-| [deml.app](https://deml.app) | Angular 22+ (`src/`) on Vercel | `deml-ui/dist/styles/deml-ui.css` via `angular.json` |
-| [ui.deml.app](https://ui.deml.app) | deml-ui Storybook on Vercel | deml-ui tokens + components |
-| [backend.deml.app](https://backend.deml.app) | Django templates | `backend/static/deml-ui.css` (synced from deml-ui) |
-
----
-
-## Warm ash palette (NFTS)
-
-Canonical hex values (case-insensitive in CSS; prefer lowercase in tokens):
+## Palette
 
 | Hex | Role |
 |-----|------|
-| `#35312D` | Dark page ground (`theme-color` dark) · `--color-bg` |
-| `#1C1916` | Deep surface / plot · `--color-surface` / `--color-plot` |
-| `#F3F0EA` | Cream elevated modules / card fill · `--color-card` / dark `--color-text` |
-| `#D4CEC5` | Light page ground (`theme-color` light) · light `--color-bg` |
-| `#2F5F8F` | Primary fill (dark theme) · `--color-primary` |
-| `#23486D` | Primary / links (light theme only — AA on `#D4CEC5`) · light `--color-primary` / `--color-highlight` |
-| `#3F6B54` | Success fill (dark) · `--color-accent-gold` / `--color-success` |
-| `#2F5540` | Success fill + ink (light) · light `--color-success` |
-| `#9E3D47` | Danger fill (dark) · `--color-accent-red` / `--color-error` |
-| `#7A3038` | Danger fill + ink (light) · light `--color-error` |
-| `#C6C0B7` | Muted text on dark ground · `--color-text-secondary` |
-| `#4A453F` | Secondary text on cream modules / light ground · `--color-card-text-secondary` |
-| `#9BB8D4` | Highlight / links on dark ground · dark `--color-highlight` |
-| `#9BC4A8` | Success **label** ink on dark ground · `--color-success-ink` |
-| `#E8A0A6` | Danger **label** ink on dark ground · `--color-error-ink` |
+| `#35312D` | Dark ground (`theme-color` dark) |
+| `#1C1916` | Surface / plot |
+| `#F3F0EA` | Cream modules / dark text |
+| `#D4CEC5` | Light ground (`theme-color` light) |
+| `#2F5F8F` | Primary (dark) · light uses `#23486D` |
+| `#3F6B54` / `#2F5540` | Success dark / light |
+| `#9E3D47` / `#7A3038` | Danger dark / light |
+| `#C6C0B7` / `#4A453F` | Muted |
+| `#9BB8D4` | Highlight on dark |
 
-**Dark default:** cream modules (`#F3F0EA`) on warm ash ground (`#35312D`), deep surface `#1C1916`.  
-**Light:** cream cards on `#D4CEC5` ground; ink `#1C1916`; deepened primary/success/error for AA links and labels.  
-**Plot wells:** always dark plot (`#1C1916`) with light ink — **never theme-invert chart series**.  
-**Contrast:** body text and links ≥ **4.5:1** (WCAG 2.0 AA); white-on-fill CTAs ≥ **4.5:1**; status labels on page ground use `*-ink` tokens.
+Plot wells stay dark (`#1C1916`); never invert chart series. On-fill text `#FFFFFF`.
 
-On-primary / on-accent text: `#FFFFFF`.
+## Charts (locked)
 
----
+| Token / rule | Law |
+|--------------|-----|
+| `--chart-height-spark` | `140px` |
+| `--chart-height-panel` | `280px` |
+| Width | `100%` |
+| Scale | `computeSharedDomain` — no per-chart auto-scale |
+| Stage | `--chart-stage-ink` (`#121212`) on panels |
+| Placement | `app-area-chart` / `app-bar-chart` inside `app-chart-card` only |
 
-## Typography
+## Ownership
 
-**Geist only** for display, marks, intro, and body.  
-`--font-display` / `--font-mark` / `--font-secondary` / `--font-body` / `--font-sans` all resolve to Geist.
+1. Edit deml-ui → `npm run build`
+2. Bump deml’s `deml-ui` dependency
+3. Sync Django: `./scripts/sync_deml_ui_static.sh`
+4. Compose product pages with deml-ui `app-*` wrappers (`ViewEncapsulation.None`, no DS chrome CSS)
 
-| Role | Treatment |
-|------|-----------|
-| Primary headings | Geist heavy (`--font-weight-display: 800`), tight tracking (`--tracking-display: -0.045em`) |
-| Marks / eyebrows | Geist semibold (`--font-weight-mark: 600`), wide tracking (`--tracking-mark: 0.24em`), uppercase |
-| Intro / lede | Geist regular, open tracking (`--tracking-intro: 0.08em`), `--leading-body: 1.55` |
-| Body | Geist regular, readable line-height (`--leading-body`) |
-
-**Forbidden type:** Syne, Fraunces, Inter-as-product-UI, decorative display mixes.
-
-Scale (8px-linked): `--font-size-xs` … `--font-size-2xl` via deml-ui tokens. Do not invent off-scale sizes.
-
----
-
-## Spacing & layout
-
-1. **8px grid** — `--grid: 8px`; use `--space-*` only.
-2. **Tile rhythm** — `--tile-gap`, `--tile-row-unit`, equal `--module-pad` / `--module-pad-lg` on every elevated module (same inset all sides).
-3. **Fluid equal cells** — `grid-auto-rows: minmax(var(--tile-row-unit), auto|1fr)` so peer tiles share height with no ragged gaps; **never** squash with fixed-only row tracks.
-4. **Sharp modules** — `--radius-sm/md/lg: 0` (pill radius for chips/controls only).
-5. **Content widths** — `--content-width*` / `--reading-width`; page body uses deml-ui `.page` / `.page-body` recipes.
-6. **No overflow** — page chrome must not introduce horizontal page scroll; clip/contain within scaffolding (`overflow-x: clip` on body per deml-ui base). Dynamic boards grow with content; do not force fixed heights that clip charts or CTAs.
-7. **Navbar** — solid opaque shell (`--navbar-bg` / `--navbar-surface`); equal inset (`--navbar-inset`); never frosted/see-through over content.
-8. **Hit targets** — `--hit-target` ≥ 44px (`--space-6`).
-
----
-
-## Charts (locked contract)
-
-> **CHART RULES LOCKED:** height fixed, width 100%, shared global scale — **DO NOT CHANGE**
-> unless the user explicitly asks. Regenerating a chart component must keep the same
-> size constants (`140` / `280`) and `computeSharedDomain`.
-
-| Token / rule | Value / law |
-|--------------|-------------|
-| `--chart-height-spark` | `140px` — stat / spark stages only |
-| `--chart-height-panel` | `280px` — full-width / chart-card / chart-panel stages |
-| Width | Always `100%` of parent; resize only in width |
-| Shared y-scale | `computeSharedDomain` over **all** line series on the board; no per-chart auto-scale |
-| Stage ink | `--chart-stage-ink` (`#121212`) on panel activity graphs; sparks stay transparent |
-| Inset | Equal `--chart-inset` from plot-well edges to SVG/stage |
-| Component | One shared `app-area-chart` (SVG activity graph) for spark + panel |
-| Placement | `app-area-chart` / `app-bar-chart` **inside** `app-chart-card` only |
-| Series | `--chart-series-*` from warm-ash tokens; do not invent hex |
-| Forbidden | Aspect-driven taller-when-wider for line charts; data-driven height; independent y-domains; theme-inverting plot ink |
-
-Peer tiles letterbox; **never** change the chart stage height.
-
----
-
-## Light / dark behavior
-
-- Attribute: `data-theme="light"|"dark"` on `<html>` (aliases `.light` / `.dark` in deml-ui).
-- Boot: `src/index.html` sets theme from `localStorage['deml-theme']` or `prefers-color-scheme` (default dark).
-- Runtime: `ThemeService` updates `data-theme`, `color-scheme`, and `theme-color` (`#35312D` / `#D4CEC5`).
-- Toggle: `app-theme-toggle` in the navbar.
-- Semantic colors flip via deml-ui token blocks only — components must not hardcode mode-specific hex.
-
----
-
-## Composition recipes (deml app)
-
-| Intent | Components |
-|--------|------------|
-| Page hero | `app-banner` (`variant="hero"` on home; default elsewhere) |
-| Site footer | `app-site-footer` |
-| Catalog / prose region | `app-page-section` (`variant="catalog"|"prose"|"auth"`) |
-| Section title | `app-section-header` |
-| Dynamic boards | `app-tile-board` → `app-dashboard-grid` + typed tiles |
-| KPI | `app-stat-card` |
-| Charts | `app-chart-card` + `app-area-chart` / `app-bar-chart` |
-| Marketing cards | `app-card-grid` + `app-card` |
-| Shell | `app-navbar`, `app-theme-toggle` |
-
-**Scaffolding order:** shell → banner → page-section → section-header → tile-board / grids → cards/charts.
-
-**Angular wrappers** under `src/app/components/*`:
-- `ViewEncapsulation.None`
-- **no** `styleUrl` / `styleUrls` / inline `styles` for design-system chrome
-- Class contracts and CSS variables come from deml-ui only
-
-**Dynamic components:** prefer deml-ui primitives + typed tile boards; do not grow one-off page CSS for modularity.
-
----
-
-## Ownership law
-
-1. Edit visuals in **deml-ui** `components/<name>/`, `styles/tokens.css`, `styles/base.css`.
-2. `npm run build` in deml-ui (committed `dist/` for `github:` installs).
-3. Bump deml’s `deml-ui` dependency / lockfile.
-4. Sync Django static with `./scripts/sync_deml_ui_static.sh` — never hand-edit the mirror.
-5. Product pages only compose `app-*` wrappers and bind content/data.
-
----
-
-## Development workflow
-
-```bash
-# Design system
-cd ../deml-ui
-npm install
-npm run storybook   # http://localhost:6006
-npm run build
-
-# Product app
-cd ../deml
-npm install
-npx ng serve
-
-# Django static mirror after deml-ui CSS changes
-./scripts/sync_deml_ui_static.sh
-```
-
----
-
-## Hard Do / Don't
-
-### Do
-
-- Treat NFTS warm ash as **mandatory** on every route and surface.
-- Expand from warm-ash NFTS only inside deml-ui.
-- Keep Geist-only type.
-- Keep fluid `minmax` dash-rows and fixed chart aspect.
-- Compose product pages only from deml-ui `app-*` wrappers.
-
-### Don't
-
-- Deviate from NFTS for “experiments,” “atelier,” cold seven-color locks, or Viking revival — **forbidden**.
-- Mix Syne/Fraunces or Viking chrome on top of NFTS.
-- Squash charts/tiles with fixed-only grid rows.
-- Add app-level DS chrome CSS.
-- Restore Viking-UI or put product UI under `frontend/`.
-
-**Confirmation:** Product UI must look like **new-from-the-start** — warm ash, Geist, fluid boards, locked charts — and nothing else.
-
----
-
-## Automated enforcement
-
-| Gate | Command | Wired |
-|------|---------|-------|
-| deml consumer | `npm run check:nfts` → `scripts/check_nfts_style.mjs` | CI quality + frontend · pre-commit |
-| deml-ui library | In deml-ui: `npm run check:nfts` | deml-ui CI |
-
-There are **no escape hatches**. Drift from NFTS fails the gate.
+**Gate:** `npm run check:nfts` — no escape hatches.

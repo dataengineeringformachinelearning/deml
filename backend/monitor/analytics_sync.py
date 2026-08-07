@@ -6,6 +6,7 @@ ciphertext leave for FORJD. Failures for one provider never abort the batch.
 
 from __future__ import annotations
 
+import json
 import logging
 import time
 from dataclasses import dataclass
@@ -18,9 +19,9 @@ from asgiref.sync import async_to_sync
 from django.utils import timezone
 from forjd.client import ForjdError
 from forjd.sealed_telemetry import client_for_credential, seal_and_ingest
+from forjd.secrets import open_service_token
 from forjd.tenancy import ForjdTenantConfigurationError, resolve_forjd_tenant_credential
 
-from monitor.integrations import open_integration_credentials
 from monitor.models import AnalyticsIntegration
 
 logger = logging.getLogger("monitor.analytics_sync")
@@ -36,6 +37,14 @@ class SyncResult:
   ok: bool
   detail: str
   sealed: bool = False
+
+
+# --- Sealed credential open (server-side sync only; never returned by API) ---
+def open_integration_credentials(integration: AnalyticsIntegration) -> dict[str, Any]:
+  """Decrypt sealed provider credentials for analytics sync."""
+  raw = open_service_token(integration.credentials_ciphertext, integration.credentials_dek)
+  loaded = json.loads(raw)
+  return loaded if isinstance(loaded, dict) else {}
 
 
 def _refresh_google_token(creds: dict[str, Any]) -> dict[str, Any]:

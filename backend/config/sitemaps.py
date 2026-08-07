@@ -1,4 +1,4 @@
-# Sitemaps — Antigravity - Claude Opus 4.6
+# Sitemaps — brand splash only (human docs live on the community site).
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
 
@@ -8,20 +8,7 @@ class StaticViewSitemap(Sitemap):
   changefreq = "daily"
 
   def items(self):
-    return ["home", "documentation"]
+    return ["home"]
 
   def location(self, item):
     return reverse(item)
-
-
-class APIDocsSitemap(Sitemap):
-  """API docs stay reachable for humans but are not advertised to crawlers."""
-
-  priority = 0.1
-  changefreq = "yearly"
-
-  def items(self):
-    return []
-
-  def location(self, item):
-    return item

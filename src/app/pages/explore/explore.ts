@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   Injector,
-  OnInit,
   afterNextRender,
   effect,
   inject,
@@ -12,17 +11,38 @@ import { lastValueFrom } from 'rxjs';
 
 import { Banner } from '../../components/banner/banner';
 import { Button } from '../../components/button/button';
+import { Callout } from '../../components/callout/callout';
+import { EmptyState } from '../../components/empty-state/empty-state';
+import { ErrorState } from '../../components/error-state/error-state';
 import {
   ExploreCard,
+  type ExploreCardMetric,
   type ExploreCardStatus,
 } from '../../components/explore-card/explore-card';
 import { PageSection } from '../../components/page-section/page-section';
-import { OFFLINE_BODY, OFFLINE_HEADING } from '../../core/continuity-copy';
-import { toUptimeHistoryDataPoints } from '../../core/utils/uptime.utils';
+import { Skeleton } from '../../components/skeleton/skeleton';
+import {
+  OFFLINE_BODY,
+  OFFLINE_HEADING,
+  RETRY,
+  STALE_DIRECTORY,
+} from '../../core/continuity-copy';
+import {
+  exploreDirectoryMetrics,
+  exploreUptimeSummary,
+} from '../../core/utils/status-card-metrics';
+import {
+  compactUptimeHistory,
+  toUptimeHistoryDataPoints,
+  type UptimeHistoryDataPoint,
+} from '../../core/utils/uptime.utils';
 import { AuthService } from '../../services/auth.service';
 import { ConnectivityService } from '../../services/connectivity.service';
-import { MonitorService, type StatusPageData } from '../../services/monitor.service';
-import type { UptimeHistoryDataPoint } from '../../shared/deml-chart/types';
+import {
+  MonitorService,
+  isPlatformStatusPage,
+  type StatusPageData,
+} from '../../services/monitor.service';
 
 /**
  * Explore directory — single SoT is FORJD published directory via BFF.
@@ -30,12 +50,12 @@ import type { UptimeHistoryDataPoint } from '../../shared/deml-chart/types';
  */
 @Component({
   selector: 'app-explore',
-  imports: [Banner, Button, ExploreCard, PageSection],
+  imports: [Banner, Button, Callout, EmptyState, ErrorState, ExploreCard, PageSection, Skeleton],
   templateUrl: './explore.html',
   host: { class: 'page page--catalog' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Explore implements OnInit {
+export class Explore {
   private readonly monitor = inject(MonitorService);
   private readonly auth = inject(AuthService);
   private readonly connectivity = inject(ConnectivityService);
@@ -52,6 +72,10 @@ export class Explore implements OnInit {
   readonly online = this.connectivity.online;
   readonly offlineHeading = OFFLINE_HEADING;
   readonly offlineBody = OFFLINE_BODY;
+  readonly staleDirectory = STALE_DIRECTORY;
+  readonly retryLabel = RETRY;
+
+  private lastReconnectGeneration = 0;
 
   constructor() {
     afterNextRender(() => {
@@ -63,11 +87,18 @@ export class Explore implements OnInit {
         },
         { injector: this.injector },
       );
+      effect(
+        () => {
+          const gen = this.connectivity.reconnectGeneration();
+          if (gen > 0 && gen !== this.lastReconnectGeneration && this.auth.isInitialized()) {
+            this.lastReconnectGeneration = gen;
+            this.monitor.invalidateStatusReads();
+            void this.loadData();
+          }
+        },
+        { injector: this.injector },
+      );
     });
-  }
-
-  ngOnInit(): void {
-    /* Directory loads after auth init. */
   }
 
   getPageUrl(page: StatusPageData): string {
@@ -75,16 +106,29 @@ export class Explore implements OnInit {
   }
 
   getPageStatus(page: StatusPageData): ExploreCardStatus {
-    // Directory SoT embeds services/incidents when present — never enrichment maps.
-    const active = (page.incidents || []).filter(incident => incident.status !== 'Resolved');
+    // Directory SoT: prefer embedded services/incidents; else trust overall_status
+    // from FORJD (directory omits service arrays by design).
+    const active = (page.incidents || []).filter((incident) => incident.status !== 'Resolved');
     if (active.length > 0) {
       return active[0].status as ExploreCardStatus;
     }
+    const mapOverall = (raw: string): ExploreCardStatus | null => {
+      const overall = raw.toLowerCase().replace(/[\s-]+/g, '_');
+      if (!overall || overall === 'unknown' || overall === 'no_data') return 'unknown';
+      if (overall === 'operational' || overall === 'up') return 'operational';
+      if (overall.includes('degraded') || overall === 'partial_outage') return 'Degraded';
+      if (overall.includes('maintenance')) return 'Maintenance';
+      if (overall.includes('outage') || overall === 'down') return 'Outage';
+      return null;
+    };
     const services = page.services || [];
+    if (services.length === 0) {
+      return mapOverall(page.overall_status || '') ?? 'unknown';
+    }
     const normalized = (status?: string | null) =>
-      (status || 'operational').toLowerCase().replace(/[\s-]+/g, '_');
+      (status || 'unknown').toLowerCase().replace(/[\s-]+/g, '_');
     if (
-      services.some(service => {
+      services.some((service) => {
         const value = normalized(service.status);
         return value === 'outage' || value === 'major_outage' || value === 'down';
       })
@@ -92,17 +136,20 @@ export class Explore implements OnInit {
       return 'Outage';
     }
     if (
-      services.some(service => {
+      services.some((service) => {
         const value = normalized(service.status);
         return value === 'degraded' || value === 'partial_outage' || value === 'partial';
       })
     ) {
       return 'Degraded';
     }
-    if (services.some(service => normalized(service.status) === 'maintenance')) {
+    if (services.some((service) => normalized(service.status) === 'maintenance')) {
       return 'Maintenance';
     }
-    return 'operational';
+    if (services.every((service) => normalized(service.status) === 'unknown')) {
+      return 'unknown';
+    }
+    return mapOverall(page.overall_status || '') ?? 'unknown';
   }
 
   getPageStatusLabel(page: StatusPageData): string {
@@ -111,18 +158,31 @@ export class Explore implements OnInit {
     if (status === 'degraded' || status === 'partial outage') return 'Degraded';
     if (status === 'maintenance') return 'Maintenance';
     if (status === 'outage' || status === 'major outage' || status === 'down') return 'Outage';
+    if (status === 'unknown' || status === 'no_data') return 'Unknown';
     return `${this.getPageStatus(page)}`;
   }
 
-  /** Single uptime field — FORJD overall_uptime is SoT (not cumulative_sla alias). */
+  /** Single uptime field — FORJD overall_uptime is SoT. */
   overallUptime(page: StatusPageData): number | null {
-    return page.overall_uptime ?? null;
+    return page.overall_uptime ?? page.cumulative_sla ?? null;
+  }
+
+  pageTag(page: StatusPageData): string {
+    return isPlatformStatusPage(page) ? 'Platform Status' : 'Public Status Page';
+  }
+
+  exploreMetrics(page: StatusPageData): readonly ExploreCardMetric[] {
+    return exploreDirectoryMetrics(page);
+  }
+
+  uptimeSummaryFor(page: StatusPageData): string {
+    return exploreUptimeSummary(this.getPageStatusLabel(page), this.overallUptime(page));
   }
 
   exploreUptimeHistory(page: StatusPageData): readonly UptimeHistoryDataPoint[] {
     const history = page.uptime_history ?? [];
     if (history.length > 0) {
-      return toUptimeHistoryDataPoints(history);
+      return compactUptimeHistory(toUptimeHistoryDataPoints(history), 14);
     }
     return [];
   }

@@ -65,7 +65,9 @@ def test_billing_endpoints_with_authenticated_user(authenticated_client, test_us
 
   response = authenticated_client.post("/api/v1/billing/create-checkout-session")
   assert response.status_code == 403
-  assert response.json()["error"] == "Pro purchases are currently unavailable"
+  body = response.json()
+  assert body["detail"] == "Pro purchases are currently unavailable"
+  assert body["code"] == "pro_checkout_disabled"
 
 
 @pytest.mark.django_db
@@ -93,7 +95,9 @@ def test_checkout_disabled_does_not_create_stripe_session(
   )
 
   assert response.status_code == 403
-  assert response.json()["error"] == "Pro purchases are currently unavailable"
+  body = response.json()
+  assert body["detail"] == "Pro purchases are currently unavailable"
+  assert body["code"] == "pro_checkout_disabled"
   create_session.assert_not_called()
 
 
@@ -118,7 +122,9 @@ def test_checkout_rejects_when_disabled_even_for_active_pro(
   )
 
   assert response.status_code == 403
-  assert response.json()["error"] == "Pro purchases are currently unavailable"
+  body = response.json()
+  assert body["detail"] == "Pro purchases are currently unavailable"
+  assert body["code"] == "pro_checkout_disabled"
   create_session.assert_not_called()
 
 

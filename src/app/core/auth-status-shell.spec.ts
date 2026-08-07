@@ -5,6 +5,10 @@ import { describe, expect, it } from 'vitest';
 const indexSource = readFileSync(resolve(process.cwd(), 'src/index.html'), 'utf8');
 const vercelSource = readFileSync(resolve(process.cwd(), 'vercel.json'), 'utf8');
 const routesSource = readFileSync(resolve(process.cwd(), 'src/app/app.routes.ts'), 'utf8');
+const navbarSource = readFileSync(
+  resolve(process.cwd(), 'backend/static/widgets/navbar.js'),
+  'utf8',
+);
 
 describe('document shell isolation', () => {
   it('does not load third-party analytics in the document shell', () => {
@@ -14,10 +18,20 @@ describe('document shell isolation', () => {
     expect(indexSource).not.toContain('googletagmanager.com');
   });
 
-  it('retires auth-status page and redirects to login', () => {
-    expect(routesSource).toContain("path: 'auth-status'");
-    expect(routesSource).toContain("redirectTo: 'login'");
+  it('does not mount retired auth-status, blog, or dashboard product routes', () => {
+    expect(routesSource).not.toContain("path: 'auth-status'");
     expect(routesSource).not.toContain('./pages/auth-status/auth-status');
+    expect(routesSource).not.toContain('./pages/blog/');
+    expect(routesSource).not.toContain("path: 'dashboard'");
+  });
+
+  it('keeps a headless auth-bridge for Django chrome (not product nav)', () => {
+    expect(routesSource).toContain("path: 'auth-bridge'");
+    expect(routesSource).toContain('bareShell: true');
+    expect(navbarSource).toContain('/auth-bridge');
+    expect(navbarSource).not.toContain('/auth-status');
+    expect(navbarSource).toContain('/settings');
+    expect(navbarSource).not.toContain('/dashboard');
   });
 
   it('ships SPA fallback and widget rewrites on Vercel CSR deploy', () => {

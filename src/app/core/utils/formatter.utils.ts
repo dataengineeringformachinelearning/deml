@@ -51,14 +51,3 @@ export const formatServiceName = (name: string): string => {
 
   return baseName + suffix;
 };
-
-/** Format an observed latency without inventing a zero when telemetry is absent. */
-export const formatLatencyMs = (
-  value: number | null | undefined,
-  fractionDigits = 0,
-): string => {
-  if (value === null || value === undefined || !Number.isFinite(value)) {
-    return '—';
-  }
-  return `${value.toFixed(fractionDigits)} ms`;
-};

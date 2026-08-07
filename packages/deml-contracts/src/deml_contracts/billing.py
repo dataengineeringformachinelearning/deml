@@ -36,8 +36,9 @@ class SubscriptionMutateOut(BaseModel):
 
 
 class BillingErrorOut(BaseModel):
-  """Legacy billing error envelope (`error` key, not `detail`)."""
+  """Billing error envelope — same `{detail, code}` shape as FORJD/policy errors."""
 
   model_config = ConfigDict(extra="forbid")
 
-  error: str = Field(min_length=1)
+  detail: str = Field(min_length=1)
+  code: str = Field(default="billing_error", min_length=1)

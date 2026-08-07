@@ -4,7 +4,7 @@ from django.http import HttpRequest, HttpResponse
 
 # Shared third-party allowlists for HTML CSP (keep in sync with frontend/vercel.json + nginx.conf).
 # Prefer hashes/nonces later; keep 'unsafe-inline' for current shell scripts — no 'unsafe-eval'.
-# jsDelivr remains for Algolia Experiences / optional published widget snippets (not swagger/redoc).
+# jsDelivr remains for optional published widget snippets only (not swagger/redoc).
 _CSP_SCRIPT_SRC = (
   "'self' 'unsafe-inline' "
   "https://cdn.jsdelivr.net "
@@ -23,9 +23,6 @@ _CSP_CONNECT_SRC = (
   "https://*.googleapis.com "
   "https://static.cloudflareinsights.com https://cloudflareinsights.com "
   "https://*.cloudflareinsights.com "
-  "https://*.algolia.net https://*.algolianet.com https://*.algolia.io "
-  "https://experiences.resolver.algolia.com https://experiences.cdn.algolia.com "
-  "https://experiences.algolia.com "
   "https://deml.app https://*.deml.app "
   "wss://deml.app wss://*.deml.app "
   "https://backend.deml.app https://*.backend.deml.app "

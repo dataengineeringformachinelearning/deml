@@ -5,7 +5,6 @@ import {
   MonitorService,
   filterOwnedStatusPages,
   isPlatformStatusPage,
-  publicStatusPageTag,
 } from './monitor.service';
 import { API_ENDPOINTS } from '../core/constants/api.constants';
 
@@ -29,10 +28,7 @@ describe('MonitorService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('labels user pages separately from the platform page', () => {
-    expect(publicStatusPageTag('joealongi-dev')).toBe('Public Status Page');
-    expect(publicStatusPageTag('platform-status')).toBe('Platform Status');
-    expect(publicStatusPageTag('loading')).toBe('Loading');
+  it('filters platform pages from owned site lists', () => {
     expect(isPlatformStatusPage('platform-status')).toBe(true);
     expect(isPlatformStatusPage({ slug: 'joealongi-dev' })).toBe(false);
     expect(

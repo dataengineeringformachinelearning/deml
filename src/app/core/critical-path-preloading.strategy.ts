@@ -40,7 +40,7 @@ function whenIdle(timeoutMs = 2500): Observable<void> {
 
 /**
  * Selective router preloading — critical paths only.
- * Avoids PreloadAllModules so guests do not download dashboard/analytics.
+ * Avoids PreloadAllModules so guests do not download auth-only chunks early.
  */
 @Injectable({ providedIn: 'root' })
 export class CriticalPathPreloadingStrategy implements PreloadingStrategy {

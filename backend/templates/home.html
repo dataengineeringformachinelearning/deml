@@ -3,34 +3,146 @@
 <html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DEML</title>
-    <meta name="description" content="DEML learning platform API." />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>DEML — Accounts and status API</title>
+    <meta
+      name="description"
+      content="DEML API for accounts, authentication, and public status pages."
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
     <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml" />
     <link rel="icon" href="{% static 'favicon-96x96.png' %}" sizes="96x96" type="image/png" />
-    <meta name="theme-color" content="#0a0a0a" />
-    {# Splash uses deml-ui tokens; suite-backend.css provides splash layout helpers. #}
+    <meta name="theme-color" content="#35312D" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#D4CEC5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#35312D" />
+    <meta name="color-scheme" content="light dark" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta property="og:title" content="DEML — Accounts and status API" />
+    <meta
+      property="og:description"
+      content="DEML API for accounts, authentication, and public status pages."
+    />
+    <meta
+      property="og:image"
+      content="{{ request.scheme }}://{{ request.get_host }}{% static 'dataengineeringformachinelearning-social.png' %}"
+    />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="720" />
+    <meta property="og:site_name" content="DEML" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DEML — Accounts and status API" />
+    <meta
+      name="twitter:description"
+      content="DEML API for accounts, authentication, and public status pages."
+    />
+    <meta
+      name="twitter:image"
+      content="{{ request.scheme }}://{{ request.get_host }}{% static 'dataengineeringformachinelearning-social.png' %}"
+    />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebAPI",
+        "name": "DEML Backend API",
+        "description": "API for DEML accounts, authentication, and status page management.",
+        "url": "{{ request.scheme }}://{{ request.get_host }}/",
+        "documentation": "{{ marketing_url }}/documentation"
+      }
+    </script>
+    <link rel="stylesheet" href="{% static 'geist.css' %}" />
     <link rel="stylesheet" href="{% static 'deml-ui.css' %}" />
+    <link rel="stylesheet" href="{% static 'suite-backend.css' %}" />
+    <script>
+      (function () {
+        try {
+          var theme = localStorage.getItem('deml-theme');
+          if (theme !== 'light' && theme !== 'dark') {
+            theme = window.matchMedia('(prefers-color-scheme: light)').matches
+              ? 'light'
+              : 'dark';
+          }
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body class="suite-backend-splash backend-splash">
-    <main class="suite-backend-shell backend-splash-shell" id="main-content">
-      <a
-        class="suite-backend-logo backend-splash-logo"
-        href="{{ frontend_url }}/"
-        aria-label="DEML product site"
-      >
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <header class="suite-backend-nav" aria-label="Site">
+      <a class="suite-backend-nav__brand" href="/" aria-label="DEML home">
         <img
-          class="suite-media"
           src="{% static 'dataengineeringformachinelearning.svg' %}"
-          width="270"
-          height="270"
-          alt="DEML"
-          decoding="async"
-          fetchpriority="high"
-          loading="eager"
-          data-priority="high"
+          width="28"
+          height="28"
+          alt=""
         />
+        <span>DEML</span>
       </a>
+      <nav class="suite-backend-nav__links" aria-label="Primary">
+        <a href="{{ marketing_url }}/book">Book</a>
+        <a href="{{ marketing_url }}/whitepaper">Whitepaper</a>
+        <a href="{{ marketing_url }}/documentation">Docs</a>
+        <a href="{{ marketing_url }}/blog">Blog</a>
+        <a href="{{ marketing_url }}/compliance">Compliance</a>
+        <a href="{{ frontend_url }}/">Product</a>
+        <a href="{{ marketing_url }}/">Community</a>
+      </nav>
+    </header>
+    <main id="main-content" class="suite-backend-shell backend-splash-shell" tabindex="-1">
+      <div class="page">
+        <section class="banner banner--hero" data-variant="hero" aria-labelledby="main-title">
+          <a
+            class="suite-backend-logo backend-splash-logo"
+            href="/"
+            aria-label="DEML home"
+          >
+            <img
+              class="suite-media"
+              src="{% static 'dataengineeringformachinelearning.svg' %}"
+              width="120"
+              height="120"
+              alt="DEML"
+              decoding="async"
+              fetchpriority="high"
+              loading="eager"
+            />
+          </a>
+          <p class="preheader">DEML</p>
+          <h1 class="banner-heading" id="main-title">Accounts and status for your services.</h1>
+          <p class="lede">
+            Authenticate users, manage sites, and publish public status through the DEML API.
+          </p>
+          <div class="banner-actions">
+            <div class="button-group" data-layout="row" role="group" aria-label="Primary actions">
+              <a
+                class="button button--primary button--pill"
+                href="{{ marketing_url }}/documentation"
+                >Documentation</a
+              >
+              <a class="button button--secondary button--pill" href="{{ frontend_url }}/"
+                >Open DEML</a
+              >
+            </div>
+          </div>
+        </section>
+      </div>
     </main>
+    <footer class="suite-backend-footer">
+      <nav aria-label="Footer">
+        <a href="{{ marketing_url }}/book">Book</a>
+        <a href="{{ marketing_url }}/whitepaper">Whitepaper</a>
+        <a href="{{ marketing_url }}/documentation">Docs</a>
+        <a href="{{ marketing_url }}/blog">Blog</a>
+        <a href="{{ marketing_url }}/compliance">Compliance</a>
+        <a href="{{ marketing_url }}/privacy/">Privacy</a>
+        <a href="{{ marketing_url }}/terms/">Terms</a>
+        <a href="{{ frontend_url }}/status/platform-status">Status</a>
+        <a href="{{ frontend_url }}/">Product</a>
+        <a href="{{ marketing_url }}/">Community</a>
+      </nav>
+    </footer>
   </body>
 </html>

@@ -150,8 +150,6 @@ function stripCommentsTs(source) {
     r.endsWith('deml-ui-elements.js') ||
     r.endsWith('deml-ui.iife.js.map') ||
     r.includes('deml-ui-tokens.css') ||
-    // Historical Blue Notes may name the retired Viking theme; content is editorial SoT.
-    r.startsWith('src/content/blue-notes/') ||
     r.endsWith('.generated.ts');
   for (const root of roots) {
     for (const p of walk(root)) {

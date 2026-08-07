@@ -1,0 +1,33 @@
+@if (open()) {
+  <div
+    class="sheet-overlay"
+    role="presentation"
+    [attr.data-state]="leaving() ? 'leaving' : 'open'"
+    (click)="onBackdropClick($event)"
+  >
+    <div
+      class="sheet"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-labelledby]="resolvedTitleId()"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        type="button"
+        class="sheet__handle"
+        aria-label="Dismiss"
+        [disabled]="leaving()"
+        (click)="dismissed.emit()"
+      ></button>
+      <header class="sheet__header">
+        <h2 class="sheet__title" [id]="resolvedTitleId()">{{ title() }}</h2>
+      </header>
+      <div class="sheet__body">
+        <ng-content />
+      </div>
+      <footer class="sheet__footer">
+        <ng-content select="[sheetFooter]" />
+      </footer>
+    </div>
+  </div>
+}

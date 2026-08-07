@@ -244,9 +244,11 @@ def test_api_key_cannot_manage_credentials_or_account(client: Client, test_user:
 def test_api_key_integration_prefixes_are_path_boundary_safe() -> None:
   from config.middleware import _api_key_path_allowed
 
-  assert _api_key_path_allowed("/api/v1/siem/signals") is True
-  assert _api_key_path_allowed("/api/v1/siem-evil/signals") is False
-  assert _api_key_path_allowed("/api/v1/exports-malicious") is False
+  assert _api_key_path_allowed("/api/v1/system-status/status_pages") is True
+  assert _api_key_path_allowed("/api/v1/ingest/events") is True
+  assert _api_key_path_allowed("/api/v1/siem/signals") is False
+  assert _api_key_path_allowed("/api/v1/exports") is False
+  assert _api_key_path_allowed("/api/v1/forjd-evil/ingest") is False
 
 
 @pytest.mark.django_db

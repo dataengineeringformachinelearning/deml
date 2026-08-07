@@ -8,7 +8,7 @@
     {% block meta_description %}
     <meta
       name="description"
-      content="User, identity, billing, and FORJD handoff APIs for the DEML learning platform."
+      content="DEML API for accounts, authentication, billing, and status page management."
     />
     {% endblock %}
     <meta
@@ -21,8 +21,6 @@
       content="{% block robots %}index, follow, max-image-preview:large{% endblock %}"
     />
     <link rel="canonical" href="{{ request.build_absolute_uri }}" />
-    <meta name="algolia-site-verification" content="687B59B29612DE68" /> <!-- pragma: allowlist secret -->
-    <script src="{% static 'algolia-config.js' %}"></script>
 
     <!-- Favicons -->
     <link
@@ -87,13 +85,14 @@
         "@context": "https://schema.org",
         "@type": "WebAPI",
         "name": "DEML Backend API",
-        "description": "User control-plane APIs for the DEML learning platform.",
+        "description": "API for DEML accounts, authentication, and status page management.",
         "url": "{{ request.scheme }}://{{ request.get_host }}/",
-        "documentation": "{{ request.scheme }}://{{ request.get_host }}/api/v1/docs"
+        "documentation": "https://dataengineeringformachinelearning.com/documentation"
       }
     </script>
 
-    <!-- Fonts — Geist via deml-ui.css tokens (NFTS only). -->
+    <!-- Fonts — Geist variable (NFTS). -->
+    <link rel="stylesheet" href="{% static 'geist.css' %}" />
 
     <!-- Vendor styles load first; deml-ui remains the visual authority. -->
     {% block vendor_styles %}{% endblock %}

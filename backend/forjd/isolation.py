@@ -51,3 +51,12 @@ def assert_product_tenant_isolation(tenant_id: UUID, secret_ref: str) -> None:
 
 def is_platform_status_slug(slug: str | None) -> bool:
   return str(slug or "").strip().lower() == PLATFORM_STATUS_SLUG
+
+
+def is_platform_status_page(page: dict | str | None) -> bool:
+  """True when a status page dict/slug is the platform dogfood sentinel."""
+  if isinstance(page, str):
+    return is_platform_status_slug(page)
+  if not isinstance(page, dict):
+    return False
+  return is_platform_status_slug(str(page.get("slug") or ""))

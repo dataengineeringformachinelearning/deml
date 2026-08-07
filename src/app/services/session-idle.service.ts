@@ -264,12 +264,11 @@ export class SessionIdleService {
     const warningGeneration = this.generation;
     const initialSeconds = Math.max(1, Math.ceil((this.logoutAt - Date.now()) / 1000));
     this.warningRemainingSeconds.set(initialSeconds);
-    const stayPromise = this.dialog.openConfirm({
+    const stayPromise = this.dialog.confirm({
       title: 'Session expiring soon',
-      message: this.warningMessage(initialSeconds),
-      confirmBtnText: 'Continue session',
-      cancelBtnText: 'Sign out now',
-      type: 'confirm',
+      body: this.warningMessage(initialSeconds),
+      confirmLabel: 'Continue session',
+      cancelLabel: 'Sign out now',
     });
     this.warningTick = setInterval(() => this.updateWarningCountdown(), 1000);
 

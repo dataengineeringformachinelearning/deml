@@ -1,0 +1,18 @@
+<aside class="callout" role="status" [attr.data-tone]="tone()">
+  <div class="callout__body">
+    @if (heading()) {
+      <p class="callout__heading">{{ heading() }}</p>
+    }
+    <p class="callout__text">{{ text() }}</p>
+  </div>
+  @if (dismissible()) {
+    <button
+      type="button"
+      class="callout__close"
+      aria-label="Dismiss"
+      (click)="dismissed.emit()"
+    >
+      ×
+    </button>
+  }
+</aside>

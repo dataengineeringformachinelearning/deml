@@ -5,7 +5,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 
-export type PageSectionVariant = 'catalog' | 'prose' | 'auth';
+export type PageSectionVariant = 'catalog' | 'auth';
 
 @Component({
   encapsulation: ViewEncapsulation.None,
@@ -18,7 +18,7 @@ export type PageSectionVariant = 'catalog' | 'prose' | 'auth';
   },
 })
 export class PageSection {
-  /** Layout measure: catalog grid, prose column, or auth center. */
+  /** Layout measure: catalog grid or auth center. */
   readonly variant = input<PageSectionVariant>('catalog');
 
   /** Accessible name when no labelled-by heading is provided. */

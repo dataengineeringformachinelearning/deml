@@ -53,8 +53,10 @@ def _pytest_nodes() -> list[str]:
   global _NODE_CACHE
   if _NODE_CACHE is not None:
     return _NODE_CACHE
+  # Prefer backend venv — system python often lacks pytest/Django.
+  py = str(_backend_python() or sys.executable)
   proc = subprocess.run(
-    [sys.executable, "-m", "pytest", "--collect-only", "-q"],
+    [py, "-m", "pytest", "--collect-only", "-q"],
     cwd=BACKEND,
     capture_output=True,
     text=True,

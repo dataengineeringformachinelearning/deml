@@ -76,7 +76,7 @@ export const mapFirebaseMfaError = (code: string | undefined): string => {
     return 'The verification code expired. Request a new code and try again.';
   }
   if (code === 'auth/session-expired') {
-    return 'Your sign-in session expired. Sign in again to continue MFA verification.';
+    return 'Your log-in session expired. Log in again to continue MFA verification.';
   }
   return mapFirebasePhoneError(code);
 };

@@ -13,7 +13,9 @@ class AuthUserResponse(BaseModel):
   model_config = ConfigDict(extra="forbid")
 
   status: str
+  # Human display name only — never a Firebase UID fallback.
   user: str | None = None
+  display_name: str | None = None
   user_id: int | None = None
   role: str | None = None
 
@@ -79,7 +81,8 @@ class DesktopAuthOut(BaseModel):
   model_config = ConfigDict(extra="forbid")
 
   status: str
-  user: str
+  user: str | None = None
+  display_name: str | None = None
   email: str
   user_id: int
   role: str

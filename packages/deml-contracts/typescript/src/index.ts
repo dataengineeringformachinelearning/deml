@@ -30,7 +30,9 @@ export type DemlRole = 'Viewer' | 'Operator' | 'Security Admin';
 // --- UC-AUTH-* ---
 export interface AuthUserResponse {
   status: string;
+  /** Human display name only — never a Firebase UID fallback. */
   user?: string | null;
+  display_name?: string | null;
   user_id?: number | null;
   role?: DemlRole | string | null;
 }
@@ -221,46 +223,9 @@ export interface SubscriptionMutateOut {
 }
 
 export interface BillingErrorOut {
-  error: string;
+  detail: string;
+  code: string;
 }
-
-// --- UC-ANALYTICS-001 ---
-export interface LiveSseReady {
-  type: 'ready';
-  tenant_id?: string;
-}
-
-export interface LiveSseProjections {
-  type: 'projections';
-  count: number;
-  cursor: string;
-}
-
-export interface LiveSseDegraded {
-  type: 'degraded';
-  code: 'forjd_degraded';
-  detail?: string;
-}
-
-export interface LiveSseEnd {
-  type: 'end';
-  reason?: string;
-}
-
-export type LiveSseEvent =
-  | LiveSseReady
-  | LiveSseProjections
-  | LiveSseDegraded
-  | LiveSseEnd;
-
-// --- UC-ANALYTICS-003 ---
-export interface PlaybookActionAckIn {
-  succeeded: boolean;
-  external_reference?: string | null;
-  metadata?: Record<string, unknown>;
-}
-
-export type PlaybookActionRetryIn = Record<string, never>;
 
 // --- UC-HEALTH-001 ---
 export interface ReadyResponse {

@@ -1,13 +1,11 @@
-import { ErrorHandler, Injectable, Injector, PLATFORM_ID, inject } from '@angular/core';
+import { ErrorHandler, Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { ToastService } from '../../services/toast.service';
 import { environment } from '../../../environments/environment';
 import { isChunkLoadError, reloadOnceOnChunkError } from '../chunk-load-recovery';
 
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
   private readonly platformId = inject(PLATFORM_ID);
-  private readonly injector = inject(Injector);
 
   handleError(error: unknown): void {
     if (isPlatformBrowser(this.platformId) && reloadOnceOnChunkError(error)) {
@@ -21,17 +19,6 @@ export class GlobalErrorHandler implements ErrorHandler {
 
     void this.captureInMonitoring(error);
     console.error('GlobalErrorHandler caught an error:', error);
-
-    if (isPlatformBrowser(this.platformId) && !isChunkLoadError(error)) {
-      queueMicrotask(() => {
-        this.injector.get(ToastService).show({
-          heading: 'System Error',
-          text: 'An unexpected system error occurred. Please try again later.',
-          tone: 'danger',
-          duration: 6000,
-        });
-      });
-    }
   }
 
   private async captureInMonitoring(error: unknown): Promise<void> {

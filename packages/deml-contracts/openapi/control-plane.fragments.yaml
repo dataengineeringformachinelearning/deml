@@ -149,63 +149,6 @@ paths:
       responses:
         "200":
           description: Upstream receipt
-  /api/v1/analytics/live:
-    get:
-      operationId: analyticsLiveSse
-      tags: [UC-ANALYTICS-001]
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: text/event-stream of LiveSse events
-          content:
-            text/event-stream:
-              schema:
-                $ref: ../schemas/live-sse.schema.json
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-  /api/v1/analytics/playbook-runs/{run_id}/actions/{action_result_id}/ack:
-    post:
-      operationId: playbookActionAck
-      tags: [UC-ANALYTICS-003]
-      x-deml-csrf: header-auth-only
-      security:
-        - bearerAuth: []
-        - apiKeyAuth: []
-      parameters:
-        - $ref: "#/components/parameters/RunId"
-        - $ref: "#/components/parameters/ActionResultId"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: ../schemas/playbook-action.schema.json#/$defs/PlaybookActionAckIn
-      responses:
-        "200":
-          description: Ack accepted by FORJD
-  /api/v1/analytics/playbook-runs/{run_id}/actions/{action_result_id}/retry:
-    post:
-      operationId: playbookActionRetry
-      tags: [UC-ANALYTICS-003]
-      x-deml-csrf: header-auth-only
-      security:
-        - bearerAuth: []
-        - apiKeyAuth: []
-      parameters:
-        - $ref: "#/components/parameters/RunId"
-        - $ref: "#/components/parameters/ActionResultId"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: ../schemas/playbook-action.schema.json#/$defs/PlaybookActionRetryIn
-      responses:
-        "200":
-          description: Retry accepted
   /api/v1/billing/create-checkout-session:
     post:
       operationId: createCheckoutSession
@@ -232,17 +175,6 @@ components:
       in: header
       name: X-API-Key
       description: deml_ API key
-  parameters:
-    RunId:
-      name: run_id
-      in: path
-      required: true
-      schema: { type: string, format: uuid }
-    ActionResultId:
-      name: action_result_id
-      in: path
-      required: true
-      schema: { type: string, format: uuid }
   responses:
     Unauthorized:
       description: Not authenticated

@@ -15,7 +15,7 @@ SRC_WC_MAP="${SRC_WC}.map"
 DEST_DIR="$ROOT/backend/static"
 
 if [[ ! -f "$SRC_CSS" ]]; then
-  echo "deml-ui.css not found at $SRC_CSS — run npm install (deml-ui@^1.1.0) first." >&2
+  echo "deml-ui.css not found at $SRC_CSS — run npm install (deml-ui git pin) or set DEML_UI_DIST." >&2
   exit 1
 fi
 

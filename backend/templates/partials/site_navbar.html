@@ -6,7 +6,6 @@
     FRONTEND_URL: "{{ frontend_url|escapejs }}",
     BACKEND_URL: "{{ request.scheme }}://{{ request.get_host }}",
     MARKETING_URL: "{{ marketing_url|escapejs }}",
-    USE_ALGOLIA_SEARCH: true,
   };
 </script>
 <header class="site-navbar" id="navbar">
@@ -36,13 +35,22 @@
     <nav class="main-navigation" aria-label="Main navigation" id="mobile-menu">
       <ul class="row wrap items-center justify-center gap-4" role="list" id="site-navbar-menu">
         <li>
-          <a href="{{ frontend_url }}/blog" data-nav-id="blog">Blog</a>
+          <a href="{{ frontend_url }}/explore" data-nav-id="explore">Explore</a>
         </li>
         <li>
-          <a href="https://dataengineeringformachinelearning.com/book/" data-nav-id="book">Book</a>
+          <a href="{{ marketing_url }}/book" data-nav-id="book">Book</a>
         </li>
         <li>
-          <a href="{{ frontend_url }}/dashboard" data-nav-id="dashboard" data-require-auth="true" hidden>Dashboard</a>
+          <a href="{{ marketing_url }}/whitepaper" data-nav-id="whitepaper">Whitepaper</a>
+        </li>
+        <li>
+          <a href="{{ marketing_url }}/documentation" data-nav-id="documentation">Docs</a>
+        </li>
+        <li>
+          <a href="{{ marketing_url }}/blog" data-nav-id="blog">Blog</a>
+        </li>
+        <li>
+          <a href="{{ marketing_url }}/compliance" data-nav-id="compliance">Compliance</a>
         </li>
         <li>
           <a href="{{ frontend_url }}/settings" data-nav-id="settings" data-require-auth="true" hidden>Settings</a>
@@ -53,14 +61,6 @@
     <div class="button-group" role="group" aria-label="Account actions">
       <button
         type="button"
-        class="button button--secondary navbar-search-trigger"
-        id="navbar-search-trigger"
-        aria-label="Open search (⌘K)"
-      >
-        Search
-      </button>
-      <button
-        type="button"
         class="theme-toggle"
         id="theme-toggle-btn"
         aria-label="Toggle light and dark theme"
@@ -69,42 +69,39 @@
         Theme
       </button>
       <a
-        class="button button--primary auth-btn"
+        class="button button--primary button--pill auth-btn"
         href="{{ frontend_url }}/login"
         id="auth-btn-desktop"
       >
-        <span id="auth-text-desktop">Sign In</span>
+        <span id="auth-text-desktop">Log in</span>
       </a>
       <button
         type="button"
-        class="button button--secondary auth-btn auth-signout-btn"
+        class="button button--secondary button--pill auth-btn auth-signout-btn"
         id="auth-signout-desktop"
         hidden
       >
-        Sign Out
+        Log out
       </button>
       {# Mobile auth mirrors (kept for navbar.js selectors) #}
       <a
-        class="button button--primary auth-btn"
+        class="button button--primary button--pill auth-btn"
         href="{{ frontend_url }}/login"
         id="auth-btn-mobile"
         hidden
       >
-        <span id="auth-text-mobile">Sign In</span>
+        <span id="auth-text-mobile">Log in</span>
       </a>
       <button
         type="button"
-        class="button button--secondary auth-btn auth-signout-btn"
+        class="button button--secondary button--pill auth-btn auth-signout-btn"
         id="auth-signout-mobile"
         hidden
       >
-        Sign Out
+        Log out
       </button>
     </div>
   </div>
 </header>
-<div id="autocomplete" class="algolia-autocomplete-host" aria-hidden="true"></div>
 <script src="{% static 'widgets/navbar.js' %}" defer></script>
 <script type="module" src="{% static 'deml-ui-elements.js' %}"></script>
-<script src="{% static 'widgets/command-palette.js' %}" defer></script>
-<script src="{% static 'widgets/algolia-search.js' %}" defer></script>

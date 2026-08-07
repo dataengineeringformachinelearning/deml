@@ -1,7 +1,7 @@
 {
-  "name": "Data Engineering for AI Engineering and Cybersecurity",
+  "name": "DEML",
   "short_name": "DEML",
-  "description": "Data engineering, machine learning, and cybersecurity operational intelligence.",
+  "description": "Publish public status pages and manage your DEML account.",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",

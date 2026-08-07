@@ -11,6 +11,7 @@
       "properties": {
         "status": { "type": "string" },
         "user": { "type": ["string", "null"] },
+        "display_name": { "type": ["string", "null"] },
         "user_id": { "type": ["integer", "null"] },
         "role": {
           "type": ["string", "null"],
