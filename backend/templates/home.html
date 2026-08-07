@@ -71,78 +71,23 @@
   </head>
   <body class="suite-backend-splash backend-splash">
     <a class="skip-link" href="#main-content">Skip to main content</a>
-    <header class="suite-backend-nav" aria-label="Site">
-      <a class="suite-backend-nav__brand" href="/" aria-label="DEML home">
-        <img
-          src="{% static 'dataengineeringformachinelearning.svg' %}"
-          width="28"
-          height="28"
-          alt=""
-        />
-        <span>DEML</span>
-      </a>
-      <nav class="suite-backend-nav__links" aria-label="Primary">
-        <a href="{{ marketing_url }}/book">Book</a>
-        <a href="{{ marketing_url }}/whitepaper">Whitepaper</a>
-        <a href="{{ marketing_url }}/documentation">Docs</a>
-        <a href="{{ marketing_url }}/blog">Blog</a>
-        <a href="{{ marketing_url }}/compliance">Compliance</a>
-        <a href="{{ frontend_url }}/">Product</a>
-        <a href="{{ marketing_url }}/">Community</a>
-      </nav>
-    </header>
     <main id="main-content" class="suite-backend-shell backend-splash-shell" tabindex="-1">
-      <div class="page">
-        <section class="banner banner--hero" data-variant="hero" aria-labelledby="main-title">
-          <a
-            class="suite-backend-logo backend-splash-logo"
-            href="{{ frontend_url }}/"
-            aria-label="DEML home"
-          >
-            <img
-              class="suite-media"
-              src="{% static 'dataengineeringformachinelearning.svg' %}"
-              width="270"
-              height="270"
-              alt="DEML"
-              decoding="async"
-              fetchpriority="high"
-              loading="eager"
-            />
-          </a>
-          <p class="preheader">DEML</p>
-          <h1 class="banner-heading" id="main-title">Accounts and status for your services.</h1>
-          <p class="lede">
-            Authenticate users, manage sites, and publish public status through the DEML API.
-          </p>
-          <div class="banner-actions">
-            <div class="button-group" data-layout="row" role="group" aria-label="Primary actions">
-              <a
-                class="button button--primary button--pill"
-                href="{{ marketing_url }}/documentation"
-                >Documentation</a
-              >
-              <a class="button button--secondary button--pill" href="{{ frontend_url }}/"
-                >Open DEML</a
-              >
-            </div>
-          </div>
-        </section>
-      </div>
+      <a
+        class="suite-backend-logo backend-splash-logo"
+        href="{{ frontend_url }}/"
+        aria-label="DEML home"
+      >
+        <img
+          class="suite-media"
+          src="{% static 'dataengineeringformachinelearning.svg' %}"
+          width="270"
+          height="270"
+          alt="DEML"
+          decoding="async"
+          fetchpriority="high"
+          loading="eager"
+        />
+      </a>
     </main>
-    <footer class="suite-backend-footer">
-      <nav aria-label="Footer">
-        <a href="{{ marketing_url }}/book">Book</a>
-        <a href="{{ marketing_url }}/whitepaper">Whitepaper</a>
-        <a href="{{ marketing_url }}/documentation">Docs</a>
-        <a href="{{ marketing_url }}/blog">Blog</a>
-        <a href="{{ marketing_url }}/compliance">Compliance</a>
-        <a href="{{ marketing_url }}/privacy/">Privacy</a>
-        <a href="{{ marketing_url }}/terms/">Terms</a>
-        <a href="{{ frontend_url }}/status/platform-status">Status</a>
-        <a href="{{ frontend_url }}/">Product</a>
-        <a href="{{ marketing_url }}/">Community</a>
-      </nav>
-    </footer>
   </body>
 </html>

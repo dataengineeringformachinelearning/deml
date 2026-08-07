@@ -47,18 +47,19 @@ def test_html_docs_shells_redirect_to_community(client: Client) -> None:
 
 
 @pytest.mark.django_db
-def test_home_splash_points_to_community_docs(client: Client) -> None:
+def test_home_splash_is_centered_brand_mark(client: Client) -> None:
   home = client.get("/")
   assert home.status_code == 200
   home_body = home.content.decode()
   assert "backend-splash" in home_body
   assert "suite-backend-shell" in home_body
   assert "suite-backend-logo" in home_body
-  assert "suite-backend-nav" in home_body
-  assert "banner banner--hero" in home_body
   assert "dataengineeringformachinelearning.svg" in home_body
-  assert "Accounts and status for your services." in home_body
-  assert "/documentation" in home_body
+  assert "/documentation" in home_body  # JSON-LD docs URL
+  assert "suite-backend-nav" not in home_body
+  assert "suite-backend-footer" not in home_body
+  assert "banner banner--hero" not in home_body
+  assert "Accounts and status for your services." not in home_body
   assert "/api/v1/docs" not in home_body
   assert "Swagger UI" not in home_body
   assert "Control plane, not data plane" not in home_body

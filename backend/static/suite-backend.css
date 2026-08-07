@@ -106,7 +106,7 @@
   text-rendering: optimizeLegibility;
 }
 
-/* Splash: community-style shell (nav + hero + footer) */
+/* Splash: centered brand mark only (parity with backend.forjd.co) */
 :is(body.suite-backend-splash, body.backend-splash) {
   margin: 0;
   min-height: 100%;
@@ -144,65 +144,8 @@
 }
 
 /* =============================================================================
-   Splash — simple community twin (logo + hero + links)
+   Splash — centered logo shell
    ============================================================================= */
-.suite-backend-nav {
-  position: sticky;
-  top: 0;
-  z-index: var(--suite-z-sticky);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--suite-space-3);
-  padding: var(--suite-space-2) max(var(--suite-page-gutter), env(safe-area-inset-left))
-    var(--suite-space-2) max(var(--suite-page-gutter), env(safe-area-inset-right));
-  background: var(--suite-surface);
-  border-bottom: 1px solid var(--suite-border);
-}
-
-.suite-backend-nav__brand {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--suite-space-2);
-  min-height: var(--suite-touch);
-  color: var(--suite-ink);
-  text-decoration: none;
-  font-weight: var(--suite-weight-semibold);
-  letter-spacing: var(--suite-tracking-brand);
-  text-transform: uppercase;
-  font-size: var(--suite-text-sm);
-}
-
-.suite-backend-nav__brand img {
-  display: block;
-  width: 28px;
-  height: 28px;
-}
-
-.suite-backend-nav__brand:hover {
-  color: var(--suite-primary);
-}
-
-.suite-backend-nav__links {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: var(--suite-space-1) var(--suite-space-3);
-}
-
-.suite-backend-nav__links a {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--suite-touch);
-  color: var(--suite-ink-muted);
-  text-decoration: none;
-  font-size: var(--suite-text-sm);
-}
-
-.suite-backend-nav__links a:hover {
-  color: var(--suite-ink);
-}
-
 :is(.suite-backend-shell, .backend-splash-shell) {
   box-sizing: border-box;
   display: flex;
@@ -213,53 +156,22 @@
   width: 100%;
   margin: 0;
   min-height: 0;
+  padding: max(var(--suite-space-4), env(safe-area-inset-top))
+    max(var(--suite-page-gutter), env(safe-area-inset-right))
+    max(var(--suite-space-4), env(safe-area-inset-bottom))
+    max(var(--suite-page-gutter), env(safe-area-inset-left));
   background: transparent;
-}
-
-:is(.suite-backend-shell, .backend-splash-shell) .page {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  width: 100%;
-  min-height: 100%;
-}
-
-/* Hero stack: brand mark centered over page atmosphere */
-:is(body.suite-backend-splash, body.backend-splash) .banner.banner--hero {
-  flex: 1 1 auto;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  width: 100%;
-  background-color: transparent;
-  background-image: none;
-}
-
-:is(body.suite-backend-splash, body.backend-splash) .banner.banner--hero .banner-heading,
-:is(body.suite-backend-splash, body.backend-splash) .banner.banner--hero .lede {
-  margin-inline: auto;
-}
-
-:is(body.suite-backend-splash, body.backend-splash) .banner.banner--hero .banner-actions {
-  display: flex;
-  justify-content: center;
-  width: 100%;
 }
 
 :is(.suite-backend-logo, .backend-splash-logo) {
   display: block;
   width: fit-content;
   max-width: 100%;
-  margin-inline: auto;
+  margin: auto;
   border: 0;
   padding: 0;
   text-decoration: none;
   line-height: 0;
-}
-
-/* Minimal logo-only splash (logo as direct shell child) */
-:is(.suite-backend-shell, .backend-splash-shell) > :is(.suite-backend-logo, .backend-splash-logo) {
-  margin: auto;
 }
 
 :is(.suite-backend-logo, .backend-splash-logo):focus-visible {
@@ -274,33 +186,6 @@
   height: auto;
   margin: 0;
   border: 0;
-}
-
-.suite-backend-footer {
-  padding: var(--suite-space-3) max(var(--suite-page-gutter), env(safe-area-inset-left))
-    max(var(--suite-space-4), env(safe-area-inset-bottom))
-    max(var(--suite-page-gutter), env(safe-area-inset-right));
-  border-top: 1px solid var(--suite-border);
-  background: var(--suite-surface);
-}
-
-.suite-backend-footer nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--suite-space-2) var(--suite-space-4);
-}
-
-.suite-backend-footer a {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--suite-touch);
-  color: var(--suite-ink-muted);
-  text-decoration: none;
-  font-size: var(--suite-text-sm);
-}
-
-.suite-backend-footer a:hover {
-  color: var(--suite-ink);
 }
 
 /* =============================================================================

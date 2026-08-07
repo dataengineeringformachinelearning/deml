@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def home(request: HttpRequest) -> HttpResponse:
-  """Community-style brand splash with API and product links."""
+  """Centered brand-mark splash (parity with backend.forjd.co)."""
   return render(
     request,
     "home.html",
