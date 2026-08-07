@@ -113,8 +113,27 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: var(--suite-bg);
+  color: var(--suite-ink);
   color-scheme: dark light;
+  /* Full-page warm ash atmosphere (matches deml-ui banner wash) */
+  background-color: var(--suite-bg);
+  background-image:
+    radial-gradient(
+      110% 80% at 50% 120%,
+      color-mix(in srgb, var(--suite-primary) 28%, transparent) 0%,
+      transparent 58%
+    ),
+    radial-gradient(
+      70% 50% at 14% 16%,
+      color-mix(in srgb, var(--suite-primary) 14%, transparent) 0%,
+      transparent 64%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--suite-surface) 38%, var(--suite-bg)) 0%,
+      var(--suite-bg) 100%
+    );
+  background-attachment: fixed;
 }
 
 :is(body.suite-backend-docs, body.backend-swagger, body.backend-redoc) {
@@ -186,24 +205,61 @@
 
 :is(.suite-backend-shell, .backend-splash-shell) {
   box-sizing: border-box;
+  display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   margin: 0;
+  min-height: 0;
+  background: transparent;
 }
 
 :is(.suite-backend-shell, .backend-splash-shell) .page {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
   min-height: 100%;
+}
+
+/* Hero stack: brand mark centered over page atmosphere */
+:is(body.suite-backend-splash, body.backend-splash) .banner.banner--hero {
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  background-color: transparent;
+  background-image: none;
+}
+
+:is(body.suite-backend-splash, body.backend-splash) .banner.banner--hero .banner-heading,
+:is(body.suite-backend-splash, body.backend-splash) .banner.banner--hero .lede {
+  margin-inline: auto;
+}
+
+:is(body.suite-backend-splash, body.backend-splash) .banner.banner--hero .banner-actions {
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
 :is(.suite-backend-logo, .backend-splash-logo) {
   display: block;
   width: fit-content;
   max-width: 100%;
-  margin: 0;
+  margin-inline: auto;
   border: 0;
   padding: 0;
   text-decoration: none;
   line-height: 0;
+}
+
+/* Minimal logo-only splash (logo as direct shell child) */
+:is(.suite-backend-shell, .backend-splash-shell) > :is(.suite-backend-logo, .backend-splash-logo) {
+  margin: auto;
 }
 
 :is(.suite-backend-logo, .backend-splash-logo):focus-visible {
@@ -214,7 +270,7 @@
 
 :is(.suite-backend-logo, .backend-splash-logo) img {
   display: block;
-  width: min(7.5rem, 32vw);
+  width: min(10rem, 40vw);
   height: auto;
   margin: 0;
   border: 0;
