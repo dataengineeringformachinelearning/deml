@@ -1,9 +1,9 @@
 <header
   id="navbar"
-  class="site-navbar items-center"
+  class="site-navbar"
   [class.is-menu-open]="menuOpen()"
 >
-  <div id="site-navbar-branding" class="site-navbar-branding row items-center">
+  <div id="site-navbar-branding" class="site-navbar-branding">
     <a
       class="site-navbar-icon"
       [routerLink]="brandHref()"
@@ -40,14 +40,10 @@
     [attr.aria-label]="menuOpen() ? 'Site menu' : null"
   >
     <div class="site-navbar-panel__inner">
-      <nav
-        id="site-navigation"
-        class="main-navigation place-center"
-        aria-label="Primary"
-      >
-        <ul id="site-navbar-menu" class="row wrap items-center justify-center gap-4" role="list">
+      <nav id="site-navigation" class="main-navigation" aria-label="Primary">
+        <ul id="site-navbar-menu" role="list">
           @for (link of navLinks(); track link.label) {
-            <li class="item-fixed">
+            <li>
               @if (link.href) {
                 <a
                   [href]="link.href"
@@ -72,22 +68,24 @@
         </ul>
       </nav>
 
-      <app-button-group id="site-button-group" align="end">
-        <app-theme-toggle />
+      <div class="site-navbar-actions">
+        <app-button-group id="site-button-group" align="end" layout="row">
+          <app-theme-toggle />
 
-        @if (!loggedIn()) {
-          <app-button
-            variant="primary"
-            shape="pill"
-            routerLink="/login"
-            (pressed)="closeMenu(true)"
-          >
-            Log in
-          </app-button>
-        } @else {
-          <app-button variant="secondary" shape="pill" (pressed)="logout()">Log out</app-button>
-        }
-      </app-button-group>
+          @if (!loggedIn()) {
+            <app-button
+              variant="primary"
+              shape="pill"
+              routerLink="/login"
+              (pressed)="closeMenu(true)"
+            >
+              Log in
+            </app-button>
+          } @else {
+            <app-button variant="secondary" shape="pill" (pressed)="logout()">Log out</app-button>
+          }
+        </app-button-group>
+      </div>
     </div>
   </div>
 </header>

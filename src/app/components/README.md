@@ -6,7 +6,7 @@ Thin Angular wrappers over **deml-ui** class contracts (`ViewEncapsulation.None`
 |-----------|---------|------------|
 | `banner` | Page hero / section title | `heading`, `lede`, `data-variant` |
 | `navbar` | Top nav + theme + auth | uses `nav-links` |
-| `site-footer` | Legal links + Made in U.S.A. / Joe Alongi credit | `SITE_FOOTER_LINKS` |
+| `site-footer` | Categorized Resources/Legal links + Made in U.S.A. / Joe Alongi credit | `SITE_FOOTER_GROUPS` |
 | `explore-card` | Status directory/detail card | `layout`, `name`, `status`, `services`, `incidents` |
 | `empty-state` / `error-state` | Empty / error modules | `title`, `description`, actions slot |
 | `skeleton` | Loading placeholder | `lines`, `block` |

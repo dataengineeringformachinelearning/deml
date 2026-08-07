@@ -21,15 +21,20 @@ describe('SiteFooter', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render suite, legal links, and Joe Alongi credit', () => {
+  it('should render categorized suite, legal links, and Joe Alongi credit', () => {
     const host = fixture.nativeElement as HTMLElement;
     const text = host.textContent ?? '';
+    const headings = Array.from(host.querySelectorAll('.site-footer__heading')).map((el) =>
+      el.textContent?.trim(),
+    );
     const labels = Array.from(host.querySelectorAll('.site-footer__list a')).map((el) =>
       el.textContent?.trim(),
     );
 
     expect(host.querySelector('footer.site-footer')).toBeTruthy();
     expect(host.querySelector('nav[aria-label="Footer"]')).toBeTruthy();
+    expect(host.querySelectorAll('.site-footer__group').length).toBe(2);
+    expect(headings).toEqual(['Resources', 'Legal']);
     expect(labels).toEqual([
       'Book',
       'Whitepaper',
