@@ -8,6 +8,7 @@ from uuid import uuid4
 import pytest
 from django.contrib.auth import get_user_model
 from django.test import Client, override_settings
+from forjd.testing import create_product_forjd_mapping
 from monitor.models import ForjdTenantMapping
 
 from forjd.angular_compat import (
@@ -147,6 +148,16 @@ def test_deml_status_pages_sets_deml_user_id() -> None:
     deml_user_id=7,
   )
   assert pages[0]["user_id"] == 7
+
+
+def test_deml_status_pages_require_pages_key_fail_closed() -> None:
+  """Missing pages must not silently become [] when honesty is required."""
+  assert deml_status_pages({}, deml_user_id=None) == []
+  try:
+    deml_status_pages({}, deml_user_id=None, require_pages_key=True)
+    raise AssertionError("expected ValueError")
+  except ValueError:
+    pass
 
 
 def test_public_status_slug_candidates_domain_and_stem() -> None:
@@ -501,7 +512,7 @@ def test_deml_control_plane_action_preserves_only_safe_configuration() -> None:
 def test_analytics_overview_proxy_maps_forjd(client: Client) -> None:
   user = User.objects.create_user(username="overview")
   tenant_id = uuid4()
-  ForjdTenantMapping.objects.create(
+  create_product_forjd_mapping(
     deml_account_id=user.profile.account_id,
     forjd_tenant_id=tenant_id,
   )
@@ -514,7 +525,7 @@ def test_analytics_overview_proxy_maps_forjd(client: Client) -> None:
     "ces": {"ces_level": 50, "ces_threat": 1, "ces_sla": 90, "ces_stability": 80},
   }
   with (
-    override_settings(FORJD_TENANT_ID=str(tenant_id)),
+    override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"),
     patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock) as mock_proxy,
   ):
     mock_proxy.return_value = ForjdResponse(
@@ -539,11 +550,11 @@ def test_analytics_overview_proxy_maps_forjd(client: Client) -> None:
 def test_unsupported_get_returns_empty_not_501(client: Client) -> None:
   user = User.objects.create_user(username="emptyget")
   tenant_id = uuid4()
-  ForjdTenantMapping.objects.create(
+  create_product_forjd_mapping(
     deml_account_id=user.profile.account_id,
     forjd_tenant_id=tenant_id,
   )
-  with override_settings(FORJD_TENANT_ID=str(tenant_id)):
+  with override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"):
     response = client.get(
       "/api/v1/system-status/endpoints",
       HTTP_AUTHORIZATION="Bearer mock-token-emptyget-emptyget@example.com",
@@ -557,15 +568,16 @@ def test_unsupported_get_returns_empty_not_501(client: Client) -> None:
   FORJD_CUTOVER_PHASE="1",
   FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
 )
-def test_status_pages_list_fallback_on_outage(client: Client) -> None:
+def test_status_pages_owned_list_fails_closed_on_outage(client: Client) -> None:
+  """Owned Settings list must not mask FORJD outages as an empty site list."""
   user = User.objects.create_user(username="pages")
   tenant_id = uuid4()
-  ForjdTenantMapping.objects.create(
+  create_product_forjd_mapping(
     deml_account_id=user.profile.account_id,
     forjd_tenant_id=tenant_id,
   )
   with (
-    override_settings(FORJD_TENANT_ID=str(tenant_id)),
+    override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"),
     patch(
       "forjd.views.ForjdClient.proxy",
       new_callable=AsyncMock,
@@ -576,8 +588,64 @@ def test_status_pages_list_fallback_on_outage(client: Client) -> None:
       "/api/v1/system-status/status_pages",
       HTTP_AUTHORIZATION="Bearer mock-token-pages-pages@example.com",
     )
-  assert response.status_code == 200
-  assert response.json() == []
+  assert response.status_code == 503
+  body = response.json()
+  assert body.get("detail")
+
+
+@pytest.mark.django_db
+@override_settings(
+  FORJD_CUTOVER_PHASE="1",
+  FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
+)
+def test_status_pages_public_directory_no_empty_on_outage(client: Client) -> None:
+  """Anonymous explore must not invent an empty directory when FORJD is down."""
+  with patch(
+    "forjd.views._fetch_published_directory",
+    new_callable=AsyncMock,
+    side_effect=ForjdError(503, "down"),
+  ):
+    response = client.get("/api/v1/system-status/status_pages")
+  assert response.status_code == 503
+  body = response.json()
+  assert body.get("detail")
+
+
+@pytest.mark.django_db
+@override_settings(
+  FORJD_CUTOVER_PHASE="1",
+  FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
+)
+def test_status_pages_owned_list_malformed_envelope_fails_closed(client: Client) -> None:
+  """A 200 without ``pages`` must not look like zero owned sites."""
+  user = User.objects.create_user(username="badpages")
+  tenant_id = uuid4()
+  create_product_forjd_mapping(
+    deml_account_id=user.profile.account_id,
+    forjd_tenant_id=tenant_id,
+  )
+  upstream = ForjdResponse(
+    status=200,
+    body=b'{"ok": true}',
+    content_type="application/json",
+  )
+  with (
+    override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"),
+    patch(
+      "forjd.views.ForjdClient.proxy",
+      new_callable=AsyncMock,
+      return_value=upstream,
+    ),
+  ):
+    response = client.get(
+      "/api/v1/system-status/status_pages",
+      HTTP_AUTHORIZATION="Bearer mock-token-badpages-badpages@example.com",
+    )
+  # AdapterError ≥500 is mapped to 503 FORJD_DEGRADED — never invent [].
+  assert response.status_code == 503
+  body = response.json()
+  assert body.get("detail")
+  assert body.get("code") == "forjd_degraded"
 
 
 @pytest.mark.django_db
@@ -588,7 +656,7 @@ def test_status_pages_list_fallback_on_outage(client: Client) -> None:
 def test_vulnerabilities_proxy_maps_forjd(client: Client) -> None:
   user = User.objects.create_user(username="vulns")
   tenant_id = uuid4()
-  ForjdTenantMapping.objects.create(
+  create_product_forjd_mapping(
     deml_account_id=user.profile.account_id,
     forjd_tenant_id=tenant_id,
   )
@@ -606,7 +674,7 @@ def test_vulnerabilities_proxy_maps_forjd(client: Client) -> None:
     ],
   }
   with (
-    override_settings(FORJD_TENANT_ID=str(tenant_id)),
+    override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"),
     patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock) as mock_proxy,
   ):
     mock_proxy.return_value = ForjdResponse(

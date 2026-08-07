@@ -53,12 +53,7 @@ describe('Navbar', () => {
     const host = fixture.nativeElement as HTMLElement;
     const links = Array.from(host.querySelectorAll('#site-navbar-menu a'));
 
-    expect(links.map((el) => el.textContent?.trim())).toEqual([
-      'Home',
-      'Learn',
-      'Blog',
-      'Explore',
-    ]);
+    expect(links.map((el) => el.textContent?.trim())).toEqual(['Explore']);
     for (const link of links) {
       expect(link.hasAttribute('aria-label')).toBe(false);
     }
@@ -72,12 +67,7 @@ describe('Navbar', () => {
     const host = fixture.nativeElement as HTMLElement;
     const links = Array.from(host.querySelectorAll('#site-navbar-menu a'));
 
-    expect(links.map((el) => el.textContent?.trim())).toEqual([
-      'Dashboard',
-      'Analytics',
-      'Vulnerabilities',
-      'Settings',
-    ]);
+    expect(links.map((el) => el.textContent?.trim())).toEqual(['Explore', 'Settings']);
   });
 
   it('should show Log in and Sign up when logged out', () => {

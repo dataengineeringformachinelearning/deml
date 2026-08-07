@@ -25,43 +25,27 @@ describe('Home', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render the hero banner with homepage copy', () => {
+  it('should render a hero-only landing', () => {
     const host = fixture.nativeElement as HTMLElement;
-    const banner = host.querySelector('app-banner');
-    expect(banner).toBeTruthy();
-    expect(banner?.getAttribute('data-variant')).toBe('hero');
-    expect(host.querySelector('.banner--hero')).toBeTruthy();
+    expect(host.querySelector('app-banner')?.getAttribute('data-variant')).toBe('hero');
     expect(host.querySelector('h1.banner-heading')?.textContent).toContain(
       'Control plane for ML data',
     );
+    expect(host.querySelector('app-card-grid')).toBeNull();
+    expect(host.querySelector('app-page-section')).toBeNull();
+    expect(host.textContent).not.toContain('Jump in');
   });
 
-  it('should show auth CTAs when logged out', () => {
+  it('should show explore and login when logged out', () => {
     const labels = Array.from(fixture.nativeElement.querySelectorAll('app-button')).map((el) =>
       (el as HTMLElement).textContent?.trim(),
     );
-
-    expect(labels).toContain('Sign up');
-    expect(labels).toContain('Log in');
     expect(labels).toContain('Explore');
+    expect(labels).toContain('Log in');
+    expect(labels).not.toContain('Sign up');
   });
 
-  it('should render landing sections without settings hash surfaces', () => {
-    const host = fixture.nativeElement as HTMLElement;
-    expect(host.querySelector('app-page-section')).toBeTruthy();
-    expect(host.querySelector('app-section-header')).toBeTruthy();
-    expect(host.querySelector('app-form-panel')).toBeTruthy();
-    expect(host.querySelector('app-card-grid')).toBeTruthy();
-    expect(host.querySelector('app-card')).toBeTruthy();
-    expect(host.querySelector('#account')).toBeNull();
-    expect(host.querySelector('#sites')).toBeNull();
-    expect(host.querySelector('#preferences')).toBeNull();
-    expect(host.textContent).not.toContain('Manage sites');
-    expect(host.textContent).toContain('What the control plane owns');
-    expect(host.textContent).toContain('Jump into the product');
-  });
-
-  it('should show dashboard CTA when logged in', async () => {
+  it('should show settings when logged in', async () => {
     auth.isAuthenticated.set(true);
     fixture.detectChanges();
     await fixture.whenStable();
@@ -69,10 +53,6 @@ describe('Home', () => {
     const labels = Array.from(fixture.nativeElement.querySelectorAll('app-button')).map((el) =>
       (el as HTMLElement).textContent?.trim(),
     );
-    expect(labels).toContain('Dashboard');
-    expect(labels).toContain('Explore');
-    expect(labels).toContain('Learn');
-    expect(labels).not.toContain('Sign up');
-    expect(fixture.nativeElement.querySelector('#sites')).toBeNull();
+    expect(labels).toEqual(['Settings']);
   });
 });

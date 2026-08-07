@@ -1,35 +1,3 @@
-<app-banner
-  preheader="DEML"
-  heading="Not found"
-  lede="That route is not available."
->
-  <app-button-group>
-    <app-button variant="primary" shape="pill" routerLink="/">Go home</app-button>
-    <app-button variant="secondary" shape="pill" routerLink="/learn">Browse Learn</app-button>
-  </app-button-group>
+<app-banner heading="Not found" lede="That route is not available.">
+  <app-button variant="primary" shape="pill" routerLink="/">Go home</app-button>
 </app-banner>
-
-<app-page-section variant="catalog" labelledBy="not-found-heading">
-  <app-section-header
-    eyebrow="404"
-    heading="Ways back"
-    lede="Pick a surface that still exists."
-    headingId="not-found-heading"
-  />
-
-  <app-card-grid>
-    @for (card of cards; track card.id) {
-      <app-card
-        [heading]="card.heading"
-        [subtext]="card.subtext"
-        [visual]="card.visual"
-      >
-        <app-button-group align="center" layout="row">
-          <app-button variant="primary" shape="pill" [routerLink]="card.href">
-            {{ card.cta }}
-          </app-button>
-        </app-button-group>
-      </app-card>
-    }
-  </app-card-grid>
-</app-page-section>

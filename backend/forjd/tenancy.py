@@ -142,6 +142,10 @@ def resolve_forjd_tenant_credential(
     )
 
   secret_ref = validate_service_token_secret_ref(mapping.service_token_secret_ref)
+  # --- Product ↔ platform boundary (never share tenant0 / platform fjsvc_) ---
+  from forjd.isolation import assert_product_tenant_isolation
+
+  assert_product_tenant_isolation(mapping.forjd_tenant_id, secret_ref)
   _require_tenant_env_match(mapping.forjd_tenant_id, secret_ref)
 
   return ForjdTenantCredential(
@@ -161,6 +165,9 @@ def resolve_forjd_snapshot_credential(
 ) -> ForjdTenantCredential:
   """Resolve an assignment-once destination without consulting the current mapping."""
   secret_ref = validate_service_token_secret_ref(service_token_secret_ref)
+  from forjd.isolation import assert_product_tenant_isolation
+
+  assert_product_tenant_isolation(tenant_id, secret_ref)
   _require_tenant_env_match(tenant_id, secret_ref)
   return ForjdTenantCredential(
     tenant_id=tenant_id,

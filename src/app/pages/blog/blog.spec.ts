@@ -29,6 +29,6 @@ describe('Blog', () => {
     expect(host.querySelector('h1.banner-heading')?.textContent).toContain('Blog');
     expect(cards.length).toBe(BLUE_NOTES.length);
     expect(host.textContent).toContain(BLUE_NOTES[0].title);
-    expect(host.querySelector('.microcard-cta')?.textContent?.trim()).toMatch(/Read/);
+    expect(host.querySelector('.microcard-cta')).toBeNull();
   });
 });

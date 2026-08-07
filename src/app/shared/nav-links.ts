@@ -3,18 +3,11 @@ export interface NavLink {
   path: string;
 }
 
-/** Primary nav when logged out. */
-export const GUEST_NAV_LINKS: NavLink[] = [
-  { label: 'Home', path: '/' },
-  { label: 'Learn', path: '/learn' },
-  { label: 'Blog', path: '/blog' },
-  { label: 'Explore', path: '/explore' },
-];
+/** Guest primary nav — product job only. Brand covers Home. */
+export const GUEST_NAV_LINKS: NavLink[] = [{ label: 'Explore', path: '/explore' }];
 
-/** Primary nav when logged in. */
+/** Auth primary nav — status + account/sites. */
 export const AUTH_NAV_LINKS: NavLink[] = [
-  { label: 'Dashboard', path: '/dashboard' },
-  { label: 'Analytics', path: '/analytics' },
-  { label: 'Vulnerabilities', path: '/vulnerabilities' },
+  { label: 'Explore', path: '/explore' },
   { label: 'Settings', path: '/settings' },
 ];

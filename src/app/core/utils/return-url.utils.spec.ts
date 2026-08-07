@@ -7,7 +7,7 @@ describe('resolvePostLoginTarget', () => {
     appOrigin: 'https://deml.app',
   };
 
-  it('defaults to the dashboard when returnUrl is missing', () => {
+  it('defaults to settings when returnUrl is missing', () => {
     expect(resolvePostLoginTarget(undefined, options)).toEqual({
       kind: 'app',
       url: DEFAULT_POST_LOGIN_PATH,
@@ -19,9 +19,9 @@ describe('resolvePostLoginTarget', () => {
   });
 
   it('keeps safe in-app relative paths', () => {
-    expect(resolvePostLoginTarget('/dashboard', options)).toEqual({
+    expect(resolvePostLoginTarget('/settings', options)).toEqual({
       kind: 'app',
-      url: '/dashboard',
+      url: '/settings',
     });
     expect(resolvePostLoginTarget('/settings?tab=billing', options)).toEqual({
       kind: 'app',
@@ -29,7 +29,7 @@ describe('resolvePostLoginTarget', () => {
     });
   });
 
-  it('sends bare home to the dashboard', () => {
+  it('sends bare home to settings', () => {
     expect(resolvePostLoginTarget('/', options)).toEqual({
       kind: 'app',
       url: DEFAULT_POST_LOGIN_PATH,
@@ -37,9 +37,9 @@ describe('resolvePostLoginTarget', () => {
   });
 
   it('rejects absolute URLs passed through navigateByUrl (the /https: bug)', () => {
-    expect(resolvePostLoginTarget('https://deml.app/dashboard', options)).toEqual({
+    expect(resolvePostLoginTarget('https://deml.app/explore', options)).toEqual({
       kind: 'app',
-      url: '/dashboard',
+      url: '/explore',
     });
     expect(resolvePostLoginTarget('https://deml.app/', options)).toEqual({
       kind: 'app',

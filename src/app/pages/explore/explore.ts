@@ -4,72 +4,61 @@ import {
   Injector,
   OnInit,
   afterNextRender,
-  computed,
   effect,
   inject,
   signal,
 } from '@angular/core';
-import { catchError, forkJoin, map, of } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 
 import { Banner } from '../../components/banner/banner';
 import { Button } from '../../components/button/button';
 import {
   ExploreCard,
-  type ExploreCardMetric,
   type ExploreCardStatus,
 } from '../../components/explore-card/explore-card';
 import { PageSection } from '../../components/page-section/page-section';
-import { SectionHeader } from '../../components/section-header/section-header';
+import { OFFLINE_BODY, OFFLINE_HEADING } from '../../core/continuity-copy';
 import { toUptimeHistoryDataPoints } from '../../core/utils/uptime.utils';
 import { AuthService } from '../../services/auth.service';
-import { MlService } from '../../services/ml.service';
-import {
-  MonitorService,
-  publicStatusPageTag,
-  type StatusPageData,
-} from '../../services/monitor.service';
+import { ConnectivityService } from '../../services/connectivity.service';
+import { MonitorService, type StatusPageData } from '../../services/monitor.service';
 import type { UptimeHistoryDataPoint } from '../../shared/deml-chart/types';
 
+/**
+ * Explore directory — single SoT is FORJD published directory via BFF.
+ * No per-slug hydrate and no authed enrichment (those race / wipe embedded truth).
+ */
 @Component({
   selector: 'app-explore',
-  imports: [Banner, Button, ExploreCard, PageSection, SectionHeader],
+  imports: [Banner, Button, ExploreCard, PageSection],
   templateUrl: './explore.html',
   host: { class: 'page page--catalog' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Explore implements OnInit {
   private readonly monitor = inject(MonitorService);
-  private readonly ml = inject(MlService);
   private readonly auth = inject(AuthService);
+  private readonly connectivity = inject(ConnectivityService);
   private readonly injector = inject(Injector);
+
+  /** Monotonic load generation — drop stale async completions. */
+  private loadGeneration = 0;
 
   readonly statusPages = signal<StatusPageData[]>([]);
   readonly loadFailed = signal(false);
   readonly isLoading = signal(true);
   readonly isRetrying = signal(false);
-
-  private readonly loadingPlaceholder: StatusPageData = {
-    id: 'loading-placeholder',
-    title: 'Loading Directory…',
-    slug: 'loading',
-    description: 'Fetching public status pages from the platform directory…',
-    created_at: new Date().toISOString(),
-    user_id: null,
-  };
-
-  readonly displayPages = computed(() => {
-    if (this.isLoading() && !this.loadFailed()) {
-      return [this.loadingPlaceholder];
-    }
-    return this.statusPages();
-  });
+  readonly servingStale = this.monitor.directoryServingStale;
+  readonly online = this.connectivity.online;
+  readonly offlineHeading = OFFLINE_HEADING;
+  readonly offlineBody = OFFLINE_BODY;
 
   constructor() {
     afterNextRender(() => {
       effect(
         () => {
           if (this.auth.isInitialized()) {
-            this.loadData();
+            void this.loadData();
           }
         },
         { injector: this.injector },
@@ -78,11 +67,7 @@ export class Explore implements OnInit {
   }
 
   ngOnInit(): void {
-    /* Meta titles come from route + page-meta; directory loads after auth init. */
-  }
-
-  pageTag(page: StatusPageData): string {
-    return publicStatusPageTag(page.slug);
+    /* Directory loads after auth init. */
   }
 
   getPageUrl(page: StatusPageData): string {
@@ -90,13 +75,12 @@ export class Explore implements OnInit {
   }
 
   getPageStatus(page: StatusPageData): ExploreCardStatus {
-    const active = (this.monitor.incidentsMap()[page.id] || []).filter(
-      incident => incident.status !== 'Resolved',
-    );
+    // Directory SoT embeds services/incidents when present — never enrichment maps.
+    const active = (page.incidents || []).filter(incident => incident.status !== 'Resolved');
     if (active.length > 0) {
-      return active[0].status;
+      return active[0].status as ExploreCardStatus;
     }
-    const services = this.monitor.servicesMap()[page.id] || page.services || [];
+    const services = page.services || [];
     const normalized = (status?: string | null) =>
       (status || 'operational').toLowerCase().replace(/[\s-]+/g, '_');
     if (
@@ -130,47 +114,9 @@ export class Explore implements OnInit {
     return `${this.getPageStatus(page)}`;
   }
 
-  uptimeSummary(page: StatusPageData): string {
-    const label = this.getPageStatusLabel(page);
-    return label === 'Operational' ? 'No current issues' : label;
-  }
-
+  /** Single uptime field — FORJD overall_uptime is SoT (not cumulative_sla alias). */
   overallUptime(page: StatusPageData): number | null {
-    return page.overall_uptime ?? page.cumulative_sla ?? null;
-  }
-
-  exploreMetrics(page: StatusPageData): readonly ExploreCardMetric[] {
-    const threatReport = this.ml.latestThreatReports()[page.id];
-    const spikeRisk = this.ml.latestTemporalForecasts()[page.id];
-    const sla = page.cumulative_sla ?? page.overall_uptime ?? null;
-    const latency = page.p99_latency;
-    const anomaly = threatReport?.anomaly_score;
-    const usesNorse = this.ml.latestTemporalUsesNorse()[page.id];
-    const norseLabel =
-      usesNorse === true ? 'Active' : usesNorse === false ? 'MLP Fallback' : 'Pending';
-
-    return [
-      {
-        label: 'Cumulative SLA',
-        value: sla == null ? '—' : `${sla.toFixed(2)}%`,
-        meta: 'Based on real telemetry',
-      },
-      {
-        label: 'P99 Latency',
-        value: latency == null ? '—' : `${latency}ms`,
-        meta: 'Last 24h',
-      },
-      {
-        label: 'Spike Risk',
-        value: spikeRisk == null ? '—' : spikeRisk.toFixed(2),
-        meta: 'Dynamic Temporal Forecasting',
-      },
-      {
-        label: 'Threat Anomaly',
-        value: anomaly == null ? '—' : `${(anomaly * 100).toFixed(2)}%`,
-        meta: norseLabel,
-      },
-    ];
+    return page.overall_uptime ?? null;
   }
 
   exploreUptimeHistory(page: StatusPageData): readonly UptimeHistoryDataPoint[] {
@@ -181,58 +127,53 @@ export class Explore implements OnInit {
     return [];
   }
 
-  loadData(): void {
+  async loadData(): Promise<void> {
+    const generation = ++this.loadGeneration;
     this.isLoading.set(true);
     this.loadFailed.set(false);
-    this.monitor.getStatusPages().subscribe({
-      next: data => {
-        if (!Array.isArray(data)) return;
-        const publicPages = data.filter(p => p.is_published || p.slug === 'platform-status');
-        const hydrations = publicPages.map(page =>
-          this.monitor.getStatusPageBySlug(page.slug).pipe(
-            map(hydrated => ({ ...page, ...hydrated, id: hydrated.id || page.id })),
-            catchError(() => of(page)),
-          ),
-        );
 
-        const applyPages = (pages: StatusPageData[]) => {
-          this.statusPages.set(pages);
-          for (const page of pages) {
-            this.monitor.seedFromEmbeddedPage(page);
-            this.ml.seedFromStatusPage(page);
-            if (this.auth.isAuthenticated()) {
-              this.ml.fetchLatestStat(page.id);
-              this.ml.fetchThreatReport(page.id);
-              this.ml.fetchTemporalForecast(page.id);
-            }
-          }
-          if (this.auth.isAuthenticated()) {
-            this.monitor.fetchAllIncidents(pages);
-            this.monitor.fetchAllServices(pages);
-          }
-          this.isLoading.set(false);
-        };
+    const peek = this.monitor.peekStatusPages();
+    if (Array.isArray(peek) && peek.length > 0) {
+      // Peek is provisional — mark stale until revalidate settles.
+      this.statusPages.set(this.publicPages(peek));
+      this.monitor.directoryServingStale.set(true);
+      this.isLoading.set(false);
+    }
 
-        if (hydrations.length === 0) {
-          applyPages([]);
-          return;
-        }
-
-        forkJoin(hydrations).subscribe({
-          next: applyPages,
-          error: () => applyPages(publicPages),
-        });
-      },
-      error: () => {
+    try {
+      // lastValueFrom waits for SWR revalidate so we never treat warm cache as final.
+      const data = await lastValueFrom(this.monitor.getStatusPages());
+      if (generation !== this.loadGeneration) return;
+      if (!Array.isArray(data)) {
+        throw new Error('invalid_directory_payload');
+      }
+      this.statusPages.set(this.publicPages(data));
+      this.loadFailed.set(false);
+    } catch {
+      if (generation !== this.loadGeneration) return;
+      const warm = this.monitor.peekStatusPages();
+      if (Array.isArray(warm) && warm.length > 0) {
+        this.statusPages.set(this.publicPages(warm));
+        this.monitor.directoryServingStale.set(true);
+        this.loadFailed.set(false);
+      } else {
         this.statusPages.set([]);
         this.loadFailed.set(true);
+      }
+    } finally {
+      if (generation === this.loadGeneration) {
         this.isLoading.set(false);
-      },
-    });
+        this.isRetrying.set(false);
+      }
+    }
   }
 
   retryLoad(): void {
     this.isRetrying.set(true);
-    this.loadData();
+    void this.loadData();
+  }
+
+  private publicPages(data: StatusPageData[]): StatusPageData[] {
+    return data.filter(p => p.is_published || p.slug === 'platform-status');
   }
 }

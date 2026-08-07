@@ -30,8 +30,8 @@
       <p class="microcard-subtext">{{ subtext() }}</p>
     }
 
-    <span class="microcard-cta">{{ cta() }}</span>
+    @if (cta()) {
+      <span class="microcard-cta">{{ cta() }}</span>
+    }
   </div>
-
-  <div class="microcard-visual" aria-hidden="true"></div>
 </a>

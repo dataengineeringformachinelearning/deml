@@ -28,7 +28,7 @@ describe('errorInterceptor', () => {
         },
         {
           provide: Router,
-          useValue: { url: '/dashboard', navigate },
+          useValue: { url: '/settings', navigate },
         },
       ],
     });
@@ -66,7 +66,7 @@ describe('errorInterceptor', () => {
     expect(logout).toHaveBeenCalledTimes(1);
     await Promise.resolve();
     expect(navigate).toHaveBeenCalledWith(['/login'], {
-      queryParams: { returnUrl: '/dashboard', reason: 'session' },
+      queryParams: { returnUrl: '/settings', reason: 'session' },
     });
   });
 });

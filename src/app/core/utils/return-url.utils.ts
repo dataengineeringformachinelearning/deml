@@ -3,7 +3,7 @@ import type { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 
 /** Default post-login destination inside the Angular app. */
-export const DEFAULT_POST_LOGIN_PATH = '/dashboard';
+export const DEFAULT_POST_LOGIN_PATH = '/settings';
 
 export type PostLoginTarget = { kind: 'app'; url: string } | { kind: 'external'; url: string };
 
@@ -18,7 +18,7 @@ type NavigateOptions = ResolveOptions & {
   assignLocation?: (url: string) => void;
 };
 
-const AUTH_PATHS = new Set(['/login', '/register', '/signup', '/mfa', '/auth-status']);
+const AUTH_PATHS = new Set(['/login', '/register', '/signup', '/mfa']);
 
 const originOf = (value: string | undefined): string => {
   const raw = typeof value === 'string' ? value.trim() : '';
@@ -34,7 +34,7 @@ const originOf = (value: string | undefined): string => {
 
 const isAuthPath = (pathname: string): boolean => {
   const normalized = pathname.replace(/\/+$/, '') || '/';
-  return AUTH_PATHS.has(normalized) || normalized.startsWith('/auth-status/');
+  return AUTH_PATHS.has(normalized);
 };
 
 const isBareHomePath = (path: string): boolean => {
@@ -78,7 +78,7 @@ export const resolvePostLoginTarget = (
   }
 
   if (isSafeAppPath(raw)) {
-    // Bare home is not a useful post-login destination — land on the dashboard.
+    // Bare home is not a useful post-login destination — land on settings.
     if (isBareHomePath(raw)) {
       return { kind: 'app', url: fallback };
     }
@@ -99,7 +99,7 @@ export const resolvePostLoginTarget = (
     const appOrigin = options.appOrigin ?? '';
     if (appOrigin && absolute.origin === appOrigin) {
       const path = `${absolute.pathname}${absolute.search}${absolute.hash}`;
-      // Bare app origin should land on the dashboard after sign-in.
+      // Bare app origin should land on settings after sign-in.
       if (isBareHomePath(path)) {
         return { kind: 'app', url: fallback };
       }
@@ -109,7 +109,7 @@ export const resolvePostLoginTarget = (
       return { kind: 'app', url: fallback };
     }
   } catch {
-    // Non-URL values fall through to the dashboard default.
+    // Non-URL values fall through to the settings default.
   }
 
   return { kind: 'app', url: fallback };
@@ -129,7 +129,7 @@ export const defaultPostLoginResolveOptions = (): ResolveOptions => {
 
 /**
  * Navigate after successful authentication using a validated `returnUrl`.
- * Defaults to `/dashboard` when the param is missing or unsafe.
+ * Defaults to `/settings` when the param is missing or unsafe.
  */
 export const navigateAfterLogin = async (
   router: Router,

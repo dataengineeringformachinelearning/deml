@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from forjd.testing import create_product_forjd_mapping
+
 import json
 from typing import Any
 from unittest.mock import AsyncMock, patch
@@ -24,7 +26,7 @@ def _mapped_actor(username: str, role: str = "Operator") -> tuple[Any, UUID]:
   user.profile.role = role
   user.profile.save(update_fields=["role"])
   tenant_id = uuid4()
-  ForjdTenantMapping.objects.create(
+  create_product_forjd_mapping(
     deml_account_id=user.profile.account_id,
     forjd_tenant_id=tenant_id,
   )
@@ -69,7 +71,7 @@ def test_processing_status_is_tenant_bound_through_deml(
     headers={"X-Request-ID": "forjd-processing-0001"},
   )
 
-  with override_settings(FORJD_TENANT_ID=str(tenant_id)):
+  with override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"):
     response = client.get(
       f"/api/v1/ingest/processing/{batch_id}",
       HTTP_AUTHORIZATION=_authorization(username),
@@ -93,7 +95,7 @@ def test_processing_status_rejects_tenant_override(
   username = "processingoverride"
   _user, tenant_id = _mapped_actor(username, role="Viewer")
 
-  with override_settings(FORJD_TENANT_ID=str(tenant_id)):
+  with override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"):
     response = client.get(
       f"/api/v1/ingest/processing/{uuid4()}?tenant_id={uuid4()}",
       HTTP_AUTHORIZATION=_authorization(username),
@@ -120,7 +122,7 @@ def test_native_batch_rejects_more_than_forjd_event_limit(
     "events": [_sealed_event(tenant_id, index) for index in range(MAX_INGEST_BATCH_EVENTS + 1)]
   }
 
-  with override_settings(FORJD_TENANT_ID=str(tenant_id)):
+  with override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"):
     response = client.post(
       "/api/v1/ingest/events:batch",
       data=payload,
@@ -157,7 +159,7 @@ def test_native_ingest_accepts_valid_body_above_django_global_limit(
     content_type="application/json",
   )
 
-  with override_settings(FORJD_TENANT_ID=str(tenant_id)):
+  with override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"):
     response = client.generic(
       "POST",
       "/api/v1/ingest/events:batch",
@@ -192,7 +194,7 @@ def test_generated_ingest_alias_accepts_same_endpoint_scoped_body_limit(
   assert settings.DATA_UPLOAD_MAX_MEMORY_SIZE < len(body) < MAX_INGEST_BODY_BYTES
   mock_request_json.return_value = {"ok": True, "accepted": 4}
 
-  with override_settings(FORJD_TENANT_ID=str(tenant_id)):
+  with override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"):
     response = client.generic(
       "POST",
       "/api/v1/forjd/ingest/events:batch",
@@ -221,7 +223,7 @@ def test_native_ingest_rejects_body_above_forjd_hard_limit(
   _user, tenant_id = _mapped_actor(username)
   body = b"{" + (b" " * MAX_INGEST_BODY_BYTES) + b"}"
 
-  with override_settings(FORJD_TENANT_ID=str(tenant_id)):
+  with override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"):
     response = client.generic(
       "POST",
       "/api/v1/ingest/events:batch",

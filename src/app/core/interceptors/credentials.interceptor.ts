@@ -1,6 +1,6 @@
-import { HttpContextToken, HttpInterceptorFn } from '@angular/common/http';
+import { HttpContextToken, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { from, switchMap } from 'rxjs';
+import { catchError, from, switchMap, throwError, timeout } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../services/auth.service';
@@ -8,9 +8,23 @@ import { AuthService } from '../../services/auth.service';
 /** Skip Firebase/session headers (public explore directory, public slug reads). */
 export const SKIP_AUTH = new HttpContextToken<boolean>(() => false);
 
+const ID_TOKEN_TIMEOUT_MS = 15_000;
+
+function authUnavailable(url: string): HttpErrorResponse {
+  return new HttpErrorResponse({
+    status: 401,
+    statusText: 'Unauthorized',
+    url,
+    error: { detail: 'Sign-in token unavailable', code: 'authentication_required' },
+  });
+}
+
 /**
  * Attach Firebase Bearer + DEML session for backend API calls when signed in.
  * Public status directory reads set SKIP_AUTH so Explore stays cross-tenant.
+ *
+ * Fail closed: if the user is authenticated but the ID token cannot be obtained,
+ * do not send an authed-looking request without credentials (silent 401 risk).
  */
 export const credentialsInterceptor: HttpInterceptorFn = (req, next) => {
   if (req.context.get(SKIP_AUTH)) {
@@ -27,13 +41,14 @@ export const credentialsInterceptor: HttpInterceptorFn = (req, next) => {
 
   const firebaseUser = auth.auth?.currentUser;
   if (!firebaseUser || typeof firebaseUser.getIdToken !== 'function') {
-    return next(req);
+    return throwError(() => authUnavailable(req.url));
   }
 
   return from(firebaseUser.getIdToken()).pipe(
+    timeout({ first: ID_TOKEN_TIMEOUT_MS }),
     switchMap(token => {
       if (!token) {
-        return next(req);
+        return throwError(() => authUnavailable(req.url));
       }
       const headers: Record<string, string> = {
         Authorization: `Bearer ${token}`,
@@ -43,6 +58,12 @@ export const credentialsInterceptor: HttpInterceptorFn = (req, next) => {
         headers['X-DEML-Session-Id'] = sessionId;
       }
       return next(req.clone({ setHeaders: headers }));
+    }),
+    catchError(err => {
+      if (err instanceof HttpErrorResponse) {
+        return throwError(() => err);
+      }
+      return throwError(() => authUnavailable(req.url));
     }),
   );
 };

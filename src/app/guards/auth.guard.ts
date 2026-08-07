@@ -12,7 +12,7 @@ const loginTree = (router: Router, returnUrl: string) =>
 export const authGuard: CanActivateFn = (_route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
-  const returnUrl = state.url || '/dashboard';
+  const returnUrl = state.url || '/settings';
 
   // If already initialized, we can check synchronously
   if (authService.isInitialized()) {

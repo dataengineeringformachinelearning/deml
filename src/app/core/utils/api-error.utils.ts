@@ -41,10 +41,12 @@ export function apiErrorMessage(err: unknown, fallback: string): string {
         return error;
       }
     }
+    if (err.status === 409) {
+      return 'A site with that slug already exists. Choose another slug or edit the existing site.';
+    }
     if (err.status === 403) {
       return (
-        'Permission denied. Saving sites requires multi-factor authentication (MFA). ' +
-        'Complete MFA from Settings, then sign out and sign back in to finish verification.'
+        'Permission denied. Site and status-page changes require Operator or Security Admin.'
       );
     }
     if (err.status === 404) {
@@ -53,6 +55,12 @@ export function apiErrorMessage(err: unknown, fallback: string): string {
     if (err.status === 401) {
       return 'Your session expired. Sign in again and retry.';
     }
+    if (err.status === 0 || err.status === 504) {
+      return 'Network timeout or offline. Check your connection, then retry.';
+    }
+  }
+  if (err && typeof err === 'object' && 'name' in err && (err as { name: string }).name === 'TimeoutError') {
+    return 'Request timed out. Check your connection, then retry.';
   }
   return fallback;
 }

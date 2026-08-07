@@ -167,6 +167,15 @@ def _provision_account_credential(
     except (TypeError, ValueError) as exc:
       raise ForjdProvisionError("partner provision returned an invalid tenant id") from exc
 
+    # Partner-minted tenants must never collide with the platform / tenant0 UUID.
+    from forjd.isolation import platform_forjd_tenant_id
+
+    platform_id = platform_forjd_tenant_id()
+    if platform_id is not None and tenant_id == platform_id:
+      raise ForjdProvisionError(
+        "partner provision returned the DEML platform FORJD tenant; refusing to bind"
+      )
+
     _persist_mapping(
       account_id=account_id,
       tenant_id=tenant_id,

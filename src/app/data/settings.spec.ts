@@ -4,13 +4,13 @@ describe('resolveSettingsSection', () => {
   it('maps direct section ids', () => {
     expect(resolveSettingsSection('account')).toBe('account');
     expect(resolveSettingsSection('sites')).toBe('sites');
-    expect(resolveSettingsSection('preferences')).toBe('preferences');
   });
 
-  it('maps legacy tab aliases', () => {
+  it('maps legacy aliases to account', () => {
     expect(resolveSettingsSection('profile')).toBe('account');
     expect(resolveSettingsSection('billing')).toBe('account');
-    expect(resolveSettingsSection('notifications')).toBe('preferences');
+    expect(resolveSettingsSection('preferences')).toBe('account');
+    expect(resolveSettingsSection('appearance')).toBe('account');
   });
 
   it('returns null for unknown values', () => {

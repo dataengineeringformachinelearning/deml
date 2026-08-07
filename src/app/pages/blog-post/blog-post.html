@@ -1,32 +1,20 @@
 @if (post(); as entry) {
   <app-banner
-    [preheader]="entry.note + ' · ' + entry.publishedLabel"
+    [preheader]="entry.publishedLabel"
     [heading]="entry.title"
     [lede]="entry.summary"
     [headingId]="headingId()"
   >
-    <app-button-group>
-      <app-button variant="secondary" shape="pill" routerLink="/blog">All posts</app-button>
-    </app-button-group>
+    <app-button variant="secondary" shape="pill" routerLink="/blog">All posts</app-button>
   </app-banner>
 
   <app-page-section variant="prose" [labelledBy]="headingId()">
-    @if (entry.categories.length > 0) {
-      <aside class="cluster" aria-label="Categories">
-        @for (category of entry.categories; track category) {
-          <span class="badge" data-tone="neutral">{{ category }}</span>
-        }
-      </aside>
-    }
-
-    @if (entry.headings.length > 0) {
+    @if (entry.headings.length > 1) {
       <nav class="toc" aria-label="On this page">
-        <h2 class="toc__heading">In this note</h2>
         <ol class="toc__list">
           @for (heading of entry.headings; track heading.slug) {
             <li>
               <a class="toc__item" [href]="'#' + heading.slug">
-                <span class="toc__num">§</span>
                 <span class="toc__label">{{ heading.text }}</span>
               </a>
             </li>
@@ -37,49 +25,21 @@
 
     <div class="article-body" [innerHTML]="safeHtml()"></div>
 
-    <aside class="callout" data-tone="info" role="note">
-      <div class="callout__body">
-        <p class="callout__heading">Living release record</p>
-        <p class="callout__text">
-          Blog posts summarize shipped outcomes. The public repository remains the detailed
-          engineering record.
-        </p>
-      </div>
-      <a
-        class="button button--secondary button--pill"
-        href="https://github.com/dataengineeringformachinelearning/deml"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        View source
-      </a>
-    </aside>
-
     <nav class="pagination" aria-label="Blog navigation">
       @if (older(); as prev) {
         <a class="pagination__prev" [routerLink]="['/blog', prev.slug]" rel="prev">
           Earlier: {{ prev.title }}
         </a>
-      } @else {
-        <span class="pagination__prev" aria-disabled="true">Earlier post</span>
       }
       @if (newer(); as next) {
         <a class="pagination__next" [routerLink]="['/blog', next.slug]" rel="next">
           Newer: {{ next.title }}
         </a>
-      } @else {
-        <span class="pagination__next" aria-disabled="true">Newer post</span>
       }
     </nav>
   </app-page-section>
 } @else {
-  <app-banner
-    preheader="Blog"
-    heading="Post not found"
-    lede="That post is not in the archive."
-  >
-    <app-button-group>
-      <app-button variant="primary" shape="pill" routerLink="/blog">All posts</app-button>
-    </app-button-group>
+  <app-banner heading="Post not found" lede="That post is not in the archive.">
+    <app-button variant="primary" shape="pill" routerLink="/blog">All posts</app-button>
   </app-banner>
 }

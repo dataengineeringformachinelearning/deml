@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from forjd.testing import create_product_forjd_mapping
+
 import json
 from typing import Any
 from unittest.mock import AsyncMock, patch
@@ -24,7 +26,7 @@ def _mapped_actor(username: str, role: str) -> tuple[Any, str]:
   user.profile.subscription_active = True
   user.profile.save(update_fields=["role", "tier", "subscription_active"])
   tenant_id = uuid4()
-  ForjdTenantMapping.objects.create(
+  create_product_forjd_mapping(
     deml_account_id=user.profile.account_id,
     forjd_tenant_id=tenant_id,
   )

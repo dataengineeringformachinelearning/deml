@@ -4,7 +4,7 @@ from uuid import UUID, uuid4
 import pytest
 from django.contrib.auth import get_user_model
 from django.test import Client, override_settings
-from monitor.models import ForjdTenantMapping
+from forjd.testing import create_product_forjd_mapping
 
 User = get_user_model()
 
@@ -38,7 +38,7 @@ def _mapped_user(username: str = "learner") -> tuple[object, UUID]:
   user.profile.role = "Operator"
   user.profile.save(update_fields=["role"])
   tenant_id = uuid4()
-  ForjdTenantMapping.objects.create(
+  create_product_forjd_mapping(
     deml_account_id=user.profile.account_id,
     forjd_tenant_id=tenant_id,
   )
@@ -69,7 +69,7 @@ def test_ingest_rejects_cross_tenant_event(mock_ingest: AsyncMock, client: Clien
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
-    FORJD_TENANT_ID=str(tenant_id),
+    FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099",
   ):
     response = client.post(
       "/api/v1/forjd/ingest",
@@ -93,7 +93,7 @@ def test_ninja_ingest_rejects_cookie_session_without_firebase_bearer(
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
-    FORJD_TENANT_ID=str(tenant_id),
+    FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099",
   ):
     response = client.post(
       "/api/v1/forjd/ingest",
@@ -116,7 +116,7 @@ def test_ingest_forwards_only_mapped_sealed_telemetry(
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
-    FORJD_TENANT_ID=str(tenant_id),
+    FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099",
   ):
     response = client.post(
       "/api/v1/forjd/ingest",
@@ -159,7 +159,7 @@ def test_ingest_rejects_unshipped_learning_and_plaintext_metadata(
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
-    FORJD_TENANT_ID=str(tenant_id),
+    FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099",
   ):
     response = client.post(
       "/api/v1/forjd/ingest",
@@ -209,7 +209,7 @@ def test_ingest_rejects_envelopes_forjd_would_reject(
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
-    FORJD_TENANT_ID=str(tenant_id),
+    FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099",
   ):
     response = client.post(
       "/api/v1/forjd/ingest",

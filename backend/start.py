@@ -113,9 +113,9 @@ def main() -> None:
   else:
     server_command = [python_bin, "-m", "daphne", *daphne_args]
 
-  # Supervised sidecar workers. All are idempotent (leases / Stripe sweeps /
-  # retention deletes), so overlapping machines during rolling deploys are safe.
-  worker_commands = {
+  # Supervised sidecar workers. Core product needs reconcile + maintenance only.
+  # Optional sealed/analytics workers are opt-in (not required for status + auth).
+  worker_commands: dict[str, list[str]] = {
     # Durable issue-report outbox + account lifecycle jobs (control plane).
     "reconcile": [
       python_bin,
@@ -134,8 +134,10 @@ def main() -> None:
       "--interval",
       "86400",
     ],
-    # Sealed platform heartbeats so FORJD analytics-rollup / ml-training stay fed.
-    "sealed_heartbeat": [
+  }
+  # Opt-in: sealed platform heartbeats (feeds FORJD analytics/ML — not status UI).
+  if os.getenv("DEML_ENABLE_SEALED_HEARTBEAT", "").strip().lower() in {"1", "true", "yes", "on"}:
+    worker_commands["sealed_heartbeat"] = [
       python_bin,
       "manage.py",
       "sealed_telemetry_heartbeat",
@@ -144,17 +146,17 @@ def main() -> None:
       "300",
       "--count",
       "6",
-    ],
-    # Pull linked GA / Clarity / Cloudflare rollups and seal them into FORJD.
-    "analytics_sync": [
+    ]
+  # Opt-in: GA / Clarity / Cloudflare rollups into FORJD (no product Settings UI).
+  if os.getenv("DEML_ENABLE_ANALYTICS_SYNC", "").strip().lower() in {"1", "true", "yes", "on"}:
+    worker_commands["analytics_sync"] = [
       python_bin,
       "manage.py",
       "sync_analytics_integrations",
       "--watch",
       "--interval",
       "3600",
-    ],
-  }
+    ]
   # Commands are fixed argv lists (manage.py workers), not shell-interpolated user input.
   # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-tainted-env-args.dangerous-subprocess-use-tainted-env-args
   server = subprocess.Popen(server_command)

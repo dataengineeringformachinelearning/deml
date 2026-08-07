@@ -14,7 +14,8 @@ const notesDir = join(root, 'src/content/blue-notes');
 const outTs = join(root, 'src/app/data/blue-notes.generated.ts');
 const outRss = join(root, 'public/blog/rss.xml');
 const SITE = 'https://deml.app';
-const VISUALS = ['gold', 'olive', 'red'];
+/* Single accent — primary via card olive visual; no decorative gold/red cycle */
+const VISUALS = ['olive'];
 
 // --- Frontmatter / slug helpers ---
 function parseFrontmatter(raw) {

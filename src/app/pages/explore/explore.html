@@ -1,61 +1,63 @@
-<app-banner
-  preheader="DEML"
-  heading="Explore"
-  lede="Browse status cards published on the platform. Open a page for live service health."
->
-  <app-button variant="secondary" shape="pill" routerLink="/status/platform-status">
-    Platform status
-  </app-button>
-</app-banner>
+<app-banner heading="Explore" lede="Published status pages." />
 
-<app-page-section variant="catalog" labelledBy="explore-heading">
-  <app-section-header
-    eyebrow="Public"
-    heading="Status directory"
-    lede="Public status mega-cards — one full-width card per page."
-    headingId="explore-heading"
-  />
-
+<app-page-section variant="catalog" ariaLabel="Status directory">
   <div class="explore-directory">
+    @if (!online()) {
+      <p class="form-panel__error" role="status">
+        {{ offlineHeading }} — {{ offlineBody }}
+      </p>
+    } @else if (servingStale()) {
+      <p class="form-panel__note" role="status">
+        Showing cached directory — couldn’t refresh from the status service.
+      </p>
+    }
+
     @if (loadFailed()) {
       <div class="explore-card__error" role="alert">
-        <h2 class="explore-card__error-title">Unable to connect</h2>
-        <p class="explore-card__error-lede">
-          We couldn’t reach the status service. Verify the backend is running, then retry.
-        </p>
+        <h2 class="explore-card__error-title">Can’t connect</h2>
+        <p class="explore-card__error-lede">Status service is unreachable. Try again shortly.</p>
         <app-button
           variant="primary"
           shape="pill"
           [disabled]="isRetrying()"
           (pressed)="retryLoad()"
         >
-          Retry connection
+          {{ isRetrying() ? 'Retrying…' : 'Retry' }}
         </app-button>
       </div>
-    } @else if (!isLoading() && statusPages().length === 0) {
+    } @else if (isLoading()) {
+      <div class="explore-card explore-card--loading" aria-busy="true" aria-live="polite">
+        <div class="skeleton" aria-hidden="true">
+          <div class="skeleton__line skeleton__line--short"></div>
+          <div class="skeleton__line skeleton__line--long"></div>
+          <div class="skeleton__line skeleton__line--medium"></div>
+          <div class="skeleton__block"></div>
+        </div>
+      </div>
+      <div class="explore-card explore-card--loading" aria-hidden="true">
+        <div class="skeleton" aria-hidden="true">
+          <div class="skeleton__line skeleton__line--short"></div>
+          <div class="skeleton__line skeleton__line--long"></div>
+          <div class="skeleton__line skeleton__line--medium"></div>
+          <div class="skeleton__block"></div>
+        </div>
+      </div>
+    } @else if (statusPages().length === 0) {
       <div class="explore-card__empty">
-        <h2 class="explore-card__empty-title">No public status pages</h2>
-        <p class="explore-card__empty-lede">
-          Users haven’t published any status pages yet. Create and publish one from settings.
-        </p>
-        <app-button variant="primary" shape="pill" routerLink="/settings">
-          Open settings
-        </app-button>
+        <h2 class="explore-card__empty-title">Nothing published</h2>
+        <p class="explore-card__empty-lede">Publish a status page from Settings.</p>
+        <app-button variant="primary" shape="pill" routerLink="/settings">Settings</app-button>
       </div>
     } @else {
-      @for (page of displayPages(); track page.id) {
+      @for (page of statusPages(); track page.id) {
         <app-explore-card
           [title]="page.title"
-          [description]="page.description || 'Monitoring core services'"
+          [description]="page.description || ''"
           [href]="getPageUrl(page)"
-          [proVerified]="!!page.is_pro_verified"
           [status]="getPageStatus(page)"
           [statusLabel]="getPageStatusLabel(page)"
-          [tag]="pageTag(page)"
-          [metrics]="exploreMetrics(page)"
           [uptimeHistory]="exploreUptimeHistory(page)"
           [uptimePercentage]="overallUptime(page)"
-          [uptimeSummary]="uptimeSummary(page)"
         />
       }
     }

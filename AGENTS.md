@@ -18,9 +18,11 @@ Scale guidance: [docs/SCALE.md](docs/SCALE.md).
 
 ## DEML ↔ FORJD Boundary
 
-- Keep the complete Angular product surface intact: dashboards, analytics, status
-  pages, vulnerability views, monitoring UI, onboarding, Pipeline Studio
-  (`/pipeline` — compose/export FORJD YAML only), and generated API contracts.
+- Keep the thin Angular product surface intact: home (hero only), auth, explore,
+  status, and settings (account + sites). `/blog` may stay addressable but must
+  not compete in primary nav. Long-form learning lives on the marketing
+  book/whitepaper; FORJD stays headless. No dashboard, demo boards, or secondary
+  product navigation. Contract: [`docs/SIMPLIFIED_SURFACE.md`](docs/SIMPLIFIED_SURFACE.md).
 - Django is the Firebase-authenticated user control plane and backend-for-frontend.
   Identity, profiles, roles, billing, consent, API credentials, issue reports,
   learning/library content, and account lifecycle remain local.

@@ -1,3 +1,4 @@
+from forjd.testing import create_product_forjd_mapping
 import base64
 import hashlib
 from datetime import timedelta
@@ -325,10 +326,9 @@ def test_delete_account_completes_after_forjd_erase(
 ) -> None:
   profile = test_user.profile
   tenant_id = uuid4()
-  ForjdTenantMapping.objects.create(
+  create_product_forjd_mapping(
     deml_account_id=profile.account_id,
     forjd_tenant_id=tenant_id,
-    service_token_secret_ref="env:FORJD_SERVICE_TOKEN",  # pragma: allowlist secret
   )
   APIKey.objects.create(
     user=test_user,
@@ -354,11 +354,12 @@ def test_delete_account_completes_after_forjd_erase(
     user_id=test_user.pk,
     expires_at=timezone.now() + timedelta(minutes=5),
   )
+  mapping = ForjdTenantMapping.objects.get(deml_account_id=profile.account_id)
   BugReport.objects.create(
     user=test_user,
     account_id=profile.account_id,
     forjd_tenant_id=tenant_id,
-    forjd_service_token_secret_ref="env:FORJD_SERVICE_TOKEN",
+    forjd_service_token_secret_ref=mapping.service_token_secret_ref,
     submitted_by_pseudonym="acct:deletion-test",
     user_description="Delete this report body",
   )
@@ -392,10 +393,12 @@ def test_delete_account_completes_after_forjd_erase(
   erase_fn = MagicMock(return_value={"ok": True})
   mock_async_to_sync.return_value = erase_fn
 
+  secret_ref = mapping.service_token_secret_ref
   with override_settings(
     FORJD_API_URL="https://backend.forjd.co",
     FORJD_SERVICE_TOKEN="fjsvc_abcdefgh_secret",
-    FORJD_TENANT_ID=str(tenant_id),
+    # Platform tenant must stay distinct from the product mapping under test.
+    FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099",
   ):
     response = client.delete("/api/v1/auth/delete-account", HTTP_AUTHORIZATION="Bearer valid-token")
 
@@ -425,7 +428,7 @@ def test_delete_account_completes_after_forjd_erase(
   assert job.forjd_erase_targets == [
     {
       "tenant_id": str(tenant_id),
-      "service_token_secret_ref": "env:FORJD_SERVICE_TOKEN",
+      "service_token_secret_ref": secret_ref,
     }
   ]
 
@@ -441,10 +444,9 @@ def test_delete_account_blocks_when_forjd_erase_fails(
   from forjd.client import ForjdError
 
   profile = test_user.profile
-  ForjdTenantMapping.objects.create(
+  create_product_forjd_mapping(
     deml_account_id=profile.account_id,
-    forjd_tenant_id="00000000-0000-0000-0000-000000000001",
-    service_token_secret_ref="env:FORJD_SERVICE_TOKEN",  # pragma: allowlist secret
+    forjd_tenant_id=uuid4(),
   )
   api_key = APIKey.objects.create(
     user=test_user,
@@ -492,10 +494,9 @@ def test_delete_account_does_not_complete_when_firebase_deletion_fails(
   mock_verify_token: Any,
 ) -> None:
   profile = test_user.profile
-  ForjdTenantMapping.objects.create(
+  create_product_forjd_mapping(
     deml_account_id=profile.account_id,
-    forjd_tenant_id="00000000-0000-0000-0000-000000000001",
-    service_token_secret_ref="env:FORJD_SERVICE_TOKEN",  # pragma: allowlist secret
+    forjd_tenant_id=uuid4(),
   )
   mock_async_to_sync.return_value = MagicMock(return_value={"ok": True})
 

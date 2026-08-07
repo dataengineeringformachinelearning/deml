@@ -26,7 +26,7 @@ describe('SessionIdleService', () => {
     logout: vi.fn(async () => undefined),
   };
   const routerMock = {
-    url: '/dashboard',
+    url: '/settings',
     navigate: vi.fn(async () => true),
   };
 
@@ -34,8 +34,7 @@ describe('SessionIdleService', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-07-10T12:00:00Z'));
     localStorage.clear();
-    // DialogService falls back to window.confirm when present; keep the
-    // signal-based confirm open so idle countdown tests can drive it.
+    // Confirm sheet is signal-driven; stub native confirm so tests stay host-based.
     vi.stubGlobal('confirm', undefined);
     authMock.isAuthenticated.mockReturnValue(true);
     authMock.logout.mockClear();
@@ -95,7 +94,7 @@ describe('SessionIdleService', () => {
     await vi.advanceTimersByTimeAsync(1);
     expect(authMock.logout).toHaveBeenCalledTimes(1);
     expect(routerMock.navigate).toHaveBeenCalledWith(['/login'], {
-      queryParams: { reason: 'timeout', returnUrl: '/dashboard' },
+      queryParams: { reason: 'timeout', returnUrl: '/settings' },
     });
   });
 
@@ -107,7 +106,7 @@ describe('SessionIdleService', () => {
 
     expect(authMock.logout).toHaveBeenCalledTimes(1);
     expect(routerMock.navigate).toHaveBeenCalledWith(['/login'], {
-      queryParams: { reason: 'timeout', returnUrl: '/dashboard' },
+      queryParams: { reason: 'timeout', returnUrl: '/settings' },
     });
   });
 

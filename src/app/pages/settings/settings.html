@@ -1,23 +1,10 @@
-<app-banner
-  preheader="DEML"
-  heading="Settings"
-  lede="Edit your account, sites, and workspace preferences in one place."
->
-  <app-button-group>
-    @for (section of sections; track section.id) {
-      <app-button variant="secondary" shape="pill" [href]="'#' + section.id">
-        {{ section.label }}
-      </app-button>
-    }
-  </app-button-group>
-</app-banner>
+<app-banner heading="Settings" lede="Account and status sites." />
 
 <app-page-section variant="catalog" ariaLabel="Settings">
   <section id="account" class="catalog-group" tabindex="-1" aria-labelledby="account-heading">
     <app-form-panel
-      eyebrow="Identity"
       title="Account"
-      description="Update how you appear in DEML. Email is managed by your sign-in provider."
+      description="Display name for this workspace."
       titleId="account-heading"
       [headingLevel]="2"
     >
@@ -32,35 +19,13 @@
           (valueChange)="displayName.set($event)"
         />
 
-        <app-text-field
-          label="Email"
-          type="email"
-          name="email"
-          autocomplete="email"
-          [value]="email()"
-          [disabled]="true"
-          hint="Sign-in email cannot be changed here."
-        />
-
-        <app-text-field
-          label="Role"
-          name="role"
-          [value]="role() || '—'"
-          [disabled]="true"
-        />
-
-        <p>
-          Multi-factor authentication:
-          {{ mfaEnrolled() ? 'Enrolled on this account.' : 'Not enrolled.' }}
-          MFA challenges use the
-          <a routerLink="/mfa">verify flow</a>.
-        </p>
+        <p class="form-panel__note">{{ email() }}</p>
 
         @if (profileError()) {
           <p class="form-panel__error" role="alert">{{ profileError() }}</p>
         }
         @if (profileMessage()) {
-          <p role="status">{{ profileMessage() }}</p>
+          <p class="form-panel__empty" role="status">{{ profileMessage() }}</p>
         }
 
         <app-button-group align="start" layout="column">
@@ -74,66 +39,84 @@
 
   <section id="sites" class="catalog-group" tabindex="-1" aria-labelledby="sites-heading">
     <app-form-panel
-      eyebrow="Connected"
       title="Sites"
-      description="Create and manage status pages linked to this account."
+      description="Create and publish public status pages."
       titleId="sites-heading"
       [headingLevel]="2"
     >
-      @if (sitesLoading() && sites().length === 0) {
-        <p role="status">Loading sites…</p>
+      @if (!online()) {
+        <p class="form-panel__error" role="status">
+          You are offline. Site changes are paused until you reconnect.
+        </p>
+      } @else if (sitesStale()) {
+        <p class="form-panel__note" role="status">
+          Showing cached sites — couldn’t refresh from the status service.
+        </p>
+      }
+
+      @if (sitesLoadFailed()) {
+        <div class="form-panel__status" role="alert">
+          <p class="form-panel__error">
+            {{ sitesError() || 'Unable to load sites. Try again.' }}
+          </p>
+          <app-button
+            variant="primary"
+            shape="pill"
+            type="button"
+            [disabled]="sitesRetrying() || !online()"
+            (pressed)="retryLoadSites()"
+          >
+            {{ sitesRetrying() ? 'Retrying…' : 'Retry' }}
+          </app-button>
+        </div>
+      } @else if (sitesLoading() && sites().length === 0) {
+        <div class="form-panel__status" role="status" aria-busy="true" aria-live="polite">
+          <div class="skeleton" aria-hidden="true">
+            <div class="skeleton__line skeleton__line--short"></div>
+            <div class="skeleton__line skeleton__line--long"></div>
+            <div class="skeleton__line skeleton__line--medium"></div>
+          </div>
+        </div>
       } @else if (sites().length === 0) {
-        <p>No sites yet. Add one below to publish a status page.</p>
+        <p class="form-panel__empty">No sites yet. Add one below to publish a status page.</p>
       } @else {
-        <table>
-          <caption>Your sites</caption>
-          <thead>
-            <tr>
-              <th scope="col">Title</th>
-              <th scope="col">Slug</th>
-              <th scope="col">Visibility</th>
-              <th scope="col">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (site of sites(); track site.id) {
-              <tr>
-                <th scope="row">{{ site.title }}</th>
-                <td>{{ site.slug }}</td>
-                <td>{{ site.is_published ? 'Published' : 'Private' }}</td>
-                <td>
-                  <app-button-group align="start" layout="row">
-                    <app-button
-                      variant="secondary"
-                      shape="pill"
-                      type="button"
-                      [disabled]="siteBusy()"
-                      (pressed)="startEditSite(site)"
-                    >
-                      Edit
-                    </app-button>
-                    <app-button
-                      variant="accent"
-                      shape="pill"
-                      type="button"
-                      [disabled]="siteBusy()"
-                      (pressed)="deleteSite(site)"
-                    >
-                      Delete
-                    </app-button>
-                  </app-button-group>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
+        <ul class="form-panel__list" aria-label="Your sites">
+          @for (site of sites(); track site.id) {
+            <li class="form-panel__item">
+              <div class="form-panel__item-header">
+                <h3 class="form-panel__item-title">{{ site.title }}</h3>
+                <p class="form-panel__item-meta">
+                  {{ site.slug }} · {{ site.is_published ? 'Published' : 'Private' }}
+                </p>
+              </div>
+              <div class="form-panel__item-actions">
+                <app-button-group align="start" layout="row">
+                  <app-button
+                    variant="secondary"
+                    shape="pill"
+                    type="button"
+                    [disabled]="siteBusy() || !online()"
+                    (pressed)="startEditSite(site)"
+                  >
+                    Edit
+                  </app-button>
+                  <app-button
+                    variant="accent"
+                    shape="pill"
+                    type="button"
+                    [disabled]="siteBusy() || !online()"
+                    (pressed)="deleteSite(site)"
+                  >
+                    Delete
+                  </app-button>
+                </app-button-group>
+              </div>
+            </li>
+          }
+        </ul>
       }
 
       <form class="form-panel__form" (submit)="saveSite($event)" novalidate>
-        <p>
-          {{ editingSiteId() ? 'Edit site' : 'Add a site' }}
-        </p>
-
         <app-text-field
           label="Title"
           name="siteTitle"
@@ -170,15 +153,20 @@
           (checkedChange)="sitePublished.set($event)"
         />
 
-        @if (sitesError()) {
+        @if (sitesError() && !sitesLoadFailed()) {
           <p class="form-panel__error" role="alert">{{ sitesError() }}</p>
         }
         @if (sitesMessage()) {
-          <p role="status">{{ sitesMessage() }}</p>
+          <p class="form-panel__empty" role="status">{{ sitesMessage() }}</p>
         }
 
         <app-button-group align="start" layout="column">
-          <app-button variant="primary" shape="pill" type="submit" [disabled]="siteBusy()">
+          <app-button
+            variant="primary"
+            shape="pill"
+            type="submit"
+            [disabled]="siteBusy() || !online() || sitesLoadFailed()"
+          >
             {{
               siteBusy()
                 ? 'Saving…'
@@ -195,54 +183,9 @@
               [disabled]="siteBusy()"
               (pressed)="startCreateSite()"
             >
-              Cancel edit
+              Cancel
             </app-button>
           }
-        </app-button-group>
-      </form>
-    </app-form-panel>
-  </section>
-
-  <section
-    id="preferences"
-    class="catalog-group"
-    tabindex="-1"
-    aria-labelledby="preferences-heading"
-  >
-    <app-form-panel
-      eyebrow="Workspace"
-      title="Preferences"
-      description="Appearance and delivery defaults for this browser."
-      titleId="preferences-heading"
-      [headingLevel]="2"
-    >
-      <form class="form-panel__form" (submit)="savePreferences($event)" novalidate>
-        <app-button-group align="start" layout="column">
-          <app-button variant="secondary" shape="pill" type="button" (pressed)="toggleTheme()">
-            {{ isDark() ? 'Use light mode' : 'Use dark mode' }}
-          </app-button>
-        </app-button-group>
-
-        <app-checkbox-field
-          label="Email me about incidents and site alerts"
-          name="emailAlerts"
-          [checked]="emailAlerts()"
-          (checkedChange)="emailAlerts.set($event)"
-        />
-
-        <app-checkbox-field
-          label="Weekly status digest"
-          name="statusDigest"
-          [checked]="statusDigest()"
-          (checkedChange)="statusDigest.set($event)"
-        />
-
-        @if (prefsMessage()) {
-          <p role="status">{{ prefsMessage() }}</p>
-        }
-
-        <app-button-group align="start" layout="column">
-          <app-button variant="primary" shape="pill" type="submit">Save preferences</app-button>
         </app-button-group>
       </form>
     </app-form-panel>

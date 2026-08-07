@@ -1,80 +1,66 @@
 <app-banner
-  preheader="DEML"
   [heading]="page()?.title || 'Status'"
   [lede]="page()?.description || statusDescription()"
 >
-  <app-button-group>
-    <app-button variant="primary" shape="pill" routerLink="/explore">Directory</app-button>
-  </app-button-group>
+  <app-button variant="secondary" shape="pill" routerLink="/explore">Directory</app-button>
 </app-banner>
 
-<app-page-section variant="catalog" labelledBy="isolated-status-heading">
-  <app-section-header
-    eyebrow="Public"
-    heading="Status page"
-    lede="Individual public status — mega-card with live analytics, intelligence, services, and uptime."
-    headingId="isolated-status-heading"
-  />
-
+<app-page-section variant="catalog" ariaLabel="Status page">
   <div class="explore-directory">
+    @if (!online()) {
+      <p class="form-panel__error" role="status">
+        {{ offlineHeading }} — {{ offlineBody }}
+      </p>
+    } @else if (servingStale()) {
+      <p class="form-panel__note" role="status">
+        Showing a cached snapshot — couldn’t refresh from the status service.
+      </p>
+    }
+
     @if (loadFailed()) {
       <div class="explore-card__error" role="alert">
         @if (loadErrorKind() === 'not_found') {
-          <h2 class="explore-card__error-title">Status page not found</h2>
+          <h2 class="explore-card__error-title">Not found</h2>
           <p class="explore-card__error-lede">
-            This page does not exist or is not published. Check the URL or sign in if you own it.
+            This page does not exist or is not published.
           </p>
-          <app-button variant="primary" shape="pill" routerLink="/explore">
-            Back to directory
-          </app-button>
+          <app-button variant="primary" shape="pill" routerLink="/explore">Directory</app-button>
         } @else if (loadErrorKind() === 'forbidden') {
-          <h2 class="explore-card__error-title">Private status page</h2>
-          <p class="explore-card__error-lede">
-            This status page is private. Sign in with an authorized account to view it.
-          </p>
+          <h2 class="explore-card__error-title">Private</h2>
+          <p class="explore-card__error-lede">Sign in with an authorized account to view it.</p>
           <app-button variant="primary" shape="pill" routerLink="/login">Sign in</app-button>
         } @else {
-          <h2 class="explore-card__error-title">Unable to connect</h2>
-          <p class="explore-card__error-lede">
-            We couldn’t reach the status service. Verify the backend is running, then retry.
-          </p>
+          <h2 class="explore-card__error-title">Can’t connect</h2>
+          <p class="explore-card__error-lede">Status service is unreachable. Try again shortly.</p>
           <app-button
             variant="primary"
             shape="pill"
             [disabled]="isRetrying()"
             (pressed)="retryLoad()"
           >
-            Retry connection
+            {{ isRetrying() ? 'Retrying…' : 'Retry' }}
           </app-button>
         }
       </div>
     } @else if (isLoading()) {
-      <app-explore-card
-        layout="detail"
-        title="Loading status…"
-        description="Fetching live telemetry for this public status page."
-        tag="Loading"
-        [showCta]="false"
-        [metrics]="[]"
-      />
+      <div class="explore-card explore-card--loading" aria-busy="true" aria-live="polite">
+        <div class="skeleton" aria-hidden="true">
+          <div class="skeleton__line skeleton__line--short"></div>
+          <div class="skeleton__line skeleton__line--long"></div>
+          <div class="skeleton__line skeleton__line--medium"></div>
+          <div class="skeleton__block"></div>
+        </div>
+      </div>
     } @else if (page(); as current) {
       <app-explore-card
         layout="detail"
         [title]="current.title"
-        [description]="current.description || statusDescription()"
-        [tag]="pageTag()"
-        [proVerified]="!!current.is_pro_verified"
         [status]="globalStatus()"
         [statusLabel]="statusLabel()"
-        [metricGroups]="metricGroups()"
         [services]="services()"
         [incidents]="incidents()"
         [uptimeHistory]="uptimeHistory()"
         [uptimePercentage]="uptimePercentage()"
-        [uptimeSummary]="uptimeSummary()"
-        uptimeLabel="Platform uptime"
-        href="/explore"
-        ctaLabel="Back to directory"
       />
     }
   </div>

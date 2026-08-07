@@ -12,9 +12,9 @@ import { Microcard } from './microcard';
       heading="fastapi"
       subtext="API framework"
       meta="Backend (Python)"
-      visual="gold"
-      [routerLink]="['/learn', 'fastapi']"
-      cta="Learn"
+      visual="olive"
+      [routerLink]="['/blog', 'fastapi']"
+      cta="Read"
     />
   `,
 })
@@ -38,9 +38,9 @@ describe('Microcard', () => {
     const host = fixture.nativeElement as HTMLElement;
     const link = host.querySelector('a.microcard');
 
-    expect(link?.getAttribute('href')).toBe('/learn/fastapi');
+    expect(link?.getAttribute('href')).toBe('/blog/fastapi');
     expect(host.querySelector('h3')?.textContent?.trim()).toBe('fastapi');
     expect(host.querySelector('.microcard-meta')?.textContent?.trim()).toBe('Backend (Python)');
-    expect(host.querySelector('.microcard-cta')?.textContent?.trim()).toBe('Learn');
+    expect(host.querySelector('.microcard-cta')?.textContent?.trim()).toBe('Read');
   });
 });

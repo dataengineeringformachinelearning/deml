@@ -1,32 +1,18 @@
-<app-banner
-  preheader="DEML · Built in public"
-  heading="Blog"
-  lede="Releases, architecture decisions, reliability work, and the details that turn a platform into durable infrastructure."
->
-  <app-button-group>
-    <app-button variant="secondary" shape="pill" href="/blog/rss.xml">Follow via RSS</app-button>
-  </app-button-group>
+<app-banner heading="Blog" lede="Field notes. Newest first.">
+  <app-button variant="secondary" shape="pill" href="/blog/rss.xml">RSS</app-button>
 </app-banner>
 
-<app-page-section variant="catalog" labelledBy="blog-list-heading">
-  <app-section-header
-    eyebrow="Archive"
-    heading="All posts"
-    lede="Newest first."
-    headingId="blog-list-heading"
-  />
-
+<app-page-section variant="catalog" ariaLabel="Blog archive">
   <app-microcard-grid ariaLabel="Blog archive" [columns]="1">
     @for (post of notes; track post.slug) {
       <li>
         <app-microcard
           [heading]="post.title"
           [subtext]="post.summary"
-          [meta]="post.note + ' · ' + post.meta"
-          [visual]="post.visual"
+          [meta]="post.meta"
           [headingId]="'blog-' + post.slug"
           [routerLink]="['/blog', post.slug]"
-          cta="Read"
+          [cta]="''"
         />
       </li>
     }

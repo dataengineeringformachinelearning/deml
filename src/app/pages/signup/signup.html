@@ -1,9 +1,5 @@
 <app-page-section variant="auth" ariaLabel="Sign up">
-  <app-form-panel
-    eyebrow="Account"
-    title="Create account"
-    description="Set up your workspace with a name, email, and password."
-  >
+  <app-form-panel title="Create account" description="Name, email, and password.">
     <form class="form-panel__form" (submit)="submit($event)" novalidate>
       <app-text-field
         label="Name"

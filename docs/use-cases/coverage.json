@@ -143,7 +143,7 @@
     },
     "UC-STATUS-001": {
       "unit": ["src/app/services/monitor.service.spec.ts"],
-      "integration": ["backend/forjd/test_angular_compat.py::test_status_pages_list_fallback_on_outage"],
+      "integration": ["backend/forjd/test_angular_compat.py::test_status_pages_public_directory_no_empty_on_outage"],
       "observability": {
         "sources": ["backend/forjd/views.py"],
         "deferred_observability": "Admin mutations via FORJD audit path"
@@ -201,7 +201,7 @@
       }
     },
     "UC-EXPORT-001": {
-      "unit": ["src/app/pages/analytics/analytics.spec.ts"],
+      "unit": ["src/app/pages/settings/settings.spec.ts"],
       "integration": ["backend/forjd/test_headless_contract.py::test_export_create_detail_and_signed_download_are_tenant_bound"],
       "observability": {
         "sources": ["backend/forjd/views.py"],

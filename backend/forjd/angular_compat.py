@@ -480,9 +480,17 @@ def deml_status_pages(
   forjd_body: dict[str, Any],
   *,
   deml_user_id: int | None,
+  require_pages_key: bool = False,
 ) -> list[dict[str, Any]]:
+  """Map FORJD ``{pages: [...]}`` to Angular status-page rows.
+
+  When ``require_pages_key`` is True, a missing/non-list ``pages`` field raises
+  ``ValueError`` so callers can fail closed (502) instead of inventing ``[]``.
+  """
   pages = forjd_body.get("pages")
   if not isinstance(pages, list):
+    if require_pages_key:
+      raise ValueError("FORJD status pages envelope missing pages list")
     return []
   return [
     deml_status_page(page, deml_user_id=deml_user_id) for page in pages if isinstance(page, dict)

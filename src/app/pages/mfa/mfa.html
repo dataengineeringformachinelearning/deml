@@ -1,9 +1,5 @@
 <app-page-section variant="auth" ariaLabel="Two-factor authentication">
-  <app-form-panel
-    eyebrow="Account"
-    title="Verify it's you"
-    [description]="description()"
-  >
+  <app-form-panel title="Verify it's you" [description]="description()">
     <form class="form-panel__form" (submit)="submit($event)" novalidate>
       <div id="mfa-recaptcha-container" class="visually-hidden" aria-hidden="true"></div>
 

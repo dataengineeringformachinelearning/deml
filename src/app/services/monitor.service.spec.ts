@@ -43,29 +43,6 @@ describe('MonitorService', () => {
     ).toEqual(['joealongi-dev']);
   });
 
-  it('should fetch all endpoints', () => {
-    const mockData = [
-      {
-        id: '1',
-        url: 'http://test.com',
-        last_tested: '',
-        status_code: 200,
-        response_time: '50ms',
-        ip_address: '',
-        is_active: true,
-      },
-    ];
-
-    service.getAllEndpoints().subscribe(data => {
-      expect(data.length).toBe(1);
-      expect(data[0].url).toBe('http://test.com');
-    });
-
-    const req = httpMock.expectOne(API_ENDPOINTS.SYSTEM_STATUS.ENDPOINTS);
-    expect(req.request.method).toBe('GET');
-    req.flush(mockData);
-  });
-
   it('should fetch the public status directory including platform', () => {
     const mockPages = [
       {
@@ -126,8 +103,6 @@ describe('MonitorService', () => {
     first.flush([]);
     expect(results).toEqual([0, 0]);
 
-    // In-flight cleanup is deferred one microtask so synchronous subscribers
-    // can share the same request.
     await Promise.resolve();
     service.getStatusPages().subscribe();
     httpMock.expectOne(API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES).flush([]);
@@ -151,6 +126,7 @@ describe('MonitorService', () => {
     const req = httpMock.expectOne(API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(payload);
+    expect(req.request.headers.get('Idempotency-Key')).toBeTruthy();
     req.flush(mockCreated);
   });
 
@@ -162,28 +138,5 @@ describe('MonitorService', () => {
     const req = httpMock.expectOne(`${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES}/p2`);
     expect(req.request.method).toBe('DELETE');
     req.flush({ success: true });
-  });
-
-  it('should fetch incidents for a status page', () => {
-    const mockIncidents = [
-      {
-        id: 'i1',
-        title: 'DB Offline',
-        message: 'Down',
-        status: 'Investigating',
-        status_page_id: 'p1',
-        created_at: '',
-        updated_at: '',
-      },
-    ];
-
-    service.getIncidents('p1').subscribe(incs => {
-      expect(incs.length).toBe(1);
-      expect(incs[0].title).toBe('DB Offline');
-    });
-
-    const req = httpMock.expectOne(`${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES}/p1/incidents`);
-    expect(req.request.method).toBe('GET');
-    req.flush(mockIncidents);
   });
 });

@@ -8,6 +8,11 @@ export type SwrOptions = {
   staleMs?: number;
   /** Logical group for bulk invalidate (e.g. `tenant:…`, `auth`). */
   scope?: string;
+  /**
+   * Called when a stale entry is kept because revalidation failed.
+   * Subscriber still completes successfully — use this for honest “cached” UX.
+   */
+  onRevalidateError?: (error: unknown) => void;
 };
 
 type SwrEntry<T> = {
@@ -95,8 +100,9 @@ export class MemorySwrCache {
             subscriber.next(value);
             subscriber.complete();
           },
-          error: () => {
-            // Keep serving stale on revalidate failure.
+          error: (error: unknown) => {
+            // Keep serving stale on revalidate failure — surface honesty via callback.
+            options.onRevalidateError?.(error);
             subscriber.complete();
           },
         });

@@ -104,7 +104,7 @@ describe('Mfa', () => {
     await fixture.whenStable();
 
     expect(authMock.resolveMfaSignIn).toHaveBeenCalledWith('123456');
-    expect(navigateSpy).toHaveBeenCalledWith('/dashboard');
+    expect(navigateSpy).toHaveBeenCalledWith('/settings');
   });
 
   it('should honor a safe in-app returnUrl after MFA', async () => {
@@ -132,7 +132,7 @@ describe('Mfa', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(navigateSpy).toHaveBeenCalledWith('/dashboard');
+    expect(navigateSpy).toHaveBeenCalledWith('/settings');
   });
 
   it('should clear the challenge when canceling back to login', () => {

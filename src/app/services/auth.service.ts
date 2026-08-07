@@ -40,6 +40,8 @@ import { logFirebaseAuthError, mapFirebaseMfaError } from '../core/utils/phone.u
 
 type AuthUserResponse = {
   status: string;
+  /** Django display name SoT (`first_name` or `username`). */
+  user: string | null;
   user_id: number | null;
   role: string | null;
 };
@@ -165,6 +167,10 @@ export class AuthService {
   public isAuthenticated = signal<boolean>(false);
   public currentUserId = signal<number | null>(null);
   public currentUserRole = signal<string | null>(null);
+  /** Display name from last successful Django `/api/v1/auth/user` (SoT for Settings). */
+  public accountDisplayName = signal<string | null>(null);
+  /** Email from Firebase/session — Django auth/user does not return email. */
+  public accountEmail = signal<string | null>(null);
   public isInitialized = signal<boolean>(false);
   public isProcessing = signal<boolean>(false);
 
@@ -244,11 +250,12 @@ export class AuthService {
           this.isAuthenticated.set(true);
           this.currentUserId.set(user.id);
           this.currentUserRole.set(user.role);
+          this.accountDisplayName.set(user.username);
+          this.accountEmail.set(user.email);
         } else {
           this.auth = null;
           this.isAuthenticated.set(false);
-          this.currentUserId.set(null);
-          this.currentUserRole.set(null);
+          this.clearAccountIdentity();
         }
         this.isInitialized.set(true);
         this.isProcessing.set(false);
@@ -267,31 +274,48 @@ export class AuthService {
                   .get<AuthUserResponse>(`${environment.backendUrl}/api/v1/auth/user`, {
                     headers: { Authorization: `Bearer ${token}` },
                   })
-                  .pipe(timeout(20000)),
+                  .pipe(timeout({ first: 20_000 })),
               );
+              // --- Session-before-product-API ---
+              // Register Postgres session before isAuthenticated flips true so
+              // Settings/guarded calls never race with middleware session checks.
               if (res.status === 'success') {
-                this.isAuthenticated.set(true);
-                this.currentUserId.set(res.user_id);
-                this.currentUserRole.set(res.role);
+                await this.refreshMfaState();
+                const sessionOk = await this.bindServerSession(user);
+                if (sessionOk) {
+                  this.isAuthenticated.set(true);
+                  this.applyAuthUserResponse(res, user);
+                } else {
+                  console.error(
+                    JSON.stringify({
+                      event: 'auth_session_bind_failed',
+                      detail: 'Postgres session registry unavailable',
+                    }),
+                  );
+                  // Fail closed: clear Firebase session so UI cannot look signed-in
+                  // while product APIs would 401 on missing Postgres session.
+                  this.isAuthenticated.set(false);
+                  this.clearAccountIdentity();
+                  try {
+                    await signOut(auth);
+                  } catch {
+                    /* best effort */
+                  }
+                }
               } else {
                 this.isAuthenticated.set(false);
-                this.currentUserId.set(null);
-                this.currentUserRole.set(null);
+                this.clearAccountIdentity();
               }
-              await this.refreshMfaState();
-              await this.bindServerSession(user);
             } catch (e: unknown) {
               console.error('Failed to sync auth with backend', e);
               this.isAuthenticated.set(false);
-              this.currentUserId.set(null);
-              this.currentUserRole.set(null);
+              this.clearAccountIdentity();
               this.mfaEnrolled.set(false);
               this.mfaVerifiedInSession.set(false);
             }
           } else {
             this.isAuthenticated.set(false);
-            this.currentUserId.set(null);
-            this.currentUserRole.set(null);
+            this.clearAccountIdentity();
             this.mfaEnrolled.set(false);
             this.mfaVerifiedInSession.set(false);
             this.clearMfaSessionFlag();
@@ -322,26 +346,27 @@ export class AuthService {
           );
           if (res.status === 'success') {
             this.isAuthenticated.set(true);
-            this.currentUserId.set(res.user_id);
-            this.currentUserRole.set(res.role);
+            this.applyAuthUserResponse(res);
+            if (!this.accountDisplayName()) this.accountDisplayName.set(user.username);
+            if (!this.accountEmail()) this.accountEmail.set(user.email);
           }
         } catch {
           this.isAuthenticated.set(true);
           this.currentUserId.set(user.id);
           this.currentUserRole.set(user.role);
+          this.accountDisplayName.set(user.username);
+          this.accountEmail.set(user.email);
         }
       } else {
         this.isAuthenticated.set(false);
-        this.currentUserId.set(null);
-        this.currentUserRole.set(null);
+        this.clearAccountIdentity();
       }
       this.isProcessing.set(false);
       return;
     }
     if (!this.auth) {
       this.isAuthenticated.set(false);
-      this.currentUserId.set(null);
-      this.currentUserRole.set(null);
+      this.clearAccountIdentity();
       this.isProcessing.set(false);
       return;
     }
@@ -350,28 +375,32 @@ export class AuthService {
       try {
         const token = await user.getIdToken();
         const res = await firstValueFrom(
-          this.http.get<AuthUserResponse>(`${environment.backendUrl}/api/v1/auth/user`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          this.http
+            .get<AuthUserResponse>(`${environment.backendUrl}/api/v1/auth/user`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            .pipe(timeout({ first: 20_000 })),
         );
         if (res.status === 'success') {
-          this.isAuthenticated.set(true);
-          this.currentUserId.set(res.user_id);
-          this.currentUserRole.set(res.role);
+          const sessionOk = await this.bindServerSession(user);
+          if (sessionOk) {
+            this.isAuthenticated.set(true);
+            this.applyAuthUserResponse(res, user);
+          } else {
+            this.isAuthenticated.set(false);
+            this.clearAccountIdentity();
+          }
         } else {
           this.isAuthenticated.set(false);
-          this.currentUserId.set(null);
-          this.currentUserRole.set(null);
+          this.clearAccountIdentity();
         }
       } catch {
         this.isAuthenticated.set(false);
-        this.currentUserId.set(null);
-        this.currentUserRole.set(null);
+        this.clearAccountIdentity();
       }
     } else {
       this.isAuthenticated.set(false);
-      this.currentUserId.set(null);
-      this.currentUserRole.set(null);
+      this.clearAccountIdentity();
     }
     this.isProcessing.set(false);
   }
@@ -395,13 +424,16 @@ export class AuthService {
         );
         if (res.status === 'success') {
           this.isAuthenticated.set(true);
-          this.currentUserId.set(res.user_id);
-          this.currentUserRole.set(res.role);
+          this.applyAuthUserResponse(res);
+          if (!this.accountDisplayName()) this.accountDisplayName.set(username);
+          if (!this.accountEmail()) this.accountEmail.set(email);
         }
       } catch {
         this.isAuthenticated.set(true);
         this.currentUserId.set(1);
         this.currentUserRole.set(role);
+        this.accountDisplayName.set(username);
+        this.accountEmail.set(email);
       }
       this.isProcessing.set(false);
       return { success: true };
@@ -493,13 +525,43 @@ export class AuthService {
     }
   }
 
-  /** Snapshot of the signed-in identity for account editing surfaces. */
+  /**
+   * Snapshot for Settings — display name prefers Django `/auth/user` (SoT),
+   * then Firebase; email is Firebase-only (not on the Django envelope).
+   */
   getAccountProfile(): { displayName: string; email: string } {
-    const user = this.auth?.currentUser;
+    const firebase = this.auth?.currentUser;
     return {
-      displayName: user?.displayName?.trim() || '',
-      email: user?.email?.trim() || '',
+      displayName:
+        this.accountDisplayName()?.trim() || firebase?.displayName?.trim() || '',
+      email: this.accountEmail()?.trim() || firebase?.email?.trim() || '',
     };
+  }
+
+  /** Apply Django auth/user identity (single write path for account signals). */
+  private applyAuthUserResponse(
+    res: AuthUserResponse,
+    firebaseUser?: FirebaseUser | null,
+  ): void {
+    this.currentUserId.set(res.user_id);
+    this.currentUserRole.set(res.role);
+    const djangoName = (res.user || '').trim();
+    if (djangoName) {
+      this.accountDisplayName.set(djangoName);
+    } else if (firebaseUser?.displayName?.trim()) {
+      this.accountDisplayName.set(firebaseUser.displayName.trim());
+    }
+    const email = firebaseUser?.email?.trim();
+    if (email) {
+      this.accountEmail.set(email);
+    }
+  }
+
+  private clearAccountIdentity(): void {
+    this.currentUserId.set(null);
+    this.currentUserRole.set(null);
+    this.accountDisplayName.set(null);
+    this.accountEmail.set(null);
   }
 
   /** Update Firebase display name (mock mode mutates the in-memory user). */
@@ -516,9 +578,30 @@ export class AuthService {
       if (this.useMock || isMockAuth(this.auth)) {
         const user = this.auth.currentUser as FirebaseUser & { displayName: string };
         user.displayName = name;
+        this.accountDisplayName.set(name);
         return { success: true };
       }
-      await updateProfile(this.requireFirebaseUser(), { displayName: name });
+      const firebaseUser = this.requireFirebaseUser();
+      await updateProfile(firebaseUser, { displayName: name });
+      // Force claim refresh so next Django sync sees the new name.
+      const token = await firebaseUser.getIdToken(true);
+      try {
+        const res = await firstValueFrom(
+          this.http
+            .get<AuthUserResponse>(`${environment.backendUrl}/api/v1/auth/user`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            .pipe(timeout({ first: 20_000 })),
+        );
+        if (res.status === 'success') {
+          this.applyAuthUserResponse(res, firebaseUser);
+        } else {
+          this.accountDisplayName.set(name);
+        }
+      } catch {
+        // Firebase write succeeded — keep local SoT honest even if Django lag.
+        this.accountDisplayName.set(name);
+      }
       return { success: true };
     } catch (e: unknown) {
       console.error(e);
@@ -539,8 +622,7 @@ export class AuthService {
       localStorage.removeItem('mock_user');
       this.auth = null;
       this.isAuthenticated.set(false);
-      this.currentUserId.set(null);
-      this.currentUserRole.set(null);
+      this.clearAccountIdentity();
       this.isProcessing.set(false);
       this.syncCrossSiteAuthCache();
       return;
@@ -551,15 +633,13 @@ export class AuthService {
         await signOut(auth);
       }
       this.isAuthenticated.set(false);
-      this.currentUserId.set(null);
-      this.currentUserRole.set(null);
+      this.clearAccountIdentity();
       this.isProcessing.set(false);
       this.syncCrossSiteAuthCache();
     } catch (e: unknown) {
       console.error(e);
       this.isAuthenticated.set(false);
-      this.currentUserId.set(null);
-      this.currentUserRole.set(null);
+      this.clearAccountIdentity();
       this.isProcessing.set(false);
       this.syncCrossSiteAuthCache();
     }
@@ -585,8 +665,7 @@ export class AuthService {
         };
       }
       this.isAuthenticated.set(false);
-      this.currentUserId.set(null);
-      this.currentUserRole.set(null);
+      this.clearAccountIdentity();
       this.isProcessing.set(false);
       return { status: 'completed' };
     } catch (error: unknown) {
@@ -1068,7 +1147,7 @@ export class AuthService {
           }),
         );
         if (res.status === 'success') {
-          this.currentUserRole.set(res.role);
+          this.applyAuthUserResponse(res, userCredential.user);
         }
       }
 
@@ -1109,7 +1188,7 @@ export class AuthService {
           }),
         );
         if (res.status === 'success') {
-          this.currentUserRole.set(res.role);
+          this.applyAuthUserResponse(res, userCredential.user);
         }
       }
 
@@ -1217,30 +1296,38 @@ export class AuthService {
     }
   }
 
-  /** Register browser session in the Postgres session registry. */
-  private async bindServerSession(user: FirebaseUser): Promise<void> {
+  /**
+   * Register browser session in the Postgres session registry.
+   * Returns false when registration fails — callers must not mark authenticated.
+   * Never publishes sessionId until the server accepts the session (no half-state).
+   */
+  private async bindServerSession(user: FirebaseUser): Promise<boolean> {
     if (typeof window === 'undefined' || this.useMock) {
-      return;
+      return true;
     }
     let id = sessionStorage.getItem('deml_session_id');
     const isNew = !id;
     if (isNew) {
       id = crypto.randomUUID();
     }
-    this.sessionId.set(id);
     try {
       const token = await user.getIdToken();
       await this.sessionApi.register(id!, token);
+      this.sessionId.set(id);
       if (isNew) {
         sessionStorage.setItem('deml_session_id', id!);
       }
+      return true;
     } catch (error) {
-      console.warn('Session registry unavailable', error);
-      // Clear bad/stale id so it doesn't cause 401s on subsequent calls
+      console.warn(
+        JSON.stringify({
+          event: 'session_registry_unavailable',
+          detail: error instanceof Error ? error.message : 'unknown',
+        }),
+      );
       this.sessionId.set(null);
-      if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('deml_session_id');
-      }
+      sessionStorage.removeItem('deml_session_id');
+      return false;
     }
   }
 

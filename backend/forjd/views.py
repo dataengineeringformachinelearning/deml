@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Final, Literal
@@ -147,7 +148,34 @@ def _client_for_credential(credential: ForjdTenantCredential) -> ForjdClient:
 
 
 # Platform / tenant0 status page — public directory only, never account "My Sites".
-PLATFORM_STATUS_SLUG: Final[str] = "platform-status"
+from forjd.isolation import is_platform_status_slug
+
+# --- Status page write boundary ---
+_STATUS_SLUG_RE: Final[re.Pattern[str]] = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+
+
+def _validate_status_page_write(payload: dict[str, Any]) -> JsonResponse | None:
+  """Schema/business checks before proxying status page create/update."""
+  title = str(payload.get("title") or "").strip()
+  slug = str(payload.get("slug") or "").strip().lower()
+  if not title:
+    return JsonResponse({"detail": "title is required", "code": "validation_error"}, status=400)
+  if not slug:
+    return JsonResponse({"detail": "slug is required", "code": "validation_error"}, status=400)
+  if not _STATUS_SLUG_RE.fullmatch(slug):
+    return JsonResponse(
+      {
+        "detail": "slug must be lowercase letters, numbers, and hyphens",
+        "code": "validation_error",
+      },
+      status=400,
+    )
+  if is_platform_status_slug(slug):
+    return JsonResponse(
+      {"detail": "Platform status slug is reserved", "code": "platform_status_immutable"},
+      status=403,
+    )
+  return None
 
 
 def _request_has_end_user_auth(request: HttpRequest) -> bool:
@@ -164,10 +192,10 @@ def _request_has_end_user_auth(request: HttpRequest) -> bool:
 
 def _is_platform_status_page(page: dict[str, Any] | str | None) -> bool:
   if isinstance(page, str):
-    return page == PLATFORM_STATUS_SLUG
+    return is_platform_status_slug(page)
   if not isinstance(page, dict):
     return False
-  return str(page.get("slug") or "") == PLATFORM_STATUS_SLUG
+  return is_platform_status_slug(str(page.get("slug") or ""))
 
 
 def _owned_status_pages(pages: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -222,7 +250,10 @@ async def _fetch_published_directory(
   upstream = json.loads(response.body)
   if not isinstance(upstream, dict):
     raise AdapterError(502, "FORJD returned an invalid published status directory")
-  return deml_status_pages(upstream, deml_user_id=None)
+  try:
+    return deml_status_pages(upstream, deml_user_id=None, require_pages_key=True)
+  except ValueError as exc:
+    raise AdapterError(502, "FORJD returned an invalid published status directory") from exc
 
 
 async def _ensure_published_status_page(
@@ -235,15 +266,14 @@ async def _ensure_published_status_page(
   try:
     pages = _published_directory_pages(await _fetch_published_directory(request_id=request_id))
   except AdapterError as exc:
-    if empty_read_fallback_enabled() and exc.status >= 500:
-      return JsonResponse({"detail": "Not found"}, status=404)
+    # Never mask dependency failure as 404 (would look like "unpublished").
     return _adapter_error_response(exc)
   except ForjdError as exc:
-    if empty_read_fallback_enabled() and exc.status >= 500:
-      return JsonResponse({"detail": "Not found"}, status=404)
     return _forjd_error_response(exc)
   except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
-    return JsonResponse({"detail": "Not found"}, status=404)
+    return _adapter_error_response(
+      AdapterError(502, "FORJD returned an invalid published status directory")
+    )
   if not any(str(page.get("id") or "") == str(page_id) for page in pages):
     return JsonResponse({"detail": "Not found"}, status=404)
   return None
@@ -1031,26 +1061,58 @@ async def status_pages_list_proxy(request: HttpRequest) -> HttpResponse:
       # Authenticated Settings: tenant-scoped only — never fall back to the
       # public directory (fail closed) and never include platform-status.
       if _request_has_end_user_auth(request) and not published_only:
+        # Settings owned-list must stay honest: never mask FORJD outages as [].
         if client is None:
+          if not reads_from_forjd():
+            return JsonResponse(
+              {
+                "detail": "FORJD reads are disabled",
+                "code": ErrorCode.FORJD_READS_DISABLED.value,
+              },
+              status=503,
+            )
+          # No tenant credential yet — genuinely empty owned sites.
           return JsonResponse([], status=200, safe=False)
-        query_string = f"tenant_id={client.tenant_id}"
-        response = await client.proxy(
-          "GET",
-          "/api/v1/status/pages",
-          body=None,
-          query_string=query_string,
-          content_type="application/json",
-          request_id=request_id_from(request),
-        )
-        if response.status >= 400:
-          if empty_read_fallback_enabled() and response.status >= 500:
-            return JsonResponse([], status=200, safe=False)
-          return _upstream_error_response(response)
-        upstream = json.loads(response.body)
-        if not isinstance(upstream, dict):
-          raise AdapterError(502, "FORJD returned an invalid status pages list")
-        pages = _owned_status_pages(deml_status_pages(upstream, deml_user_id=deml_user_id))
-        return JsonResponse(pages, status=200, safe=False)
+        try:
+          query_string = f"tenant_id={client.tenant_id}"
+          response = await client.proxy(
+            "GET",
+            "/api/v1/status/pages",
+            body=None,
+            query_string=query_string,
+            content_type="application/json",
+            request_id=request_id_from(request),
+          )
+          if response.status >= 400:
+            logger.warning(
+              "forjd_owned_status_pages_failed status=%s request_id=%s",
+              response.status,
+              request_id_from(request),
+            )
+            return _upstream_error_response(response)
+          upstream = json.loads(response.body)
+          if not isinstance(upstream, dict):
+            raise AdapterError(502, "FORJD returned an invalid status pages list")
+          try:
+            pages = _owned_status_pages(
+              deml_status_pages(upstream, deml_user_id=deml_user_id, require_pages_key=True)
+            )
+          except ValueError as exc:
+            raise AdapterError(502, "FORJD returned an invalid status pages list") from exc
+          return JsonResponse(pages, status=200, safe=False)
+        except AdapterError as exc:
+          return _adapter_error_response(exc)
+        except ForjdError as exc:
+          logger.warning(
+            "forjd_owned_status_pages_error status=%s request_id=%s",
+            exc.status,
+            request_id_from(request),
+          )
+          return _forjd_error_response(exc)
+        except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
+          return _adapter_error_response(
+            AdapterError(502, "FORJD returned an invalid status pages list")
+          )
 
       if published_only or client is None:
         try:
@@ -1058,12 +1120,9 @@ async def status_pages_list_proxy(request: HttpRequest) -> HttpResponse:
             await _fetch_published_directory(request_id=request_id_from(request))
           )
         except AdapterError as exc:
-          if empty_read_fallback_enabled() and exc.status >= 500:
-            return JsonResponse([], status=200, safe=False)
+          # Never invent an empty directory — Explore would show "Nothing published".
           return _adapter_error_response(exc)
         except ForjdError as exc:
-          if empty_read_fallback_enabled() and exc.status >= 500:
-            return JsonResponse([], status=200, safe=False)
           return _forjd_error_response(exc)
         return JsonResponse(pages, status=200, safe=False)
 
@@ -1071,8 +1130,8 @@ async def status_pages_list_proxy(request: HttpRequest) -> HttpResponse:
     except AdapterError as exc:
       return _adapter_error_response(exc)
     except ForjdError as exc:
-      if empty_read_fallback_enabled() and exc.status >= 500:
-        return JsonResponse([], status=200, safe=False)
+      # Outer catch is for owned-list transport errors already handled above;
+      # public directory errors are handled in the inner try.
       return _forjd_error_response(exc)
     except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
       return _adapter_error_response(
@@ -1090,35 +1149,49 @@ async def status_pages_list_proxy(request: HttpRequest) -> HttpResponse:
     credential = await _credential_for_request(request)
     deml_user_id = await sync_to_async(lambda: getattr(request.user, "id", None))()
     payload = _json_object(request)
+    denied = _validate_status_page_write(payload)
+    if denied is not None:
+      return denied
     slug = str(payload.get("slug") or "").strip().lower()
-    if _is_platform_status_page(slug):
-      return JsonResponse(
-        {"detail": "Platform status slug is reserved", "code": "platform_status_immutable"},
-        status=403,
-      )
+    title = str(payload.get("title") or "").strip()
     body = json.dumps(
       {
         "tenant_id": str(credential.tenant_id),
         "slug": slug,
-        "title": str(payload.get("title") or ""),
-        "description": str(payload.get("description") or ""),
+        "title": title,
+        "description": str(payload.get("description") or "").strip(),
         "is_published": bool(payload.get("is_published")),
       }
     ).encode()
     client = _client_for_credential(credential)
+    # Prefer client Idempotency-Key for correlation; writes are never auto-replayed.
+    create_request_id = (
+      str(request.META.get("HTTP_IDEMPOTENCY_KEY") or "").strip() or request_id_from(request)
+    )
     response = await client.proxy(
       "POST",
       "/api/v1/status/pages",
       body=body,
       content_type="application/json",
-      request_id=request_id_from(request),
+      request_id=create_request_id,
     )
     if response.status >= 400:
+      logger.warning(
+        "forjd_status_page_create_failed status=%s slug=%s request_id=%s",
+        response.status,
+        slug,
+        create_request_id,
+      )
       return _upstream_error_response(response)
     upstream = json.loads(response.body)
     page = upstream.get("page") if isinstance(upstream, dict) else None
     if not isinstance(page, dict):
       raise AdapterError(502, "FORJD returned an invalid status page")
+    logger.info(
+      "forjd_status_page_created slug=%s request_id=%s",
+      slug,
+      create_request_id,
+    )
     return JsonResponse(deml_status_page(page, deml_user_id=deml_user_id), status=200)
   except AdapterError as exc:
     return _adapter_error_response(exc)
@@ -1143,6 +1216,36 @@ async def status_page_detail_proxy(request: HttpRequest, page_id: str) -> HttpRe
     credential = await _credential_for_request(request)
     deml_user_id = await sync_to_async(lambda: getattr(request.user, "id", None))()
     client = _client_for_credential(credential)
+    # --- Re-validate: refuse mutate of platform-status by UUID (not only by slug rename) ---
+    existing = await client.proxy(
+      "GET",
+      "/api/v1/status/pages",
+      body=None,
+      query_string=f"tenant_id={credential.tenant_id}",
+      content_type="application/json",
+      request_id=request_id_from(request),
+    )
+    if existing.status < 400:
+      try:
+        listed = json.loads(existing.body)
+        pages = listed.get("pages") if isinstance(listed, dict) else None
+        if isinstance(pages, list):
+          for page in pages:
+            if (
+              isinstance(page, dict)
+              and str(page.get("id") or "") == str(page_id)
+              and _is_platform_status_page(page)
+            ):
+              return JsonResponse(
+                {
+                  "detail": "Platform status page is immutable",
+                  "code": "platform_status_immutable",
+                },
+                status=403,
+              )
+      except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
+        pass
+
     if request.method == "DELETE":
       response = await client.proxy(
         "DELETE",
@@ -1155,19 +1258,18 @@ async def status_page_detail_proxy(request: HttpRequest, page_id: str) -> HttpRe
       return JsonResponse({"ok": True}, status=200)
 
     payload = _json_object(request)
-    slug_raw = payload.get("slug")
-    if slug_raw is not None and _is_platform_status_page(str(slug_raw).strip().lower()):
-      return JsonResponse(
-        {"detail": "Platform status slug is reserved", "code": "platform_status_immutable"},
-        status=403,
-      )
+    denied = _validate_status_page_write(payload)
+    if denied is not None:
+      return denied
+    slug = str(payload.get("slug") or "").strip().lower()
+    title = str(payload.get("title") or "").strip()
     body = json.dumps(
       {
         "tenant_id": str(credential.tenant_id),
-        "slug": slug_raw,
-        "title": payload.get("title"),
-        "description": payload.get("description"),
-        "is_published": payload.get("is_published"),
+        "slug": slug,
+        "title": title,
+        "description": str(payload.get("description") or "").strip(),
+        "is_published": bool(payload.get("is_published")),
       }
     ).encode()
     response = await client.proxy(
@@ -1199,14 +1301,29 @@ async def status_page_services_proxy(request: HttpRequest, page_id: str) -> Http
   try:
     if request.method == "GET":
       client, _deml_user_id, published_only = await _status_directory_read_client(request)
-      if client is None:
-        return JsonResponse([], status=200, safe=False)
       if published_only:
+        # Public clients must use the embedded slug payload. Never call FORJD
+        # with the platform tenant_id + a foreign page_id (cross-tenant pattern).
+        if client is None:
+          return JsonResponse(
+            {"detail": "Status directory unavailable", "code": ErrorCode.FORJD_DEGRADED.value},
+            status=503,
+          )
         denied = await _ensure_published_status_page(
           client, page_id, request_id=request_id_from(request)
         )
         if denied is not None:
           return denied
+        return JsonResponse([], status=200, safe=False)
+      if client is None:
+        # Authed enrichment without a tenant credential must not invent [].
+        return JsonResponse(
+          {
+            "detail": "FORJD tenant credential unavailable",
+            "code": ErrorCode.FORJD_READS_DISABLED.value,
+          },
+          status=503,
+        )
       response = await client.proxy(
         "GET",
         f"/api/v1/status/pages/{quote(page_id, safe='')}/services",
@@ -1214,8 +1331,12 @@ async def status_page_services_proxy(request: HttpRequest, page_id: str) -> Http
         request_id=request_id_from(request),
       )
       if response.status >= 400:
-        if empty_read_fallback_enabled() and response.status >= 500:
-          return JsonResponse([], status=200, safe=False)
+        logger.warning(
+          "forjd_status_services_failed status=%s page_id=%s published_only=%s",
+          response.status,
+          page_id,
+          published_only,
+        )
         return _upstream_error_response(response)
       upstream = json.loads(response.body)
       if not isinstance(upstream, dict):
@@ -1318,14 +1439,27 @@ async def status_page_incidents_proxy(request: HttpRequest, page_id: str) -> Htt
   try:
     if request.method == "GET":
       client, _deml_user_id, published_only = await _status_directory_read_client(request)
-      if client is None:
-        return JsonResponse([], status=200, safe=False)
       if published_only:
+        # Same isolation rule as services: public uses embedded slug payload only.
+        if client is None:
+          return JsonResponse(
+            {"detail": "Status directory unavailable", "code": ErrorCode.FORJD_DEGRADED.value},
+            status=503,
+          )
         denied = await _ensure_published_status_page(
           client, page_id, request_id=request_id_from(request)
         )
         if denied is not None:
           return denied
+        return JsonResponse([], status=200, safe=False)
+      if client is None:
+        return JsonResponse(
+          {
+            "detail": "FORJD tenant credential unavailable",
+            "code": ErrorCode.FORJD_READS_DISABLED.value,
+          },
+          status=503,
+        )
       response = await client.proxy(
         "GET",
         f"/api/v1/status/pages/{quote(page_id, safe='')}/incidents",
@@ -1333,8 +1467,12 @@ async def status_page_incidents_proxy(request: HttpRequest, page_id: str) -> Htt
         request_id=request_id_from(request),
       )
       if response.status >= 400:
-        if empty_read_fallback_enabled() and response.status >= 500:
-          return JsonResponse([], status=200, safe=False)
+        logger.warning(
+          "forjd_status_incidents_failed status=%s page_id=%s published_only=%s",
+          response.status,
+          page_id,
+          published_only,
+        )
         return _upstream_error_response(response)
       upstream = json.loads(response.body)
       if not isinstance(upstream, dict):

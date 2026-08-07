@@ -21,20 +21,15 @@ describe('SiteFooter', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render restored footer directories and legal copy', () => {
+  it('should render compact legal footer', () => {
     const host = fixture.nativeElement as HTMLElement;
     const text = host.textContent ?? '';
 
     expect(host.querySelector('footer.site-footer')).toBeTruthy();
     expect(host.querySelector('nav[aria-label="Footer"]')).toBeTruthy();
-    expect(text).toContain('Platforms');
-    expect(text).toContain('Resources');
-    expect(text).toContain('Support');
-    expect(text).toContain('Legal & Compliance');
-    expect(text).toContain('Explore');
-    expect(text).toContain('Platform Status');
-    expect(text).toContain('Privacy Policy');
-    expect(text).toContain('Made in the U.S.A.');
-    expect(text).toContain('Joe Alongi');
+    expect(text).toContain('Privacy');
+    expect(text).toContain('Terms');
+    expect(text).toContain('Status');
+    expect(text).toContain(`© ${new Date().getFullYear()} DEML`);
   });
 });

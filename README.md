@@ -1,6 +1,6 @@
 # DEML — Control Plane
 
-Firebase-authenticated user control plane: Angular product UI (`deml.app`) + Django BFF (`backend.deml.app`) + [deml-ui](https://github.com/dataengineeringformachinelearning/deml-ui).
+Firebase-authenticated control plane: Angular product UI (`deml.app`) + Django BFF (`backend.deml.app`) + [deml-ui](https://github.com/dataengineeringformachinelearning/deml-ui).
 
 > **Repo map**
 >
@@ -29,14 +29,14 @@ cd backend && uv run python manage.py runserver 127.0.0.1:8000
 
 ## Product surfaces
 
+Core job: identity, public status, site management. See [`docs/SIMPLIFIED_SURFACE.md`](docs/SIMPLIFIED_SURFACE.md).
+
 | Route | Purpose |
 |-------|---------|
-| `/` `/learn` `/blog` | Marketing / education |
-| `/login` `/signup` | Auth |
-| `/dashboard` | CES / KPI overview |
-| `/analytics` | Telemetry & threats |
-| `/vulnerabilities` | Findings |
-| `/settings` `/account` | Account / billing / consent |
-| `/status` `/explore` | Public status |
+| `/` | Hero landing |
+| `/explore` `/status/:slug` | Public status |
+| `/login` `/signup` `/mfa` | Auth |
+| `/settings` | Account + sites |
+| `/blog` | Field notes (not primary nav) |
 
-Design system dependency: published npm package `deml-ui` (`^1.1.0`+; use `file:../deml-ui` only for local DS work). App behavioral components live under `src/app/components` and consume deml-ui CSS (no parallel local DS stylesheets). See [THEME.md](THEME.md) and [docs/DEML_UI.md](docs/DEML_UI.md). **Viking-UI is retired.**
+Design system: published npm package `deml-ui`. App wrappers under `src/app/components` consume deml-ui CSS. See [THEME.md](THEME.md). **Viking-UI is retired.**

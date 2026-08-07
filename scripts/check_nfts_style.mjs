@@ -266,24 +266,8 @@ function stripCommentsTs(source) {
     }
   }
 
-  const scalePath = join(ROOT, 'src/app/components/dashboard/chart-scale.ts');
-  if (!existsSync(scalePath)) {
-    fail('src/app/components/dashboard/chart-scale.ts missing');
-  } else {
-    const scale = read(scalePath);
-    if (!/sparkHeight:\s*140/.test(scale) || !/panelHeight:\s*280/.test(scale)) {
-      fail(
-        'chart-scale.ts must lock sparkHeight: 140 and panelHeight: 280',
-      );
-    }
-    if (!/function computeSharedDomain/.test(scale)) {
-      fail('chart-scale.ts must export computeSharedDomain for shared y-scale');
-    }
-    if (!/CHART RULES LOCKED/.test(scale)) {
-      fail('chart-scale.ts must include CHART RULES LOCKED comment');
-    }
-  }
-
+  // Product SPA no longer ships dashboard charts — height/scale locks live in deml-ui.
+  // If app-level area-chart is reintroduced, it must carry CHART RULES LOCKED.
   const areaTs = join(ROOT, 'src/app/components/area-chart/area-chart.ts');
   if (existsSync(areaTs) && !/CHART RULES LOCKED/.test(read(areaTs))) {
     fail('area-chart.ts must include CHART RULES LOCKED comment');

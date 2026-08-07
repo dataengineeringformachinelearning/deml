@@ -1,6 +1,8 @@
+from __future__ import annotations
+
+from forjd.testing import create_product_forjd_mapping
 """Tests for the SSE live-updates lane (/api/v1/analytics/live)."""
 
-from __future__ import annotations
 
 import json
 from typing import Any
@@ -25,7 +27,7 @@ def _mapped_actor(username: str) -> tuple[Any, str]:
   user.profile.role = "Viewer"
   user.profile.save(update_fields=["role"])
   tenant_id = uuid4()
-  ForjdTenantMapping.objects.create(
+  create_product_forjd_mapping(
     deml_account_id=user.profile.account_id,
     forjd_tenant_id=tenant_id,
   )

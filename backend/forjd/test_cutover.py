@@ -17,6 +17,7 @@ from monitor.models import ForjdShadowReceipt, ForjdTenantMapping
 
 from forjd.client import ForjdError, ForjdResponse
 from forjd.cutover import empty_read_envelope, read_mode, write_mode
+from forjd.testing import create_product_forjd_mapping
 
 pytestmark = pytest.mark.quarantine
 
@@ -28,7 +29,7 @@ def _mapped_user(username: str = "cutover") -> tuple[object, object]:
   user.profile.role = "Operator"
   user.profile.save(update_fields=["role"])
   tenant_id = uuid4()
-  ForjdTenantMapping.objects.create(
+  create_product_forjd_mapping(
     deml_account_id=user.profile.account_id,
     forjd_tenant_id=tenant_id,
   )
@@ -90,7 +91,7 @@ def test_phase_zero_projections_return_empty_without_forjd_call(client: Client) 
   _user, tenant_id = _mapped_user()
 
   with (
-    override_settings(FORJD_TENANT_ID=str(tenant_id)),
+    override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"),
     patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock) as mock_proxy,
   ):
     response = client.get(
@@ -116,7 +117,7 @@ def test_dual_read_falls_back_on_forjd_outage(client: Client) -> None:
   _user, tenant_id = _mapped_user("dualread")
 
   with (
-    override_settings(FORJD_TENANT_ID=str(tenant_id)),
+    override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"),
     patch(
       "forjd.views.ForjdClient.proxy",
       new_callable=AsyncMock,
@@ -141,7 +142,7 @@ def test_dual_write_records_shadow_receipt(client: Client) -> None:
   _user, tenant_id = _mapped_user("dualwrite")
 
   with (
-    override_settings(FORJD_TENANT_ID=str(tenant_id)),
+    override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"),
     patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock) as mock_proxy,
   ):
     mock_proxy.return_value = ForjdResponse(
@@ -175,7 +176,7 @@ def test_writes_disabled_returns_503(client: Client) -> None:
   _user, tenant_id = _mapped_user("writeoff")
 
   with (
-    override_settings(FORJD_TENANT_ID=str(tenant_id)),
+    override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"),
     patch("forjd.views.ForjdClient.proxy", new_callable=AsyncMock) as mock_proxy,
   ):
     response = client.post(

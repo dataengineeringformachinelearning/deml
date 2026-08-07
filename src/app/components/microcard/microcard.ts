@@ -20,7 +20,7 @@ let microcardIdSeq = 0;
   templateUrl: './microcard.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    '[attr.data-visual]': 'visual()',
+    '[attr.data-visual]': 'visual() || null',
   },
 })
 export class Microcard {
@@ -32,7 +32,7 @@ export class Microcard {
 
   readonly meta = input<string>();
 
-  readonly visual = input<Exclude<CardVisual, 'none'>>('gold');
+  readonly visual = input<Exclude<CardVisual, 'none'> | ''>('');
 
   readonly headingLevel = input<MicrocardHeadingLevel>(3);
 
@@ -41,8 +41,8 @@ export class Microcard {
   /** Router destination for the card. */
   readonly routerLink = input.required<string | readonly string[]>();
 
-  /** CTA label shown on the card. */
-  readonly cta = input('Learn');
+  /** Optional CTA label — omit for whole-card affordance. */
+  readonly cta = input('');
 
   readonly resolvedHeadingId = computed(() => this.headingId() || this.autoId);
 }

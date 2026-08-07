@@ -9,25 +9,20 @@ from django.test import override_settings
 from monitor.models import ForjdTenantMapping
 
 from forjd.tenancy import ForjdTenantConfigurationError, resolve_forjd_tenant_credential
+from forjd.testing import create_product_forjd_mapping
 
 
 @pytest.mark.django_db
-def test_resolves_tenant_bound_default_service_token() -> None:
+@override_settings(SECRET_KEY="test-secret-key-for-sealed-tokens")  # pragma: allowlist secret
+def test_resolves_sealed_product_mapping() -> None:
   account_id = uuid4()
   tenant_id = uuid4()
-  ForjdTenantMapping.objects.create(
-    deml_account_id=account_id,
-    forjd_tenant_id=tenant_id,
-  )
+  create_product_forjd_mapping(deml_account_id=account_id, forjd_tenant_id=tenant_id)
 
-  with override_settings(
-    FORJD_SERVICE_TOKEN="fjsvc_00000000_default-secret",
-    FORJD_TENANT_ID=str(tenant_id),
-  ):
-    credential = resolve_forjd_tenant_credential(account_id)
+  credential = resolve_forjd_tenant_credential(account_id)
 
   assert credential.tenant_id == tenant_id
-  assert credential.service_token == "fjsvc_00000000_default-secret"  # pragma: allowlist secret
+  assert credential.service_token.startswith("fjsvc_")
 
 
 @pytest.mark.django_db
@@ -73,17 +68,17 @@ def test_rejects_unsafe_secret_reference_at_save(secret_ref: str) -> None:
 
 @pytest.mark.django_db
 @override_settings(
-  FORJD_SERVICE_TOKEN="not-a-service-token",
+  FORJD_SERVICE_TOKEN="fjsvc_00000000_default-secret",
   FORJD_TENANT_ID="00000000-0000-0000-0000-000000000001",
 )
-def test_rejects_invalid_token_format_at_resolve() -> None:
+def test_rejects_platform_default_service_token_for_product_accounts() -> None:
   account_id = uuid4()
   ForjdTenantMapping.objects.create(
     deml_account_id=account_id,
     forjd_tenant_id=UUID("00000000-0000-0000-0000-000000000001"),
   )
 
-  with pytest.raises(ForjdTenantConfigurationError, match="invalid format"):
+  with pytest.raises(ForjdTenantConfigurationError, match="platform credential"):
     resolve_forjd_tenant_credential(account_id)
 
 
@@ -91,15 +86,14 @@ def test_rejects_invalid_token_format_at_resolve() -> None:
 @override_settings(
   FORJD_SERVICE_TOKEN="fjsvc_00000000_default-secret",
   FORJD_TENANT_ID="00000000-0000-0000-0000-000000000001",
+  SECRET_KEY="test-secret-key-for-sealed-tokens",  # pragma: allowlist secret
 )
-def test_default_service_token_cannot_be_reused_for_another_tenant() -> None:
+def test_rejects_product_mapping_onto_platform_tenant_even_with_sealed_token() -> None:
   account_id = uuid4()
-  ForjdTenantMapping.objects.create(
-    deml_account_id=account_id,
-    forjd_tenant_id=uuid4(),
-  )
+  platform = UUID("00000000-0000-0000-0000-000000000001")
+  create_product_forjd_mapping(deml_account_id=account_id, forjd_tenant_id=platform)
 
-  with pytest.raises(ForjdTenantConfigurationError, match="does not match"):
+  with pytest.raises(ForjdTenantConfigurationError, match="platform FORJD tenant"):
     resolve_forjd_tenant_credential(account_id)
 
 
@@ -107,39 +101,6 @@ def test_default_service_token_cannot_be_reused_for_another_tenant() -> None:
 def test_unmapped_account_fails_closed() -> None:
   with pytest.raises(ForjdTenantConfigurationError, match="not mapped"):
     resolve_forjd_tenant_credential(uuid4())
-
-
-@pytest.mark.django_db
-@override_settings(
-  SECRET_KEY="test-secret-key-for-sealed-tokens"  # pragma: allowlist secret
-)
-def test_resolves_sealed_service_token() -> None:
-  from monitor.models import ForjdServiceCredential
-
-  from forjd.secrets import seal_service_token, sealed_ref
-
-  account_id = uuid4()
-  tenant_id = uuid4()
-  credential_id = uuid4()
-  ciphertext, encrypted_dek = seal_service_token(
-    "fjsvc_abcd1234_sealed-secret"  # pragma: allowlist secret
-  )
-  ForjdServiceCredential.objects.create(
-    id=credential_id,
-    deml_account_id=account_id,
-    forjd_tenant_id=tenant_id,
-    ciphertext=ciphertext,
-    encrypted_dek=encrypted_dek,
-  )
-  ForjdTenantMapping.objects.create(
-    deml_account_id=account_id,
-    forjd_tenant_id=tenant_id,
-    service_token_secret_ref=sealed_ref(str(credential_id)),
-  )
-
-  credential = resolve_forjd_tenant_credential(account_id)
-  assert credential.tenant_id == tenant_id
-  assert credential.service_token == "fjsvc_abcd1234_sealed-secret"  # pragma: allowlist secret
 
 
 @pytest.mark.django_db

@@ -46,7 +46,7 @@ describe('authGuard', () => {
     });
 
     const result = TestBed.runInInjectionContext(() =>
-      authGuard({} as never, { url: '/dashboard' } as never),
+      authGuard({} as never, { url: '/settings' } as never),
     );
 
     expect(result).toBe(true);

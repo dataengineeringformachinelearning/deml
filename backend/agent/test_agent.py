@@ -1,3 +1,4 @@
+from forjd.testing import create_product_forjd_mapping
 import json
 from typing import Any
 from unittest.mock import AsyncMock, patch
@@ -27,7 +28,7 @@ async def test_report_issue_forwards_to_forjd_report_documents(
   async_client: AsyncClient,
 ) -> None:
   await sync_to_async(User.objects.create_user)(username="learner")
-  await sync_to_async(ForjdTenantMapping.objects.create)(
+  await sync_to_async(create_product_forjd_mapping)(
     deml_account_id=ACCOUNT_ID,
     forjd_tenant_id=TENANT_ID,
   )

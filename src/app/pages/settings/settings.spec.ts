@@ -23,6 +23,7 @@ describe('Settings', () => {
           provide: MonitorService,
           useValue: {
             peekOwnedStatusPages: () => undefined,
+            ownedSitesServingStale: signal(false),
             getOwnedStatusPages: () =>
               of([
                 {
@@ -72,21 +73,18 @@ describe('Settings', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render editable settings sections without card grids', async () => {
+  it('should render account and sites only', async () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
     const host = fixture.nativeElement as HTMLElement;
-    expect(host.querySelector('app-banner')).toBeTruthy();
     expect(host.querySelector('h1.banner-heading')?.textContent).toContain('Settings');
     expect(host.querySelector('#account')).toBeTruthy();
     expect(host.querySelector('#sites')).toBeTruthy();
-    expect(host.querySelector('#preferences')).toBeTruthy();
-    expect(host.querySelector('app-form-panel')).toBeTruthy();
+    expect(host.querySelector('#appearance')).toBeNull();
+    expect(host.querySelector('#preferences')).toBeNull();
     expect(host.querySelector('app-card-grid')).toBeNull();
     expect(fixture.componentInstance.sites().length).toBe(1);
-    expect(fixture.componentInstance.sites()[0].slug).toBe('studio');
-    expect(host.querySelector('table')).toBeTruthy();
     expect(host.textContent).not.toContain('Platform Status');
   });
 
@@ -101,11 +99,5 @@ describe('Settings', () => {
     });
     expect(fixture.componentInstance.editingSiteId()).toBeNull();
     expect(fixture.componentInstance.sitesError()).toContain('Platform status');
-  });
-
-  it('should toggle theme from preferences', () => {
-    const before = fixture.componentInstance.isDark();
-    fixture.componentInstance.toggleTheme();
-    expect(fixture.componentInstance.isDark()).toBe(!before);
   });
 });

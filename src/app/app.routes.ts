@@ -1,35 +1,19 @@
 import { Routes } from '@angular/router';
 
 import { getBlogPost } from './data/blog-posts';
-import { getLearnTopic } from './data/packages';
 import { authGuard } from './guards/auth.guard';
 import { settingsSectionRedirect } from './shared/settings-redirect';
 
+/**
+ * Core product: identity + public status + site management.
+ * Writing (/blog) stays addressable; it is not primary chrome.
+ */
 export const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('./pages/home/home').then((m) => m.Home),
     title: 'DEML',
     data: { preload: 'guest' },
-  },
-  {
-    path: 'learn',
-    loadComponent: () => import('./pages/learn/learn').then((m) => m.Learn),
-    title: 'Learn · DEML',
-    data: { preload: 'guest' },
-  },
-  {
-    path: 'learn/:slug',
-    loadComponent: () => import('./pages/learn-topic/learn-topic').then((m) => m.LearnTopicPage),
-    title: (route) => {
-      const topic = getLearnTopic(String(route.params['slug'] ?? ''));
-      return topic ? `${topic.title} · Learn · DEML` : 'Topic not found · DEML';
-    },
-  },
-  {
-    path: 'about',
-    redirectTo: 'learn',
-    pathMatch: 'full',
   },
   {
     path: 'blog',
@@ -81,28 +65,6 @@ export const routes: Routes = [
     data: { preload: 'guest' },
   },
   {
-    path: 'dashboard',
-    canActivate: [authGuard],
-    loadComponent: () => import('./pages/dashboard/dashboard').then((m) => m.Dashboard),
-    title: 'Dashboard · DEML',
-    data: { preload: 'auth' },
-  },
-  {
-    path: 'analytics',
-    canActivate: [authGuard],
-    loadComponent: () => import('./pages/analytics/analytics').then((m) => m.Analytics),
-    title: 'Analytics · DEML',
-    data: { preload: 'auth' },
-  },
-  {
-    path: 'vulnerabilities',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./pages/vulnerabilities/vulnerabilities').then((m) => m.Vulnerabilities),
-    title: 'Vulnerabilities · DEML',
-    data: { preload: 'auth' },
-  },
-  {
     path: 'settings',
     canActivate: [authGuard],
     loadComponent: () => import('./pages/settings/settings').then((m) => m.Settings),
@@ -121,26 +83,17 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/settings/settings').then((m) => m.Settings),
     title: 'Settings · DEML',
   },
-  {
-    path: 'pipeline',
-    redirectTo: 'dashboard',
-    pathMatch: 'full',
-  },
-  {
-    path: 'success',
-    loadComponent: () => import('./pages/success/success').then((m) => m.Success),
-    title: 'Success · DEML',
-  },
-  {
-    path: 'auth-status',
-    loadComponent: () => import('./pages/auth-status/auth-status').then((m) => m.AuthStatus),
-    title: 'Auth status · DEML',
-  },
-  {
-    path: 'home',
-    redirectTo: '',
-    pathMatch: 'full',
-  },
+  // --- Retired → core ---
+  { path: 'dashboard', redirectTo: 'settings', pathMatch: 'full' },
+  { path: 'learn', redirectTo: 'blog', pathMatch: 'full' },
+  { path: 'learn/:slug', redirectTo: 'blog' },
+  { path: 'about', redirectTo: 'explore', pathMatch: 'full' },
+  { path: 'analytics', redirectTo: 'settings', pathMatch: 'full' },
+  { path: 'vulnerabilities', redirectTo: 'settings', pathMatch: 'full' },
+  { path: 'pipeline', redirectTo: 'settings', pathMatch: 'full' },
+  { path: 'success', redirectTo: 'settings', pathMatch: 'full' },
+  { path: 'auth-status', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'home', redirectTo: '', pathMatch: 'full' },
   {
     path: '**',
     loadComponent: () => import('./pages/not-found/not-found').then((m) => m.NotFound),

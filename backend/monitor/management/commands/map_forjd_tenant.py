@@ -5,8 +5,8 @@ from uuid import UUID
 
 from django.core.management.base import BaseCommand, CommandError, CommandParser
 from django.db import IntegrityError, transaction
+from forjd.isolation import assert_product_tenant_isolation
 from forjd.tenancy import (
-  DEFAULT_SERVICE_TOKEN_SECRET_REF,
   ForjdTenantConfigurationError,
   validate_service_token_secret_ref,
 )
@@ -27,8 +27,11 @@ class Command(BaseCommand):
     parser.add_argument("forjd_tenant_id", type=UUID)
     parser.add_argument(
       "--service-token-secret-ref",
-      default=DEFAULT_SERVICE_TOKEN_SECRET_REF,
-      help="Environment secret reference such as env:FORJD_SERVICE_TOKEN_CUSTOMER_A.",
+      required=True,
+      help=(
+        "Product secret reference: sealed:<uuid> or env:FORJD_SERVICE_TOKEN_<CUSTOMER>. "
+        "Never env:FORJD_SERVICE_TOKEN (platform)."
+      ),
     )
 
   def handle(self, *args: object, **options: object) -> None:
@@ -38,6 +41,7 @@ class Command(BaseCommand):
       raise CommandError("Both tenant identifiers must be UUIDs")
     try:
       secret_ref = validate_service_token_secret_ref(str(options["service_token_secret_ref"]))
+      assert_product_tenant_isolation(forjd_tenant_id, secret_ref)
       with transaction.atomic():
         if not (
           UserProfile.objects.select_for_update().filter(account_id=deml_account_id).exists()

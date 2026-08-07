@@ -89,6 +89,6 @@ describe('Signup', () => {
     });
     expect(authMock.isAuthenticated()).toBe(true);
     expect(authMock.currentUserId()).toBe(1);
-    expect(navigateSpy).toHaveBeenCalledWith('/dashboard');
+    expect(navigateSpy).toHaveBeenCalledWith('/settings');
   });
 });

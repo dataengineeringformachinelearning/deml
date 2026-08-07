@@ -9,8 +9,8 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { firstValueFrom, lastValueFrom } from 'rxjs';
 
 import { Banner } from '../../components/banner/banner';
 import { Button } from '../../components/button/button';
@@ -19,32 +19,18 @@ import { CheckboxField } from '../../components/checkbox-field/checkbox-field';
 import { FormPanel } from '../../components/form-panel/form-panel';
 import { PageSection } from '../../components/page-section/page-section';
 import { TextField } from '../../components/text-field/text-field';
+import { OFFLINE_BODY } from '../../core/continuity-copy';
 import { apiErrorMessage } from '../../core/utils/api-error.utils';
-import {
-  SETTINGS_SECTION_LINKS,
-  resolveSettingsSection,
-  type SettingsSectionId,
-} from '../../data/settings';
+import { resolveSettingsSection, type SettingsSectionId } from '../../data/settings';
 import { AuthService } from '../../services/auth.service';
+import { ConnectivityService } from '../../services/connectivity.service';
+import { DialogService } from '../../services/dialog.service';
 import {
   MonitorService,
   filterOwnedStatusPages,
   isPlatformStatusPage,
   type StatusPageData,
 } from '../../services/monitor.service';
-import { ThemeService } from '../../services/theme';
-
-const NOTIFY_STORAGE_KEY = 'deml-notification-prefs';
-
-interface NotificationPrefs {
-  emailAlerts: boolean;
-  statusDigest: boolean;
-}
-
-const DEFAULT_NOTIFY_PREFS: NotificationPrefs = {
-  emailAlerts: true,
-  statusDigest: false,
-};
 
 @Component({
   selector: 'app-settings',
@@ -56,7 +42,6 @@ const DEFAULT_NOTIFY_PREFS: NotificationPrefs = {
     FormPanel,
     PageSection,
     TextField,
-    RouterLink,
   ],
   templateUrl: './settings.html',
   host: { class: 'page page--catalog' },
@@ -64,17 +49,13 @@ const DEFAULT_NOTIFY_PREFS: NotificationPrefs = {
 })
 export class Settings {
   private readonly auth = inject(AuthService);
+  private readonly dialog = inject(DialogService);
   private readonly monitor = inject(MonitorService);
-  private readonly themeService = inject(ThemeService);
+  private readonly connectivity = inject(ConnectivityService);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly isBrowser = isPlatformBrowser(this.platformId);
-
-  readonly sections = SETTINGS_SECTION_LINKS;
-  readonly isDark = this.themeService.isDark;
-  readonly role = this.auth.currentUserRole;
-  readonly mfaEnrolled = this.auth.mfaEnrolled;
 
   readonly displayName = signal('');
   readonly email = signal('');
@@ -84,9 +65,16 @@ export class Settings {
 
   readonly sites = signal<StatusPageData[]>([]);
   readonly sitesLoading = signal(true);
+  /** True when owned-list load failed with no cache — never show “No sites yet”. */
+  readonly sitesLoadFailed = signal(false);
+  readonly sitesRetrying = signal(false);
   readonly sitesError = signal('');
   readonly sitesMessage = signal('');
+  readonly sitesStale = this.monitor.ownedSitesServingStale;
+  readonly online = this.connectivity.online;
   readonly siteBusy = signal(false);
+  /** Monotonic load generation — drop stale async completions. */
+  private sitesLoadGeneration = 0;
   readonly editingSiteId = signal<string | null>(null);
   readonly siteTitle = signal('');
   readonly siteSlug = signal('');
@@ -95,13 +83,8 @@ export class Settings {
   readonly siteTitleError = signal('');
   readonly siteSlugError = signal('');
 
-  readonly emailAlerts = signal(DEFAULT_NOTIFY_PREFS.emailAlerts);
-  readonly statusDigest = signal(DEFAULT_NOTIFY_PREFS.statusDigest);
-  readonly prefsMessage = signal('');
-
   constructor() {
     this.hydrateProfile();
-    this.hydrateNotificationPrefs();
     this.loadSites();
 
     this.route.fragment.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((fragment) => {
@@ -131,15 +114,14 @@ export class Settings {
     });
   }
 
-  toggleTheme(): void {
-    this.themeService.toggle();
-    this.prefsMessage.set('Theme preference saved.');
-  }
-
   async saveProfile(event: Event): Promise<void> {
     event.preventDefault();
     this.profileError.set('');
     this.profileMessage.set('');
+    if (!this.online()) {
+      this.profileError.set(OFFLINE_BODY);
+      return;
+    }
     this.profileBusy.set(true);
     try {
       const result = await this.auth.updateDisplayName(this.displayName());
@@ -185,10 +167,18 @@ export class Settings {
 
   async saveSite(event: Event): Promise<void> {
     event.preventDefault();
+    if (this.siteBusy()) {
+      return;
+    }
     this.sitesError.set('');
     this.sitesMessage.set('');
     this.siteTitleError.set('');
     this.siteSlugError.set('');
+
+    if (!this.online()) {
+      this.sitesError.set(OFFLINE_BODY);
+      return;
+    }
 
     const title = this.siteTitle().trim();
     const slug = this.siteSlug().trim().toLowerCase().replace(/\s+/g, '-');
@@ -247,14 +237,28 @@ export class Settings {
       this.sitesError.set('Platform status is managed by DEML and cannot be deleted here.');
       return;
     }
-    const confirmed = globalThis.confirm(`Delete site “${site.title}”? This cannot be undone.`);
+    const confirmed = await this.dialog.confirm({
+      title: `Delete “${site.title}”?`,
+      body: 'This cannot be undone.',
+      confirmLabel: 'Delete',
+      cancelLabel: 'Keep site',
+      tone: 'danger',
+    });
     if (!confirmed) {
+      return;
+    }
+
+    if (!this.online()) {
+      this.sitesError.set(OFFLINE_BODY);
       return;
     }
 
     this.siteBusy.set(true);
     this.sitesError.set('');
     this.sitesMessage.set('');
+    const prior = this.sites();
+    // Optimistic remove — restore on failure so UI never lies about delete success.
+    this.sites.set(prior.filter(item => item.id !== site.id));
     try {
       await firstValueFrom(this.monitor.deleteStatusPage(site.id));
       if (this.editingSiteId() === site.id) {
@@ -263,19 +267,11 @@ export class Settings {
       this.sitesMessage.set('Site deleted.');
       await this.loadSites();
     } catch (err: unknown) {
+      this.sites.set(prior);
       this.sitesError.set(apiErrorMessage(err, 'Unable to delete site. Try again.'));
     } finally {
       this.siteBusy.set(false);
     }
-  }
-
-  savePreferences(event: Event): void {
-    event.preventDefault();
-    this.persistNotificationPrefs({
-      emailAlerts: this.emailAlerts(),
-      statusDigest: this.statusDigest(),
-    });
-    this.prefsMessage.set('Preferences saved.');
   }
 
   private hydrateProfile(): void {
@@ -284,56 +280,52 @@ export class Settings {
     this.email.set(profile.email);
   }
 
-  private hydrateNotificationPrefs(): void {
-    if (!this.isBrowser) {
-      return;
-    }
-    try {
-      const raw = localStorage.getItem(NOTIFY_STORAGE_KEY);
-      if (!raw) {
-        return;
-      }
-      const parsed = JSON.parse(raw) as Partial<NotificationPrefs>;
-      if (typeof parsed.emailAlerts === 'boolean') {
-        this.emailAlerts.set(parsed.emailAlerts);
-      }
-      if (typeof parsed.statusDigest === 'boolean') {
-        this.statusDigest.set(parsed.statusDigest);
-      }
-    } catch {
-      /* ignore corrupt prefs */
-    }
-  }
-
-  private persistNotificationPrefs(prefs: NotificationPrefs): void {
-    if (!this.isBrowser) {
-      return;
-    }
-    try {
-      localStorage.setItem(NOTIFY_STORAGE_KEY, JSON.stringify(prefs));
-    } catch {
-      /* ignore storage failures */
-    }
+  retryLoadSites(): void {
+    this.sitesRetrying.set(true);
+    void this.loadSites();
   }
 
   private async loadSites(): Promise<void> {
+    const generation = ++this.sitesLoadGeneration;
     this.sitesLoading.set(true);
+    this.sitesLoadFailed.set(false);
     const peek = filterOwnedStatusPages(this.monitor.peekOwnedStatusPages());
     if (peek.length) {
+      // Peek is provisional — mark stale until revalidate settles.
       this.sites.set(peek);
+      this.monitor.ownedSitesServingStale.set(true);
       this.sitesLoading.set(false);
     }
 
     try {
-      const pages = await firstValueFrom(this.monitor.getOwnedStatusPages());
+      // lastValueFrom waits for SWR revalidate; never treat warm cache as final.
+      const pages = await lastValueFrom(this.monitor.getOwnedStatusPages());
+      if (generation !== this.sitesLoadGeneration) return;
+      if (!Array.isArray(pages)) {
+        throw new Error('invalid_owned_sites_payload');
+      }
       this.sites.set(filterOwnedStatusPages(pages));
       this.sitesError.set('');
+      this.sitesLoadFailed.set(false);
+      // Stale flag is cleared only by MonitorService network tap on success.
     } catch (err: unknown) {
-      if (!peek.length) {
+      if (generation !== this.sitesLoadGeneration) return;
+      const warm = filterOwnedStatusPages(this.monitor.peekOwnedStatusPages());
+      if (warm.length) {
+        this.sites.set(warm);
+        this.monitor.ownedSitesServingStale.set(true);
+        this.sitesError.set('');
+        this.sitesLoadFailed.set(false);
+      } else {
+        this.sites.set([]);
+        this.sitesLoadFailed.set(true);
         this.sitesError.set(apiErrorMessage(err, 'Unable to load sites. Try again.'));
       }
     } finally {
-      this.sitesLoading.set(false);
+      if (generation === this.sitesLoadGeneration) {
+        this.sitesLoading.set(false);
+        this.sitesRetrying.set(false);
+      }
     }
   }
 
@@ -341,7 +333,6 @@ export class Settings {
     if (!this.isBrowser) {
       return;
     }
-    // Defer until the section nodes are in the document (fragment / query navigation).
     globalThis.setTimeout(() => {
       document.getElementById(section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 0);

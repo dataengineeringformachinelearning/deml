@@ -105,7 +105,7 @@ describe('Login', () => {
     });
     expect(authMock.isAuthenticated()).toBe(true);
     expect(authMock.currentUserId()).toBe(1);
-    expect(navigateSpy).toHaveBeenCalledWith('/dashboard');
+    expect(navigateSpy).toHaveBeenCalledWith('/settings');
   });
 
   it('should honor a safe in-app returnUrl', async () => {
@@ -133,7 +133,7 @@ describe('Login', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(navigateSpy).toHaveBeenCalledWith('/dashboard');
+    expect(navigateSpy).toHaveBeenCalledWith('/settings');
   });
 
   it('should open the MFA panel when Firebase requires a second factor', async () => {

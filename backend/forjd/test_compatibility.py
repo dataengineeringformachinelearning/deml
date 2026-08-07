@@ -1,3 +1,4 @@
+from forjd.testing import create_product_forjd_mapping
 import json
 from unittest.mock import AsyncMock, MagicMock, patch
 from urllib.parse import parse_qs
@@ -20,7 +21,7 @@ def _mapped_user(username: str = "learner") -> UUID:
   user.profile.subscription_active = True
   user.profile.save(update_fields=["role", "tier", "subscription_active"])
   tenant_id = uuid4()
-  ForjdTenantMapping.objects.create(
+  create_product_forjd_mapping(
     deml_account_id=user.profile.account_id,
     forjd_tenant_id=tenant_id,
   )
@@ -89,7 +90,7 @@ def test_authenticated_adapter_uses_native_path_and_mapped_tenant(
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
-    FORJD_TENANT_ID=str(tenant_id),
+    FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099",
   ):
     response = client.get(
       "/api/v1/projections?workflow_id=deml_telemetry&limit=25",
@@ -124,7 +125,7 @@ def test_threat_report_reads_only_classical_anomaly_scores(
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
-    FORJD_TENANT_ID=str(tenant_id),
+    FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099",
   ):
     response = client.get(
       "/api/v1/ml/threat-intel/report",
@@ -163,7 +164,7 @@ def test_threat_training_reads_only_threat_ensemble_scores(
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
-    FORJD_TENANT_ID=str(tenant_id),
+    FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099",
   ):
     response = client.post(
       "/api/v1/ml/threat-intel/train",
@@ -192,7 +193,7 @@ def test_adapter_rejects_cross_tenant_query(
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
-    FORJD_TENANT_ID=str(tenant_id),
+    FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099",
   ):
     response = client.get(
       f"/api/v1/projections?tenant_id={uuid4()}",
@@ -218,7 +219,7 @@ def test_stable_ingest_path_forwards_only_valid_sealed_telemetry(
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
-    FORJD_TENANT_ID=str(tenant_id),
+    FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099",
   ):
     response = client.post(
       "/api/v1/ingest",
@@ -252,7 +253,7 @@ def test_projections_run_rewrites_product_local_workflow_id(
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
-    FORJD_TENANT_ID=str(tenant_id),
+    FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099",
   ):
     response = client.post(
       "/api/v1/projections/run",
@@ -285,7 +286,7 @@ def test_stable_ingest_path_rejects_unshipped_learning_contract(
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
-    FORJD_TENANT_ID=str(tenant_id),
+    FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099",
   ):
     response = client.post(
       path,
@@ -341,7 +342,11 @@ def test_anonymous_status_services_require_published_page(
   mock_proxy: AsyncMock,
   client: Client,
 ) -> None:
-  """Anonymous service reads must not leak unpublished page detail."""
+  """Anonymous service reads must not leak unpublished page detail.
+
+  Public clients use the embedded slug payload — BFF never calls FORJD with the
+  platform tenant_id + a foreign page_id after the published check.
+  """
   pages_body = json.dumps(
     {
       "ok": True,
@@ -361,19 +366,11 @@ def test_anonymous_status_services_require_published_page(
       ],
     }
   ).encode()
-  services_body = json.dumps(
-    {
-      "ok": True,
-      "services": [{"id": "svc-1", "name": "API", "status": "operational"}],
-    }
-  ).encode()
 
   async def _proxy(method: str, path: str, **_kwargs: object) -> ForjdResponse:
     if path == "/api/v1/status/pages/published":
       return ForjdResponse(status=200, body=pages_body, content_type="application/json")
-    if path == "/api/v1/status/pages":
-      return ForjdResponse(status=200, body=pages_body, content_type="application/json")
-    return ForjdResponse(status=200, body=services_body, content_type="application/json")
+    raise AssertionError(f"unexpected FORJD path for anonymous services: {path}")
 
   mock_proxy.side_effect = _proxy
 
@@ -382,8 +379,8 @@ def test_anonymous_status_services_require_published_page(
 
   assert denied.status_code == 404
   assert allowed.status_code == 200
-  assert allowed.json()[0]["name"] == "API"
-  assert mock_proxy.await_count == 3  # published check (denied) + published check + services
+  assert allowed.json() == []
+  assert mock_proxy.await_count == 2  # published check only (denied + allowed)
 
 
 @pytest.mark.django_db
@@ -495,7 +492,7 @@ def test_authenticated_status_pages_list_excludes_platform_and_skips_directory(
     content_type="application/json",
   )
 
-  with override_settings(FORJD_TENANT_ID=str(tenant_id)):
+  with override_settings(FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099"):
     response = client.get(
       "/api/v1/system-status/status_pages",
       HTTP_AUTHORIZATION="Bearer mock-token-sitesowner-sitesowner@example.com",
@@ -835,7 +832,7 @@ def test_status_incident_create_normalizes_legacy_title_case_status(
   user.profile.subscription_active = True
   user.profile.save(update_fields=["role", "tier", "subscription_active"])
   tenant_id = uuid4()
-  ForjdTenantMapping.objects.create(
+  create_product_forjd_mapping(
     deml_account_id=user.profile.account_id,
     forjd_tenant_id=tenant_id,
   )
@@ -858,7 +855,7 @@ def test_status_incident_create_normalizes_legacy_title_case_status(
 
   with override_settings(
     FORJD_SERVICE_TOKEN="fjsvc_deadbeef_test-secret",
-    FORJD_TENANT_ID=str(tenant_id),
+    FORJD_TENANT_ID="00000000-0000-0000-0000-000000000099",
   ):
     response = client.post(
       "/api/v1/system-status/status_pages/page-1/incidents",

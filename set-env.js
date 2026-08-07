@@ -43,8 +43,6 @@ const projectId = process.env.FIREBASE_PROJECT_ID ?? 'demldotcom';
 const appId = process.env.FIREBASE_APP_ID ?? '1:870072971206:web:5231fde2822d750abfccc7';
 const authDomain = process.env.FIREBASE_AUTH_DOMAIN ?? 'demldotcom.firebaseapp.com';
 const messagingSenderId = process.env.FIREBASE_MESSAGING_SENDER_ID ?? '870072971206';
-const sanityProjectId = process.env.SANITY_PROJECT_ID ?? 'hj5wtuct';
-const sanityDataset = process.env.SANITY_DATASET ?? 'production';
 // Client DSN / post_client_item tokens are public by design; env overrides win.
 const DEFAULT_SENTRY_DSN =
   'https://5b1b2fcdf985d485d90abd260c529953@o4511437520044032.ingest.us.sentry.io/4511793586962432'; // pragma: allowlist secret
@@ -208,10 +206,6 @@ export const environment = {
   /** Informational — data plane is reached via Django BFF, not from the browser. */
   forjdApiUrl: '${forjdApiUrl}',
   firebase: getFirebaseConfig(),
-  sanity: {
-    projectId: '${sanityProjectId}',
-    dataset: '${sanityDataset}'
-  },
   sentryDsn: '${sentryDsn}',
   rollbarAccessToken: '${rollbarAccessToken}'
 };

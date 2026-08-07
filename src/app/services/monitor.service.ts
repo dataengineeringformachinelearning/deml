@@ -1,19 +1,13 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient, HttpContext } from '@angular/common/http';
-import { Observable, map, tap } from 'rxjs';
+import { HttpClient, HttpContext, HttpHeaders } from '@angular/common/http';
+import { Observable, map, tap, timeout } from 'rxjs';
 import { API_ENDPOINTS } from '../core/constants/api.constants';
 import { SwrCacheService } from '../core/cache/swr-cache.service';
 import { SKIP_AUTH } from '../core/interceptors/credentials.interceptor';
 
-export interface EndpointData {
-  id: string;
-  url: string;
-  last_tested: string;
-  status_code: number;
-  response_time: string;
-  ip_address: string;
-  is_active: boolean;
-}
+/** Align with BFF/FORJD read budget (client retries included). */
+const STATUS_READ_TIMEOUT_MS = 25_000;
+const STATUS_WRITE_TIMEOUT_MS = 20_000;
 
 export interface StatusPageData {
   id: string;
@@ -21,30 +15,11 @@ export interface StatusPageData {
   slug: string;
   description: string;
   is_published?: boolean;
-  google_analytics_id?: string;
-  microsoft_clarity_id?: string;
-  cloudflare_analytics_id?: string;
   created_at: string;
   user_id: number | null;
-  is_pro_verified?: boolean;
-  cumulative_sla?: number;
   overall_uptime?: number;
   uptime_history?: { date: string; status: string; uptime: number | null }[];
-  p99_latency?: number | null;
-  total_requests?: number | null;
-  threats_detected_24h?: number | null;
-  /** Public intelligence (ciphertext-free) for explore/status ML gauges. */
-  spiking_temporal_forecast?: number | null;
-  temporal_status?: string | null;
-  temporal_backend?: string | null;
-  temporal_sample_count?: number | null;
-  temporal_scored_at?: string | null;
-  /** Explicit SLA forecast (never current cumulative_sla / overall_uptime). */
-  predicted_sla?: number | null;
-  threat_anomaly_score?: number | null;
-  threat_suspicious_ratio?: number | null;
-  uses_norse?: boolean | null;
-  /** Embedded on the public slug payload so anonymous visitors see services. */
+  /** Embedded on the public slug / directory payload (SoT for product UI). */
   services?: MonitoredServiceData[];
   incidents?: IncidentData[];
 }
@@ -91,6 +66,10 @@ export const publicStatusPageTag = (slug: string): string => {
   return isPlatformStatusPage(slug) ? 'Platform Status' : 'Public Status Page';
 };
 
+/**
+ * Status data plane client — directory, slug embed, owned CRUD only.
+ * No enrichment, endpoints, or third-party integrations.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -98,66 +77,12 @@ export class MonitorService {
   private http = inject(HttpClient);
   private swr = inject(SwrCacheService);
 
-  public incidentsMap = signal<Record<string, IncidentData[]>>({});
-  public servicesMap = signal<Record<string, MonitoredServiceData[]>>({});
-
-  /** Seed maps from a public slug payload (embedded arrays, no auth needed). */
-  seedFromEmbeddedPage(page: StatusPageData) {
-    if (Array.isArray(page.services)) {
-      const services = page.services;
-      this.servicesMap.update(map => ({ ...map, [page.id]: services }));
-    }
-    if (Array.isArray(page.incidents)) {
-      const incidents = page.incidents;
-      this.incidentsMap.update(map => ({ ...map, [page.id]: incidents }));
-    }
-  }
-
-  fetchAllIncidents(pages: StatusPageData[]) {
-    if (!Array.isArray(pages)) return;
-    pages.forEach(page => {
-      this.getIncidents(page.id).subscribe({
-        next: incidents => {
-          this.incidentsMap.update(map => ({ ...map, [page.id]: incidents }));
-        },
-        error: err => console.error('Error fetching incidents for status page:', page.id, err),
-      });
-    });
-  }
-
-  fetchAllServices(pages: StatusPageData[]) {
-    if (!Array.isArray(pages)) return;
-    pages.forEach(page => {
-      this.getServices(page.id).subscribe({
-        next: services => {
-          // Preserve embedded public telemetry when the authed list omits KPIs.
-          const prior = this.servicesMap()[page.id] || [];
-          const priorById = new Map(prior.map(service => [service.id, service]));
-          const merged = services.map(service => {
-            const embedded = priorById.get(service.id);
-            if (!embedded) return service;
-            return {
-              ...service,
-              sla: service.sla ?? embedded.sla ?? null,
-              uptime_history: service.uptime_history?.length
-                ? service.uptime_history
-                : embedded.uptime_history,
-              p99_latency:
-                service.p99_latency !== null && service.p99_latency !== undefined
-                  ? service.p99_latency
-                  : (embedded.p99_latency ?? null),
-            };
-          });
-          this.servicesMap.update(map => ({ ...map, [page.id]: merged }));
-        },
-        error: err => console.error('Error fetching services for status page:', page.id, err),
-      });
-    });
-  }
-
-  getAllEndpoints() {
-    return this.http.get<EndpointData[]>(API_ENDPOINTS.SYSTEM_STATUS.ENDPOINTS);
-  }
+  /** True when public directory is painted from SWR cache after a failed refresh. */
+  readonly directoryServingStale = signal(false);
+  /** True when owned sites list is painted from SWR cache after a failed refresh. */
+  readonly ownedSitesServingStale = signal(false);
+  /** True when a public slug page is painted from SWR cache after a failed refresh. */
+  readonly slugServingStale = signal(false);
 
   /** Public explore directory (cross-tenant published + platform). Never send auth. */
   getStatusPages(): Observable<StatusPageData[]> {
@@ -165,13 +90,21 @@ export class MonitorService {
     return this.swr.observe(
       key,
       () =>
-        this.http.get<StatusPageData[]>(API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES, {
-          withCredentials: true,
-          context: new HttpContext().set(SKIP_AUTH, true),
-        }),
-      // Status telemetry is time-sensitive: paint a warm value immediately,
-      // then always revalidate it instead of treating it as fresh for 30s.
-      { freshMs: 0, staleMs: 5 * 60_000, scope: 'public-status' },
+        this.http
+          .get<StatusPageData[]>(API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES, {
+            withCredentials: true,
+            context: new HttpContext().set(SKIP_AUTH, true),
+          })
+          .pipe(
+            timeout({ first: STATUS_READ_TIMEOUT_MS }),
+            tap(() => this.directoryServingStale.set(false)),
+          ),
+      {
+        freshMs: 0,
+        staleMs: 5 * 60_000,
+        scope: 'public-status',
+        onRevalidateError: () => this.directoryServingStale.set(true),
+      },
     );
   }
 
@@ -185,8 +118,17 @@ export class MonitorService {
           .get<StatusPageData[]>(API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES, {
             withCredentials: true,
           })
-          .pipe(map(pages => filterOwnedStatusPages(pages))),
-      { freshMs: 0, staleMs: 5 * 60_000, scope: 'auth' },
+          .pipe(
+            timeout({ first: STATUS_READ_TIMEOUT_MS }),
+            map(pages => filterOwnedStatusPages(pages)),
+            tap(() => this.ownedSitesServingStale.set(false)),
+          ),
+      {
+        freshMs: 0,
+        staleMs: 5 * 60_000,
+        scope: 'auth',
+        onRevalidateError: () => this.ownedSitesServingStale.set(true),
+      },
     );
   }
 
@@ -200,20 +142,34 @@ export class MonitorService {
     return this.swr.get<StatusPageData[]>(this.swr.key('status:pages:owned', {}));
   }
 
+  /** Synchronous SWR peek for a public slug page (provisional until revalidate). */
+  peekStatusPageBySlug(slug: string): StatusPageData | undefined {
+    return this.swr.get<StatusPageData>(this.swr.key('status:slug', { slug }));
+  }
+
   getStatusPageBySlug(slug: string) {
-    // BFF resolves domain-style / stem aliases (joealongi.dev → joealongi-dev).
     const key = this.swr.key('status:slug', { slug });
     return this.swr.observe(
       key,
       () =>
-        this.http.get<StatusPageData>(
-          `${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES}/slug/${encodeURIComponent(slug)}`,
-          {
-            withCredentials: true,
-            context: new HttpContext().set(SKIP_AUTH, true),
-          },
-        ),
-      { freshMs: 0, staleMs: 10 * 60_000, scope: 'public-status' },
+        this.http
+          .get<StatusPageData>(
+            `${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES}/slug/${encodeURIComponent(slug)}`,
+            {
+              withCredentials: true,
+              context: new HttpContext().set(SKIP_AUTH, true),
+            },
+          )
+          .pipe(
+            timeout({ first: STATUS_READ_TIMEOUT_MS }),
+            tap(() => this.slugServingStale.set(false)),
+          ),
+      {
+        freshMs: 0,
+        staleMs: 10 * 60_000,
+        scope: 'public-status',
+        onRevalidateError: () => this.slugServingStale.set(true),
+      },
     );
   }
 
@@ -227,15 +183,20 @@ export class MonitorService {
     slug: string;
     description?: string;
     is_published?: boolean;
-    google_analytics_id?: string;
-    microsoft_clarity_id?: string;
-    cloudflare_analytics_id?: string;
   }) {
+    const idempotencyKey =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `create-${Date.now()}`;
     return this.http
       .post<StatusPageData>(API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES, data, {
         withCredentials: true,
+        headers: new HttpHeaders({ 'Idempotency-Key': idempotencyKey }),
       })
-      .pipe(tap(() => this.invalidateStatusReads()));
+      .pipe(
+        timeout({ first: STATUS_WRITE_TIMEOUT_MS }),
+        tap(() => this.invalidateStatusReads()),
+      );
   }
 
   updateStatusPage(
@@ -245,16 +206,16 @@ export class MonitorService {
       slug: string;
       description?: string;
       is_published?: boolean;
-      google_analytics_id?: string;
-      microsoft_clarity_id?: string;
-      cloudflare_analytics_id?: string;
     },
   ) {
     return this.http
       .put<StatusPageData>(`${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES}/${pageId}`, data, {
         withCredentials: true,
       })
-      .pipe(tap(() => this.invalidateStatusReads()));
+      .pipe(
+        timeout({ first: STATUS_WRITE_TIMEOUT_MS }),
+        tap(() => this.invalidateStatusReads()),
+      );
   }
 
   deleteStatusPage(pageId: string) {
@@ -262,93 +223,9 @@ export class MonitorService {
       .delete(`${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES}/${pageId}`, {
         withCredentials: true,
       })
-      .pipe(tap(() => this.invalidateStatusReads()));
+      .pipe(
+        timeout({ first: STATUS_WRITE_TIMEOUT_MS }),
+        tap(() => this.invalidateStatusReads()),
+      );
   }
-
-  getServices(pageId: string) {
-    return this.http.get<MonitoredServiceData[]>(
-      `${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES}/${pageId}/services`,
-      { withCredentials: true },
-    );
-  }
-
-  addService(pageId: string, data: { name: string; url: string }) {
-    return this.http.post<MonitoredServiceData>(
-      `${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES}/${pageId}/services`,
-      data,
-      { withCredentials: true },
-    );
-  }
-
-  deleteService(serviceId: string) {
-    return this.http.delete(`${API_ENDPOINTS.SYSTEM_STATUS.SERVICES}/${serviceId}`, {
-      withCredentials: true,
-    });
-  }
-
-  getIncidents(pageId: string) {
-    return this.http.get<IncidentData[]>(
-      `${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES}/${pageId}/incidents`,
-      { withCredentials: true },
-    );
-  }
-
-  createIncident(pageId: string, data: { title: string; message: string; status: string }) {
-    return this.http.post<IncidentData>(
-      `${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES}/${pageId}/incidents`,
-      data,
-      { withCredentials: true },
-    );
-  }
-
-  deleteIncident(incidentId: string) {
-    return this.http.delete(`${API_ENDPOINTS.SYSTEM_STATUS.INCIDENTS}/${incidentId}`, {
-      withCredentials: true,
-    });
-  }
-
-  getIntegrations() {
-    return this.http.get<IntegrationData[]>(
-      `${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES.replace('status_pages', 'integrations')}`,
-      { withCredentials: true },
-    );
-  }
-
-  getGoogleAuthUrl() {
-    return this.http.get<{ url: string; redirect_uri?: string }>(
-      `${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES.replace('status_pages', 'integrations/google/auth-url')}`,
-      { withCredentials: true },
-    );
-  }
-
-  saveClarityIntegration(data: { project_id: string; api_key: string }) {
-    return this.http.post<IntegrationData>(
-      `${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES.replace('status_pages', 'integrations/clarity')}`,
-      data,
-      { withCredentials: true },
-    );
-  }
-
-  saveCloudflareIntegration(data: { project_id: string; api_key: string }) {
-    return this.http.post<IntegrationData>(
-      `${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES.replace('status_pages', 'integrations/cloudflare')}`,
-      data,
-      { withCredentials: true },
-    );
-  }
-
-  deleteIntegration(integrationId: string) {
-    return this.http.delete(
-      `${API_ENDPOINTS.SYSTEM_STATUS.STATUS_PAGES.replace('status_pages', 'integrations')}/${integrationId}`,
-      { withCredentials: true },
-    );
-  }
-}
-
-export interface IntegrationData {
-  id: string;
-  provider: string;
-  active: boolean;
-  last_sync: string | null;
-  created_at: string;
 }

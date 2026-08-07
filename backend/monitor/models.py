@@ -206,7 +206,11 @@ class ForjdTenantMapping(models.Model):
     ]
 
   def clean(self) -> None:
-    """Reject plaintext tokens — only env: or sealed: refs."""
+    """Reject plaintext tokens — only env: or sealed: refs.
+
+    Platform/product isolation is enforced at resolve/provision/map time
+    (``forjd.isolation.assert_product_tenant_isolation``), not only at save.
+    """
     from django.core.exceptions import ValidationError
     from forjd.tenancy import ForjdTenantConfigurationError, validate_service_token_secret_ref
 

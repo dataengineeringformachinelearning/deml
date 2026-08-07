@@ -23,7 +23,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         !req.url.includes('/api/v1/auth/')
       ) {
         handling401 = true;
-        const returnUrl = router.url && router.url !== '/login' ? router.url : '/dashboard';
+        const returnUrl = router.url && router.url !== '/login' ? router.url : '/settings';
         void auth
           .logout()
           .catch(() => undefined)
@@ -36,9 +36,22 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       if (error.status === 0 || error.error instanceof ErrorEvent) {
-        console.error('[Global Error Interceptor] Network error', error.message);
+        console.error(
+          JSON.stringify({
+            event: 'http_network_error',
+            url: req.url,
+            detail: error.message,
+          }),
+        );
       } else if (error.status >= 500) {
-        console.error('[Global Error Interceptor] Server error', error.status, error.message);
+        console.error(
+          JSON.stringify({
+            event: 'http_server_error',
+            status: error.status,
+            url: req.url,
+            detail: error.message,
+          }),
+        );
       }
 
       return throwError(() => error);

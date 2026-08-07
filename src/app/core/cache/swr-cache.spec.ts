@@ -51,10 +51,12 @@ describe('MemorySwrCache', () => {
     vi.setSystemTime(new Date('2026-07-26T15:00:45Z'));
     const values: unknown[] = [];
     let errored = false;
+    const onRevalidateError = vi.fn();
     cache
       .observe('k', () => throwError(() => new Error('network')), {
         freshMs: 10_000,
         staleMs: 120_000,
+        onRevalidateError,
       })
       .subscribe({
         next: v => values.push(v),
@@ -64,6 +66,7 @@ describe('MemorySwrCache', () => {
       });
     expect(values).toEqual([{ n: 1 }]);
     expect(errored).toBe(false);
+    expect(onRevalidateError).toHaveBeenCalledTimes(1);
   });
 
   it('dedupes in-flight fetches', () => {
