@@ -3095,7 +3095,7 @@ deml-panel-grid > *,
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-1);
 }
 
 /* inlined: components/box/box.css */
@@ -5634,28 +5634,126 @@ progress::-moz-progress-bar {
 
 /* Feedback */
 /* inlined: components/badge/badge.css */
-/* Component: badge — NFTS cream mark */
+/* Component: badge — quiet NFTS mark chips (page + cream module aware) */
 
 .component--badge .demo {
-  display: grid;
-  gap: var(--space-md);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .badge {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
   gap: var(--space-1);
-  min-height: var(--space-3);
-  padding: 0 var(--space-1);
-  border: var(--border-width) solid var(--color-card-border);
+  min-height: var(--space-4);
+  padding: var(--space-half) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-pill);
   font-family: var(--font-mark);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-mark);
   font-weight: var(--font-weight-mark);
   letter-spacing: var(--tracking-mark);
+  line-height: var(--leading-ui);
   text-transform: uppercase;
-  color: var(--color-card-text);
-  background-color: var(--color-card);
+  white-space: nowrap;
+  color: var(--color-text-secondary);
+  background-color: color-mix(in srgb, var(--color-text) 8%, transparent);
+}
+
+/* Cream modules / teaser cards — ink wash so chips stay quiet on card ground */
+.module .badge,
+.card .badge,
+.article.module .badge {
+  color: var(--color-card-text-secondary);
+  border-color: var(--color-card-border);
+  background-color: color-mix(in srgb, var(--color-card-text) 8%, transparent);
+}
+
+.badge[data-tone='neutral'] {
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
+  background-color: color-mix(in srgb, var(--color-text) 8%, transparent);
+}
+
+.module .badge[data-tone='neutral'],
+.card .badge[data-tone='neutral'],
+.article.module .badge[data-tone='neutral'] {
+  color: var(--color-card-text-secondary);
+  border-color: var(--color-card-border);
+  background-color: color-mix(in srgb, var(--color-card-text) 8%, transparent);
+}
+
+.badge[data-tone='info'],
+.badge[data-tone='primary'] {
+  color: var(--color-primary-hover);
+  border-color: color-mix(in srgb, var(--color-primary) 42%, transparent);
+  background-color: color-mix(in srgb, var(--color-primary) 16%, transparent);
+}
+
+.badge[data-tone='success'] {
+  color: var(--color-success-ink);
+  border-color: color-mix(in srgb, var(--color-success) 42%, transparent);
+  background-color: color-mix(in srgb, var(--color-success) 16%, transparent);
+}
+
+.badge[data-tone='warning'],
+.badge[data-tone='warn'] {
+  color: var(--color-warning-ink);
+  border-color: color-mix(in srgb, var(--color-text-secondary) 42%, transparent);
+  background-color: color-mix(in srgb, var(--color-text-secondary) 14%, transparent);
+}
+
+.badge[data-tone='danger'],
+.badge[data-tone='error'] {
+  color: var(--color-error-ink);
+  border-color: color-mix(in srgb, var(--color-error) 42%, transparent);
+  background-color: color-mix(in srgb, var(--color-error) 16%, transparent);
+}
+
+/* Soft tones keep ink readable on cream modules */
+.module .badge[data-tone='info'],
+.module .badge[data-tone='primary'],
+.card .badge[data-tone='info'],
+.card .badge[data-tone='primary'],
+.article.module .badge[data-tone='info'],
+.article.module .badge[data-tone='primary'] {
+  color: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 34%, var(--color-card-border));
+  background-color: color-mix(in srgb, var(--color-primary) 12%, var(--color-card));
+}
+
+.module .badge[data-tone='success'],
+.card .badge[data-tone='success'],
+.article.module .badge[data-tone='success'] {
+  color: var(--color-success);
+  border-color: color-mix(in srgb, var(--color-success) 34%, var(--color-card-border));
+  background-color: color-mix(in srgb, var(--color-success) 12%, var(--color-card));
+}
+
+.module .badge[data-tone='warning'],
+.module .badge[data-tone='warn'],
+.card .badge[data-tone='warning'],
+.card .badge[data-tone='warn'],
+.article.module .badge[data-tone='warning'],
+.article.module .badge[data-tone='warn'] {
+  color: var(--color-card-text-secondary);
+  border-color: color-mix(in srgb, var(--color-card-text) 22%, var(--color-card-border));
+  background-color: color-mix(in srgb, var(--color-card-text) 8%, var(--color-card));
+}
+
+.module .badge[data-tone='danger'],
+.module .badge[data-tone='error'],
+.card .badge[data-tone='danger'],
+.card .badge[data-tone='error'],
+.article.module .badge[data-tone='danger'],
+.article.module .badge[data-tone='error'] {
+  color: var(--color-error);
+  border-color: color-mix(in srgb, var(--color-error) 34%, var(--color-card-border));
+  background-color: color-mix(in srgb, var(--color-error) 12%, var(--color-card));
 }
 
 /* inlined: components/status-badge/status-badge.css */
