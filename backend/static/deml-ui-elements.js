@@ -67,6 +67,8 @@ var DemlUi=(function(e){Object.defineProperty(e,Symbol.toStringTag,{value:"Modul
         <pre><code>npm run build</code></pre>
       </div>
     </article>`))}};function Le(){customElements.get(s.tagName)||customElements.define(s.tagName,s)}var i=class extends HTMLElement{static{this.tagName="deml-badge"}static{this.componentName="badge"}connectedCallback(){this.dataset.demlHydrated!=="true"&&(this.dataset.demlHydrated="true",this.hasChildNodes()||(this.innerHTML=`<span class="badge">Badge</span>
+    <span class="badge" data-tone="neutral">Neutral</span>
+    <span class="badge" data-tone="info">Info</span>
     <span class="badge" data-tone="success">Success</span>
     <span class="badge" data-tone="warning">Warning</span>
     <span class="badge" data-tone="danger">Danger</span>`))}};function ke(){customElements.get(i.tagName)||customElements.define(i.tagName,i)}var n=class extends HTMLElement{static{this.tagName="deml-banner"}static{this.componentName="banner"}connectedCallback(){this.dataset.demlHydrated!=="true"&&(this.dataset.demlHydrated="true",this.hasChildNodes()||(this.innerHTML=`<div class="banner banner--hero" data-variant="hero">
