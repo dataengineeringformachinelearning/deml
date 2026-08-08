@@ -344,6 +344,8 @@ html {
 }
 
 body {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   min-height: 100dvh;
   min-height: 100svh;
@@ -358,6 +360,25 @@ body {
   line-height: var(--leading-body);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: contain;
+}
+
+/* Angular host fills the viewport so main/footer can pin */
+app-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 100%;
+  min-width: 0;
+}
+
+/* Grow between fixed navbar chrome and site footer */
+main,
+.main {
+  display: block;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
 }
 
 .visually-hidden {
@@ -1911,13 +1932,16 @@ deml-site-footer,
   display: block;
   width: 100%;
   margin: 0;
+  margin-top: auto;
   padding: 0;
+  flex-shrink: 0;
 }
 
 .site-footer {
   box-sizing: border-box;
   width: 100%;
   margin: 0;
+  margin-top: auto;
   padding-top: var(--space-8);
   padding-left: max(var(--space-3), var(--safe-left));
   padding-right: max(var(--space-3), var(--safe-right));
@@ -1925,6 +1949,7 @@ deml-site-footer,
   color: var(--color-text-secondary);
   background-color: var(--color-surface);
   border-top: var(--border-width) solid var(--color-border);
+  flex-shrink: 0;
 }
 
 .site-footer__inner {
@@ -6670,6 +6695,36 @@ a.card[data-layout='teaser'],
   text-align: left;
   text-decoration: none;
   color: inherit;
+  transition: var(--motion-ui);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a.card[data-layout='teaser']:hover {
+    border-color: color-mix(
+      in srgb,
+      var(--card-visual, var(--color-primary)) 45%,
+      var(--color-card-border)
+    );
+    box-shadow: var(--elevation-2);
+  }
+}
+
+a.card[data-layout='teaser']:active {
+  transform: scale(var(--press-scale));
+  opacity: var(--press-opacity);
+}
+
+a.card[data-layout='teaser']:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a.card[data-layout='teaser'],
+  a.card[data-layout='teaser']:active {
+    transition: none;
+    transform: none;
+  }
 }
 
 app-card[data-layout='teaser'] .card-copy,
@@ -7503,9 +7558,15 @@ a.explore-card:focus-visible,
   max-width: none;
   margin: 0;
   padding: 0;
-  min-height: 100%;
+  min-height: 0;
   background-color: transparent;
   color: var(--color-text);
+}
+
+/* Cream reading surface (blog posts, long-form notes) */
+.article.module {
+  padding: var(--module-pad-lg);
+  min-height: 0;
 }
 
 .article + .article,
